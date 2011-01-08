@@ -20,7 +20,7 @@ EventReceiver::EventReceiver()
       joystick(0),
       deadZone(0.01f),
       test_kc(0),
-      keyMap()
+      keyNameMap()
 {
     OIS::ParamList pl;
     size_t windowHnd = 0;
@@ -41,17 +41,24 @@ EventReceiver::EventReceiver()
     KeyProperty kp;
     kp.primaryKeyConfig = kp.secondaryKeyConfig = 0;
     kp.continous = true;
-    keyMap["accelerate"] = kp;
-    keyMap["brake"] = kp;
-    keyMap["left"] = kp;
-    keyMap["right"] = kp;
-    keyMap["clutch"] = kp;
+    keyNameMap["accelerate"] = ACCELERATE;
+    keyMap[ACCELERATE] = kp;
+    keyNameMap["brake"] = BRAKE;
+    keyMap[BRAKE] = kp;
+    keyNameMap["left"] = LEFT;
+    keyMap[LEFT] = kp;
+    keyNameMap["right"] = RIGHT;
+    keyMap[RIGHT] = kp;
+    keyNameMap["clutch"] = CLUTCH;
+    keyMap[CLUTCH] = kp;
 
     loadKeyMapping();
 }
 
 EventReceiver::~EventReceiver()
 {
+    clearKeyMapping();
+
     if (inputManager)
     {
         inputManager->destroyInputObject(mouse);
@@ -87,15 +94,26 @@ void EventReceiver::saveKeyMapping()
 {
 }
 
+void EventReceiver::clearKeyMapping()
+{
+    for (unsigned int kn = ACCELERATE; kn < NUMBER_OF_KEYNAMES; kn++)
+    {
+        if (keyMap[kn].primaryKeyConfig)
+        {
+            delete keyMap[kn].primaryKeyConfig;
+        }
+        if (keyMap[kn].secondaryKeyConfig)
+        {
+            delete keyMap[kn].secondaryKeyConfig;
+        }
+        keyMap[kn].primaryKeyConfig = keyMap[kn].secondaryKeyConfig = 0;
+    }
+}
+
 void EventReceiver::loadKeyMapping()
 {
     // Load resource paths from config file
-    for (keyMap_t::iterator it = keyMap.begin(); it != keyMap.end(); it++)
-    {
-        delete it->second.primaryKeyConfig;
-        delete it->second.secondaryKeyConfig;
-        it->second.primaryKeyConfig = it->second.secondaryKeyConfig = 0;
-    }
+    clearKeyMapping();
 
     Ogre::ConfigFile cf;
     cf.load(keyMappingFilename);
@@ -179,10 +197,19 @@ void EventReceiver::loadKeyMapping()
                 s_to = Ogre::StringConverter::parseUnsignedInt(valueName, 0);
             }
         }
-        keyMap_t::iterator kit = keyMap.find(secName);
-        if (kit != keyMap.end())
+        keyNameMap_t::iterator kit = keyNameMap.find(secName);
+        if (kit != keyNameMap.end())
         {
-
+            KeyName kn = kit->second;
+            assert(kn < NUMBER_OF_KEYNAMES);
+            if (primary)
+            {
+                keyMap[kn].primaryKeyConfig = KeyConfig::getKeyConfig((KeyConfig::type_t)p_type, p_key, p_key2, p_from, p_to);
+            }
+            if (secondary)
+            {
+                keyMap[kn].secondaryKeyConfig = KeyConfig::getKeyConfig((KeyConfig::type_t)s_type, s_key, s_key2, s_from, s_to);
+            }
         }
     }
 }
@@ -196,6 +223,7 @@ void EventReceiver::checkEvents()
 
     const OIS::JoyStickState joystickState = joystick->getJoyStickState();
     
+    /*
     if (test_kc == 0)
     {
         test_kc = KeyConfig::getKeyConfig(keyboard, joystickState, deadZone, false);
@@ -218,7 +246,8 @@ void EventReceiver::checkEvents()
         delete test_kc;
         test_kc = 0;
     }
-    
+    */
+
     //printf("%s\n", keyboard->isKeyDown(OIS::KC_K)?"true":"false");
     /*
     printf("Axes: %lu\n", joystickState.mAxes.size());
@@ -232,5 +261,34 @@ void EventReceiver::checkEvents()
         printf("\t%u: %d, %d\n", i, joystickState.mSliders[i].abX, joystickState.mSliders[i].abY);
     }
     */
+
+    if ((keyMap[ACCELERATE].primaryKeyConfig && keyMap[ACCELERATE].primaryKeyConfig->getPercentage(keyboard, joystickState)) ||
+        (keyMap[ACCELERATE].secondaryKeyConfig && keyMap[ACCELERATE].secondaryKeyConfig->getPercentage(keyboard, joystickState))
+       )
+    {
+        dprintf(MY_DEBUG_NOTE, "accelerate pressed\n");
+    }
+
+    if ((keyMap[BRAKE].primaryKeyConfig && keyMap[BRAKE].primaryKeyConfig->getPercentage(keyboard, joystickState)) ||
+        (keyMap[BRAKE].secondaryKeyConfig && keyMap[BRAKE].secondaryKeyConfig->getPercentage(keyboard, joystickState))
+       )
+    {
+        dprintf(MY_DEBUG_NOTE, "brake pressed\n");
+    }
+
+    if ((keyMap[LEFT].primaryKeyConfig && keyMap[LEFT].primaryKeyConfig->getPercentage(keyboard, joystickState)) ||
+        (keyMap[LEFT].secondaryKeyConfig && keyMap[LEFT].secondaryKeyConfig->getPercentage(keyboard, joystickState))
+       )
+    {
+        dprintf(MY_DEBUG_NOTE, "left pressed\n");
+    }
+
+    if ((keyMap[RIGHT].primaryKeyConfig && keyMap[RIGHT].primaryKeyConfig->getPercentage(keyboard, joystickState)) ||
+        (keyMap[RIGHT].secondaryKeyConfig && keyMap[RIGHT].secondaryKeyConfig->getPercentage(keyboard, joystickState))
+       )
+    {
+        dprintf(MY_DEBUG_NOTE, "right pressed\n");
+    }
+
 }
 

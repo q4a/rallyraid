@@ -24,13 +24,23 @@ public:
     //typedef std::map<std::string, unsigned int> strToKey_t;
     //typedef std::vector<std::string> keyToStr_t;
 private:
+    enum KeyName
+    {
+        ACCELERATE = 0,
+        BRAKE,
+        LEFT,
+        RIGHT,
+        CLUTCH,
+        NUMBER_OF_KEYNAMES
+    };
     struct KeyProperty
     {
         bool            continous;
         KeyConfig*      primaryKeyConfig;
         KeyConfig*      secondaryKeyConfig;
     };
-    typedef std::map<Ogre::String, KeyProperty> keyMap_t;
+    typedef std::map<Ogre::String, KeyName> keyNameMap_t;
+    //typedef std::map<KeyName, KeyProperty> keyMap_t;
 
 private:
     static const Ogre::String keyMappingFilename;
@@ -45,6 +55,7 @@ public:
     void saveKeyMapping();
 
 private:
+    void clearKeyMapping();
     void loadKeyMapping();
 
 private:
@@ -57,7 +68,8 @@ private:
     //OIS::JoyStickState  centralJoystickState;
     float               deadZone;
     KeyConfig*          test_kc;
-    keyMap_t            keyMap;
+    keyNameMap_t        keyNameMap;
+    KeyProperty         keyMap[NUMBER_OF_KEYNAMES];
 };
 
 #endif // EVENTRECEIVER_H
