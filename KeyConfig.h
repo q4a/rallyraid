@@ -33,6 +33,7 @@ public:
 
 public:
     static KeyConfig* getKeyConfig(OIS::Keyboard* keyboard, const OIS::JoyStickState& joystickState, float deadZone, bool continous = true);
+    static KeyConfig* getKeyConfig(type_t p_type, unsigned int p_key, unsigned int p_key2, int p_from, int p_to);
     static void recalibrate(OIS::JoyStick* joystick);
 
 public:

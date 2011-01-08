@@ -156,6 +156,64 @@ KeyConfig* KeyConfig::getKeyConfig(OIS::Keyboard* keyboard, const OIS::JoyStickS
     return ret;
 }
 
+KeyConfig* KeyConfig::getKeyConfig(KeyConfig::type_t p_type, unsigned int p_key, unsigned int p_key2, int p_from, int p_to)
+{
+    switch (p_type)
+    {
+        case KeyConfig::Keyboard:
+        {
+            KeyConfigKeyboard* ret = new KeyConfigKeyboard();
+            ret->key = p_key;
+            return ret;
+            break;
+        }
+        case KeyConfig::JoystickButton:
+        {
+            KeyConfigJoystickButton* ret = new KeyConfigJoystickButton();
+            ret->key = p_key;
+            return ret;
+            break;
+        }
+        case KeyConfig::JoystickAxis:
+        {
+            KeyConfigJoystickAxis* ret = new KeyConfigJoystickAxis();
+            ret->key = p_key;
+            ret->from = p_from;
+            ret->to = p_to;
+            return ret;
+            break;
+        }
+        case KeyConfig::JoystickSliderX:
+        {
+            KeyConfigJoystickSliderX* ret = new KeyConfigJoystickSliderX();
+            ret->key = p_key;
+            ret->from = p_from;
+            ret->to = p_to;
+            return ret;
+            break;
+        }
+        case KeyConfig::JoystickSliderY:
+        {
+            KeyConfigJoystickSliderY* ret = new KeyConfigJoystickSliderY();
+            ret->key = p_key;
+            ret->from = p_from;
+            ret->to = p_to;
+            return ret;
+            break;
+        }
+        case KeyConfig::JoystickPov:
+        {
+            KeyConfigJoystickPov* ret = new KeyConfigJoystickPov();
+            ret->key = p_key;
+            ret->key2 = p_key2;
+            return ret;
+            break;
+        }
+    }
+
+    return 0;
+}
+
 void KeyConfig::recalibrate(OIS::JoyStick* joystick)
 {
     centralJoystickState = joystick->getJoyStickState();
@@ -222,7 +280,7 @@ float KeyConfigJoystickButton::getPercentage(OIS::Keyboard* keyboard, const OIS:
 
 // class KeyConfigJoystickPov : public KeyConfig
 KeyConfigJoystickPov::KeyConfigJoystickPov()
-    : KeyConfig(KeyConfig::JoystickPov)
+    : KeyConfig(KeyConfig::JoystickPov), key2((unsigned int)-1)
 {
 }
 
