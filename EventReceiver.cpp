@@ -2,6 +2,8 @@
 #include "EventReceiver.h"
 #include "TheGame.h"
 #include "KeyConfig.h"
+#include "ConfigFile.h"
+#include "StringConverter.h"
 
 #include "stdafx.h"
 
@@ -11,7 +13,7 @@
 #include <OISMouse.h>
 #include <OISJoyStick.h>
 
-const Ogre::String EventReceiver::keyMappingFilename = "data/Dakar2012_keymapping.cfg";
+const std::string EventReceiver::keyMappingFilename = "data/Dakar2012_keymapping.cfg";
 
 EventReceiver::EventReceiver()
     : inputManager(0),
@@ -22,15 +24,7 @@ EventReceiver::EventReceiver()
       test_kc(0),
       keyNameMap()
 {
-    OIS::ParamList pl;
-    size_t windowHnd = 0;
-    std::ostringstream windowHndStr;
-
-    TheGame::getInstance()->getWindow()->getCustomAttribute("WINDOW", &windowHnd);
-    windowHndStr << windowHnd;
-    pl.insert(std::make_pair(std::string("WINDOW"), windowHndStr.str()));
-
-    inputManager = OIS::InputManager::createInputSystem(pl);
+    inputManager = OIS::InputManager::createInputSystem(TheGame::getInstance()->getWindowId());
 
     keyboard = static_cast<OIS::Keyboard*>(inputManager->createInputObject(OIS::OISKeyboard, false));
     mouse = static_cast<OIS::Mouse*>(inputManager->createInputObject(OIS::OISMouse, false));
@@ -115,14 +109,14 @@ void EventReceiver::loadKeyMapping()
     // Load resource paths from config file
     clearKeyMapping();
 
-    Ogre::ConfigFile cf;
+    ConfigFile cf;
     cf.load(keyMappingFilename);
 
     dprintf(MY_DEBUG_NOTE, "Read keymapping file:\n");
     // Go through all sections & settings in the file
-    Ogre::ConfigFile::SectionIterator seci = cf.getSectionIterator();
+    ConfigFile::SectionIterator seci = cf.getSectionIterator();
 
-    Ogre::String secName, keyName, valueName;
+    std::string secName, keyName, valueName;
     while (seci.hasMoreElements())
     {
         bool primary = false;
@@ -140,8 +134,8 @@ void EventReceiver::loadKeyMapping()
 
         secName = seci.peekNextKey();
         dprintf(MY_DEBUG_NOTE, "\tKey: %s\n", secName.c_str());
-        Ogre::ConfigFile::SettingsMultiMap *settings = seci.getNext();
-        for (Ogre::ConfigFile::SettingsMultiMap::iterator i = settings->begin(); i != settings->end(); ++i)
+        ConfigFile::SettingsMultiMap *settings = seci.getNext();
+        for (ConfigFile::SettingsMultiMap::iterator i = settings->begin(); i != settings->end(); ++i)
         {
             keyName = i->first;
             valueName = i->second;
@@ -149,52 +143,52 @@ void EventReceiver::loadKeyMapping()
             if (keyName == "primary_type")
             {
                 primary = true;
-                p_type = Ogre::StringConverter::parseUnsignedInt(valueName, 0);
+                p_type = StringConverter::parseUnsignedInt(valueName, 0);
             } else
             if (keyName == "secondary_type")
             {
                 secondary = true;
-                s_type = Ogre::StringConverter::parseUnsignedInt(valueName, 0);
+                s_type = StringConverter::parseUnsignedInt(valueName, 0);
             } else
             if (keyName == "primary_key")
             {
                 primary = true;
-                p_key = Ogre::StringConverter::parseUnsignedInt(valueName, (unsigned int)-1);
+                p_key = StringConverter::parseUnsignedInt(valueName, (unsigned int)-1);
             } else
             if (keyName == "secondary_key")
             {
                 secondary = true;
-                s_key = Ogre::StringConverter::parseUnsignedInt(valueName, (unsigned int)-1);
+                s_key = StringConverter::parseUnsignedInt(valueName, (unsigned int)-1);
             } else
             if (keyName == "primary_key2")
             {
                 primary = true;
-                p_key2 = Ogre::StringConverter::parseUnsignedInt(valueName, (unsigned int)-1);
+                p_key2 = StringConverter::parseUnsignedInt(valueName, (unsigned int)-1);
             } else
             if (keyName == "secondary_key2")
             {
                 secondary = true;
-                s_key2 = Ogre::StringConverter::parseUnsignedInt(valueName, (unsigned int)-1);
+                s_key2 = StringConverter::parseUnsignedInt(valueName, (unsigned int)-1);
             } else
             if (keyName == "primary_from")
             {
                 primary = true;
-                p_from = Ogre::StringConverter::parseUnsignedInt(valueName, 0);
+                p_from = StringConverter::parseInt(valueName, 0);
             } else
             if (keyName == "secondary_from")
             {
                 secondary = true;
-                s_from = Ogre::StringConverter::parseUnsignedInt(valueName, 0);
+                s_from = StringConverter::parseInt(valueName, 0);
             } else
             if (keyName == "primary_to")
             {
                 primary = true;
-                p_to = Ogre::StringConverter::parseUnsignedInt(valueName, 0);
+                p_to = StringConverter::parseInt(valueName, 0);
             } else
             if (keyName == "secondary_to")
             {
                 secondary = true;
-                s_to = Ogre::StringConverter::parseUnsignedInt(valueName, 0);
+                s_to = StringConverter::parseInt(valueName, 0);
             }
         }
         keyNameMap_t::iterator kit = keyNameMap.find(secName);

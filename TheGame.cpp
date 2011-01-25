@@ -2,6 +2,7 @@
 #include "TheGame.h"
 #include "stdafx.h"
 #include "EventReceiver.h"
+#include "ConfigFile.h"
 
 // static stuff
 TheGame* TheGame::theGame = 0;
@@ -30,56 +31,32 @@ void TheGame::destroy()
 
 // non-static stuff    
 TheGame::TheGame()
-    : root(0), window(0), smgr(0), camera(0),
+    : device(0), driver(0), smgr(0), camera(0),
       eventReceiver(0),
       terminate(true)
 {
     dprintf(MY_DEBUG_INFO, "TheGame::TheGame(): this: %p\n", this);
     theGame = this;
 
-    const Ogre::String pluginFileName = "data/Dakar2012_plugin.cfg";
-    const Ogre::String configFileName = "data/Dakar2012.cfg";
-    const Ogre::String logFileName = "log/Dakar2012.log";
 
-    root = new Ogre::Root(pluginFileName, configFileName, logFileName);
+    irr::SIrrlichtCreationParameters params;
+    
+    readSettings(params);
 
-    if (!root->restoreConfig())
+    device = irr::createDeviceEx(params);
+
+    windowId = (size_t)params.WindowId;
+    eventReceiver = new EventReceiver();
+
+    if (device)
     {
-        dprintf(MY_DEBUG_WARNING, "No default config file found! Show configuration window!\n");
-        if (root->showConfigDialog())
-        {
-            terminate = false;
-        }
-        else
-        {
-            dprintf(MY_DEBUG_ERROR, "User canceled the configuration window. Program will exit\n");
-        }
+         dprintf(MY_DEBUG_ERROR, "unable to create device\n");
+         terminate = true;
     }
     else
     {
         terminate = false;
-    }
-
-    if (!terminate)
-    {
-        setupResources();
-        window = root->initialise(true, "Dakar 2012 Game");
-        smgr = root->createSceneManager(Ogre::ST_GENERIC);
-        camera = smgr->createCamera("DefaultCam");
-        camera->setNearClipDistance(0.5);
-        // no use for stencil shadow: camera->setFarClipDistance(12500.0);
-
-        Ogre::Viewport* vp = window->addViewport(camera);
-        vp->setBackgroundColour(Ogre::ColourValue(0.3f, 0.3f, 0.3f));
-        camera->setAspectRatio(Ogre::Real(vp->getActualWidth()) / Ogre::Real(vp->getActualHeight()));
-
-        Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
-
-        eventReceiver = new EventReceiver();
-        windowResized(window);
-
-        Ogre::WindowEventUtilities::addWindowEventListener(window, this);
-        root->addFrameListener(this);
+        // TODO: here
     }
 }
 
@@ -87,50 +64,53 @@ TheGame::~TheGame()
 {
     dprintf(MY_DEBUG_IMPINFO, "TheGame::~TheGame(): this: %p\n", this);
 
-    Ogre::WindowEventUtilities::addWindowEventListener(window, this);
-
     if (eventReceiver)
     {
         delete eventReceiver;
         eventReceiver = 0;
     }
 
-    window = 0;
+    windowId = 0;
     smgr = 0;
     camera = 0;
 
-    if (root)
+    if (driver)
     {
-        delete root;
-        root = 0;
+        driver->removeAllTextures();
+        driver->removeAllHardwareBuffers();
+        driver = 0;
+    }
+    if (device)
+    {
+        device->drop();
+        device = 0;
     }
 
 }
 
-void TheGame::setupResources()
+void TheGame::readSettings(irr::SIrrlichtCreationParameters& params)
 {
+
     // Load resource paths from config file
-    Ogre::ConfigFile cf;
+    ConfigFile cf;
     cf.load("data/Dakar2012_resources.cfg");
 
     dprintf(MY_DEBUG_NOTE, "Read resource file:\n");
     // Go through all sections & settings in the file
-    Ogre::ConfigFile::SectionIterator seci = cf.getSectionIterator();
+    ConfigFile::SectionIterator seci = cf.getSectionIterator();
 
-    Ogre::String secName, typeName, archName;
+    std::string secName, typeName, archName;
     while (seci.hasMoreElements())
     {
         secName = seci.peekNextKey();
         dprintf(MY_DEBUG_NOTE, "\tKey: %s\n", secName.c_str());
-        Ogre::ConfigFile::SettingsMultiMap *settings = seci.getNext();
-        Ogre::ConfigFile::SettingsMultiMap::iterator i;
+        ConfigFile::SettingsMultiMap *settings = seci.getNext();
+        ConfigFile::SettingsMultiMap::iterator i;
         for (i = settings->begin(); i != settings->end(); ++i)
         {
             typeName = i->first;
             archName = i->second;
             dprintf(MY_DEBUG_NOTE, "\t\ttype: %s, arch: %s\n", typeName.c_str(), archName.c_str());
-            Ogre::ResourceGroupManager::getSingleton().addResourceLocation(
-                archName, typeName, secName);
         }
     }
 }

@@ -5,7 +5,7 @@
 #include <OISKeyboard.h>
 #include <OISJoyStick.h>
 
-#include <OgreMath.h>
+#include <math.h>
 #include <assert.h>
 
 OIS::JoyStickState KeyConfig::centralJoystickState;
@@ -65,11 +65,11 @@ KeyConfig* KeyConfig::getKeyConfig(OIS::Keyboard* keyboard, const OIS::JoyStickS
 
     for (unsigned int i = 0; i < joystickState.mAxes.size(); i++)
     {
-        if (Ogre::Math::IAbs(centralJoystickState.mAxes[i].abs - joystickState.mAxes[i].abs) > 10000)
+        if (abs(centralJoystickState.mAxes[i].abs - joystickState.mAxes[i].abs) > 10000)
         {
             if (joystickState.mAxes[i].abs == OIS::JoyStick::MIN_AXIS ||
                 joystickState.mAxes[i].abs == OIS::JoyStick::MAX_AXIS ||
-                Ogre::Math::IAbs(centralJoystickState.mAxes[i].abs - joystickState.mAxes[i].abs) > 20000)
+                abs(centralJoystickState.mAxes[i].abs - joystickState.mAxes[i].abs) > 20000)
             {
                 dprintf(MY_DEBUG_INFO, "joystick state has been changed, but recalibrate: axes[%u]: %d -> %d\n", i,
                     centralJoystickState.mAxes[i].abs, joystickState.mAxes[i].abs);
@@ -95,11 +95,11 @@ KeyConfig* KeyConfig::getKeyConfig(OIS::Keyboard* keyboard, const OIS::JoyStickS
 
     for (unsigned int i = 0; i < 4; i++)
     {
-        if (Ogre::Math::IAbs(centralJoystickState.mSliders[i].abX - joystickState.mSliders[i].abX) > 10000)
+        if (abs(centralJoystickState.mSliders[i].abX - joystickState.mSliders[i].abX) > 10000)
         {
             if (joystickState.mSliders[i].abX == OIS::JoyStick::MIN_AXIS ||
                 joystickState.mSliders[i].abX == OIS::JoyStick::MAX_AXIS ||
-                Ogre::Math::IAbs(centralJoystickState.mSliders[i].abX - joystickState.mSliders[i].abX) > 20000)
+                abs(centralJoystickState.mSliders[i].abX - joystickState.mSliders[i].abX) > 20000)
             {
                 dprintf(MY_DEBUG_INFO, "joystick state has been changed, but recalibrate: slider[%u] x: %d -> %d\n", i,
                     centralJoystickState.mSliders[i].abY, joystickState.mSliders[i].abY);
@@ -125,11 +125,11 @@ KeyConfig* KeyConfig::getKeyConfig(OIS::Keyboard* keyboard, const OIS::JoyStickS
 
     for (unsigned int i = 0; i < 4; i++)
     {
-        if (Ogre::Math::IAbs(centralJoystickState.mSliders[i].abY - joystickState.mSliders[i].abY) > 10000)
+        if (abs(centralJoystickState.mSliders[i].abY - joystickState.mSliders[i].abY) > 10000)
         {
             if (joystickState.mSliders[i].abY == OIS::JoyStick::MIN_AXIS ||
                 joystickState.mSliders[i].abY == OIS::JoyStick::MAX_AXIS ||
-                Ogre::Math::IAbs(centralJoystickState.mSliders[i].abY - joystickState.mSliders[i].abY) > 20000)
+                abs(centralJoystickState.mSliders[i].abY - joystickState.mSliders[i].abY) > 20000)
             {
                 dprintf(MY_DEBUG_INFO, "joystick state has been changed, but recalibrate: slider[%u] y: %d -> %d\n", i,
                     centralJoystickState.mSliders[i].abY, joystickState.mSliders[i].abY);
@@ -325,7 +325,11 @@ float KeyConfigJoystickAxis::getPercentage(int state)
         min = 0;
     }*/
 
-    state = Ogre::Math::Clamp(state, min, max);
+    if (state < min)
+        state = min;
+    else
+        if (state > max)
+            state = max;
     
     if (to > from)
     {

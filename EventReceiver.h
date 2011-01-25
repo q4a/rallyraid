@@ -6,7 +6,6 @@
 #include <vector>
 #include <string>
 #include <utility>
-#include <OgreString.h>
 
 namespace OIS
 {
@@ -39,11 +38,11 @@ private:
         KeyConfig*      primaryKeyConfig;
         KeyConfig*      secondaryKeyConfig;
     };
-    typedef std::map<Ogre::String, KeyName> keyNameMap_t;
+    typedef std::map<std::string, KeyName> keyNameMap_t;
     //typedef std::map<KeyName, KeyProperty> keyMap_t;
 
 private:
-    static const Ogre::String keyMappingFilename;
+    static const std::string keyMappingFilename;
 
 public:
     EventReceiver();

@@ -1,19 +1,11 @@
 #ifndef THEGAME_H
 #define THEGAME_H
 
-#include <OgreFrameListener.h>
-#include <OgreWindowEventUtilities.h>
+#include "stdafx.h"
 
-namespace Ogre
-{
-    class Root;
-    class RenderWindow;
-    class SceneManager;
-    class Camera;
-}
 class EventReceiver;
 
-class TheGame : public Ogre::FrameListener, public Ogre::WindowEventListener
+class TheGame
 {
 public:
     static TheGame* getInstance();
@@ -22,64 +14,60 @@ public:
 public:
     void loop();
 
-    Ogre::Root*         getRoot();
-    Ogre::RenderWindow* getWindow();
-    Ogre::SceneManager* getSceneManager();
-    Ogre::Camera*       getCamera();
+    irr::IrrlichtDevice*            getDevice();
+    irr::video::IVideoDriver*       getDriver();
+    irr::scene::ISceneManager*      getSmgr();
+    irr::scene::ICameraSceneNode*   getCamera();
+    size_t                          getWindowId();
 
 private:
     TheGame();
     ~TheGame();
 
 protected:
-    // Ogre::WindowEventListener
-    //Adjust mouse clipping area
-    virtual void windowResized(Ogre::RenderWindow* rw);
-    //Unattach OIS before window shutdown (very important under Linux)
-    virtual bool windowClosing(Ogre::RenderWindow* rw);
-    virtual void windowClosed(Ogre::RenderWindow* rw);
-    virtual void windowFocusChange(Ogre::RenderWindow *rw);
-
-    // Ogre::FrameRenderListener
-    virtual bool frameStarted(const Ogre::FrameEvent &evt);
-    virtual bool frameRenderingQueued(const Ogre::FrameEvent &evt);
-    //virtual bool 	frameEnded (const FrameEvent &evt)
 
 private:
-    static TheGame*     theGame;
+    static TheGame*                 theGame;
 
-    void setupResources();
+    void readSettings(irr::SIrrlichtCreationParameters& params);
 
 private:
     // members
-    Ogre::Root*             root;
-    Ogre::RenderWindow*     window;
-    Ogre::SceneManager*     smgr;
-    Ogre::Camera*           camera;
+    irr::IrrlichtDevice*            device;
+    irr::video::IVideoDriver*       driver;
+    irr::scene::ISceneManager*      smgr;
+    irr::scene::ICameraSceneNode*   camera;
 
-    EventReceiver*          eventReceiver;
 
-    bool                    terminate;
+    EventReceiver*                  eventReceiver;
+
+    bool                            terminate;
+    size_t                          windowId;
 };
 
-inline Ogre::Root* TheGame::getRoot()
+inline irr::IrrlichtDevice* TheGame::getDevice()
 {
-    return root;
+    return device;
 }
 
-inline Ogre::RenderWindow* TheGame::getWindow()
+inline irr::video::IVideoDriver* TheGame::getDriver()
 {
-    return window;
+    return driver;
 }
 
-inline Ogre::SceneManager* TheGame::getSceneManager()
+inline irr::scene::ISceneManager* TheGame::getSmgr()
 {
     return smgr;
 }
 
-inline Ogre::Camera* TheGame::getCamera()
+inline irr::scene::ICameraSceneNode* TheGame::getCamera()
 {
     return camera;
+}
+
+inline size_t TheGame::getWindowId()
+{
+    return windowId;
 }
 
 #endif // THEGAME_H

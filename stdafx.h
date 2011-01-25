@@ -12,16 +12,7 @@
 #include <stdio.h>
 #include <assert.h>
 //#include <tchar.h>
-#include <OgreRoot.h>
-#include <OgreRenderWindow.h>
-#include <OgreSceneManager.h>
-#include <OgreSceneNode.h>
-#include <OgreEntity.h>
-#include <OgreMeshManager.h>
-#include <OgreResourceManager.h>
-#include <OgreConfigFile.h>
-#include <OgreLight.h>
-#include <OgreMath.h>
+#include <irrlicht.h>
 
 #define MY_DEBUG_SERROR  0
 #define MY_DEBUG_ERROR   1
