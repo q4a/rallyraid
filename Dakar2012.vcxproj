@@ -52,13 +52,13 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>MY_DEBUG;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\hk2010_1_0_r1\Source;..\dx_stuff\include;..\freealut-1.1.0-bin\include;..\openal11sdk\include;..\ogre\Dependencies\include\OIS;..\irrlicht-svn-vs\source\Irrlicht;..\irrlicht-svn-vs\include;..\Cg30\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\hk2010_1_0_r1\Source;..\dx_stuff\include;..\freealut-1.1.0-bin\include;..\openal11sdk\include;..\ogre\Dependencies\include\OIS;..\irrlicht-svn-patch4\source\Irrlicht;..\irrlicht-svn-patch4\include;..\Cg30\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>..\hk2010_1_0_r1\Lib\win32_net_9-0\$(Configuration)_multithreaded_dll;..\openal11sdk\libs\Win32;..\freealut-1.1.0-bin\lib;..\irrlicht-svn-vs\lib\Win32-visualstudio;..\Cg30\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>OgreMain_d.lib;OgreRTShaderSystem_d.lib;OIS_d.lib;OgreTerrain_d.lib;OgrePaging_d.lib;freetype2311_d.lib;FreeImaged.lib;zziplibd.lib;zlibd.lib;libboost_thread-vc100-mt-gd-1_45.lib;libboost_date_time-vc100-mt-gd-1_45.lib;alut.lib;OpenAl32.lib;hkBase.lib;hkSerialize.lib;hkSceneData.lib;hkInternal.lib;hkGeometryUtilities.lib;hkVisualize.lib;hkCompat.lib;hkpCollide.lib;hkpConstraintSolver.lib;hkpDynamics.lib;hkpInternal.lib;hkpUtilities.lib;hkpVehicle.lib;hkaAnimation.lib;hkaInternal.lib;hkaRagdoll.lib;hkgBridge.lib;hkgCommon.lib;hkgDx9.lib;hkgDx9s.lib;hkgDx10.lib;hkgOgl.lib;hkgOgls.lib;hksCommon.lib;hksXAudio2.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\ogre\Dependencies\lib\$(Configuration);..\hk2010_1_0_r1\Lib\win32_net_9-0\$(Configuration)_multithreaded_dll;..\openal11sdk\libs\Win32;..\freealut-1.1.0-bin\lib;..\irrlicht-svn-patch4\lib\Win32-visualstudio;..\Cg30\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>Irrlicht.lib;cg.lib;cgD3D9.lib;cgGL.lib;opengl32.lib;OIS_d.lib;alut.lib;OpenAl32.lib;hkBase.lib;hkSerialize.lib;hkSceneData.lib;hkInternal.lib;hkGeometryUtilities.lib;hkVisualize.lib;hkCompat.lib;hkpCollide.lib;hkpConstraintSolver.lib;hkpDynamics.lib;hkpInternal.lib;hkpUtilities.lib;hkpVehicle.lib;hkaAnimation.lib;hkaInternal.lib;hkaRagdoll.lib;hkgBridge.lib;hkgCommon.lib;hkgDx9.lib;hkgDx9s.lib;hkgDx10.lib;hkgOgl.lib;hkgOgls.lib;hksCommon.lib;hksXAudio2.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -70,31 +70,38 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\hk2010_1_0_r1\Source;..\dx_stuff\include;..\freealut-1.1.0-bin\include;..\openal11sdk\include;..\ogre\Dependencies\include\OIS;..\irrlicht-svn-vs\source\Irrlicht;..\irrlicht-svn-vs\include;..\Cg30\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\hk2010_1_0_r1\Source;..\dx_stuff\include;..\freealut-1.1.0-bin\include;..\openal11sdk\include;..\ogre\Dependencies\include\OIS;..\irrlicht-svn-patch4\source\Irrlicht;..\irrlicht-svn-patch4\include;..\Cg30\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>..\hk2010_1_0_r1\Lib\win32_net_9-0\$(Configuration)_multithreaded_dll;..\openal11sdk\libs\Win32;..\freealut-1.1.0-bin\lib;..\irrlicht-svn-vs\lib\Win32-visualstudio;..\Cg30\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>libboost_thread-vc100-mt-gd-1_45.lib;libboost_date_time-vc100-mt-gd-1_45.lib;alut.lib;OpenAl32.lib;hkBase.lib;hkSerialize.lib;hkSceneData.lib;hkInternal.lib;hkGeometryUtilities.lib;hkVisualize.lib;hkCompat.lib;hkpCollide.lib;hkpConstraintSolver.lib;hkpDynamics.lib;hkpInternal.lib;hkpUtilities.lib;hkpVehicle.lib;hkaAnimation.lib;hkaInternal.lib;hkaRagdoll.lib;hkgBridge.lib;hkgCommon.lib;hkgDx9.lib;hkgDx9s.lib;hkgDx10.lib;hkgOgl.lib;hkgOgls.lib;hksCommon.lib;hksXAudio2.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\ogre\Dependencies\lib\$(Configuration);..\hk2010_1_0_r1\Lib\win32_net_9-0\$(Configuration)_multithreaded_dll;..\openal11sdk\libs\Win32;..\freealut-1.1.0-bin\lib;..\irrlicht-svn-patch4\lib\Win32-visualstudio;..\Cg30\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>Irrlicht.lib;cg.lib;cgD3D9.lib;cgGL.lib;opengl32.lib;alut.lib;OpenAl32.lib;OIS.lib;hkBase.lib;hkSerialize.lib;hkSceneData.lib;hkInternal.lib;hkGeometryUtilities.lib;hkVisualize.lib;hkCompat.lib;hkpCollide.lib;hkpConstraintSolver.lib;hkpDynamics.lib;hkpInternal.lib;hkpUtilities.lib;hkpVehicle.lib;hkaAnimation.lib;hkaInternal.lib;hkaRagdoll.lib;hkgBridge.lib;hkgCommon.lib;hkgDx9.lib;hkgDx9s.lib;hkgDx10.lib;hkgOgl.lib;hkgOgls.lib;hksCommon.lib;hksXAudio2.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ConfigFile.h" />
     <ClInclude Include="EventReceiver.h" />
+    <ClInclude Include="IteratorWrapper.h" />
     <ClInclude Include="KeyConfig.h" />
+    <ClInclude Include="ScreenQuad.h" />
+    <ClInclude Include="Settings.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="StringConverter.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="TheGame.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ConfigFile.cpp" />
     <ClCompile Include="Dakar2012.cpp" />
     <ClCompile Include="EventReceiver.cpp" />
     <ClCompile Include="KeyConfig.cpp" />
+    <ClCompile Include="Settings.cpp" />
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="TheGame.cpp" />
   </ItemGroup>

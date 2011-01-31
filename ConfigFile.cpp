@@ -34,13 +34,13 @@ void ConfigFile::load(const std::string& filename, const std::string& separators
 }
 //-----------------------------------------------------------------------
 void ConfigFile::loadDirect(const std::string& filename, const std::string& separators, 
-	bool trimWhitespace)
+    bool trimWhitespace)
 {
-	/* Open the configuration file */
-	std::ifstream fp;
+    /* Open the configuration file */
+    std::ifstream fp;
     // Always open in binary mode
-	fp.open(filename.c_str(), std::ios::in | std::ios::binary);
-	if(!fp)
+    fp.open(filename.c_str(), std::ios::in | std::ios::binary);
+    if(!fp)
     {
         dprintf(MY_DEBUG_ERROR, "ConfigFile::loadDirect(): error loading file: %s\n", filename.c_str());
         return;
@@ -50,7 +50,7 @@ void ConfigFile::loadDirect(const std::string& filename, const std::string& sepa
 
 }
 //-----------------------------------------------------------------------
-void ConfigFile::load(std::ifstream& stream, const std::string& separators = "\t:=", bool trimWhitespace = true)
+void ConfigFile::load(std::ifstream& stream, const std::string& separators, bool trimWhitespace)
 {
     /* Clear current settings map */
     clear();
@@ -67,6 +67,7 @@ void ConfigFile::load(std::ifstream& stream, const std::string& separators = "\t
     {
         stream.getline(buffer, 2048);
         line = buffer;
+        trim(line);
         /* Ignore comments & blanks */
         if (line.length() > 0 && line.at(0) != '#' && line.at(0) != '@')
         {
@@ -74,21 +75,21 @@ void ConfigFile::load(std::ifstream& stream, const std::string& separators = "\t
             {
                 // Section
                 currentSection = line.substr(1, line.length() - 2);
-				SettingsBySection::const_iterator seci = mSettings.find(currentSection);
-				if (seci == mSettings.end())
-				{
-					currentSettings = new SettingsMultiMap();
-					mSettings[currentSection] = currentSettings;
-				}
-				else
-				{
-					currentSettings = seci->second;
-				} 
+                SettingsBySection::const_iterator seci = mSettings.find(currentSection);
+                if (seci == mSettings.end())
+                {
+                    currentSettings = new SettingsMultiMap();
+                    mSettings[currentSection] = currentSettings;
+                }
+                else
+                {
+                    currentSettings = seci->second;
+                } 
             }
             else
             {
                 /* Find the first seperator character and split the string there */
-				std::string::size_type separator_pos = line.find_first_of(separators, 0);
+                std::string::size_type separator_pos = line.find_first_of(separators, 0);
                 if (separator_pos != std::string::npos)
                 {
                     optName = line.substr(0, separator_pos);
@@ -135,7 +136,8 @@ ConfigFile::SettingsIterator ConfigFile::getSettingsIterator(const std::string& 
     SettingsBySection::const_iterator seci = mSettings.find(section);
     if (seci == mSettings.end())
     {
-        assert(0, "Cannot find section ");
+        assert(0 && "Cannot find section");
+        return SettingsIterator(seci->second->begin(), seci->second->end());
     }
     else
     {
@@ -178,4 +180,4 @@ void ConfigFile::trim(std::string& str, bool left, bool right)
         str.erase(str.find_last_not_of(delims)+1); // trim right
     if(left)
         str.erase(0, str.find_first_not_of(delims)); // trim left
-} 
+}

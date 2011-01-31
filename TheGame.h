@@ -19,6 +19,10 @@ public:
     irr::scene::ISceneManager*      getSmgr();
     irr::scene::ICameraSceneNode*   getCamera();
     size_t                          getWindowId();
+    irr::gui::IGUIEnvironment*      getEnv();
+    const irr::core::dimension2du&  getScreenSize();
+    unsigned int                    getTick();
+    void                            switchCamera();
 
 private:
     TheGame();
@@ -37,12 +41,18 @@ private:
     irr::video::IVideoDriver*       driver;
     irr::scene::ISceneManager*      smgr;
     irr::scene::ICameraSceneNode*   camera;
-
+    irr::scene::ICameraSceneNode*   fix_camera;
+    irr::scene::ICameraSceneNode*   fps_camera;
+    irr::gui::IGUIEnvironment*      env;
 
     EventReceiver*                  eventReceiver;
 
     bool                            terminate;
     size_t                          windowId;
+    irr::core::dimension2du         lastScreenSize;
+    unsigned int                    failed_render;
+    unsigned int                    tick;
+    unsigned int                    last_tick;
 };
 
 inline irr::IrrlichtDevice* TheGame::getDevice()
@@ -68,6 +78,21 @@ inline irr::scene::ICameraSceneNode* TheGame::getCamera()
 inline size_t TheGame::getWindowId()
 {
     return windowId;
+}
+
+inline irr::gui::IGUIEnvironment* TheGame::getEnv()
+{
+    return env;
+}
+
+inline const irr::core::dimension2du& TheGame::getScreenSize()
+{
+    return driver->getScreenSize();
+}
+
+inline unsigned int TheGame::getTick()
+{
+    return tick;
 }
 
 #endif // THEGAME_H

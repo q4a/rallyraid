@@ -2,7 +2,7 @@
 #include "TheGame.h"
 #include "stdafx.h"
 #include "EventReceiver.h"
-#include "ConfigFile.h"
+#include "Settings.h"
 
 // static stuff
 TheGame* TheGame::theGame = 0;
@@ -31,24 +31,28 @@ void TheGame::destroy()
 
 // non-static stuff    
 TheGame::TheGame()
-    : device(0), driver(0), smgr(0), camera(0),
+    : device(0), driver(0), smgr(0), camera(0), fix_camera(0), fps_camera(0),
+      env(0),
       eventReceiver(0),
-      terminate(true)
+      terminate(true),
+      windowId(0),
+      lastScreenSize(),
+      failed_render(0),
+      tick(0)
 {
     dprintf(MY_DEBUG_INFO, "TheGame::TheGame(): this: %p\n", this);
     theGame = this;
 
-
     irr::SIrrlichtCreationParameters params;
-    
+    params.DriverType = irr::video::EDT_DIRECT3D9;
+
     readSettings(params);
 
     device = irr::createDeviceEx(params);
 
     windowId = (size_t)params.WindowId;
-    eventReceiver = new EventReceiver();
 
-    if (device)
+    if (device==0)
     {
          dprintf(MY_DEBUG_ERROR, "unable to create device\n");
          terminate = true;
@@ -56,7 +60,19 @@ TheGame::TheGame()
     else
     {
         terminate = false;
-        // TODO: here
+
+        device->setWindowCaption(L"Dakar 2012");
+
+        driver = device->getVideoDriver();
+        smgr = device->getSceneManager();
+        env = device->getGUIEnvironment();
+        fix_camera = smgr->addCameraSceneNode();
+        fps_camera = smgr->addCameraSceneNodeFPS(0, 100.f, 0.5f);
+        camera = fps_camera;
+        smgr->setActiveCamera(camera);
+        lastScreenSize = getScreenSize();
+
+        eventReceiver = new EventReceiver();
     }
 }
 
@@ -72,7 +88,7 @@ TheGame::~TheGame()
 
     windowId = 0;
     smgr = 0;
-    camera = 0;
+    fps_camera = fix_camera = camera = 0;
 
     if (driver)
     {
@@ -85,34 +101,12 @@ TheGame::~TheGame()
         device->drop();
         device = 0;
     }
-
+    Settings::destroy();
 }
 
 void TheGame::readSettings(irr::SIrrlichtCreationParameters& params)
 {
-
-    // Load resource paths from config file
-    ConfigFile cf;
-    cf.load("data/Dakar2012_resources.cfg");
-
-    dprintf(MY_DEBUG_NOTE, "Read resource file:\n");
-    // Go through all sections & settings in the file
-    ConfigFile::SectionIterator seci = cf.getSectionIterator();
-
-    std::string secName, typeName, archName;
-    while (seci.hasMoreElements())
-    {
-        secName = seci.peekNextKey();
-        dprintf(MY_DEBUG_NOTE, "\tKey: %s\n", secName.c_str());
-        ConfigFile::SettingsMultiMap *settings = seci.getNext();
-        ConfigFile::SettingsMultiMap::iterator i;
-        for (i = settings->begin(); i != settings->end(); ++i)
-        {
-            typeName = i->first;
-            archName = i->second;
-            dprintf(MY_DEBUG_NOTE, "\t\ttype: %s, arch: %s\n", typeName.c_str(), archName.c_str());
-        }
-    }
+    Settings::getInstance()->read();
 }
 
 void TheGame::loop()
@@ -126,119 +120,89 @@ void TheGame::loop()
     }
 
     /* test */
-    camera->setPosition(0, 10, 20);
-    camera->lookAt(0, 2, 0);
+    camera->setPosition(irr::core::vector3df(0.f, 10.f, 20.f));
+    camera->setTarget(irr::core::vector3df(0.f, 2.f, 0.f));
 
-    smgr->setAmbientLight(Ogre::ColourValue(0.3f, 0.3f, 0.3f));
-    smgr->setShadowTechnique(/*Ogre::SHADOWTYPE_STENCIL_ADDITIVE*//*Ogre::SHADOWTYPE_STENCIL_MODULATIVE*/Ogre::SHADOWTYPE_TEXTURE_MODULATIVE);
-    smgr->setShadowTextureSize(2048);
-    smgr->setShadowColour(Ogre::ColourValue(0.2f, 0.2f, 0.2f));
+    smgr->setAmbientLight(irr::video::SColorf(0.3f, 0.3f, 0.3f));
+    smgr->setShadowColor(irr::video::SColor(255, 50, 50, 50));
 
-    Ogre::Entity* ent = smgr->createEntity("data/objects/meshes/vw3.mesh");
-    ent->setMaterialName("car/vw3");
-    ent->setCastShadows(true);
-    Ogre::SceneNode* node = smgr->getRootSceneNode()->createChildSceneNode();
-    node->attachObject(ent);
-    //node->yaw(Ogre::Degree(45));
-
-    Ogre::Plane plane(Ogre::Vector3::UNIT_Y, 0);
-    Ogre::MeshManager::getSingleton().createPlane("ground",
-        Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
-        plane, 1500, 1500, 20, 20, true, 1, 5, 5, Ogre::Vector3::UNIT_Z);
-    Ogre::Entity* entG = smgr->createEntity("valami", "ground");
-    smgr->getRootSceneNode()->createChildSceneNode()->attachObject(entG);
-    entG->setMaterialName("test/rockwall");
-    entG->setCastShadows(false);
-
-    //node->yaw(Ogre::Degree(45), Ogre::Node::TS_WORLD);
-    //node->setOrientation(1, 0, Ogre::Math::HALF_PI/*Ogre::Degree(90).valueRadians()*/, 0);
-    //Ogre::Quaternion myq = node->getOrientation();
-    //printf("w: %f, x: %f, y: %f, z: %f\n", myq.w, myq.x, myq.y, myq.z);
-    //exit(0);
-
+    /*
     Ogre::Light* dLight = smgr->createLight("dLight");
     dLight->setType(Ogre::Light::LT_DIRECTIONAL);
     dLight->setDiffuseColour(Ogre::ColourValue(0.9f, 0.9f, 0.9f));
     dLight->setSpecularColour(Ogre::ColourValue(0.4f, 0.4f, 0.4f));
     dLight->setDirection(0, -1, 1);
+    */
+    device->run();
+    last_tick = tick = device->getTimer()->getTime();
 
-    camera->yaw(Ogre::Degree(30));
-    /* end test */
+    while (device->run() && !terminate)
+    {
+        if (device->isWindowActive())
+        {
+            tick = device->getTimer()->getTime();
 
-    root->startRendering();
+            // -------------------------------
+            //         update events
+            // -------------------------------
+            if (eventReceiver)
+            {
+                eventReceiver->checkEvents();
+            }
+            /*
+            if (eventReceiver)
+            {
+                eventReceiver->updateWindow(width, height);
+            }
+            */
+
+            // -------------------------------
+            //         update physics
+            // -------------------------------
+
+            // -------------------------------
+            //         update graphics
+            // -------------------------------
+            if (!driver->beginScene(true, true, irr::video::SColor(0,192,192,192)))
+            {
+                driver->endScene();
+                driver->OnResize(lastScreenSize);
+                failed_render++;
+                if (failed_render > 5)
+                {
+                    dprintf(MY_DEBUG_ERROR, "failed to render 5 times, quit\n");
+                    terminate = true;
+                }
+                continue;
+            }
+            failed_render = 0;
+
+            driver->setRenderTarget(0, true, true, irr::video::SColor(0, 0, 0, 255));
+            smgr->drawAll();
+            env->drawAll();
+
+            driver->endScene();
+
+            int fps = driver->getFPS();
+
+            last_tick = tick;
+        } // if (window->active)
+        else
+        {
+            device->sleep(100);
+            last_tick = device->getTimer()->getTime();
+        } // if (!window->active)
+    } // wile (run && !terminate)
 
     dprintf(MY_DEBUG_INFO, "TheGame::loop() end\n");
 }
 
-// Ogre::WindowEventListener
-//Adjust mouse clipping area
-void TheGame::windowResized(Ogre::RenderWindow* rw)
+void TheGame::switchCamera()
 {
-    if (rw == window)
-    {
-        unsigned int width, height, depth;
-        int left, top;
-        rw->getMetrics(width, height, depth, left, top);
-
-        if (eventReceiver)
-        {
-            eventReceiver->updateWindow(width, height);
-        }
-
-        dprintf(MY_DEBUG_NOTE, "Main window resized: width: %u, heigth: %u, depth: %u, left: %d, top: %d\n",
-            width, height, depth, left, top);
-    }
-}
-
-//Unattach OIS before window shutdown (very important under Linux)
-bool TheGame::windowClosing(Ogre::RenderWindow* rw)
-{
-    if (rw == window)
-    {
-        dprintf(MY_DEBUG_INFO, "Main window closing\n");
-    }
-    return true;
-}
-
-void TheGame::windowClosed(Ogre::RenderWindow* rw)
-{
-    if (rw == window)
-    {
-        dprintf(MY_DEBUG_INFO, "Main window closed\n");
-
-        if (eventReceiver)
-        {
-            delete eventReceiver;
-            eventReceiver = 0;
-        }
-
-        terminate = true;
-    }
-}
-
-void TheGame::windowFocusChange(Ogre::RenderWindow *rw)
-{
-    if (rw == window)
-    {
-        dprintf(MY_DEBUG_INFO, "Main window focus change\n");
-    }
-}
-
-// Ogre::FrameRenderListener
-bool TheGame::frameStarted(const Ogre::FrameEvent &evt)
-{
-    if (terminate) return false;
-    return !terminate;
-}
-
-bool TheGame::frameRenderingQueued(const Ogre::FrameEvent &evt)
-{
-    if (terminate) return false;
-
-    if (eventReceiver)
-    {
-        eventReceiver->checkEvents();
-    }
-
-    return !terminate;
+    irr::core::vector3df pos = camera->getPosition();
+    irr::core::vector3df tar = camera->getTarget();
+    camera = camera == fix_camera ? fix_camera : fps_camera;
+    smgr->setActiveCamera(camera);
+    camera->setPosition(pos);
+    camera->setTarget(tar);
 }
