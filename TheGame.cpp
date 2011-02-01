@@ -3,6 +3,8 @@
 #include "stdafx.h"
 #include "EventReceiver.h"
 #include "Settings.h"
+#include "ScreenQuad.h"
+#include "ShadersSM20.h"
 
 // static stuff
 TheGame* TheGame::theGame = 0;
@@ -34,6 +36,7 @@ TheGame::TheGame()
     : device(0), driver(0), smgr(0), camera(0), fix_camera(0), fps_camera(0),
       env(0),
       eventReceiver(0),
+      shaders(0),
       terminate(true),
       windowId(0),
       lastScreenSize(),
@@ -44,7 +47,7 @@ TheGame::TheGame()
     theGame = this;
 
     irr::SIrrlichtCreationParameters params;
-    params.DriverType = irr::video::EDT_DIRECT3D9;
+    params.DriverType = irr::video::EDT_DIRECT3D9 /*irr::video::EDT_OPENGL*/;
 
     readSettings(params);
 
@@ -73,6 +76,7 @@ TheGame::TheGame()
         lastScreenSize = getScreenSize();
 
         eventReceiver = new EventReceiver();
+        shaders = new ShadersSM20();
     }
 }
 
@@ -84,6 +88,11 @@ TheGame::~TheGame()
     {
         delete eventReceiver;
         eventReceiver = 0;
+    }
+    if (shaders)
+    {
+        delete shaders;
+        shaders = 0;
     }
 
     windowId = 0;
@@ -136,6 +145,13 @@ void TheGame::loop()
     device->run();
     last_tick = tick = device->getTimer()->getTime();
 
+    ScreenQuad testQuad(driver, irr::core::position2di(10, 10), irr::core::dimension2du(400, 300));
+    // ScreenQuad testQuad(driver, irr::core::position2di(0, 0), driver->getScreenSize());
+
+    testQuad.getMaterial().setTexture(0, driver->getTexture("data/bg/dakar_bg1.jpg"));
+    testQuad.getMaterial().MaterialType = shaders->quad2d;
+    //testQuad.getMaterial().setTexture(0, driver->getTexture("data/menu_textures/bg_frame_main_1280.png"));
+
     while (device->run() && !terminate)
     {
         if (device->isWindowActive())
@@ -180,6 +196,7 @@ void TheGame::loop()
             driver->setRenderTarget(0, true, true, irr::video::SColor(0, 0, 0, 255));
             smgr->drawAll();
             env->drawAll();
+            testQuad.render();
 
             driver->endScene();
 

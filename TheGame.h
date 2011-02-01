@@ -4,6 +4,7 @@
 #include "stdafx.h"
 
 class EventReceiver;
+class Shaders;
 
 class TheGame
 {
@@ -23,6 +24,7 @@ public:
     const irr::core::dimension2du&  getScreenSize();
     unsigned int                    getTick();
     void                            switchCamera();
+    Shaders*                        getShaders();
 
 private:
     TheGame();
@@ -46,6 +48,7 @@ private:
     irr::gui::IGUIEnvironment*      env;
 
     EventReceiver*                  eventReceiver;
+    Shaders*                        shaders;
 
     bool                            terminate;
     size_t                          windowId;
@@ -93,6 +96,11 @@ inline const irr::core::dimension2du& TheGame::getScreenSize()
 inline unsigned int TheGame::getTick()
 {
     return tick;
+}
+
+inline Shaders* TheGame::getShaders()
+{
+    return shaders;
 }
 
 #endif // THEGAME_H
