@@ -5,6 +5,7 @@
 
 class EventReceiver;
 class Shaders;
+class OffsetManager;
 
 class TheGame
 {
@@ -49,6 +50,7 @@ private:
 
     EventReceiver*                  eventReceiver;
     Shaders*                        shaders;
+    OffsetManager*                  offsetManager;
 
     bool                            terminate;
     size_t                          windowId;

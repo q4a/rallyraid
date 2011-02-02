@@ -5,6 +5,8 @@
 #include "Settings.h"
 #include "ScreenQuad.h"
 #include "ShadersSM20.h"
+#include "OffsetManager.h"
+#include "hk.h"
 
 // static stuff
 TheGame* TheGame::theGame = 0;
@@ -37,6 +39,7 @@ TheGame::TheGame()
       env(0),
       eventReceiver(0),
       shaders(0),
+      offsetManager(OffsetManager::getInstance()),
       terminate(true),
       windowId(0),
       lastScreenSize(),
@@ -77,6 +80,7 @@ TheGame::TheGame()
 
         eventReceiver = new EventReceiver();
         shaders = new ShadersSM20();
+        hk::initialize();
     }
 }
 
@@ -111,6 +115,8 @@ TheGame::~TheGame()
         device = 0;
     }
     Settings::destroy();
+    OffsetManager::destroy();
+    hk::finalize();
 }
 
 void TheGame::readSettings(irr::SIrrlichtCreationParameters& params)
@@ -151,6 +157,7 @@ void TheGame::loop()
     testQuad.getMaterial().setTexture(0, driver->getTexture("data/bg/dakar_bg1.jpg"));
     testQuad.getMaterial().MaterialType = shaders->quad2d;
     //testQuad.getMaterial().setTexture(0, driver->getTexture("data/menu_textures/bg_frame_main_1280.png"));
+    testQuad.rotate(30.0f, irr::core::position2di(150, 150));
 
     while (device->run() && !terminate)
     {
@@ -175,6 +182,7 @@ void TheGame::loop()
             // -------------------------------
             //         update physics
             // -------------------------------
+            offsetManager->update(camera->getPosition());
 
             // -------------------------------
             //         update graphics
