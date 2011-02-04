@@ -56,6 +56,8 @@ Shaders::Shaders()
     {
         supportedSMVersion = 2;
     }
+    
+    loadBaseMaterials();
 }
 
 Shaders::~Shaders()
@@ -66,3 +68,53 @@ Shaders::~Shaders()
         gpu = 0;
     }
 }
+
+void Shaders::loadBaseMaterials()
+{
+    // Load resource paths from config file
+    materialMap.clear();
+
+    ConfigFile cf;
+    cf.load("data/materials/base_materials.cfg");
+
+    dprintf(MY_DEBUG_NOTE, "Read base materials file:\n");
+    // Go through all sections & settings in the file
+    ConfigFile::SectionIterator seci = cf.getSectionIterator();
+
+    std::string materialName, keyName, materialType, typeName;
+    while (seci.hasMoreElements())
+    {
+        materialType = "";
+        materialName = seci.peekNextKey();
+        dprintf(MY_DEBUG_NOTE, "\tMaterial: %s\n", materialName.c_str());
+        ConfigFile::SettingsMultiMap *settings = seci.getNext();
+        for (ConfigFile::SettingsMultiMap::iterator i = settings->begin(); i != settings->end(); ++i)
+        {
+            keyName = i->first;
+            typeName = i->second;
+
+            if (keyName == "base_material")
+            {
+                materialType = typeName;
+            }
+        }
+        
+        if (materialName != "")
+        {
+            materialMap[materialName] = stringToBaseType(materialType);
+        }
+    }
+}
+
+irr::video::E_MATERIAL_TYPE stringToBaseType(const std::string& baseMaterialName)
+{
+    if (baseMaterialName == "alpha" || baseMaterialName == "transparent")
+    {
+        return irr::video::EMT_TRANSPARENT_ALPHA_CHANNEL;
+    }
+    else
+    {
+        return irr::video::EMT_SOLID;
+    }
+}
+

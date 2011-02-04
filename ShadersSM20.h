@@ -10,6 +10,9 @@ public:
     ShadersSM20();
     ~ShadersSM20();
 
+private:
+    loadSM20Materials();
+
 };
 
 #endif // SHADERSSM20_H

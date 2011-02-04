@@ -42,7 +42,7 @@ public:
     {
     }
 
-    ~OffsetObject();
+    virtual ~OffsetObject();
     
     void update(const irr::core::vector3df& offset, const irr::core::vector3df& loffset);
     

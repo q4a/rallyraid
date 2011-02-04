@@ -17,11 +17,12 @@ public:
     SM20_ShaderCallback()
         : device(TheGame::getInstance()->getDevice()), driver(TheGame::getInstance()->getDriver())
     {
+        callbacks.insert(this);
     }
 
     virtual void OnSetConstants(ICgServices* services,const CGeffect& Effect,const CGpass& Pass,const CGprogram& Vertex,const CGprogram& Pixel,const irr::video::SMaterial& Material)
     {
-        assert(0);
+        //assert(0);
     }
 
 public:
@@ -33,6 +34,7 @@ public:
 };
 
 
+/*
 class SM20_ShaderCallback_quad2d : public SM20_ShaderCallback
 {
 public:
@@ -48,6 +50,7 @@ public:
     }
 
 };
+*/
 
 std::set<SM20_ShaderCallback*> SM20_ShaderCallback::callbacks;
 
@@ -58,19 +61,8 @@ ShadersSM20::ShadersSM20()
     {
         return;
     }
-    const irr::c8* ogl_vs_version = "arbvp1";
-    const irr::c8* ogl_ps_version = "arbfp1";
-    const irr::c8* d3d_vs_version = "vs_2_0";
-    const irr::c8* d3d_ps_version = "ps_2_0";
-
-    irr::core::stringc cg_dir = "data/shaders/cg/SM20/";
-
-    irr::core::stringc quad2dFilename = cg_dir + "quad2d.cg";
-
-    quad2d = (irr::video::E_MATERIAL_TYPE)gpu->addCgShaderMaterialFromFiles(CG_SOURCE,
-                    quad2dFilename.c_str(), "main_v", ogl_vs_version, d3d_vs_version,
-                    quad2dFilename.c_str(), "main_f", ogl_ps_version, d3d_ps_version,
-                    new SM20_ShaderCallback_quad2d(), /*video::EMT_SOLID*/irr::video::EMT_TRANSPARENT_ALPHA_CHANNEL);
+    
+    loadSM20Materials();
 }
 
 ShadersSM20::~ShadersSM20()
@@ -82,3 +74,64 @@ ShadersSM20::~ShadersSM20()
         delete *it;
     }
 }
+
+void ShadersSM20::loadSM20Materials()
+{
+    // Load resource paths from config file
+    //materialMap.clear();
+
+    const irr::c8* ogl_vs_version = "arbvp1";
+    const irr::c8* ogl_ps_version = "arbfp1";
+    const irr::c8* d3d_vs_version = "vs_2_0";
+    const irr::c8* d3d_ps_version = "ps_2_0";
+
+
+    ConfigFile cf;
+    cf.load("data/materials/sm20.cfg");
+
+    dprintf(MY_DEBUG_NOTE, "Read base materials file:\n");
+    // Go through all sections & settings in the file
+    ConfigFile::SectionIterator seci = cf.getSectionIterator();
+
+    std::string materialName, keyName, typeName, shaderFile;
+    while (seci.hasMoreElements())
+    {
+        shaderFile = "";
+        materialName = seci.peekNextKey();
+        dprintf(MY_DEBUG_NOTE, "\tMaterial: %s\n", materialName.c_str());
+        ConfigFile::SettingsMultiMap *settings = seci.getNext();
+        for (ConfigFile::SettingsMultiMap::iterator i = settings->begin(); i != settings->end(); ++i)
+        {
+            keyName = i->first;
+            typeName = i->second;
+
+            if (keyName == "shader")
+            {
+                shaderFile = typeName;
+            }
+        }
+        
+        
+        if (materialName != "" && shaderFile != "")
+        {
+            irr::video::E_MATERIAL_TYPE baseMaterial = irr::video::EMT_SOLID;
+            materialMap_t::const_iterator it = materialMap.find(materialName);
+            if (it != materialMap.end())
+            {
+                baseMaterial = it->second;
+            }
+            //if (materialName=="blabla")
+            //{
+            //    use specific shader CB
+            //}
+            //else
+            {
+                materialMap[materialName] = (irr::video::E_MATERIAL_TYPE)gpu->addCgShaderMaterialFromFiles(CG_SOURCE,
+                    shaderFile.c_str(), "main_v", ogl_vs_version, d3d_vs_version,
+                    shaderFile.c_str(), "main_f", ogl_ps_version, d3d_ps_version,
+                    new SM20_ShaderCallback(), /*video::EMT_SOLIDirr::video::EMT_TRANSPARENT_ALPHA_CHANNEL*/baseMaterial);
+            }
+        }
+    }
+}
+
