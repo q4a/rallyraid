@@ -5,13 +5,13 @@
 #include "Shaders.h"
 #include "IrrCg.h"
 #include "TheGame.h"
+#include "ConfigFile.h"
 
 using namespace IrrCg;
 
 Shaders::Shaders()
     : gpu(0),
-      supportedSMVersion(0),
-      quad2d(irr::video::EMT_SOLID)
+      supportedSMVersion(0)
 {
     gpu = new ICgProgrammingServices(TheGame::getInstance()->getDevice()/*, false, true*/);
     ICgServices* cgServices = gpu->getCgServices();

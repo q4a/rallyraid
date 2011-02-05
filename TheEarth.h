@@ -27,7 +27,7 @@ public:
 private:
     static TheEarth* theEarth;
     
-    typedef stf::set<Tile*> tileSet_t;
+    typedef std::set<Tile*> tileSet_t;
 
 public:
     static const unsigned int TILE_POINTS_NUM = 32;

@@ -47,6 +47,7 @@ public:
     void update(const irr::core::vector3df& offset, const irr::core::vector3df& loffset);
     
     irr::core::vector3df& getPos() {return pos;}
+    irr::scene::ISceneNode* getNode() {return node;}
 
     void addToManager();
     void removeFromManager();
