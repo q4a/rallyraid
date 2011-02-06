@@ -46,8 +46,10 @@ public:
     
     void update(const irr::core::vector3df& offset, const irr::core::vector3df& loffset);
     
+    void setPos(const irr::core::vector3df& apos) {pos = apos;}
     irr::core::vector3df& getPos() {return pos;}
     irr::scene::ISceneNode* getNode() {return node;}
+    hkpRigidBody* getBody() {return hkBody;}
 
     void addToManager();
     void removeFromManager();

@@ -77,7 +77,7 @@ TheEarth::~TheEarth()
         hasDetailTex = 0;
     }
     
-    for (tileSet_t::iterator = it; it != tileSet.end(); it++)
+    for (tileSet_t::iterator it = tileSet.begin(); it != tileSet.end(); it++)
     {
         delete *it;
     }
@@ -213,7 +213,7 @@ bool TheEarth::setHasDetailTex(unsigned int x, unsigned int y, bool val)
     }
 }
 
-const irr::video::SColor& TheEarth::getDensity(unsigned int x, unsigned int y) const
+irr::video::SColor TheEarth::getDensity(unsigned int x, unsigned int y) const
 {
     static const irr::video::SColor nullColor;
     if (density && xsize > 0 && ysize > 0)
@@ -243,7 +243,7 @@ bool TheEarth::setDensity(unsigned int x, unsigned int y, const irr::video::SCol
     }
 }
 
-const irr::video::SColor& TheEarth::getTexture(unsigned int x, unsigned int y) const
+irr::video::SColor TheEarth::getTexture(unsigned int x, unsigned int y) const
 {
     static const irr::video::SColor nullColor;
     if (density && xsize > 0 && ysize > 0)
@@ -273,14 +273,15 @@ bool TheEarth::read()
 bool TheEarth::readHeight()
 {
     int rc = 0;
-    FILE* f = fopen("earthdata/earth_data_height.dat", "rb");
-    if (!f)
+    FILE* f;
+    errno_t error = fopen_s(&f, "earthdata/earth_data_height.dat", "rb");
+    if (error)
     {
         printf("unable to open file for read earthdata/earth_data_height.dat\n");
         return false;
     }
 
-    rc = fscanf(f, "%u\n%u\n", &xsize, &ysize);
+    rc = fscanf_s(f, "%u\n%u\n", &xsize, &ysize);
     if (rc < 2)
     {
         printf("unable to read xsize, ysize\n");
@@ -332,14 +333,15 @@ bool TheEarth::readHeight()
 bool TheEarth::readHasDetail()
 {
     int rc = 0;
-    FILE* f = fopen("earthdata/earth_data_hasDetail.dat", "rb");
-    if (!f)
+    FILE* f;
+    errno_t error = fopen_s(&f, "earthdata/earth_data_hasDetail.dat", "rb");
+    if (error)
     {
         printf("unable to open file for read earthdata/earth_data_hasDetail.dat\n");
         return false;
     }
 
-    rc = fscanf(f, "%u\n%u\n", &xsize, &ysize);
+    rc = fscanf_s(f, "%u\n%u\n", &xsize, &ysize);
     if (rc < 2)
     {
         printf("unable to read xsize, ysize\n");
@@ -376,14 +378,15 @@ bool TheEarth::readHasDetail()
 bool TheEarth::readHasDetailTex()
 {
     int rc = 0;
-    FILE* f = fopen("earthdata/earth_data_hasDetailTex.dat", "rb");
-    if (!f)
+    FILE* f;
+    errno_t error = fopen_s(&f, "earthdata/earth_data_hasDetailTex.dat", "rb");
+    if (error)
     {
         printf("unable to open file for read earthdata/earth_data_hasDetailTex.dat\n");
         return false;
     }
 
-    rc = fscanf(f, "%u\n%u\n", &xsize, &ysize);
+    rc = fscanf_s(f, "%u\n%u\n", &xsize, &ysize);
     if (rc < 2)
     {
         printf("unable to read xsize, ysize\n");
@@ -450,8 +453,9 @@ bool TheEarth::writeHeight()
     if (height==0) return false;
     
     int rc = 0;
-    FILE* f = fopen("earthdata/earth_data_height.dat", "wb");
-    if (!f) return false;
+    FILE* f;
+    errno_t error = fopen_s(&f, "earthdata/earth_data_height.dat", "wb");
+    if (error) return false;
 
     rc = fprintf(f, "%u\n%u\n", xsize, ysize);
     if (rc <= 0)
@@ -487,8 +491,9 @@ bool TheEarth::writeHasDetail()
     if (hasDetail==0) return false;
     
     int rc = 0;
-    FILE* f = fopen("earthdata/earth_data_hasDetail.dat", "wb");
-    if (!f) return false;
+    FILE* f;
+    errno_t error = fopen_s(&f, "earthdata/earth_data_hasDetail.dat", "wb");
+    if (error) return false;
 
     rc = fprintf(f, "%u\n%u\n", xsize, ysize);
     if (rc <= 0)
@@ -524,8 +529,9 @@ bool TheEarth::writeHasDetailTex()
     if (hasDetailTex==0) return false;
     
     int rc = 0;
-    FILE* f = fopen("earthdata/earth_data_hasDetailTex.dat", "wb");
-    if (!f) return false;
+    FILE* f;
+    errno_t error = fopen_s(&f, "earthdata/earth_data_hasDetailTex.dat", "wb");
+    if (error) return false;
 
     rc = fprintf(f, "%u\n%u\n", xsize, ysize);
     if (rc <= 0)

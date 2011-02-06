@@ -2,6 +2,8 @@
 #include "ObjectPool.h"
 #include "OffsetObject.h"
 #include "TheGame.h"
+#include "Settings.h"
+#include "Shaders.h"
 
 /*
     enum ObjectType
@@ -22,18 +24,25 @@
 */
 
 ObjectPool::ObjectPool(const std::string& meshFilename, const std::string& textureFilename,
-                       bool physics, ObjectType objectType, const std::string& material,
-                       unsigned int num, unsigned int category)
+                       const std::string& texture2Filename,
+                       bool physics, ObjectType objectType,
+                       const std::string& materialName, const std::string& material2Name,
+                       unsigned int num, unsigned int category, float friction)
     : objectList(),
       objectMesh(0),
       hkShape(0),
-      category(category)
+      category(category),
+      texture(0),
+      texture2(0),
+      objectType(objectType),
+      material(irr::video::EMT_SOLID),
+      material2(irr::video::EMT_SOLID),
+      friction(friction)
 {
-    if (meshFilename == "" && objectType == grass)
+    if (meshFilename == "" && objectType == Grass)
     {
         objectMesh = generateGrassMesh();
-    }
-    if (meshFilename.rfind(".mso") != std::string::npos)
+    } else if (meshFilename.rfind(".mso") != std::string::npos)
     {
         objectMesh = readMySimpleObject(meshFilename);
     }
@@ -47,22 +56,116 @@ ObjectPool::ObjectPool(const std::string& meshFilename, const std::string& textu
         hkShape = calculateCollisionMesh(objectMesh);
     }
 
-    for (unsigned int i = 0; i < num; i++)
+    if (textureFilename != "")
     {
-        switch
+        texture = TheGame::getInstance()->getDriver()->getTexture(textureFilename.c_str());
+    }
+    if (texture2Filename != "")
+    {
+        texture2 = TheGame::getInstance()->getDriver()->getTexture(texture2Filename.c_str());
+    }
+    if (materialName != "")
+    {
+        material = TheGame::getInstance()->getShaders()->materialMap[materialName];
+    }
+    if (material2Name != "")
+    {
+        material2 = TheGame::getInstance()->getShaders()->materialMap[material2Name];
+    }
+
+    if (Settings::getInstance()->preloadObjects)
+    {
+        for (unsigned int i = 0; i < num; i++)
+        {
+            OffsetObject* offsetObject = createNewInstance();
+            objectList.push_back(offsetObject);
+        }
     }
 }
 
 ObjectPool::~ObjectPool()
 {
+    for (objectList_t::iterator it = objectList.begin();
+         it != objectList.end();
+         it++)
+    {
+        (*it)->getNode()->drop();
+        delete *it;
+    }
+    objectList.clear();
 }
 
-OffsetObject* ObjectPool::getObject()
+OffsetObject* ObjectPool::getObject(const irr::core::vector3df& apos)
 {
+    OffsetObject* offsetObject = 0;
+    if (objectList.size() > 0)
+    {
+        offsetObject = *objectList.begin();
+        objectList.erase(objectList.begin());
+    }
+    else
+    {
+        offsetObject = createNewInstance();
+    }
+
+    offsetObject->setPos(apos);
+    offsetObject->getNode()->setPosition(apos);
+
+    if (hkShape)
+    {
+        hkpRigidBodyCinfo groundInfo;
+        groundInfo.m_shape = hkShape;
+        groundInfo.m_position.set(apos.X, apos.Y, apos.Z);
+        groundInfo.m_motionType = hkpMotion::MOTION_FIXED;
+        groundInfo.m_friction = friction;
+        hkpRigidBody* hkBody = new hkpRigidBody(groundInfo);
+        //hkpPropertyValue val(1);
+        //hkBody->addProperty(treeID, val);
+        hk::hkWorld->addEntity(hkBody);
+        offsetObject->setBody(hkBody);
+    }
+    offsetObject->getNode()->setVisible(true);
+    offsetObject->addToManager();
+    return offsetObject;
 }
 
 void ObjectPool::putObject(OffsetObject* object)
 {
+    object->getNode()->setVisible(false);
+    hkpRigidBody* hkBody = object->getBody();
+    if (hkBody)
+    {
+        hkBody->removeReference();
+        hk::hkWorld->removeEntity(hkBody);
+        hkBody = 0;
+        object->setBody(0);
+    }
+    object->removeFromManager();
+}
+
+OffsetObject* ObjectPool::createNewInstance()
+{
+    /*
+        switch (objectType)
+        {
+            case Standard:
+            case Grass:
+            case Vehicle:
+            case Tree:
+            {
+                break;
+            }
+        }
+    */
+    irr::scene::IAnimatedMeshSceneNode* objectNode = TheGame::getInstance()->getSmgr()->addAnimatedMeshSceneNode(objectMesh);
+    objectNode->setVisible(false);
+    objectNode->setMaterialTexture(0, texture);
+    objectNode->setMaterialTexture(1, texture);
+    objectNode->setMaterialType(material);
+    // TODO
+    OffsetObject* offsetObject = new OffsetObject(objectNode, false);
+
+    return offsetObject;
 }
 
 irr::scene::SAnimatedMesh* ObjectPool::readMySimpleObject(const std::string& meshFilename)
@@ -72,7 +175,7 @@ irr::scene::SAnimatedMesh* ObjectPool::readMySimpleObject(const std::string& mes
     float x,y,z,tu,tv;
     irr::u32 r,g,b;
     int ret, index;
-    irr::s32 verInd;
+    irr::u32 verInd;
     irr::video::S3DVertex vtx;
     vtx.Color.set(255,255,255,255);
     vtx.Normal.set(0,1,0);
@@ -81,9 +184,9 @@ irr::scene::SAnimatedMesh* ObjectPool::readMySimpleObject(const std::string& mes
     printf("Read my simple object: %s\n", name);
 #endif
     
-    f = fopen(meshFilename.c_str(), "r");
+    errno_t error = fopen_s(&f, meshFilename.c_str(), "r");
     
-    if (!f)
+    if (error)
     {
         printf("my simple object file unable to open: %s\n", meshFilename.c_str());
         return 0;
@@ -95,10 +198,10 @@ irr::scene::SAnimatedMesh* ObjectPool::readMySimpleObject(const std::string& mes
 #ifdef MSO_DEBUG
     printf("read vertices\n");
 #endif    
-    ret = fscanf(f, "vertices\n%u\n", &numOfVertices);
+    ret = fscanf_s(f, "vertices\n%u\n", &numOfVertices);
     if (ret <= 0)
     {
-       printf("error reading %s ret %d errno %d\n", name, ret, errno);
+       printf("error reading %s ret %d errno %d\n", meshFilename.c_str(), ret, errno);
        fclose(f);
        return 0;
     }
@@ -107,15 +210,15 @@ irr::scene::SAnimatedMesh* ObjectPool::readMySimpleObject(const std::string& mes
     printf("vertices: %u\n", numOfVertices);
 #endif    
 
-    for (int ind = 0; ind < numOfVertices; ind++)
+    for (unsigned int ind = 0; ind < numOfVertices; ind++)
     {
 #ifdef MSO_DEBUG
     printf("read a vertex\n");
 #endif    
-        ret = fscanf(f, "%d %f %f %f %f %f %u %u %u\n", &index, &x, &y, &z, &tu, &tv, &r, &g, &b);
+        ret = fscanf_s(f, "%d %f %f %f %f %f %u %u %u\n", &index, &x, &y, &z, &tu, &tv, &r, &g, &b);
         if (ret <= 0)
         {
-           printf("error reading %s ret %d errno %d\n", name, ret, errno);
+           printf("error reading %s ret %d errno %d\n", meshFilename.c_str(), ret, errno);
            fclose(f);
            return 0;
         }
@@ -133,25 +236,25 @@ irr::scene::SAnimatedMesh* ObjectPool::readMySimpleObject(const std::string& mes
 #ifdef MSO_DEBUG
     printf("read polygons number\n");
 #endif    
-    ret = fscanf(f, "polygons\n%u\n", &numOfPols);
+    ret = fscanf_s(f, "polygons\n%u\n", &numOfPols);
     if (ret <= 0)
     {
-       printf("error reading %s ret %d errno %d\n", name, ret, errno);
+       printf("error reading %s ret %d errno %d\n", meshFilename.c_str(), ret, errno);
        fclose(f);
        return 0;
     }
 #ifdef MSO_DEBUG
     printf("polygons: %u\n", numOfPols);
 #endif    
-    for (int ind = 0; ind < numOfPols*3; ind++)
+    for (unsigned int ind = 0; ind < numOfPols*3; ind++)
     {
 #ifdef MSO_DEBUG
     printf("read a poly part\n");
 #endif    
-        ret = fscanf(f, "%u\n", &verInd);
+        ret = fscanf_s(f, "%u\n", &verInd);
         if (ret <= 0)
         {
-           printf("error reading %s ret %d errno %d\n", name, ret, errno);
+           printf("error reading %s ret %d errno %d\n", meshFilename.c_str(), ret, errno);
            fclose(f);
            return 0;
         }
@@ -209,7 +312,7 @@ hkpShape* ObjectPool::calculateCollisionMesh(irr::scene::IAnimatedMesh* objectMe
     if (objectMesh == 0) return hkShape;
     
     int sizeOfBuffers = 0;
-    for (int i = 0; i < objectMesh->getMeshBufferCount(); i++)
+    for (unsigned int i = 0; i < objectMesh->getMeshBufferCount(); i++)
     {
         if (objectMesh->getMeshBuffer(i)->getVertexType() != irr::video::EVT_STANDARD)
         {
@@ -224,11 +327,11 @@ hkpShape* ObjectPool::calculateCollisionMesh(irr::scene::IAnimatedMesh* objectMe
     float* my_vertices = new float[sizeOfBuffers*4];
     int cursor = 0;
         
-    for (int i = 0; i < objectMesh->getMeshBufferCount();i++)
+    for (unsigned int i = 0; i < objectMesh->getMeshBufferCount();i++)
     {
         irr::scene::IMeshBuffer* mb = objectMesh->getMeshBuffer(i);
         irr::video::S3DVertex* mb_vertices = (irr::video::S3DVertex*)mb->getVertices();
-        for (int j = 0; j < mb->getVertexCount(); j++)
+        for (unsigned int j = 0; j < mb->getVertexCount(); j++)
         {
             my_vertices[(cursor+j)*4] = mb_vertices[j].Pos.X /* scale.X */;
             my_vertices[(cursor+j)*4+1] = mb_vertices[j].Pos.Y /* scale.Y */;

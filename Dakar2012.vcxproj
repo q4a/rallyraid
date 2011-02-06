@@ -94,6 +94,7 @@
     <ClInclude Include="IrrCgSceneNode.h" />
     <ClInclude Include="IteratorWrapper.h" />
     <ClInclude Include="KeyConfig.h" />
+    <ClInclude Include="ObjectPool.h" />
     <ClInclude Include="ObjectPoolManager.h" />
     <ClInclude Include="OffsetManager.h" />
     <ClInclude Include="OffsetObject.h" />
@@ -106,6 +107,7 @@
     <ClInclude Include="targetver.h" />
     <ClInclude Include="TheEarth.h" />
     <ClInclude Include="TheGame.h" />
+    <ClInclude Include="Tile.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ConfigFile.cpp" />
@@ -116,6 +118,7 @@
     <ClCompile Include="IrrCgMaterial.cpp" />
     <ClCompile Include="IrrCgSceneNode.cpp" />
     <ClCompile Include="KeyConfig.cpp" />
+    <ClCompile Include="ObjectPool.cpp" />
     <ClCompile Include="ObjectPoolManager.cpp" />
     <ClCompile Include="OffsetManager.cpp" />
     <ClCompile Include="OffsetObject.cpp" />

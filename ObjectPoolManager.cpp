@@ -44,6 +44,7 @@ ObjectPoolManager::~ObjectPoolManager()
     {
         delete it->second;
     }
+    objectPoolMap.clear();
 }
 
 void ObjectPoolManager::read()
@@ -61,11 +62,14 @@ void ObjectPoolManager::read()
     {
         std::string meshFilename = "";
         std::string textureFilename = "";
+        std::string texture2Filename = "";
         bool physics = false;
-        std::string material;
+        std::string material = "";
+        std::string material2 = "";
         ObjectPool::ObjectType objectType = ObjectPool::Standard;
         unsigned int category = 0;
         unsigned int num = 1;
+        float friction = 0.5f;
 
         objectName = seci.peekNextKey();
         dprintf(MY_DEBUG_NOTE, "\tObject: %s\n", objectName.c_str());
@@ -81,12 +85,18 @@ void ObjectPoolManager::read()
             } else if (keyName == "texture")
             {
                 textureFilename = valName;
+            } else if (keyName == "texture2")
+            {
+                texture2Filename = valName;
             } else if (keyName == "physics")
             {
                 physics = StringConverter::parseBool(valName, false);
             } else if (keyName == "material")
             {
                 material = valName;
+            } else if (keyName == "material2")
+            {
+                material2 = valName;
             } else if (keyName == "type")
             {
                 if (valName == "vehicle")
@@ -99,12 +109,16 @@ void ObjectPoolManager::read()
             } else if (keyName == "num")
             {
                 num = StringConverter::parseUnsignedInt(valName, 1);
+            } else if (keyName == "friction")
+            {
+                friction = StringConverter::parseFloat(valName, 0.5f);
             }
         }
         
         if (objectName != "")
         {
-            objectPoolMap[objectName] = new ObjectPool(meshFilename, textureFilename, physics, objectType, material, num, category);
+            objectPoolMap[objectName] = new ObjectPool(meshFilename, textureFilename, texture2Filename,
+                physics, objectType, material, material2, num, category, friction);
         }
     }
 }

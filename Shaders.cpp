@@ -106,7 +106,7 @@ void Shaders::loadBaseMaterials()
     }
 }
 
-irr::video::E_MATERIAL_TYPE stringToBaseType(const std::string& baseMaterialName)
+irr::video::E_MATERIAL_TYPE Shaders::stringToBaseType(const std::string& baseMaterialName)
 {
     if (baseMaterialName == "alpha" || baseMaterialName == "transparent")
     {

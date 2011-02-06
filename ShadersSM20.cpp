@@ -7,6 +7,7 @@
 #include "ShadersSM20.h"
 #include "IrrCg.h"
 #include "TheGame.h"
+#include "ConfigFile.h"
 
 using namespace IrrCg;
 
@@ -89,7 +90,7 @@ void ShadersSM20::loadSM20Materials()
     ConfigFile cf;
     cf.load("data/materials/sm20.cfg");
 
-    dprintf(MY_DEBUG_NOTE, "Read base materials file:\n");
+    dprintf(MY_DEBUG_NOTE, "Read SM20 materials file:\n");
     // Go through all sections & settings in the file
     ConfigFile::SectionIterator seci = cf.getSectionIterator();
 

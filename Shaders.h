@@ -15,7 +15,7 @@ namespace IrrCg
 class Shaders
 {
 public:
-    typedef std::map<std::string, irr::video::E_MATERIAL_TYPE> materialMap_t
+    typedef std::map<std::string, irr::video::E_MATERIAL_TYPE> materialMap_t;
 
     Shaders();
     ~Shaders();

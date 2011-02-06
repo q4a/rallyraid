@@ -10,8 +10,9 @@ class OffsetManager;
 class TheGame
 {
 public:
-    static TheGame* getInstance();
-    static void destroy();
+    static void initialize();
+    static void finalize();
+    static TheGame* getInstance() {return theGame;}
 
 public:
     void loop();

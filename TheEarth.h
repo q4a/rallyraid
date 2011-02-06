@@ -2,6 +2,7 @@
 #ifndef THEEARTH_H
 #define THEEARTH_H
 
+#include <irrlicht.h>
 #include <set>
 
 namespace irr
@@ -49,8 +50,8 @@ public:
     bool getHasDetail(unsigned int x, unsigned int y) const;
     bool getIsLoaded(unsigned int x, unsigned int y) const;
     bool getHasDetailTex(unsigned int x, unsigned int y) const;
-    const irr::video::SColor& getDensity(unsigned int x, unsigned int y) const;
-    const irr::video::SColor& getTexture(unsigned int x, unsigned int y) const;
+    irr::video::SColor getDensity(unsigned int x, unsigned int y) const;
+    irr::video::SColor getTexture(unsigned int x, unsigned int y) const;
 
     bool read();
     bool readHeight();

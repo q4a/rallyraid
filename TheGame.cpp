@@ -11,19 +11,18 @@
 // static stuff
 TheGame* TheGame::theGame = 0;
 
-TheGame* TheGame::getInstance()
+void TheGame::initialize()
 {
-    dprintf(MY_DEBUG_INFO, "TheGame::getInstance(): theGame: %p\n", theGame);
+    dprintf(MY_DEBUG_INFO, "TheGame::initialize(): theGame: %p\n", theGame);
     if (theGame == 0)
     {
         theGame = new TheGame();
     }
-    return theGame;
 }
 
-void TheGame::destroy()
+void TheGame::finalize()
 {
-    dprintf(MY_DEBUG_IMPINFO, "TheGame::destroy(): theGame: %p\n", theGame);
+    dprintf(MY_DEBUG_IMPINFO, "TheGame::finalize(): theGame: %p\n", theGame);
     //assert(0);
     if (theGame)
     {
@@ -74,7 +73,7 @@ TheGame::TheGame()
         env = device->getGUIEnvironment();
         fix_camera = smgr->addCameraSceneNode();
         fps_camera = smgr->addCameraSceneNodeFPS(0, 100.f, 0.5f);
-        camera = fps_camera;
+        camera = fix_camera;
         smgr->setActiveCamera(camera);
         lastScreenSize = getScreenSize();
 
@@ -155,7 +154,7 @@ void TheGame::loop()
     // ScreenQuad testQuad(driver, irr::core::position2di(0, 0), driver->getScreenSize());
 
     testQuad.getMaterial().setTexture(0, driver->getTexture("data/bg/dakar_bg1.jpg"));
-    testQuad.getMaterial().MaterialType = shaders->quad2d;
+    testQuad.getMaterial().MaterialType = shaders->materialMap["quad2d"];
     //testQuad.getMaterial().setTexture(0, driver->getTexture("data/menu_textures/bg_frame_main_1280.png"));
     testQuad.rotate(30.0f, irr::core::position2di(150, 150));
 

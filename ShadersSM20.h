@@ -11,7 +11,7 @@ public:
     ~ShadersSM20();
 
 private:
-    loadSM20Materials();
+    void loadSM20Materials();
 
 };
 

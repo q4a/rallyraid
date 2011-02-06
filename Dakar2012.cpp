@@ -13,11 +13,11 @@ int main()
 {
 //    try
 //    {
-        TheGame* theGame = TheGame::getInstance();
+        TheGame::initialize();
 
-        theGame->loop();
+        TheGame::getInstance()->loop();
 
-        TheGame::destroy();
+        TheGame::finalize();
 /*    } catch (Ogre::Exception& e)
     {
         printf("FATAL EXCEPTION: %s\n", e.getFullDescription().c_str());
