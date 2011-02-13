@@ -94,6 +94,9 @@
     <ClInclude Include="IrrCgSceneNode.h" />
     <ClInclude Include="IteratorWrapper.h" />
     <ClInclude Include="KeyConfig.h" />
+    <ClInclude Include="MyLock.h" />
+    <ClInclude Include="MySound.h" />
+    <ClInclude Include="MyThread.h" />
     <ClInclude Include="ObjectPool.h" />
     <ClInclude Include="ObjectPoolManager.h" />
     <ClInclude Include="OffsetManager.h" />
@@ -105,6 +108,9 @@
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="StringConverter.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="Terrain.h" />
+    <ClInclude Include="TerrainSceneNode.h" />
+    <ClInclude Include="Terrain_defs.h" />
     <ClInclude Include="TheEarth.h" />
     <ClInclude Include="TheGame.h" />
     <ClInclude Include="Tile.h" />
@@ -118,6 +124,8 @@
     <ClCompile Include="IrrCgMaterial.cpp" />
     <ClCompile Include="IrrCgSceneNode.cpp" />
     <ClCompile Include="KeyConfig.cpp" />
+    <ClCompile Include="MySound.cpp" />
+    <ClCompile Include="MyThread.cpp" />
     <ClCompile Include="ObjectPool.cpp" />
     <ClCompile Include="ObjectPoolManager.cpp" />
     <ClCompile Include="OffsetManager.cpp" />
@@ -126,8 +134,11 @@
     <ClCompile Include="Shaders.cpp" />
     <ClCompile Include="ShadersSM20.cpp" />
     <ClCompile Include="stdafx.cpp" />
+    <ClCompile Include="Terrain.cpp" />
+    <ClCompile Include="TerrainSceneNode.cpp" />
     <ClCompile Include="TheEarth.cpp" />
     <ClCompile Include="TheGame.cpp" />
+    <ClCompile Include="Tile.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Dakar2012.rc" />

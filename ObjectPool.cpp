@@ -27,7 +27,7 @@ ObjectPool::ObjectPool(const std::string& meshFilename, const std::string& textu
                        const std::string& texture2Filename,
                        bool physics, ObjectType objectType,
                        const std::string& materialName, const std::string& material2Name,
-                       unsigned int num, unsigned int category, float friction)
+                       unsigned int num, unsigned int category, float friction, float mass)
     : objectList(),
       objectMesh(0),
       hkShape(0),
@@ -37,7 +37,8 @@ ObjectPool::ObjectPool(const std::string& meshFilename, const std::string& textu
       objectType(objectType),
       material(irr::video::EMT_SOLID),
       material2(irr::video::EMT_SOLID),
-      friction(friction)
+      friction(friction),
+      mass(mass)
 {
     if (meshFilename == "" && objectType == Grass)
     {
@@ -89,10 +90,19 @@ ObjectPool::~ObjectPool()
          it != objectList.end();
          it++)
     {
-        (*it)->getNode()->drop();
+        //printf("drop node: %p\n", (*it)->getNode());
+        //(*it)->getNode()->drop();
+        (*it)->getNode()->remove();
         delete *it;
     }
     objectList.clear();
+    if (hkShape)
+    {
+        hk::lock();
+        hkShape->removeReference();
+        hk::unlock();
+        hkShape = 0;
+    }
 }
 
 OffsetObject* ObjectPool::getObject(const irr::core::vector3df& apos)
@@ -113,17 +123,31 @@ OffsetObject* ObjectPool::getObject(const irr::core::vector3df& apos)
 
     if (hkShape)
     {
+        hk::lock();
         hkpRigidBodyCinfo groundInfo;
         groundInfo.m_shape = hkShape;
         groundInfo.m_position.set(apos.X, apos.Y, apos.Z);
-        groundInfo.m_motionType = hkpMotion::MOTION_FIXED;
+        if (objectType == Vehicle)
+        {
+            groundInfo.m_motionType = hkpMotion::MOTION_BOX_INERTIA;
+            groundInfo.m_mass = mass;
+        }
+        else
+        {
+            groundInfo.m_motionType = hkpMotion::MOTION_FIXED;
+        }
         groundInfo.m_friction = friction;
         hkpRigidBody* hkBody = new hkpRigidBody(groundInfo);
         //hkpPropertyValue val(1);
         //hkBody->addProperty(treeID, val);
         hk::hkWorld->addEntity(hkBody);
+        hk::unlock();
         offsetObject->setBody(hkBody);
+
     }
+
+    offsetObject->setPool(this);
+
     offsetObject->getNode()->setVisible(true);
     offsetObject->addToManager();
     return offsetObject;
@@ -135,12 +159,25 @@ void ObjectPool::putObject(OffsetObject* object)
     hkpRigidBody* hkBody = object->getBody();
     if (hkBody)
     {
+        hk::lock();
         hkBody->removeReference();
         hk::hkWorld->removeEntity(hkBody);
+        hk::unlock();
         hkBody = 0;
         object->setBody(0);
+        object->setPool(0);
     }
     object->removeFromManager();
+    if (Settings::getInstance()->cacheObjects)
+    {
+        objectList.push_back(object);
+    }
+    else
+    {
+        object->getNode()->remove();
+        object->setNode(0);
+        delete object;
+    }
 }
 
 OffsetObject* ObjectPool::createNewInstance()
@@ -160,10 +197,10 @@ OffsetObject* ObjectPool::createNewInstance()
     irr::scene::IAnimatedMeshSceneNode* objectNode = TheGame::getInstance()->getSmgr()->addAnimatedMeshSceneNode(objectMesh);
     objectNode->setVisible(false);
     objectNode->setMaterialTexture(0, texture);
-    objectNode->setMaterialTexture(1, texture);
+    objectNode->setMaterialTexture(1, texture2);
     objectNode->setMaterialType(material);
     // TODO
-    OffsetObject* offsetObject = new OffsetObject(objectNode, false);
+    OffsetObject* offsetObject = new OffsetObject(objectNode, objectType == Vehicle);
 
     return offsetObject;
 }
@@ -341,12 +378,14 @@ hkpShape* ObjectPool::calculateCollisionMesh(irr::scene::IAnimatedMesh* objectMe
         cursor += mb->getVertexCount();
     }
     
+    hk::lock();
     hkStridedVertices stridedVerts;
     stridedVerts.m_numVertices = sizeOfBuffers;
     stridedVerts.m_striding = 4*sizeof(float);
     stridedVerts.m_vertices = my_vertices;
 
     hkShape = new hkpConvexVerticesShape(stridedVerts);
+    hk::unlock();
 
     delete [] my_vertices;
 

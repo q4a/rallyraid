@@ -7,8 +7,9 @@
 class Settings
 {
 public:
-    static Settings* getInstance();
-    static void destroy();
+    static void initialize();
+    static void finalize();
+    static Settings* getInstance() {return settings;}
 
 private:
     static Settings* settings;

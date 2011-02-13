@@ -18,6 +18,16 @@ public:
     static void initialize();
     static void finalize();
 
+    static void lock()
+    {
+        hkWorld->lock();
+    }
+
+    static void unlock()
+    {
+        hkWorld->unlock();
+    }
+
 public:
     static hkpWorld*        hkWorld;
 

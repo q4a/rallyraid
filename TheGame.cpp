@@ -7,6 +7,7 @@
 #include "ShadersSM20.h"
 #include "OffsetManager.h"
 #include "hk.h"
+#include "ObjectPoolManager.h"
 
 // static stuff
 TheGame* TheGame::theGame = 0;
@@ -38,7 +39,7 @@ TheGame::TheGame()
       env(0),
       eventReceiver(0),
       shaders(0),
-      offsetManager(OffsetManager::getInstance()),
+      offsetManager(0),
       terminate(true),
       windowId(0),
       lastScreenSize(),
@@ -80,6 +81,9 @@ TheGame::TheGame()
         eventReceiver = new EventReceiver();
         shaders = new ShadersSM20();
         hk::initialize();
+        OffsetManager::initialize();
+        offsetManager = OffsetManager::getInstance();
+        ObjectPoolManager::initialize();
     }
 }
 
@@ -102,6 +106,9 @@ TheGame::~TheGame()
     smgr = 0;
     fps_camera = fix_camera = camera = 0;
 
+    OffsetManager::finalize();
+    ObjectPoolManager::finalize();
+    Settings::finalize();
     if (driver)
     {
         driver->removeAllTextures();
@@ -113,13 +120,12 @@ TheGame::~TheGame()
         device->drop();
         device = 0;
     }
-    Settings::destroy();
-    OffsetManager::destroy();
     hk::finalize();
 }
 
 void TheGame::readSettings(irr::SIrrlichtCreationParameters& params)
 {
+    Settings::initialize();
     Settings::getInstance()->read();
 }
 
@@ -157,6 +163,8 @@ void TheGame::loop()
     testQuad.getMaterial().MaterialType = shaders->materialMap["quad2d"];
     //testQuad.getMaterial().setTexture(0, driver->getTexture("data/menu_textures/bg_frame_main_1280.png"));
     testQuad.rotate(30.0f, irr::core::position2di(150, 150));
+
+    ObjectPoolManager::getInstance()->getObject("vw3", irr::core::vector3df());
 
     while (device->run() && !terminate)
     {

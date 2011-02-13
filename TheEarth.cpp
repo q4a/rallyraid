@@ -11,9 +11,114 @@
 //#include <sys/types.h>
 //#include <direct.h>
 #include <errno.h>
+#include "Terrain.h"
+
+
+const irr::core::vector3di TheEarth::VisualMembers::terrainPos[3][3] =
+{
+    {
+        irr::core::vector3di(-TILE_SIZE-TILE_HSIZE, 0,            TILE_HSIZE),
+        irr::core::vector3di(-TILE_SIZE-TILE_HSIZE, 0,           -TILE_HSIZE),
+        irr::core::vector3di(-TILE_SIZE-TILE_HSIZE, 0, -TILE_SIZE-TILE_HSIZE)
+
+    },
+    {
+        irr::core::vector3di(          -TILE_HSIZE, 0,            TILE_HSIZE),
+        irr::core::vector3di(          -TILE_HSIZE, 0,           -TILE_HSIZE),
+        irr::core::vector3di(          -TILE_HSIZE, 0, -TILE_SIZE-TILE_HSIZE)
+    },
+    {
+        irr::core::vector3di(           TILE_HSIZE, 0,            TILE_HSIZE),
+        irr::core::vector3di(           TILE_HSIZE, 0,           -TILE_HSIZE),
+        irr::core::vector3di(           TILE_HSIZE, 0, -TILE_SIZE-TILE_HSIZE)
+    }
+};
+
+const irr::core::vector3df TheEarth::VisualMembers::terrainPosf[3][3] =
+{
+    {
+        irr::core::vector3df(-TILE_SIZE_F-TILE_HSIZE_F, 0.0f,              TILE_HSIZE_F),
+        irr::core::vector3df(-TILE_SIZE_F-TILE_HSIZE_F, 0.0f,             -TILE_HSIZE_F),
+        irr::core::vector3df(-TILE_SIZE_F-TILE_HSIZE_F, 0.0f, -TILE_SIZE_F-TILE_HSIZE_F)
+
+    },
+    {
+        irr::core::vector3df(            -TILE_HSIZE_F, 0.0f,              TILE_HSIZE_F),
+        irr::core::vector3df(            -TILE_HSIZE_F, 0.0f,             -TILE_HSIZE_F),
+        irr::core::vector3df(            -TILE_HSIZE_F, 0.0f, -TILE_SIZE_F-TILE_HSIZE_F)
+    },
+    {
+        irr::core::vector3df(             TILE_HSIZE_F, 0.0f,              TILE_HSIZE_F),
+        irr::core::vector3df(             TILE_HSIZE_F, 0.0f,             -TILE_HSIZE_F),
+        irr::core::vector3df(             TILE_HSIZE_F, 0.0f, -TILE_SIZE_F-TILE_HSIZE_F)
+    }
+};
+
+
+TheEarth::VisualMembers::VisualMembers()
+{
+    memset(terrainCircle, 0, sizeof(Terrain*)*3*3);
+}
+
+TheEarth::VisualMembers::~VisualMembers()
+{
+    for (unsigned int i = 0; i < 3; i++)
+    {
+        for (unsigned int j = 0; j < 3; j++)
+        {
+            if (terrainCircle[i][j])
+            {
+                delete terrainCircle[i][j];
+                terrainCircle[i][j] = 0;
+            }
+        }
+    }
+}
+
+void TheEarth::VisualMembers::setVisible(bool visible)
+{
+    for (unsigned int i = 0; i < 3; i++)
+    {
+        for (unsigned int j = 0; j < 3; j++)
+        {
+            if (terrainCircle[i][j])
+            {
+                terrainCircle[i][j]->setVisible(visible);
+            }
+        }
+    }
+}
+
+void TheEarth::VisualMembers::createMembers(const irr::core::vector3di& centerPosi, TheEarth* earth)
+{
+    for (unsigned int i = 0; i < 3; i++)
+    {
+        for (unsigned int j = 0; j < 3; j++)
+        {
+            assert(terrainCircle[i][j] == 0);
+            terrainCircle[i][j] = new Terrain(centerPosi+terrainPos[i][j], earth);
+        }
+    }
+}
+
+void TheEarth::VisualMembers::loadMembers(TheEarth* earth)
+{
+    for (unsigned int i = 0; i < 3; i++)
+    {
+        for (unsigned int j = 0; j < 3; j++)
+        {
+            assert(terrainCircle[i][j] != 0);
+        }
+    }
+}
+
+void TheEarth::VisualMembers::finalizeMembers()
+{
+}
 
 
 TheEarth* TheEarth::theEarth = 0;
+const irr::video::SColor TheEarth::baseColor;
 
 void TheEarth::initialize()
 {
@@ -35,6 +140,11 @@ void TheEarth::finalize()
     
 TheEarth::TheEarth()
     : earthTexture(0),
+      visualPart(0),
+      newVisualPart(0),
+      lastPosBox(),
+      lastCenterPos(),
+      lastCenterPosi(),
       xsize(0),
       ysize(0),
       height(0),
@@ -44,8 +154,9 @@ TheEarth::TheEarth()
       hasDetailTex(0),
       maxHeight(0),
       minHeight(0xFFFF),
-      tileSet()
+      tileMap()
 {
+    TheGame::getInstance()->getDevice()->getFileSystem()->grab();
     read();
 }
 
@@ -77,14 +188,83 @@ TheEarth::~TheEarth()
         hasDetailTex = 0;
     }
     
-    for (tileSet_t::iterator it = tileSet.begin(); it != tileSet.end(); it++)
+    for (tileMap_t::iterator it = tileMap.begin(); it != tileMap.end(); it++)
     {
-        delete *it;
+        delete it->second;
     }
-    tileSet.clear();
+    tileMap.clear();
+    TheGame::getInstance()->getDevice()->getFileSystem()->drop();
 }
 
-unsigned short TheEarth::getHeight(unsigned int x, unsigned int y) const
+void TheEarth::run()
+{
+}
+
+unsigned short TheEarth::getTileHeight(unsigned int x, unsigned int y)
+{
+    const unsigned int tileX = x / TILE_POINTS_NUM;
+    const unsigned int tileY = y / TILE_POINTS_NUM;
+    const unsigned int inX = x % TILE_POINTS_NUM;
+    const unsigned int inY = y % TILE_POINTS_NUM;
+
+    if (tileX < xsize && tileY < ysize)
+    {
+        Tile* tile;
+        if (getIsLoaded(tileX, tileY))
+        {
+            tile = tileMap[tileX + (xsize*tileY)];
+            tile->setInUse();
+        }
+        else
+        {
+            tile = new Tile(tileX, tileY,
+                getEarthTexture(tileX, tileY),
+                getEarthTexture(tileX+1, tileY),
+                getEarthTexture(tileX, tileY+1),
+                getEarthTexture(tileX+1, tileY+1));
+            tileMap[tileX + (xsize*tileY)] = tile;
+        }
+        return tile->getHeight(inX, inY);
+    }
+    else
+    {
+        return 0;
+    }
+}
+
+const irr::video::SColor& TheEarth::getTileTexture(unsigned int x, unsigned int y)
+{
+    const unsigned int tileX = x / TILE_POINTS_NUM;
+    const unsigned int tileY = y / TILE_POINTS_NUM;
+    const unsigned int inX = x % TILE_POINTS_NUM;
+    const unsigned int inY = y % TILE_POINTS_NUM;
+
+    if (tileX < xsize && tileY < ysize)
+    {
+        Tile* tile;
+        if (getIsLoaded(tileX, tileY))
+        {
+            tile = tileMap[tileX + (xsize*tileY)];
+            tile->setInUse();
+        }
+        else
+        {
+            tile = new Tile(tileX, tileY,
+                getEarthTexture(tileX, tileY),
+                getEarthTexture(tileX+1, tileY),
+                getEarthTexture(tileX, tileY+1),
+                getEarthTexture(tileX+1, tileY+1));
+            tileMap[tileX + (xsize*tileY)] = tile;
+        }
+        return tile->getColor(inX, inY);
+    }
+    else
+    {
+        return baseColor;
+    }
+}
+
+unsigned short TheEarth::getEarthHeight(unsigned int x, unsigned int y) const
 {
     if (height && x < xsize && y < ysize)
     {
@@ -96,7 +276,7 @@ unsigned short TheEarth::getHeight(unsigned int x, unsigned int y) const
     }
 }
 
-bool TheEarth::setHeight(unsigned int x, unsigned int y, unsigned short val)
+bool TheEarth::setEarthHeight(unsigned int x, unsigned int y, unsigned short val)
 {
     if (height && x < xsize && y < ysize)
     {
@@ -213,9 +393,8 @@ bool TheEarth::setHasDetailTex(unsigned int x, unsigned int y, bool val)
     }
 }
 
-irr::video::SColor TheEarth::getDensity(unsigned int x, unsigned int y) const
+irr::video::SColor TheEarth::getEarthDensity(unsigned int x, unsigned int y) const
 {
-    static const irr::video::SColor nullColor;
     if (density && xsize > 0 && ysize > 0)
     {
         if (x >= xsize) x = xsize - 1;
@@ -224,11 +403,11 @@ irr::video::SColor TheEarth::getDensity(unsigned int x, unsigned int y) const
     }
     else
     {
-        return nullColor;
+        return baseColor;
     }
 }
 
-bool TheEarth::setDensity(unsigned int x, unsigned int y, const irr::video::SColor& val)
+bool TheEarth::setEarthDensity(unsigned int x, unsigned int y, const irr::video::SColor& val)
 {
     if (density && xsize > 0 && ysize > 0)
     {
@@ -243,9 +422,8 @@ bool TheEarth::setDensity(unsigned int x, unsigned int y, const irr::video::SCol
     }
 }
 
-irr::video::SColor TheEarth::getTexture(unsigned int x, unsigned int y) const
+irr::video::SColor TheEarth::getEarthTexture(unsigned int x, unsigned int y) const
 {
-    static const irr::video::SColor nullColor;
     if (density && xsize > 0 && ysize > 0)
     {
         if (x >= xsize) x = xsize - 1;
@@ -254,7 +432,7 @@ irr::video::SColor TheEarth::getTexture(unsigned int x, unsigned int y) const
     }
     else
     {
-        return nullColor;
+        return baseColor;
     }
 }
 
@@ -317,7 +495,7 @@ bool TheEarth::readHeight()
     {
         for (unsigned int i = 0; i < xsize; i++)
         {
-            unsigned short val = getHeight(i, j);
+            unsigned short val = getEarthHeight(i, j);
             if (val > maxHeight) maxHeight = val;
             if (val < minHeight) minHeight = val;
         }
@@ -608,7 +786,7 @@ bool TheEarth::writeHeightToPNG(irr::IrrlichtDevice* device, irr::video::IVideoD
     {
         for (unsigned int j = 0; j < ysize; j++)
         {
-            unsigned int color = (255*(unsigned int)(getHeight(i, j)-minHeight))/(unsigned int)(maxHeight-minHeight);
+            unsigned int color = (255*(unsigned int)(getEarthHeight(i, j)-minHeight))/(unsigned int)(maxHeight-minHeight);
             image->setPixel(i, j, irr::video::SColor(255, color, color, color));
         }
     }
@@ -658,4 +836,31 @@ bool TheEarth::writeEarthTextureToPNG(irr::IrrlichtDevice* device, irr::video::I
 
     bool ret = driver->writeImageToFile(earthTexture, device->getFileSystem()->createAndWriteFile(path));
     return ret;
+}
+
+void TheEarth::createFirst(const irr::core::vector3df& pos, const irr::core::vector3df& dir)
+{
+    lastCenterPosi = irr::core::vector3di((int)pos.X, 0, (int)pos.Z);
+    lastCenterPos = irr::core::vector3df((float)lastCenterPosi.X, (float)lastCenterPosi.Y, (float)lastCenterPosi.Z);
+    lastPosBox = irr::core::aabbox3df(lastCenterPos.X-VISUAL_BOX_HSIZE_F, -1000.0f, lastCenterPos.Z-VISUAL_BOX_HSIZE_F,
+        lastCenterPos.X+VISUAL_BOX_HSIZE_F, 10000.0f, lastCenterPos.Z+VISUAL_BOX_HSIZE_F);
+
+    if (visualPart)
+    {
+        delete visualPart;
+        visualPart = 0;
+    }
+    if (newVisualPart)
+    {
+        delete newVisualPart;
+        newVisualPart = 0;
+    }
+
+    visualPart = new VisualMembers();
+    visualPart->createMembers(lastCenterPosi, this);
+    visualPart->loadMembers(this);
+}
+
+void TheEarth::update(const irr::core::vector3df& pos, const irr::core::vector3df& dir)
+{
 }

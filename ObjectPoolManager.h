@@ -4,8 +4,10 @@
 
 #include <string>
 #include <map>
+#include <irrlicht.h>
 
 class ObjectPool;
+class OffsetObject;
 
 class ObjectPoolManager
 {
@@ -25,7 +27,11 @@ private:
     ~ObjectPoolManager();
 
     void read();
-    
+
+public:
+    OffsetObject* getObject(const std::string& objectPoolName, const irr::core::vector3df& apos);
+    void putObject(OffsetObject* offsetObject);
+
 private:
     objectPoolMap_t objectPoolMap;
 };

@@ -36,7 +36,7 @@ public:
         bool physics, ObjectType objectType,
         const std::string& materialName, const std::string& material2Name,
         unsigned int num, unsigned int category,
-        float friction);
+        float friction, float mass);
     ~ObjectPool();
 
     OffsetObject* getObject(const irr::core::vector3df& apos);
@@ -61,6 +61,7 @@ private:
     irr::video::E_MATERIAL_TYPE material;
     irr::video::E_MATERIAL_TYPE material2;
     float                       friction;
+    float                       mass;
 };
 
 #endif // OBJECTPOOL_H

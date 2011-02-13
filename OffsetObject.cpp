@@ -5,12 +5,12 @@
 #include <stdio.h>
 
 OffsetObject::OffsetObject()
-    : node(0), hkBody(0), pos(), iterator(), dynamic(false), offsetManager(OffsetManager::getInstance())
+    : node(0), hkBody(0), pos(), iterator(), dynamic(false), offsetManager(OffsetManager::getInstance()), pool(0), updateCB(0)
 {
 }
 
 OffsetObject::OffsetObject(irr::scene::ISceneNode* node)
-    : node(node), hkBody(0), pos(), iterator(), dynamic(false), offsetManager(OffsetManager::getInstance())
+    : node(node), hkBody(0), pos(), iterator(), dynamic(false), offsetManager(OffsetManager::getInstance()), pool(0), updateCB(0)
 {
     if (node)
     {
@@ -19,7 +19,7 @@ OffsetObject::OffsetObject(irr::scene::ISceneNode* node)
 }
 
 OffsetObject::OffsetObject(irr::scene::ISceneNode* node, hkpRigidBody* hkBody)
-    : node(node), hkBody(hkBody), pos(), iterator(), dynamic(false), offsetManager(OffsetManager::getInstance())
+    : node(node), hkBody(hkBody), pos(), iterator(), dynamic(false), offsetManager(OffsetManager::getInstance()), pool(0), updateCB(0)
 {
     if (node)
     {
@@ -28,7 +28,7 @@ OffsetObject::OffsetObject(irr::scene::ISceneNode* node, hkpRigidBody* hkBody)
 }
 
 OffsetObject::OffsetObject(irr::scene::ISceneNode* node, bool dynamic)
-    : node(node), hkBody(0), pos(), iterator(), dynamic(dynamic), offsetManager(OffsetManager::getInstance())
+    : node(node), hkBody(0), pos(), iterator(), dynamic(dynamic), offsetManager(OffsetManager::getInstance()), pool(0), updateCB(0)
 {
     /*
     if (node)
@@ -39,7 +39,7 @@ OffsetObject::OffsetObject(irr::scene::ISceneNode* node, bool dynamic)
 }
 
 OffsetObject::OffsetObject(irr::scene::ISceneNode* node, hkpRigidBody* hkBody, bool dynamic)
-    : node(node), hkBody(hkBody), pos(), iterator(), dynamic(dynamic), offsetManager(OffsetManager::getInstance())
+    : node(node), hkBody(hkBody), pos(), iterator(), dynamic(dynamic), offsetManager(OffsetManager::getInstance()), pool(0), updateCB(0)
 {
     /*
     if (node)
@@ -85,7 +85,10 @@ void OffsetObject::update(const irr::core::vector3df& offset, const irr::core::v
         }
         hkBody->setPosition(hkVector4(tv.X, tv.Y, tv.Z));
     }
-    updatePositionCB(node->getPosition());
+    if (updateCB)
+    {
+        updateCB->handleUpdatePos(node->getPosition());
+    }
 }
 
 void OffsetObject::addToManager()

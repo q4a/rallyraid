@@ -10,13 +10,15 @@ typedef irr::core::list<OffsetObject*> offsetObjectList_t;
 class OffsetManager
 {
 public:
-    static OffsetManager* getInstance();
-    static void destroy();
+    static void initialize();
+    static void finalize();
+    static OffsetManager* getInstance() {return offsetManager;}
 private:
     static OffsetManager* offsetManager;
 
 public:
     OffsetManager();
+    ~OffsetManager();
     bool update(const irr::core::vector3df& newPos, bool force = false);
     const irr::core::vector3df& getOffset() const {return offset;}
     void addObject(OffsetObject* object);

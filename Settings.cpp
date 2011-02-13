@@ -6,16 +6,15 @@
 Settings* Settings::settings = 0;
 const std::string Settings::settingsFilename = "data/Dakar2012_settings.cfg";
 
-Settings* Settings::getInstance()
+void Settings::initialize()
 {
     if (settings == 0)
     {
         settings = new Settings();
     }
-    return settings;
 }
 
-void Settings::destroy()
+void Settings::finalize()
 {
     if (settings)
     {

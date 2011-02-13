@@ -1,21 +1,21 @@
 #include "OffsetManager.h"
 #include "OffsetObject.h"
+#include "ObjectPoolManager.h"
 //#include "TerrainPool.h"
 //#include "gameplay.h"
 #include <stdio.h>
 
 OffsetManager* OffsetManager::offsetManager = 0;
 
-OffsetManager* OffsetManager::getInstance()
+void OffsetManager::initialize()
 {
     if (offsetManager == 0)
     {
         offsetManager = new OffsetManager();
     }
-    return offsetManager;
 }
 
-void OffsetManager::destroy()
+void OffsetManager::finalize()
 {
     if (offsetManager)
     {
@@ -27,6 +27,14 @@ void OffsetManager::destroy()
 OffsetManager::OffsetManager()
     : objects(), offset(), last()
 {
+}
+
+OffsetManager::~OffsetManager()
+{
+    while (objects.size() > 0)
+    {
+        ObjectPoolManager::getInstance()->putObject(*objects.begin());
+    }
 }
 
 void OffsetManager::addObject(OffsetObject* object)

@@ -5,6 +5,15 @@
 #include "hk.h"
 #include "OffsetManager.h"
 
+class ObjectPool;
+
+class OffsetObjectUpdateCB
+{
+protected:
+    friend class OffsetObject;
+    virtual void handleUpdatePos(const irr::core::vector3df& newPos);
+};
+
 class OffsetObject
 {
 public:
@@ -13,7 +22,9 @@ public:
     OffsetObject(irr::scene::ISceneNode* node, hkpRigidBody* hkBody);
     OffsetObject(irr::scene::ISceneNode* node, bool dynamic);
     OffsetObject(irr::scene::ISceneNode* node, hkpRigidBody* hkBody, bool dynamic);
-    
+    virtual ~OffsetObject();
+
+    irr::scene::ISceneNode* getNode() {return node;}
     void setNode(irr::scene::ISceneNode* p_node)
     {
         node = p_node;
@@ -26,6 +37,8 @@ public:
             pos = irr::core::vector3df();
         }
     }
+
+    hkpRigidBody* getBody() {return hkBody;}
     void setBody(hkpRigidBody* p_hkBody)
     {
         if (node)
@@ -37,22 +50,19 @@ public:
             hkBody = 0;
         }
     }
-
-    virtual void updatePositionCB(const irr::core::vector3df& newPos)
-    {
-    }
-
-    virtual ~OffsetObject();
     
     void update(const irr::core::vector3df& offset, const irr::core::vector3df& loffset);
     
     void setPos(const irr::core::vector3df& apos) {pos = apos;}
     irr::core::vector3df& getPos() {return pos;}
-    irr::scene::ISceneNode* getNode() {return node;}
-    hkpRigidBody* getBody() {return hkBody;}
+
+    ObjectPool* getPool() {return pool;}
+    void setPool(ObjectPool* p_pool) {pool = p_pool;}
 
     void addToManager();
     void removeFromManager();
+
+    void setUpdateCB(OffsetObjectUpdateCB* p_updateCB) {updateCB = p_updateCB;}
     
 private:
     friend class OffsetManager;
@@ -62,6 +72,8 @@ private:
     offsetObjectList_t::Iterator    iterator;
     bool                            dynamic;
     OffsetManager*                  offsetManager;
+    ObjectPool*                     pool;
+    OffsetObjectUpdateCB*           updateCB;
 };
 
 #endif // OFFSETOBJECT_H

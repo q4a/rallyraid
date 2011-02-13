@@ -1,6 +1,7 @@
 
 #include "ObjectPoolManager.h"
 #include "ObjectPool.h"
+#include "OffsetObject.h"
 #include "ConfigFile.h"
 #include "stdafx.h"
 #include "StringConverter.h"
@@ -70,6 +71,7 @@ void ObjectPoolManager::read()
         unsigned int category = 0;
         unsigned int num = 1;
         float friction = 0.5f;
+        float mass = 0.0f;
 
         objectName = seci.peekNextKey();
         dprintf(MY_DEBUG_NOTE, "\tObject: %s\n", objectName.c_str());
@@ -102,6 +104,12 @@ void ObjectPoolManager::read()
                 if (valName == "vehicle")
                 {
                     objectType = ObjectPool::Vehicle;
+                } else if (valName == "grass")
+                {
+                    objectType = ObjectPool::Grass;
+                } else if (valName == "tree")
+                {
+                    objectType = ObjectPool::Tree;
                 }
             } else if (keyName == "category")
             {
@@ -112,13 +120,26 @@ void ObjectPoolManager::read()
             } else if (keyName == "friction")
             {
                 friction = StringConverter::parseFloat(valName, 0.5f);
+            } else if (keyName == "mass")
+            {
+                mass = StringConverter::parseFloat(valName, 0.0f);
             }
         }
         
         if (objectName != "")
         {
             objectPoolMap[objectName] = new ObjectPool(meshFilename, textureFilename, texture2Filename,
-                physics, objectType, material, material2, num, category, friction);
+                physics, objectType, material, material2, num, category, friction, mass);
         }
     }
+}
+
+OffsetObject* ObjectPoolManager::getObject(const std::string& objectPoolName, const irr::core::vector3df& apos)
+{
+    return objectPoolMap[objectPoolName]->getObject(apos);
+}
+
+void ObjectPoolManager::putObject(OffsetObject* offsetObject)
+{
+    offsetObject->getPool()->putObject(offsetObject);
 }
