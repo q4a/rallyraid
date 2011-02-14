@@ -20,6 +20,8 @@ public:
     Shaders();
     ~Shaders();
 
+    unsigned int getSupportedSMVersion() {return supportedSMVersion;}
+
     static irr::video::E_MATERIAL_TYPE stringToBaseType(const std::string& baseMaterialName);
 
 private:

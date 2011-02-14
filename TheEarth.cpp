@@ -264,6 +264,41 @@ const irr::video::SColor& TheEarth::getTileTexture(unsigned int x, unsigned int 
     }
 }
 
+void TheEarth::getTileHeightAndTexture(unsigned int x, unsigned int y, 
+    unsigned short& height, irr::video::SColor& textureColor)
+{
+    const unsigned int tileX = x / TILE_POINTS_NUM;
+    const unsigned int tileY = y / TILE_POINTS_NUM;
+    const unsigned int inX = x % TILE_POINTS_NUM;
+    const unsigned int inY = y % TILE_POINTS_NUM;
+
+    if (tileX < xsize && tileY < ysize)
+    {
+        Tile* tile;
+        if (getIsLoaded(tileX, tileY))
+        {
+            tile = tileMap[tileX + (xsize*tileY)];
+            tile->setInUse();
+        }
+        else
+        {
+            tile = new Tile(tileX, tileY,
+                getEarthTexture(tileX, tileY),
+                getEarthTexture(tileX+1, tileY),
+                getEarthTexture(tileX, tileY+1),
+                getEarthTexture(tileX+1, tileY+1));
+            tileMap[tileX + (xsize*tileY)] = tile;
+        }
+        height = tile->getHeight(inX, inY);
+        textureColor = tile->getColor(inX, inY);
+    }
+    else
+    {
+        height = 0;
+        textureColor = baseColor;
+    }
+}
+
 unsigned short TheEarth::getEarthHeight(unsigned int x, unsigned int y) const
 {
     if (height && x < xsize && y < ysize)

@@ -5,6 +5,7 @@
 #include "OffsetObject.h"
 #include "TheEarth.h"
 #include <math.h>
+#include "Shaders.h"
 
 class HeightFieldHelper : public hkpSampledHeightFieldShape
 {
@@ -60,12 +61,14 @@ Terrain::Terrain(const irr::core::vector3di& posi, TheEarth* earth)
     terrain->setVisible(false);
     offsetObject = new OffsetObject(terrain);
 
+    hk::lock();
     hkpSampledHeightFieldBaseCinfo ci;
     ci.m_xRes = TILE_POINTS_NUM + 1;
     ci.m_zRes = TILE_POINTS_NUM + 1;
-    ci.m_scale.set(TILE_SCALE_F, 1.0f, TILE_SCALE);
+    ci.m_scale.set(TILE_SCALE_F, 1.0f, TILE_SCALE_F);
 
     hkShape = new HeightFieldHelper(ci, earth, posi.X, posi.Z);
+    hk::unlock();
 }
 
 Terrain::~Terrain()
@@ -87,9 +90,20 @@ Terrain::~Terrain()
 
 void Terrain::load(TheEarth* earth)
 {
-    hk::lock();
+    terrain->loadHeightMap(earth, offsetX, offsetY, TILE_POINTS_NUM);
 
-    hk::unlock();
+    if (TheGame::getInstance()->getShaders()->getSupportedSMVersion() < 2)
+    {
+        terrain->setMaterialFlag(irr::video::EMF_LIGHTING, true);
+    }
+    else
+    {
+        terrain->setMaterialFlag(irr::video::EMF_LIGHTING, false);
+    }
+    terrain->scaleTexture(1.0f, TILE_SIZE_F);
+    terrain->setMaterialTexture(0, terrain->getGeneratedTexture());
+    terrain->setMaterialTexture(1, TheGame::getInstance()->getDriver()->getTexture("data/earthdata/detailmap.jpg"));
+    terrain->setMaterialType(TheGame::getInstance()->getShaders()->materialMap["terrain"]);
 }
 
 void Terrain::setVisible(bool p_visible)

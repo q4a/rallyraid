@@ -46,6 +46,8 @@ private:
 public:
     unsigned short getTileHeight(unsigned int x, unsigned int y);
     const irr::video::SColor& getTileTexture(unsigned int x, unsigned int y);
+    void getTileHeightAndTexture(unsigned int x, unsigned int y,
+        unsigned short& height, irr::video::SColor& textureColor);
 
     unsigned short getEarthHeight(unsigned int x, unsigned int y) const;
     bool getHasDetail(unsigned int x, unsigned int y) const;

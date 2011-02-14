@@ -112,7 +112,12 @@ irr::video::E_MATERIAL_TYPE Shaders::stringToBaseType(const std::string& baseMat
     {
         return irr::video::EMT_TRANSPARENT_ALPHA_CHANNEL;
     }
+    else if (baseMaterialName == "detailmap")
+    {
+        return irr::video::EMT_DETAIL_MAP;
+    }
     else
+
     {
         return irr::video::EMT_SOLID;
     }

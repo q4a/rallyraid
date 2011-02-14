@@ -10,12 +10,18 @@
 #include <path.h>
 #include <ETerrainElements.h>
 
+class TheEarth;
+
 namespace irr
 {
 namespace io
 {
 	class IFileSystem;
 	class IReadFile;
+}
+namespace video
+{
+    class ITexture;
 }
 namespace scene
 {
@@ -48,6 +54,9 @@ namespace scene
 
 		virtual ~TerrainSceneNode();
 
+		virtual bool loadHeightMap(TheEarth* earth, int offsetX, int offsetY, unsigned int size);
+        irr::video::ITexture* getGeneratedTexture() {return texture;}
+#if 0
 		//! Initializes the terrain data.  Loads the vertices from the heightMapFile.
 		virtual bool loadHeightMap(io::IReadFile* file,
 			video::SColor vertexColor = video::SColor ( 255, 255, 255, 255 ), s32 smoothFactor = 0 );
@@ -55,7 +64,7 @@ namespace scene
 		//! Initializes the terrain data.  Loads the vertices from the heightMapFile.
 		virtual bool loadHeightMapRAW(io::IReadFile* file, s32 bitsPerPixel = 16,
 			bool signedData=true, bool floatVals=false, s32 width=0, video::SColor vertexColor = video::SColor ( 255, 255, 255, 255 ), s32 smoothFactor = 0 );
-
+#endif // 0
 		//! Returns the material based on the zero based index i. This scene node only uses
 		//! 1 material.
 		//! \param i: Zero based index i. UNUSED, left in for virtual purposes.
@@ -324,12 +333,11 @@ namespace scene
 		f32 TCoordScale2;
 		io::path HeightmapFile;
 		io::IFileSystem* FileSystem;
+        video::ITexture* texture;
 	};
 
 
 } // end namespace scene
 } // end namespace irr
 
-#endif // __C_TERRAIN_SCENE_NODE_H__
-
-
+#endif // TERRAINSCENENODE_H
