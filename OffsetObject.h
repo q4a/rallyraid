@@ -2,6 +2,7 @@
 #define OFFSETOBJECT_H
 
 #include <irrlicht.h>
+#include <set>
 #include "hk.h"
 #include "OffsetManager.h"
 
@@ -62,7 +63,9 @@ public:
     void addToManager();
     void removeFromManager();
 
-    void setUpdateCB(OffsetObjectUpdateCB* p_updateCB) {updateCB = p_updateCB;}
+    void setUpdateCB(OffsetObjectUpdateCB* p_updateCB);
+    
+    static void updateDynamicToPhys();
     
 private:
     friend class OffsetManager;
@@ -74,6 +77,10 @@ private:
     OffsetManager*                  offsetManager;
     ObjectPool*                     pool;
     OffsetObjectUpdateCB*           updateCB;
+    
+    typedef std::set<OffsetObject*> dynamicObjectSet_t;
+    static dynamicObjectSet_t       dynamicObjectSet;
+    static irr::core::matrix4       helperMatrix;
 };
 
 #endif // OFFSETOBJECT_H

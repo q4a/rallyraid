@@ -5,7 +5,7 @@
 #ifndef TERRAINSCENENODE_H
 #define TERRAINSCENENODE_H
 
-#include <ISceneNode.h>
+#include <ITerrainSceneNode.h>
 #include <IDynamicMeshBuffer.h>
 #include <path.h>
 #include <ETerrainElements.h>
@@ -22,6 +22,7 @@ namespace io
 namespace video
 {
     class ITexture;
+    class IImage;
 }
 namespace scene
 {
@@ -30,7 +31,7 @@ namespace scene
 	class IMesh;
 
 	//! A scene node for displaying terrain using the geo mip map algorithm.
-	class TerrainSceneNode : public ISceneNode
+	class TerrainSceneNode : public ITerrainSceneNode
 	{
 	public:
 
@@ -55,8 +56,9 @@ namespace scene
 		virtual ~TerrainSceneNode();
 
 		virtual bool loadHeightMap(TheEarth* earth, int offsetX, int offsetY, unsigned int size);
-        irr::video::ITexture* getGeneratedTexture() {return texture;}
-#if 0
+        //irr::video::ITexture* getGeneratedTexture() {return texture;}
+        irr::video::IImage* getGeneratedImage() {return image;}
+#if 1
 		//! Initializes the terrain data.  Loads the vertices from the heightMapFile.
 		virtual bool loadHeightMap(io::IReadFile* file,
 			video::SColor vertexColor = video::SColor ( 255, 255, 255, 255 ), s32 smoothFactor = 0 );
@@ -333,7 +335,8 @@ namespace scene
 		f32 TCoordScale2;
 		io::path HeightmapFile;
 		io::IFileSystem* FileSystem;
-        video::ITexture* texture;
+        //video::ITexture* texture;
+        video::IImage* image;
 	};
 
 

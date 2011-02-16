@@ -6,6 +6,7 @@
 class EventReceiver;
 class Shaders;
 class OffsetManager;
+class TheEarth;
 
 class TheGame
 {
@@ -52,13 +53,17 @@ private:
     EventReceiver*                  eventReceiver;
     Shaders*                        shaders;
     OffsetManager*                  offsetManager;
+    TheEarth*                       earth;
 
     bool                            terminate;
     size_t                          windowId;
     irr::core::dimension2du         lastScreenSize;
     unsigned int                    failed_render;
     unsigned int                    tick;
-    unsigned int                    last_tick;
+    unsigned int                    lastPhysTick;
+    unsigned int                    lastSlowTick;
+
+    irr::gui::IGUIStaticText*       testText;
 };
 
 inline irr::IrrlichtDevice* TheGame::getDevice()

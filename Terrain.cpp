@@ -20,6 +20,7 @@ public:
     
     HK_FORCE_INLINE hkReal getHeightAtImpl(int x, int z) const
     {
+        //printf("gh ");
         return (hkReal)earth->getTileHeight((unsigned int)abs(offsetX+x), (unsigned int)abs(offsetY+z));
     }
     
@@ -47,7 +48,7 @@ Terrain::Terrain(const irr::core::vector3di& posi, TheEarth* earth)
       offsetObject(0),
       visible(false),
       offsetX(posi.X / TILE_SCALE),
-      offsetY(posi.Y / TILE_SCALE)
+      offsetY(posi.Z / TILE_SCALE)
 {
     terrain = new irr::scene::TerrainSceneNode(0, 
         TheGame::getInstance()->getSmgr(),
@@ -60,7 +61,18 @@ Terrain::Terrain(const irr::core::vector3di& posi, TheEarth* earth)
         irr::core::vector3df(TILE_SCALE, 1.0f, TILE_SCALE));
     terrain->setVisible(false);
     offsetObject = new OffsetObject(terrain);
-
+    //terrain = TheGame::getInstance()->getSmgr()->addTerrainSceneNode("data/earthdata/detailmap.jpg");
+    /*
+    terrain = new irr::scene::TerrainSceneNode(0, 
+        TheGame::getInstance()->getSmgr(),
+        TheGame::getInstance()->getDevice()->getFileSystem(),
+        -1,
+        4,
+        irr::scene::ETPS_17,
+        irr::core::vector3df(0.f, 0.f, 0.f),
+        irr::core::vector3df(),
+        irr::core::vector3df(TILE_SCALE_F, 1.0f, TILE_SCALE_F));
+    */
     hk::lock();
     hkpSampledHeightFieldBaseCinfo ci;
     ci.m_xRes = TILE_POINTS_NUM + 1;
@@ -90,7 +102,9 @@ Terrain::~Terrain()
 
 void Terrain::load(TheEarth* earth)
 {
-    terrain->loadHeightMap(earth, offsetX, offsetY, TILE_POINTS_NUM);
+    //irr::io::IReadFile* file = TheGame::getInstance()->getDevice()->getFileSystem()->createAndOpenFile("data/earthdata/detailmap.jpg");
+    //terrain->loadHeightMap(file);
+    terrain->loadHeightMap(earth, offsetX, offsetY, TILE_POINTS_NUM+1);
 
     if (TheGame::getInstance()->getShaders()->getSupportedSMVersion() < 2)
     {
@@ -101,9 +115,28 @@ void Terrain::load(TheEarth* earth)
         terrain->setMaterialFlag(irr::video::EMF_LIGHTING, false);
     }
     terrain->scaleTexture(1.0f, TILE_SIZE_F);
-    terrain->setMaterialTexture(0, terrain->getGeneratedTexture());
-    terrain->setMaterialTexture(1, TheGame::getInstance()->getDriver()->getTexture("data/earthdata/detailmap.jpg"));
-    terrain->setMaterialType(TheGame::getInstance()->getShaders()->materialMap["terrain"]);
+    //terrain->setMaterialTexture(0, terrain->getGeneratedTexture());
+    //terrain->setMaterialTexture(1, TheGame::getInstance()->getDriver()->getTexture("data/earthdata/detailmap.jpg"));
+    //terrain->setMaterialType(TheGame::getInstance()->getShaders()->materialMap["terrain"]);
+    
+    // precache body
+    /*
+    if (hkShape)
+    {
+        hk::lock();
+        hkpRigidBodyCinfo groundInfo;
+        groundInfo.m_shape = hkShape;
+        groundInfo.m_position.set(terrain->getPosition().X, terrain->getPosition().Y, terrain->getPosition().Z);
+        groundInfo.m_motionType = hkpMotion::MOTION_FIXED;
+        groundInfo.m_friction = 0.7f;
+        hkpRigidBody* hkBody = new hkpRigidBody(groundInfo);
+        //hkpPropertyValue val(1);
+        //hkBody->addProperty(terrainID, val);
+        hk::hkWorld->addEntity(hkBody);
+        hk::unlock();
+        offsetObject->setBody(hkBody);
+    }
+    */
 }
 
 void Terrain::setVisible(bool p_visible)
@@ -114,12 +147,12 @@ void Terrain::setVisible(bool p_visible)
 
     if (visible)
     {
-        if (hkShape)
+        if (hkShape && offsetObject->getBody() == 0)
         {
             hk::lock();
             hkpRigidBodyCinfo groundInfo;
             groundInfo.m_shape = hkShape;
-            groundInfo.m_position.set(offsetObject->getPos().X, offsetObject->getPos().Y, offsetObject->getPos().Z);
+            groundInfo.m_position.set(terrain->getPosition().X, terrain->getPosition().Y, terrain->getPosition().Z);
             groundInfo.m_motionType = hkpMotion::MOTION_FIXED;
             groundInfo.m_friction = 0.7f;
             hkpRigidBody* hkBody = new hkpRigidBody(groundInfo);
@@ -130,6 +163,14 @@ void Terrain::setVisible(bool p_visible)
             offsetObject->setBody(hkBody);
         }
         offsetObject->addToManager();
+        {
+            char textureMapPartName[255];
+            sprintf_s(textureMapPartName, "textureMapPart_%d_%d", offsetX, offsetY);
+            irr::video::ITexture* texture = TheGame::getInstance()->getSmgr()->getVideoDriver()->addTexture(textureMapPartName, terrain->getGeneratedImage());
+            terrain->setMaterialTexture(0, texture);
+            terrain->setMaterialTexture(1, TheGame::getInstance()->getDriver()->getTexture("data/earthdata/detailmap.jpg"));
+            //image->drop();
+        }
     }
     else
     {
@@ -146,4 +187,9 @@ void Terrain::setVisible(bool p_visible)
         offsetObject->removeFromManager();
     }
     terrain->setVisible(visible);
+}
+
+void Terrain::registerTerrain()
+{
+    terrain->OnRegisterSceneNode();
 }

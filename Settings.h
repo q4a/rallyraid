@@ -26,6 +26,7 @@ public:
 public:
     bool                    preloadObjects;
     bool                    cacheObjects;
+    unsigned int            targetFps;
 };
 
 #endif // SETTINGS_H

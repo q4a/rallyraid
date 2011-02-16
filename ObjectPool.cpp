@@ -131,6 +131,10 @@ OffsetObject* ObjectPool::getObject(const irr::core::vector3df& apos)
         {
             groundInfo.m_motionType = hkpMotion::MOTION_BOX_INERTIA;
             groundInfo.m_mass = mass;
+            // TODO
+            groundInfo.m_position.set(0.0f, 0.0f, 0.0f);
+            groundInfo.m_inertiaTensor.setDiagonal(1.0f, 1.0f, 1.0f);
+            groundInfo.m_centerOfMass.set(/*engine_center_of_mass*/0.0f, /*-center_of_mass*/0.0f, 0.0f);
         }
         else
         {
@@ -143,13 +147,13 @@ OffsetObject* ObjectPool::getObject(const irr::core::vector3df& apos)
         hk::hkWorld->addEntity(hkBody);
         hk::unlock();
         offsetObject->setBody(hkBody);
-
+        //hkBody->activate();
     }
 
     offsetObject->setPool(this);
 
-    offsetObject->getNode()->setVisible(true);
     offsetObject->addToManager();
+    offsetObject->getNode()->setVisible(true);
     return offsetObject;
 }
 

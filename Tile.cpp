@@ -79,9 +79,9 @@ bool Tile::read()
     char filename[256];
     char zipfilename[256];
     char dirname[256];
-    sprintf(dirname, "data/earthdata/tiles/%d_%d", catx, caty);
-    sprintf(zipfilename, "data/earthdata/tiles/%d_%d.zip", catx, caty);
-    sprintf(filename, "%s/%d_%d.dat", dirname, posx, posy);
+    sprintf_s(dirname, "data/earthdata/tiles/%d_%d", catx, caty);
+    sprintf_s(zipfilename, "data/earthdata/tiles/%d_%d.zip", catx, caty);
+    sprintf_s(filename, "%s/%d_%d.dat", dirname, posx, posy);
 
     TheGame::getInstance()->getDevice()->getFileSystem()->addFileArchive(zipfilename, false, false, irr::io::EFAT_ZIP);
     irr::io::IReadFile* file = TheGame::getInstance()->getDevice()->getFileSystem()->createAndOpenFile(filename);

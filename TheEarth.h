@@ -27,7 +27,7 @@ public:
     
 private:
     static TheEarth* theEarth;
-    static const irr::video::SColor baseColor;
+    static irr::video::SColor baseColor;
     
     typedef std::map<unsigned int, Tile*> tileMap_t;
 
@@ -77,6 +77,7 @@ public:
 
     void createFirst(const irr::core::vector3df& pos, const irr::core::vector3df& dir);
     void update(const irr::core::vector3df& pos, const irr::core::vector3df& dir);
+    void registerVisual();
 
 private:
     // common data
@@ -92,6 +93,7 @@ private:
         void createMembers(const irr::core::vector3di& centerPosi, TheEarth* earth);
         void loadMembers(TheEarth* earth);
         void finalizeMembers();
+        void registerMembers();
         
         Terrain* terrainCircle[3][3];
         static const irr::core::vector3di terrainPos[3][3];
@@ -100,6 +102,7 @@ private:
     
     VisualMembers*      visualPart;
     VisualMembers*      newVisualPart;
+    VisualMembers*      newReadyVisualPart;
     
     irr::core::aabbox3df    lastPosBox;
     irr::core::vector3df    lastCenterPos;

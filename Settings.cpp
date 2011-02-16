@@ -26,7 +26,8 @@ void Settings::finalize()
 
 Settings::Settings()
     : preloadObjects(true),
-      cacheObjects(true)
+      cacheObjects(true),
+      targetFps(60)
 {
 }
 
@@ -62,6 +63,9 @@ void Settings::read()
             } else if (keyName == "cache_objects")
             {
                 cacheObjects = StringConverter::parseBool(valName, true);
+            } else if (keyName == "target_fps")
+            {
+                targetFps = StringConverter::parseUnsignedInt(valName, 60);
             }
         }
     }
@@ -83,6 +87,7 @@ void Settings::write()
 
     ret = fprintf(f, "preload_objects=%s\n", preloadObjects?"yes":"no");
     ret = fprintf(f, "cache_objects=%s\n", cacheObjects?"yes":"no");
+    ret = fprintf(f, "target_fps=%u\n", targetFps);
 
     fclose(f);
 }

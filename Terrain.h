@@ -10,6 +10,7 @@
 }*/
 #include <irrlicht.h>
 #include "TerrainSceneNode.h"
+#include "NTerrainSceneNode.h"
 #include "hk.h"
 
 class OffsetObject;
@@ -24,6 +25,8 @@ public:
     void load(TheEarth* earth);
 
     void setVisible(bool visible);
+
+    void registerTerrain();
 
 private:
     irr::scene::TerrainSceneNode*   terrain;

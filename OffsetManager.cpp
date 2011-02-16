@@ -33,7 +33,16 @@ OffsetManager::~OffsetManager()
 {
     while (objects.size() > 0)
     {
-        ObjectPoolManager::getInstance()->putObject(*objects.begin());
+        OffsetObject* oo = *objects.begin();
+        if (oo->getPool())
+        {
+            ObjectPoolManager::getInstance()->putObject(oo);
+        }
+        else
+        {
+            // TODO: who will remove it?
+            removeObject(oo);
+        }
     }
 }
 
@@ -54,18 +63,18 @@ void OffsetManager::removeObject(OffsetObject* object)
 }
 
 //#warning use proper value for the offset unit
-#define SMALLTERRAIN_SIZE 2048
+#define OFFSET_UNIT 4096
 bool OffsetManager::update(const irr::core::vector3df& newPos, bool force)
 {
-    const irr::core::vector3di new_((irr::s32)(newPos.X/SMALLTERRAIN_SIZE), 0, (irr::s32)(newPos.Z/SMALLTERRAIN_SIZE));
+    const irr::core::vector3di new_((irr::s32)(newPos.X/OFFSET_UNIT), 0, (irr::s32)(newPos.Z/OFFSET_UNIT));
     
     if (last.X != new_.X || last.Z != new_.Z || force)
     {
-        irr::core::vector3df loffset((float)(new_.X-last.X)*SMALLTERRAIN_SIZE, 0.f, (float)(new_.Z-last.Z)*SMALLTERRAIN_SIZE);
+        irr::core::vector3df loffset((float)(new_.X-last.X)*OFFSET_UNIT, 0.f, (float)(new_.Z-last.Z)*OFFSET_UNIT);
         last.X = new_.X;
         last.Z = new_.Z;
-        offset.X = (float)last.X * SMALLTERRAIN_SIZE;
-        offset.Z = (float)last.Z * SMALLTERRAIN_SIZE;
+        offset.X = (float)last.X * OFFSET_UNIT;
+        offset.Z = (float)last.Z * OFFSET_UNIT;
         unsigned int updated = 0;
         for (offsetObjectList_t::Iterator it = objects.begin(); it != objects.end(); it++)
         {

@@ -13,8 +13,6 @@ public:
     MyThread();
     ~MyThread();
     
-    void lock();
-    void unlock();
     void execute();
     
     void kill();
@@ -22,6 +20,10 @@ public:
 protected:
     virtual void run() = 0;
     void run_in();
+
+private:
+    void lock();
+    void unlock();
 
     volatile bool underTermination;
 

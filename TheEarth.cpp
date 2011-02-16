@@ -108,6 +108,7 @@ void TheEarth::VisualMembers::loadMembers(TheEarth* earth)
         for (unsigned int j = 0; j < 3; j++)
         {
             assert(terrainCircle[i][j] != 0);
+            terrainCircle[i][j]->load(earth);
         }
     }
 }
@@ -116,9 +117,23 @@ void TheEarth::VisualMembers::finalizeMembers()
 {
 }
 
+void TheEarth::VisualMembers::registerMembers()
+{
+    for (unsigned int i = 0; i < 3; i++)
+    {
+        for (unsigned int j = 0; j < 3; j++)
+        {
+            if (terrainCircle[i][j])
+            {
+                terrainCircle[i][j]->registerTerrain();
+            }
+        }
+    }
+}
+
 
 TheEarth* TheEarth::theEarth = 0;
-const irr::video::SColor TheEarth::baseColor;
+irr::video::SColor TheEarth::baseColor;
 
 void TheEarth::initialize()
 {
@@ -142,6 +157,7 @@ TheEarth::TheEarth()
     : earthTexture(0),
       visualPart(0),
       newVisualPart(0),
+      newReadyVisualPart(0),
       lastPosBox(),
       lastCenterPos(),
       lastCenterPosi(),
@@ -188,16 +204,23 @@ TheEarth::~TheEarth()
         hasDetailTex = 0;
     }
     
+    if (visualPart)
+    {
+        delete visualPart;
+        visualPart = 0;
+    }
+    if (newReadyVisualPart)
+    {
+        delete newReadyVisualPart;
+        newReadyVisualPart = 0;
+    }
+    
     for (tileMap_t::iterator it = tileMap.begin(); it != tileMap.end(); it++)
     {
         delete it->second;
     }
     tileMap.clear();
     TheGame::getInstance()->getDevice()->getFileSystem()->drop();
-}
-
-void TheEarth::run()
-{
 }
 
 unsigned short TheEarth::getTileHeight(unsigned int x, unsigned int y)
@@ -217,12 +240,20 @@ unsigned short TheEarth::getTileHeight(unsigned int x, unsigned int y)
         }
         else
         {
-            tile = new Tile(tileX, tileY,
-                getEarthTexture(tileX, tileY),
-                getEarthTexture(tileX+1, tileY),
-                getEarthTexture(tileX, tileY+1),
-                getEarthTexture(tileX+1, tileY+1));
-            tileMap[tileX + (xsize*tileY)] = tile;
+            if (getHasDetail(tileX, tileY))
+            {
+                tile = new Tile(tileX, tileY,
+                    getEarthTexture(tileX, tileY),
+                    getEarthTexture(tileX+1, tileY),
+                    getEarthTexture(tileX, tileY+1),
+                    getEarthTexture(tileX+1, tileY+1));
+                tileMap[tileX + (xsize*tileY)] = tile;
+                setIsLoaded(tileX, tileY, true);
+            }
+            else
+            {
+                return 0;
+            }
         }
         return tile->getHeight(inX, inY);
     }
@@ -249,12 +280,20 @@ const irr::video::SColor& TheEarth::getTileTexture(unsigned int x, unsigned int 
         }
         else
         {
-            tile = new Tile(tileX, tileY,
-                getEarthTexture(tileX, tileY),
-                getEarthTexture(tileX+1, tileY),
-                getEarthTexture(tileX, tileY+1),
-                getEarthTexture(tileX+1, tileY+1));
-            tileMap[tileX + (xsize*tileY)] = tile;
+            if (getHasDetail(tileX, tileY))
+            {
+                tile = new Tile(tileX, tileY,
+                    getEarthTexture(tileX, tileY),
+                    getEarthTexture(tileX+1, tileY),
+                    getEarthTexture(tileX, tileY+1),
+                    getEarthTexture(tileX+1, tileY+1));
+                tileMap[tileX + (xsize*tileY)] = tile;
+            }
+            else
+            {
+                baseColor = getEarthTexture(tileX, tileY);
+                return baseColor;
+            }
         }
         return tile->getColor(inX, inY);
     }
@@ -282,12 +321,21 @@ void TheEarth::getTileHeightAndTexture(unsigned int x, unsigned int y,
         }
         else
         {
-            tile = new Tile(tileX, tileY,
-                getEarthTexture(tileX, tileY),
-                getEarthTexture(tileX+1, tileY),
-                getEarthTexture(tileX, tileY+1),
-                getEarthTexture(tileX+1, tileY+1));
-            tileMap[tileX + (xsize*tileY)] = tile;
+            if (getHasDetail(tileX, tileY))
+            {
+                tile = new Tile(tileX, tileY,
+                    getEarthTexture(tileX, tileY),
+                    getEarthTexture(tileX+1, tileY),
+                    getEarthTexture(tileX, tileY+1),
+                    getEarthTexture(tileX+1, tileY+1));
+                tileMap[tileX + (xsize*tileY)] = tile;
+            }
+            else
+            {
+                height = 0;
+                textureColor = getEarthTexture(tileX, tileY);
+                return;
+            }
         }
         height = tile->getHeight(inX, inY);
         textureColor = tile->getColor(inX, inY);
@@ -487,10 +535,10 @@ bool TheEarth::readHeight()
 {
     int rc = 0;
     FILE* f;
-    errno_t error = fopen_s(&f, "earthdata/earth_data_height.dat", "rb");
+    errno_t error = fopen_s(&f, "data/earthdata/earth_data_height.dat", "rb");
     if (error)
     {
-        printf("unable to open file for read earthdata/earth_data_height.dat\n");
+        printf("unable to open file for read data/earthdata/earth_data_height.dat\n");
         return false;
     }
 
@@ -503,9 +551,12 @@ bool TheEarth::readHeight()
     }
 
     if (height) delete [] height;
-
     height = new unsigned short[xsize*ysize];
     memset(height, 0, (xsize*ysize) * sizeof(unsigned short));
+
+    if (isLoaded) delete [] isLoaded;
+    isLoaded = new unsigned char[(xsize*ysize)/8+1];
+    memset(isLoaded, 0, (xsize*ysize)/8+1);
 
     unsigned int twsize = xsize * ysize;// * sizeof(unsigned short);
     unsigned int i = twsize;
@@ -546,15 +597,17 @@ bool TheEarth::readHeight()
 bool TheEarth::readHasDetail()
 {
     int rc = 0;
+    unsigned int readxsize;
+    unsigned int readysize;
     FILE* f;
-    errno_t error = fopen_s(&f, "earthdata/earth_data_hasDetail.dat", "rb");
+    errno_t error = fopen_s(&f, "data/earthdata/earth_data_hasDetail.dat", "rb");
     if (error)
     {
-        printf("unable to open file for read earthdata/earth_data_hasDetail.dat\n");
+        printf("unable to open file for read data/earthdata/earth_data_hasDetail.dat\n");
         return false;
     }
 
-    rc = fscanf_s(f, "%u\n%u\n", &xsize, &ysize);
+    rc = fscanf_s(f, "%u\n%u\n", &readxsize, &readysize);
     if (rc < 2)
     {
         printf("unable to read xsize, ysize\n");
@@ -562,8 +615,9 @@ bool TheEarth::readHasDetail()
         return false;
     }
 
-    if (hasDetail) delete [] hasDetail;
+    assert(readxsize == xsize && readysize == ysize);
 
+    if (hasDetail) delete [] hasDetail;
     hasDetail = new unsigned char[(xsize*ysize)/8+1];
     memset(hasDetail, 0, (xsize*ysize)/8+1);
 
@@ -591,15 +645,17 @@ bool TheEarth::readHasDetail()
 bool TheEarth::readHasDetailTex()
 {
     int rc = 0;
+    unsigned int readxsize;
+    unsigned int readysize;
     FILE* f;
-    errno_t error = fopen_s(&f, "earthdata/earth_data_hasDetailTex.dat", "rb");
+    errno_t error = fopen_s(&f, "data/earthdata/earth_data_hasDetailTex.dat", "rb");
     if (error)
     {
-        printf("unable to open file for read earthdata/earth_data_hasDetailTex.dat\n");
+        printf("unable to open file for read data/earthdata/earth_data_hasDetailTex.dat\n");
         return false;
     }
 
-    rc = fscanf_s(f, "%u\n%u\n", &xsize, &ysize);
+    rc = fscanf_s(f, "%u\n%u\n", &readxsize, &readysize);
     if (rc < 2)
     {
         printf("unable to read xsize, ysize\n");
@@ -607,8 +663,9 @@ bool TheEarth::readHasDetailTex()
         return false;
     }
 
-    if (hasDetailTex) delete [] hasDetailTex;
+    assert(readxsize == xsize && readysize == ysize);
 
+    if (hasDetailTex) delete [] hasDetailTex;
     hasDetailTex = new unsigned char[(xsize*ysize)/8+1];
     memset(hasDetailTex, 0, (xsize*ysize)/8+1);
 
@@ -637,8 +694,9 @@ bool TheEarth::readDensity()
 {
 
     if (density) density->drop();
-    density = TheGame::getInstance()->getDriver()->createImageFromFile("earthdata/earth_data_density.png");
+    density = TheGame::getInstance()->getDriver()->createImageFromFile("data/earthdata/earth_data_density.png");
     printf("%ux%u map read density ok\n", density->getDimension().Width, density->getDimension().Height);
+    assert(density->getDimension().Width == xsize && density->getDimension().Height == ysize);
     return true;
 }
 
@@ -646,8 +704,9 @@ bool TheEarth::readEarthTexture()
 {
 
     if (earthTexture) earthTexture->drop();
-    earthTexture = TheGame::getInstance()->getDriver()->createImageFromFile("earthdata/earth_data_texture.png");
+    earthTexture = TheGame::getInstance()->getDriver()->createImageFromFile("data/earthdata/earth_data_texture.png");
     printf("%ux%u map read texture ok\n", earthTexture->getDimension().Width, earthTexture->getDimension().Height);
+    assert(earthTexture->getDimension().Width == xsize && earthTexture->getDimension().Height == ysize);
     return true;
 }
 
@@ -667,7 +726,7 @@ bool TheEarth::writeHeight()
     
     int rc = 0;
     FILE* f;
-    errno_t error = fopen_s(&f, "earthdata/earth_data_height.dat", "wb");
+    errno_t error = fopen_s(&f, "data/earthdata/earth_data_height.dat", "wb");
     if (error) return false;
 
     rc = fprintf(f, "%u\n%u\n", xsize, ysize);
@@ -705,7 +764,7 @@ bool TheEarth::writeHasDetail()
     
     int rc = 0;
     FILE* f;
-    errno_t error = fopen_s(&f, "earthdata/earth_data_hasDetail.dat", "wb");
+    errno_t error = fopen_s(&f, "data/earthdata/earth_data_hasDetail.dat", "wb");
     if (error) return false;
 
     rc = fprintf(f, "%u\n%u\n", xsize, ysize);
@@ -743,7 +802,7 @@ bool TheEarth::writeHasDetailTex()
     
     int rc = 0;
     FILE* f;
-    errno_t error = fopen_s(&f, "earthdata/earth_data_hasDetailTex.dat", "wb");
+    errno_t error = fopen_s(&f, "data/earthdata/earth_data_hasDetailTex.dat", "wb");
     if (error) return false;
 
     rc = fprintf(f, "%u\n%u\n", xsize, ysize);
@@ -815,7 +874,7 @@ bool TheEarth::writeHeightToPNG(irr::IrrlichtDevice* device, irr::video::IVideoD
         return false;
     }
     irr::video::IImage* image = driver->createImage(irr::video::ECF_R8G8B8, irr::core::dimension2d<irr::u32>(xsize, ysize));
-    irr::io::path path = "earthdata/earth_data_height.png";
+    irr::io::path path = "data/earthdata/earth_data_height.png";
 
     for (unsigned int i = 0; i < xsize; i++)
     {
@@ -836,7 +895,7 @@ bool TheEarth::writeHasDetailToPNG(irr::IrrlichtDevice* device, irr::video::IVid
     if (hasDetail==0) return false;
 
     irr::video::IImage* image = driver->createImage(irr::video::ECF_R8G8B8, irr::core::dimension2d<irr::u32>(xsize, ysize));
-    irr::io::path path = "earthdata/earth_data_hasDetail.png";
+    irr::io::path path = "data/earthdata/earth_data_hasDetail.png";
 
     for (unsigned int i = 0; i < xsize; i++)
     {
@@ -857,7 +916,7 @@ bool TheEarth::writeDensityToPNG(irr::IrrlichtDevice* device, irr::video::IVideo
 {
     if (density==0) return false;
 
-    irr::io::path path = "earthdata/earth_data_density.png";
+    irr::io::path path = "data/earthdata/earth_data_density.png";
 
     bool ret = driver->writeImageToFile(density, device->getFileSystem()->createAndWriteFile(path));
     return ret;
@@ -867,7 +926,7 @@ bool TheEarth::writeEarthTextureToPNG(irr::IrrlichtDevice* device, irr::video::I
 {
     if (earthTexture==0) return false;
 
-    irr::io::path path = "earthdata/earth_data_texture.png";
+    irr::io::path path = "data/earthdata/earth_data_texture.png";
 
     bool ret = driver->writeImageToFile(earthTexture, device->getFileSystem()->createAndWriteFile(path));
     return ret;
@@ -885,17 +944,71 @@ void TheEarth::createFirst(const irr::core::vector3df& pos, const irr::core::vec
         delete visualPart;
         visualPart = 0;
     }
-    if (newVisualPart)
+    if (newReadyVisualPart)
     {
-        delete newVisualPart;
-        newVisualPart = 0;
+        delete newReadyVisualPart;
+        newReadyVisualPart = 0;
     }
+    newVisualPart = 0;
 
     visualPart = new VisualMembers();
+    printf("create members ... ");
     visualPart->createMembers(lastCenterPosi, this);
+    printf("done\nload members ... ");
     visualPart->loadMembers(this);
+    printf("done\nset visible members ... ");
+    visualPart->setVisible(true);
+    printf("done\n");
 }
 
 void TheEarth::update(const irr::core::vector3df& pos, const irr::core::vector3df& dir)
 {
+#if 0
+    if (!lastPosBox.isPointInside(irr::core::vector3df(pos.X, 0.0f, pos.Z)))
+    {
+        createFirst(pos, dir);
+    }
+#else // 0
+    if (newVisualPart)
+    {
+        printf("under construction\n");
+        return;
+    }
+    else if (newReadyVisualPart)
+    {
+        printf("switch to new\n");
+        delete visualPart;
+        visualPart = newReadyVisualPart;
+        newReadyVisualPart = 0;
+        visualPart->setVisible(true);
+        return;
+    }
+
+    if (!lastPosBox.isPointInside(irr::core::vector3df(pos.X, 0.0f, pos.Z)))
+    {
+        printf("start create new\n");
+        newVisualPart = new VisualMembers();
+        lastCenterPosi = irr::core::vector3di((int)pos.X, 0, (int)pos.Z);
+        lastCenterPos = irr::core::vector3df((float)lastCenterPosi.X, (float)lastCenterPosi.Y, (float)lastCenterPosi.Z);
+        lastPosBox = irr::core::aabbox3df(lastCenterPos.X-VISUAL_BOX_HSIZE_F, -1000.0f, lastCenterPos.Z-VISUAL_BOX_HSIZE_F,
+        lastCenterPos.X+VISUAL_BOX_HSIZE_F, 10000.0f, lastCenterPos.Z+VISUAL_BOX_HSIZE_F);
+        newVisualPart->createMembers(lastCenterPosi, this);
+        execute();
+    }
+#endif // 0
+}
+
+void TheEarth::run()
+{
+    newVisualPart->loadMembers(this);
+    newReadyVisualPart = newVisualPart;
+    newVisualPart = 0;
+}
+
+void TheEarth::registerVisual()
+{
+    if (visualPart)
+    {
+        visualPart->registerMembers();
+    }
 }

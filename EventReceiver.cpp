@@ -27,7 +27,7 @@ EventReceiver::EventReceiver()
     inputManager = OIS::InputManager::createInputSystem(TheGame::getInstance()->getWindowId());
 
     keyboard = static_cast<OIS::Keyboard*>(inputManager->createInputObject(OIS::OISKeyboard, false));
-    mouse = static_cast<OIS::Mouse*>(inputManager->createInputObject(OIS::OISMouse, false));
+    //mouse = static_cast<OIS::Mouse*>(inputManager->createInputObject(OIS::OISMouse, false));
     joystick = static_cast<OIS::JoyStick*>(inputManager->createInputObject(OIS::OISJoyStick, false));
 
     recalibrate();
@@ -55,8 +55,8 @@ EventReceiver::~EventReceiver()
 
     if (inputManager)
     {
-        inputManager->destroyInputObject(mouse);
-        mouse = 0;
+        //inputManager->destroyInputObject(mouse);
+        //mouse = 0;
         inputManager->destroyInputObject(keyboard);
         keyboard = 0;
         inputManager->destroyInputObject(joystick);
@@ -212,12 +212,12 @@ void EventReceiver::checkEvents()
 {
     //Need to capture/update each device
     keyboard->capture();
-    mouse->capture();
+    //mouse->capture();
     joystick->capture();
 
     const OIS::JoyStickState joystickState = joystick->getJoyStickState();
     
-    /*
+    
     if (test_kc == 0)
     {
         test_kc = KeyConfig::getKeyConfig(keyboard, joystickState, deadZone, false);
@@ -240,7 +240,7 @@ void EventReceiver::checkEvents()
         delete test_kc;
         test_kc = 0;
     }
-    */
+    
 
     //printf("%s\n", keyboard->isKeyDown(OIS::KC_K)?"true":"false");
     /*
@@ -256,6 +256,8 @@ void EventReceiver::checkEvents()
     }
     */
 
+#if 0
+    // the real event check
     if ((keyMap[ACCELERATE].primaryKeyConfig && keyMap[ACCELERATE].primaryKeyConfig->getPercentage(keyboard, joystickState)) ||
         (keyMap[ACCELERATE].secondaryKeyConfig && keyMap[ACCELERATE].secondaryKeyConfig->getPercentage(keyboard, joystickState))
        )
@@ -283,6 +285,6 @@ void EventReceiver::checkEvents()
     {
         dprintf(MY_DEBUG_NOTE, "right pressed\n");
     }
-
+#endif // 0 or 1
 }
 

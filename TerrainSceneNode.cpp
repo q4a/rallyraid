@@ -24,6 +24,7 @@
 #include "SMesh.h"
 #include "CDynamicMeshBuffer.h"
 #include "IMesh.h"
+#include "IImage.h"
 
 #include "TheEarth.h"
 #include <assert.h>
@@ -32,6 +33,7 @@ namespace irr
 {
 namespace scene
 {
+    //video::IImage* TerrainSceneNode::image = 0;
 
 	//! constructor
 	TerrainSceneNode::TerrainSceneNode(ISceneNode* parent, ISceneManager* mgr,
@@ -39,7 +41,7 @@ namespace scene
 			const core::vector3df& position,
 			const core::vector3df& rotation,
 			const core::vector3df& scale)
-	: ISceneNode(parent, mgr, id, position, rotation, scale),
+	: ITerrainSceneNode(parent, mgr, id, position, rotation, scale),
 	TerrainData(patchSize, maxLOD, position, rotation, scale), RenderBuffer(0),
 	VerticesToRender(0), IndicesToRender(0), DynamicSelectorUpdate(false),
 	OverrideDistanceThreshold(false), UseDefaultRotationPivot(true), ForceRecalculation(false),
@@ -47,8 +49,9 @@ namespace scene
 	OldCameraRotation(core::vector3df(-99999.9f, -99999.9f, -99999.9f)),
 	OldCameraUp(core::vector3df(-99999.9f, -99999.9f, -99999.9f)),
 	CameraMovementDelta(10.0f), CameraRotationDelta(1.0f),CameraFOVDelta(0.1f),
-	TCoordScale1(1.0f), TCoordScale2(1.0f), FileSystem(fs), texture(0)
+	TCoordScale1(1.0f), TCoordScale2(1.0f), FileSystem(fs)/*, texture(0)*/, image(0)
 	{
+        printf("TerrainSceneNode: ctor\n");
 		#ifdef _DEBUG
 		setDebugName("TerrainSceneNode");
 		#endif
@@ -79,10 +82,17 @@ namespace scene
 		if (RenderBuffer)
 			RenderBuffer->drop();
         
+        if (image)
+        {
+            image->drop();
+            image = 0;
+        }
+        /*
         if (texture)
         {
             texture = 0;
         }
+        */
 	}
 
 	//! Initializes the terrain data. Loads the vertices from earth data
@@ -90,7 +100,10 @@ namespace scene
 	{
 		Mesh->MeshBuffers.clear();
 		//const u32 startTime = os::Timer::getRealTime();
-        video::IImage* image = SceneManager->getVideoDriver()->createImage(irr::video::ECF_A8R8G8B8, irr::core::dimension2du(size-1, size-1));
+        if (!image)
+        {
+            image = SceneManager->getVideoDriver()->createImage(irr::video::ECF_A8R8G8B8, irr::core::dimension2du(size-1, size-1));
+        }
 
 		// Get the dimension of the heightmap data
 		TerrainData.Size = size;
@@ -167,7 +180,7 @@ namespace scene
 				//vertex.Color = vertexColor;
                 earth->getTileHeightAndTexture((unsigned int)abs(offsetX+x), (unsigned int)abs(offsetY+z), height, vertex.Color);
 				vertex.Pos.X = fx;
-				vertex.Pos.Y = (f32) height; //Map->getPixel(TerrainData.Size-x-1,z).getLuminance();
+				vertex.Pos.Y = (f32)height; //Map->getPixel(TerrainData.Size-x-1,z).getLuminance();
 				vertex.Pos.Z = fz;
 
                 if (x < TerrainData.Size - 1 && z < TerrainData.Size - 1)
@@ -204,10 +217,10 @@ namespace scene
 		// We no longer need the mb
 		mb->drop();
 
-        char textureMapPartName[255];
-        sprintf_s(textureMapPartName, "textureMapPart_%d_%d", offsetX, offsetY);
-        texture = SceneManager->getVideoDriver()->addTexture(textureMapPartName, image);
-        image->drop();
+        //char textureMapPartName[255];
+        //sprintf_s(textureMapPartName, "textureMapPart_%d_%d", offsetX, offsetY);
+        //texture = SceneManager->getVideoDriver()->addTexture(textureMapPartName, image);
+        //image->drop();
 
 		// calculate all the necessary data for the patches and the terrain
 		calculateDistanceThresholds();
@@ -239,7 +252,7 @@ namespace scene
 
 		return true;
 	}
-#if 0
+#if 1
 	//! Initializes the terrain data. Loads the vertices from the heightMapFile
 	bool TerrainSceneNode::loadHeightMap(io::IReadFile* file, video::SColor vertexColor,
 			s32 smoothFactor)
@@ -248,12 +261,13 @@ namespace scene
 			return false;
 
 		Mesh->MeshBuffers.clear();
-		const u32 startTime = os::Timer::getRealTime();
+		//const u32 startTime = os::Timer::getRealTime();
 		video::IImage* heightMap = SceneManager->getVideoDriver()->createImageFromFile(file);
 
 		if (!heightMap)
 		{
-			os::Printer::log("Unable to load heightmap.");
+			//os::Printer::log("Unable to load heightmap.");
+            assert(0);
 			return false;
 		}
 
@@ -389,14 +403,14 @@ namespace scene
 				TerrainData.CalcPatchSize * TerrainData.CalcPatchSize * 6);
 
 		RenderBuffer->setDirty();
-
+        /*
 		const u32 endTime = os::Timer::getRealTime();
 
 		c8 tmp[255];
 		snprintf(tmp, 255, "Generated terrain data (%dx%d) in %.4f seconds",
 			TerrainData.Size, TerrainData.Size, (endTime - startTime) / 1000.0f );
 		os::Printer::log(tmp);
-
+        */
 		return true;
 	}
 
@@ -412,7 +426,7 @@ namespace scene
 			return false;
 
 		// start reading
-		const u32 startTime = os::Timer::getTime();
+		//const u32 startTime = os::Timer::getTime();
 
 		Mesh->MeshBuffers.clear();
 
@@ -426,7 +440,8 @@ namespace scene
 		{
 			if ((filesize-file->getPos())/bytesPerPixel>width*width)
 			{
-				os::Printer::log("Error reading heightmap RAW file", "File is too small.");
+				//os::Printer::log("Error reading heightmap RAW file", "File is too small.");
+                assert(0);
 				return false;
 			}
 			TerrainData.Size = width;
@@ -569,8 +584,9 @@ namespace scene
 				}
 				if (failure)
 				{
-					os::Printer::log("Error reading heightmap RAW file.");
+					//os::Printer::log("Error reading heightmap RAW file.");
 					mb->drop();
+                    assert(0);
 					return false;
 				}
 				vertex.Pos.Z = fz;
@@ -625,14 +641,14 @@ namespace scene
 		RenderBuffer->getIndexBuffer().set_used(
 				TerrainData.PatchCount*TerrainData.PatchCount*
 				TerrainData.CalcPatchSize*TerrainData.CalcPatchSize*6);
-
+        /*
 		const u32 endTime = os::Timer::getTime();
 
 		c8 tmp[255];
 		snprintf(tmp, 255, "Generated terrain data (%dx%d) in %.4f seconds",
 			TerrainData.Size, TerrainData.Size, (endTime - startTime) / 1000.0f);
 		os::Printer::log(tmp);
-
+        */
 		return true;
 	}
 #endif // 0
@@ -731,6 +747,7 @@ namespace scene
 	//! generated for that patch.
 	void TerrainSceneNode::OnRegisterSceneNode()
 	{
+        //printf("onreg: %d\n", IsVisible);
 		if (!IsVisible || !SceneManager->getActiveCamera())
 			return;
 
@@ -743,6 +760,7 @@ namespace scene
 
 	void TerrainSceneNode::preRenderLODCalculations()
 	{
+        //printf("prelod: %d\n", IsVisible);
 		scene::ICameraSceneNode * camera = SceneManager->getActiveCamera();
 		if(!camera)
 			return;
@@ -819,6 +837,7 @@ namespace scene
 
 	void TerrainSceneNode::preRenderIndicesCalculations()
 	{
+        //printf("prerenderind: %d\n", IsVisible);
 		scene::IIndexBuffer& indexBuffer = RenderBuffer->getIndexBuffer();
 		IndicesToRender = 0;
 		indexBuffer.set_used(0);
@@ -873,8 +892,7 @@ namespace scene
 		if (DynamicSelectorUpdate && TriangleSelector)
 		{
 			CTerrainTriangleSelector* selector = (CTerrainTriangleSelector*)TriangleSelector;
-            // TODO
-			//selector->setTriangleData(this, -1);
+			selector->setTriangleData(this, -1);
 		}
 	}
 
@@ -882,6 +900,7 @@ namespace scene
 	//! Render the scene node
 	void TerrainSceneNode::render()
 	{
+        //printf("render: %d\n", IsVisible);
 		if (!IsVisible || !SceneManager->getActiveCamera())
 			return;
 
