@@ -114,6 +114,8 @@
     <ClInclude Include="TheEarth.h" />
     <ClInclude Include="TheGame.h" />
     <ClInclude Include="Tile.h" />
+    <ClInclude Include="VehicleType.h" />
+    <ClInclude Include="VehicleTypeManager.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ConfigFile.cpp" />
@@ -139,6 +141,8 @@
     <ClCompile Include="TheEarth.cpp" />
     <ClCompile Include="TheGame.cpp" />
     <ClCompile Include="Tile.cpp" />
+    <ClCompile Include="VehicleType.cpp" />
+    <ClCompile Include="VehicleTypeManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Dakar2012.rc" />

@@ -48,6 +48,7 @@ TheGame::TheGame()
       lastScreenSize(),
       failed_render(0),
       tick(0),
+      physicsOngoing(false),
       testText(0)
 {
     dprintf(MY_DEBUG_INFO, "TheGame::TheGame(): this: %p\n", this);
@@ -236,7 +237,10 @@ void TheGame::loop()
             if (physUpdate > 10) physUpdate = 10;
             while (lastPhysTick < tick && physUpdate)
             {
-                //hk::hkWorld->stepDeltaTime(step_sec);
+                if (physicsOngoing)
+                {
+                    hk::hkWorld->stepDeltaTime(step_sec);
+                }
                 lastPhysTick += 16;
                 physUpdate--;
                 physUpdateDone = true;

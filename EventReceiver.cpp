@@ -45,6 +45,8 @@ EventReceiver::EventReceiver()
     keyMap[RIGHT] = kp;
     keyNameMap["clutch"] = CLUTCH;
     keyMap[CLUTCH] = kp;
+    keyNameMap["physics"] = PHYSICS;
+    keyMap[PHYSICS] = kp;
 
     loadKeyMapping();
 }
@@ -217,7 +219,7 @@ void EventReceiver::checkEvents()
 
     const OIS::JoyStickState joystickState = joystick->getJoyStickState();
     
-    
+#if 0
     if (test_kc == 0)
     {
         test_kc = KeyConfig::getKeyConfig(keyboard, joystickState, deadZone, false);
@@ -255,8 +257,7 @@ void EventReceiver::checkEvents()
         printf("\t%u: %d, %d\n", i, joystickState.mSliders[i].abX, joystickState.mSliders[i].abY);
     }
     */
-
-#if 0
+#else // 0 or 1
     // the real event check
     if ((keyMap[ACCELERATE].primaryKeyConfig && keyMap[ACCELERATE].primaryKeyConfig->getPercentage(keyboard, joystickState)) ||
         (keyMap[ACCELERATE].secondaryKeyConfig && keyMap[ACCELERATE].secondaryKeyConfig->getPercentage(keyboard, joystickState))
@@ -284,6 +285,17 @@ void EventReceiver::checkEvents()
        )
     {
         dprintf(MY_DEBUG_NOTE, "right pressed\n");
+    }
+
+    if ((keyMap[PHYSICS].primaryKeyConfig && keyMap[PHYSICS].primaryKeyConfig->getPercentage(keyboard, joystickState)) ||
+        (keyMap[PHYSICS].secondaryKeyConfig && keyMap[PHYSICS].secondaryKeyConfig->getPercentage(keyboard, joystickState))
+       )
+    {
+        TheGame::getInstance()->setPhysicsOngoing(true);
+    }
+    else
+    {
+        TheGame::getInstance()->setPhysicsOngoing(false);
     }
 #endif // 0 or 1
 }

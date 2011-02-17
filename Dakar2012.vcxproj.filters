@@ -105,6 +105,12 @@
     <ClInclude Include="Terrain_defs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="VehicleTypeManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VehicleType.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -174,6 +180,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Terrain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="VehicleTypeManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="VehicleType.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

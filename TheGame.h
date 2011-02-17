@@ -29,6 +29,9 @@ public:
     void                            switchCamera();
     Shaders*                        getShaders();
 
+    bool                            getPhysicsOngoing() {return physicsOngoing;}
+    void                            setPhysicsOngoing(bool newValue) {physicsOngoing = newValue;}
+
 private:
     TheGame();
     ~TheGame();
@@ -62,6 +65,7 @@ private:
     unsigned int                    tick;
     unsigned int                    lastPhysTick;
     unsigned int                    lastSlowTick;
+    bool                            physicsOngoing;
 
     irr::gui::IGUIStaticText*       testText;
 };

@@ -30,6 +30,7 @@ private:
         LEFT,
         RIGHT,
         CLUTCH,
+        PHYSICS,
         NUMBER_OF_KEYNAMES
     };
     struct KeyProperty
