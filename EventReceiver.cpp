@@ -263,28 +263,28 @@ void EventReceiver::checkEvents()
         (keyMap[ACCELERATE].secondaryKeyConfig && keyMap[ACCELERATE].secondaryKeyConfig->getPercentage(keyboard, joystickState))
        )
     {
-        dprintf(MY_DEBUG_NOTE, "accelerate pressed\n");
+        //dprintf(MY_DEBUG_NOTE, "accelerate pressed\n");
     }
 
     if ((keyMap[BRAKE].primaryKeyConfig && keyMap[BRAKE].primaryKeyConfig->getPercentage(keyboard, joystickState)) ||
         (keyMap[BRAKE].secondaryKeyConfig && keyMap[BRAKE].secondaryKeyConfig->getPercentage(keyboard, joystickState))
        )
     {
-        dprintf(MY_DEBUG_NOTE, "brake pressed\n");
+        //dprintf(MY_DEBUG_NOTE, "brake pressed\n");
     }
 
     if ((keyMap[LEFT].primaryKeyConfig && keyMap[LEFT].primaryKeyConfig->getPercentage(keyboard, joystickState)) ||
         (keyMap[LEFT].secondaryKeyConfig && keyMap[LEFT].secondaryKeyConfig->getPercentage(keyboard, joystickState))
        )
     {
-        dprintf(MY_DEBUG_NOTE, "left pressed\n");
+        //dprintf(MY_DEBUG_NOTE, "left pressed\n");
     }
 
     if ((keyMap[RIGHT].primaryKeyConfig && keyMap[RIGHT].primaryKeyConfig->getPercentage(keyboard, joystickState)) ||
         (keyMap[RIGHT].secondaryKeyConfig && keyMap[RIGHT].secondaryKeyConfig->getPercentage(keyboard, joystickState))
        )
     {
-        dprintf(MY_DEBUG_NOTE, "right pressed\n");
+        //dprintf(MY_DEBUG_NOTE, "right pressed\n");
     }
 
     if ((keyMap[PHYSICS].primaryKeyConfig && keyMap[PHYSICS].primaryKeyConfig->getPercentage(keyboard, joystickState)) ||

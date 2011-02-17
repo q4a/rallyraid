@@ -79,7 +79,7 @@ TheGame::TheGame()
         smgr = device->getSceneManager();
         env = device->getGUIEnvironment();
         fix_camera = smgr->addCameraSceneNode();
-        fps_camera = smgr->addCameraSceneNodeFPS(0, 100.f, 0.5f);
+        fps_camera = smgr->addCameraSceneNodeFPS(0, 100.f, 0.1f);
         camera = fps_camera;
         smgr->setActiveCamera(camera);
         lastScreenSize = getScreenSize();
@@ -160,11 +160,17 @@ void TheGame::loop()
 
     /* test */
     //irr::core::vector3df initialPos(4190208.f, 1000.f, -6414336.f);
-    irr::core::vector3df initialPos(4190225.f, 100.f, -6411350.f);
+    irr::core::vector3df initialPos(4190225.f, 95.f, -6411350.f);
     irr::core::vector3df initialDir(20.f, -20.f, 20.f);
     camera->setPosition(initialPos);
     camera->setTarget(camera->getPosition()+initialDir);
+    //earth->createFirst(initialPos, irr::core::vector3df(1.f, 2.f, 1.f));
+
+    OffsetObject* cameraOObject = new OffsetObject(camera, true);
+    cameraOObject->addToManager();
+    offsetManager->update(camera->getPosition());
     earth->createFirst(initialPos, irr::core::vector3df(1.f, 2.f, 1.f));
+
 
     smgr->setAmbientLight(irr::video::SColorf(0.3f, 0.3f, 0.3f));
     smgr->setShadowColor(irr::video::SColor(255, 50, 50, 50));
@@ -183,10 +189,6 @@ void TheGame::loop()
     const unsigned int slowStep_ms = 100;
     const float step_sec = 1.f / (float)Settings::getInstance()->targetFps;
     unsigned int physUpdate;
-
-    OffsetObject* cameraOObject = new OffsetObject(camera, true);
-    cameraOObject->addToManager();
-    offsetManager->update(camera->getPosition());
 
     /*ScreenQuad testQuad(driver, irr::core::position2di(10, 10), irr::core::dimension2du(400, 300));
     // ScreenQuad testQuad(driver, irr::core::position2di(0, 0), driver->getScreenSize());

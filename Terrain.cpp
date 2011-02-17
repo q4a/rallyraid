@@ -21,7 +21,9 @@ public:
     HK_FORCE_INLINE hkReal getHeightAtImpl(int x, int z) const
     {
         //printf("gh ");
-        return (hkReal)earth->getTileHeight((unsigned int)abs(offsetX+x), (unsigned int)abs(offsetY+z));
+        unsigned short h = earth->getTileHeight((unsigned int)abs(offsetX+x), (unsigned int)abs(offsetY+z));
+        //printf("x: %d, y: %d, offsetX: %d, offsetY: %d, h: %hu\n", x, z, offsetX, offsetY, h);
+        return (hkReal)h;
     }
     
     /// this should return true if the two triangles share the edge p00-p11
@@ -79,7 +81,7 @@ Terrain::Terrain(const irr::core::vector3di& posi, TheEarth* earth)
     ci.m_zRes = TILE_POINTS_NUM + 1;
     ci.m_scale.set(TILE_SCALE_F, 1.0f, TILE_SCALE_F);
 
-    hkShape = new HeightFieldHelper(ci, earth, posi.X, posi.Z);
+    hkShape = new HeightFieldHelper(ci, earth, offsetX, offsetY/*posi.X, posi.Z*/);
     hk::unlock();
 }
 
@@ -149,6 +151,7 @@ void Terrain::setVisible(bool p_visible)
     {
         if (hkShape && offsetObject->getBody() == 0)
         {
+            //dprintf(MY_DEBUG_NOTE, "create terrain object\n");
             hk::lock();
             hkpRigidBodyCinfo groundInfo;
             groundInfo.m_shape = hkShape;
@@ -187,6 +190,9 @@ void Terrain::setVisible(bool p_visible)
         offsetObject->removeFromManager();
     }
     terrain->setVisible(visible);
+    //dprintf(MY_DEBUG_NOTE, "terrain: nodepos: %f, %f, %f, bodypos: %f, %f, %f\n",
+    //    offsetObject->getNode()->getPosition().X, offsetObject->getNode()->getPosition().Y, offsetObject->getNode()->getPosition().Z,
+    //    offsetObject->getBody()->getPosition()(0), offsetObject->getBody()->getPosition()(1), offsetObject->getBody()->getPosition()(2));
 }
 
 void Terrain::registerTerrain()
