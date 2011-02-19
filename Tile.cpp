@@ -56,6 +56,11 @@ Tile::~Tile()
         delete [] height;
         height = 0;
     }
+    if (colors)
+    {
+        delete [] colors;
+        colors = 0;
+    }
 }
 
 bool Tile::setHeight(unsigned int x, unsigned int y, unsigned short val)

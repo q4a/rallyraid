@@ -3,6 +3,31 @@
 
 #include <string>
 #include <irrlicht.h>
+#include <map>
+
+class VehicleTypeTyre
+{
+public:
+    VehicleTypeTyre(unsigned int id = (unsigned int)-1);
+    ~VehicleTypeTyre();
+
+public:
+    unsigned int            id;
+    std::string             objectName;
+    irr::video::ITexture*   texture;
+    irr::core::vector3df    scale;
+    irr::core::vector3df    localPos;
+    float                   mass;
+    float                   friction;
+    float                   suspensionLength;
+    float                   suspensionSpring;
+    float                   suspensionDamper;
+    bool                    steerable;
+    bool                    torqueable;
+    bool                    handbrakeable;
+};
+typedef std::map<unsigned int, VehicleTypeTyre*> vehicleTypeTyreMap_t;
+typedef std::map<unsigned int, float> gearMap_t;
 
 class VehicleType
 {
@@ -14,7 +39,22 @@ private:
     bool read(const std::string& vehicleTypeFilename);
 
 private:
-    std::string         vehicleTypeName;
+    std::string             vehicleTypeName;
+    vehicleTypeTyreMap_t    vehicleTypeTyreMap;
+    gearMap_t               gearMap;
+
+    std::string             objectName;
+    irr::video::ITexture*   texture;
+    std::string             engineSoundFilename;
+    float                   maxBrakeForce;
+    float                   maxSpeed;
+    unsigned int            changeGearTime;
+    float                   maxSteerAngle;
+    float                   maxSteerRate;
+    irr::core::matrix4      viewPos[12];
+    irr::core::matrix4      viewDest[12];
+
+    friend class Vehicle;
 };
 
 #endif // VEHICLETYPE_H

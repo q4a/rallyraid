@@ -29,7 +29,7 @@ public:
     /// this should return true if the two triangles share the edge p00-p11
     ///      otherwise it should return false if the triangles shere the edge p01-p10
     HK_FORCE_INLINE hkBool getTriangleFlipImpl() const
-    {	
+    {
         return true;
     }
     

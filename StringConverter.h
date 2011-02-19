@@ -16,6 +16,14 @@ public:
         return ret;
     }
 
+    static void StringConverter::parseFloat3(const std::string& val, float& x, float& y, float& z)
+    {
+        std::istringstream str(val);
+        str >> x;
+        str >> y;
+        str >> z;
+    }
+
     static int parseInt(const std::string& val, int defaultValue)
     {
         std::istringstream str(val);
