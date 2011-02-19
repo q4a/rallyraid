@@ -177,7 +177,7 @@ TheEarth::TheEarth()
 {
     TheGame::getInstance()->getDevice()->getFileSystem()->grab();
     read();
-#if 0
+#if 1
     miniMap = TheGame::getInstance()->getDriver()->createImage(irr::video::ECF_R8G8B8, irr::core::dimension2du(MINIMAP_SIZE,MINIMAP_SIZE));
 #else
     miniMap = TheGame::getInstance()->getDriver()->createImage(irr::video::ECF_R8G8B8, irr::core::dimension2du(TILE_POINTS_NUM, TILE_POINTS_NUM));
@@ -950,7 +950,7 @@ bool TheEarth::writeEarthTextureToPNG(irr::IrrlichtDevice* device, irr::video::I
 
 void TheEarth::createFirst(const irr::core::vector3df& pos, const irr::core::vector3df& dir)
 {
-    lastCenterPosi = irr::core::vector3di((int)pos.X, 0, (int)pos.Z);
+    lastCenterPosi = irr::core::vector3di(((int)(pos.X/TILE_SCALE_F))*TILE_SCALE, 0, ((int)(pos.Z/TILE_SCALE_F))*TILE_SCALE);
     lastCenterPos = irr::core::vector3df((float)lastCenterPosi.X, (float)lastCenterPosi.Y, (float)lastCenterPosi.Z);
     lastPosBox = irr::core::aabbox3df(lastCenterPos.X-VISUAL_BOX_HSIZE_F, -1000.0f, lastCenterPos.Z-VISUAL_BOX_HSIZE_F,
         lastCenterPos.X+VISUAL_BOX_HSIZE_F, 10000.0f, lastCenterPos.Z+VISUAL_BOX_HSIZE_F);
@@ -1006,7 +1006,8 @@ void TheEarth::update(const irr::core::vector3df& pos, const irr::core::vector3d
     {
         printf("start create new\n");
         newVisualPart = new VisualMembers();
-        lastCenterPosi = irr::core::vector3di((int)pos.X, 0, (int)pos.Z);
+        lastCenterPosi = irr::core::vector3di(((int)(pos.X/TILE_SCALE_F))*TILE_SCALE, 0, ((int)(pos.Z/TILE_SCALE_F))*TILE_SCALE);
+        //lastCenterPosi = irr::core::vector3di((int)pos.X, 0, (int)pos.Z);
         lastCenterPos = irr::core::vector3df((float)lastCenterPosi.X, (float)lastCenterPosi.Y, (float)lastCenterPosi.Z);
         lastPosBox = irr::core::aabbox3df(lastCenterPos.X-VISUAL_BOX_HSIZE_F, -1000.0f, lastCenterPos.Z-VISUAL_BOX_HSIZE_F,
         lastCenterPos.X+VISUAL_BOX_HSIZE_F, 10000.0f, lastCenterPos.Z+VISUAL_BOX_HSIZE_F);
@@ -1034,7 +1035,7 @@ void TheEarth::registerVisual()
 
 void TheEarth::refreshMiniMap()
 {
-#if 0
+#if 1
     irr::core::dimension2di currentPos(abs(lastCenterPosi.X / TILE_SIZE), abs(lastCenterPosi.Z / TILE_SIZE));
 
     if (currentPos != lastMiniMapPos)

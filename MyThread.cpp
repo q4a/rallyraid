@@ -1,6 +1,7 @@
 #include "MyThread.h"
 #include "stdafx.h"
 #include <stdio.h>
+#include "TheGame.h"
 
 #ifdef __linux__
 void* MyThread::ThreadEntry(void* arg)
@@ -19,7 +20,8 @@ DWORD WINAPI MyThread::ThreadEntry (void* pArg)
 #endif
 
 MyThread::MyThread()
-    : underTermination(false)
+    : underTermination(false),
+      terminated(false)
 #ifdef __linux__
 //      , currentMutex(0)
 #else
@@ -64,7 +66,11 @@ MyThread::MyThread()
 
 MyThread::~MyThread()
 {
-    kill();
+    if (!terminated)
+    {
+        kill();
+        while (!terminated) TheGame::getInstance()->getDevice()->sleep(100);
+    }
 #ifdef __linux__
 //    pthread_mutex_destroy(&mutex[0]);
 //    pthread_mutex_destroy(&mutex[1]);
@@ -117,7 +123,7 @@ void MyThread::run_in()
 #else
 //        LeaveCriticalSection(&critSection[1 - currentCritSection]);
 #endif
-     //   if (underTermination) break;
+        if (underTermination) break;
 #ifdef __linux__
         dprintf(printf("thread call run: %p\n", &thread);)
 #else
@@ -135,6 +141,7 @@ void MyThread::run_in()
 #else
     dprintf(MY_DEBUG_NOTE, "thread leave the loop will terminate: handle %p, tid %d\n", handle, tid);
 #endif
+    terminated = true;
 }
 
 void MyThread::lock()

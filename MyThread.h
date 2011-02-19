@@ -26,6 +26,7 @@ private:
     void unlock();
 
     volatile bool underTermination;
+    volatile bool terminated;
 
 #ifdef __linux__
     static void* ThreadEntry(void* arg);
