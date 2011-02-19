@@ -99,7 +99,7 @@ TheGame::TheGame()
         TheEarth::initialize();
         earth = TheEarth::getInstance();
 
-        testText = env->addStaticText(L"", irr::core::recti(10, 10, 790, 26), false, true, 0, -1, true);
+        testText = env->addStaticText(L"", irr::core::recti(10, 10, 790, 30), false, true, 0, -1, true);
     }
 }
 
@@ -146,6 +146,7 @@ void TheGame::readSettings(irr::SIrrlichtCreationParameters& params)
 {
     Settings::initialize();
     Settings::getInstance()->read();
+    //assert(0);
 }
 
 void TheGame::loop()
@@ -160,7 +161,8 @@ void TheGame::loop()
 
     /* test */
     //irr::core::vector3df initialPos(4190208.f, 1000.f, -6414336.f);
-    irr::core::vector3df initialPos(4190225.f, 95.f, -6411350.f);
+    //irr::core::vector3df initialPos(4190225.f, 95.f, -6411350.f);
+    irr::core::vector3df initialPos(4190225.f, 430.f, -6401350.f);
     irr::core::vector3df initialDir(20.f, -20.f, 20.f);
     camera->setPosition(initialPos);
     camera->setTarget(camera->getPosition()+initialDir);
@@ -197,6 +199,11 @@ void TheGame::loop()
     testQuad.getMaterial().MaterialType = shaders->materialMap["quad2d"];
     //testQuad.getMaterial().setTexture(0, driver->getTexture("data/menu_textures/bg_frame_main_1280.png"));
     testQuad.rotate(30.0f, irr::core::position2di(150, 150));*/
+
+    ScreenQuad miniMapQuad(driver,
+        irr::core::position2di(driver->getScreenSize().Width - MINIMAP_SIZE - 10, driver->getScreenSize().Height - MINIMAP_SIZE - 10),
+        irr::core::dimension2du(MINIMAP_SIZE, MINIMAP_SIZE), false);
+    miniMapQuad.getMaterial().MaterialType = shaders->materialMap["quad2d"];
 
     OffsetObject* car = ObjectPoolManager::getInstance()->getObject("vw3", initialPos+initialDir);
     printf("car off: %f, %f (%f, %f)\n", offsetManager->getOffset().X, offsetManager->getOffset().Z,
@@ -268,6 +275,10 @@ void TheGame::loop()
                 str += (int)offsetManager->getOffset().X;
                 str += L", ";
                 str += (int)offsetManager->getOffset().Z;
+                str += "\nTile pos: ";
+                str += ((int)offsetManager->getOffset().X+(int)camera->getPosition().X)/TILE_SIZE;
+                str += L", ";
+                str += abs((int)offsetManager->getOffset().Z+(int)camera->getPosition().Z)/TILE_SIZE;
                 testText->setText(str.c_str());
 
                 earth->update(offsetManager->getOffset()+camera->getPosition(), initialDir);
@@ -299,6 +310,8 @@ void TheGame::loop()
             env->drawAll();
             //printf("4\n");
             //testQuad.render();
+            miniMapQuad.getMaterial().setTexture(0, earth->getMiniMapTexture());
+            miniMapQuad.render();
 
             driver->endScene();
             //printf("5\n");

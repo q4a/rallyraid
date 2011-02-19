@@ -161,6 +161,9 @@ TheEarth::TheEarth()
       lastPosBox(),
       lastCenterPos(),
       lastCenterPosi(),
+      miniMap(0),
+      miniMapTexture(0),
+      lastMiniMapPos(),
       xsize(0),
       ysize(0),
       height(0),
@@ -174,6 +177,11 @@ TheEarth::TheEarth()
 {
     TheGame::getInstance()->getDevice()->getFileSystem()->grab();
     read();
+#if 0
+    miniMap = TheGame::getInstance()->getDriver()->createImage(irr::video::ECF_R8G8B8, irr::core::dimension2du(MINIMAP_SIZE,MINIMAP_SIZE));
+#else
+    miniMap = TheGame::getInstance()->getDriver()->createImage(irr::video::ECF_R8G8B8, irr::core::dimension2du(TILE_POINTS_NUM, TILE_POINTS_NUM));
+#endif
 }
 
 TheEarth::~TheEarth()
@@ -220,6 +228,11 @@ TheEarth::~TheEarth()
         delete it->second;
     }
     tileMap.clear();
+    if (miniMap)
+    {
+        miniMap->drop();
+    }
+    miniMapTexture = 0;
     TheGame::getInstance()->getDevice()->getFileSystem()->drop();
 }
 
@@ -288,6 +301,7 @@ const irr::video::SColor& TheEarth::getTileTexture(unsigned int x, unsigned int 
                     getEarthTexture(tileX, tileY+1),
                     getEarthTexture(tileX+1, tileY+1));
                 tileMap[tileX + (xsize*tileY)] = tile;
+                setIsLoaded(tileX, tileY, true);
             }
             else
             {
@@ -329,21 +343,23 @@ void TheEarth::getTileHeightAndTexture(unsigned int x, unsigned int y,
                     getEarthTexture(tileX, tileY+1),
                     getEarthTexture(tileX+1, tileY+1));
                 tileMap[tileX + (xsize*tileY)] = tile;
+                setIsLoaded(tileX, tileY, true);
             }
             else
             {
                 height = 0;
-                textureColor = getEarthTexture(tileX, tileY);
+                textureColor = /*irr::video::SColor(0, 0, 255, 0);//*/getEarthTexture(tileX, tileY);
                 return;
             }
         }
         height = tile->getHeight(inX, inY);
-        textureColor = tile->getColor(inX, inY);
+        textureColor = /*irr::video::SColor(0, 255, 0, 0);getEarthTexture(tileX, tileY);*/tile->getColor(inX, inY);
+        //printf("%u, %u: %u %u %u\n", inX, inY, textureColor.getRed(), textureColor.getGreen(), textureColor.getBlue());
     }
     else
     {
         height = 0;
-        textureColor = baseColor;
+        textureColor = /*irr::video::SColor(0, 0, 0, 255);//*/baseColor;
     }
 }
 
@@ -511,7 +527,7 @@ irr::video::SColor TheEarth::getEarthTexture(unsigned int x, unsigned int y) con
     {
         if (x >= xsize) x = xsize - 1;
         if (y >= ysize) y = ysize - 1;
-        return density->getPixel(x, y);
+        return earthTexture->getPixel(x, y);
     }
     else
     {
@@ -958,6 +974,8 @@ void TheEarth::createFirst(const irr::core::vector3df& pos, const irr::core::vec
     visualPart->loadMembers(this);
     printf("done\nset visible members ... ");
     visualPart->setVisible(true);
+    printf("done\nrefresh minimap ... ");
+    refreshMiniMap();
     printf("done\n");
 }
 
@@ -994,6 +1012,7 @@ void TheEarth::update(const irr::core::vector3df& pos, const irr::core::vector3d
         lastCenterPos.X+VISUAL_BOX_HSIZE_F, 10000.0f, lastCenterPos.Z+VISUAL_BOX_HSIZE_F);
         newVisualPart->createMembers(lastCenterPosi, this);
         execute();
+        refreshMiniMap();
     }
 #endif // 0
 }
@@ -1011,4 +1030,60 @@ void TheEarth::registerVisual()
     {
         visualPart->registerMembers();
     }
+}
+
+void TheEarth::refreshMiniMap()
+{
+#if 0
+    irr::core::dimension2di currentPos(abs(lastCenterPosi.X / TILE_SIZE), abs(lastCenterPosi.Z / TILE_SIZE));
+
+    if (currentPos != lastMiniMapPos)
+    {
+        lastMiniMapPos = currentPos;
+        irr::core::dimension2di generateFrom(currentPos.Width - MINIMAP_HSIZE, currentPos.Height - MINIMAP_HSIZE);
+
+        if (generateFrom.Width < 0) generateFrom.Width = 0;
+        if (generateFrom.Height < 0) generateFrom.Height = 0;
+        if (generateFrom.Width + MINIMAP_SIZE > (int)xsize) generateFrom.Width = xsize - MINIMAP_SIZE;
+        if (generateFrom.Height + MINIMAP_SIZE > (int)ysize) generateFrom.Height = ysize - MINIMAP_SIZE;
+
+        for (int x = generateFrom.Width; x < generateFrom.Width + MINIMAP_SIZE; x++)
+        {
+            for (int y = generateFrom.Height; y < generateFrom.Height + MINIMAP_SIZE; y++)
+            {
+                if (x == currentPos.Width && y == currentPos.Height)
+                //if (x == generateFrom.Width+MINIMAP_SIZE-1 || y == generateFrom.Height+MINIMAP_SIZE-1)
+                {
+                    miniMap->setPixel(x - generateFrom.Width, y - generateFrom.Height, irr::video::SColor(255, 255, 0, 0));
+                }
+                else
+                {
+                    miniMap->setPixel(x - generateFrom.Width, y - generateFrom.Height, getEarthTexture(x, y));
+                }
+            }
+        }
+
+        char miniMapName[255];
+        sprintf_s(miniMapName, "minimap_%d_%d", currentPos.Width, currentPos.Height);
+        miniMapTexture = TheGame::getInstance()->getDriver()->addTexture(miniMapName, miniMap);
+    }
+#else
+        for (int x = 0; x < TILE_POINTS_NUM; x++)
+        {
+            for (int y = 0; y < TILE_POINTS_NUM; y++)
+            {
+                irr::video::SColor col = tileMap.begin()->second->getColor(x, y);
+                miniMap->setPixel(x, y, col);
+                //printf("%u %u %u \n", col.getRed(), col.getGreen(), col.getBlue());
+                printf("%u ", col.getRed());
+            }
+            printf("\n\n");
+        }
+        printf("ptilepos: %u %u", tileMap.begin()->second->getPosX(), tileMap.begin()->second->getPosY());
+        char miniMapName[255];
+        sprintf_s(miniMapName, "minimap_1_1");
+        //TheGame::getInstance()->getSmgr()->getVideoDriver()->setTextureCreationFlag(irr::video::ETCF_CREATE_MIP_MAPS, false);
+        miniMapTexture = TheGame::getInstance()->getDriver()->addTexture(miniMapName, miniMap);
+        //TheGame::getInstance()->getSmgr()->getVideoDriver()->setTextureCreationFlag(irr::video::ETCF_CREATE_MIP_MAPS, true);
+#endif
 }

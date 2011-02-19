@@ -23,30 +23,40 @@ Tile::Tile(unsigned int posx, unsigned int posy,
     }
     for (unsigned int x = 0; x < TILE_POINTS_NUM; x++)
     {
+        const unsigned int cdiv = (TILE_POINTS_NUM + 1);
+        const unsigned int cx0 = cdiv - x;
+        const unsigned int cx1 = /*cdiv -*/ x;
+        const irr::video::SColor color0(255,
+              (color00.getRed()*cx0 +   color10.getRed()*cx1) / cdiv,
+            (color00.getGreen()*cx0 + color10.getGreen()*cx1) / cdiv,
+             (color00.getBlue()*cx0 +  color10.getBlue()*cx1) / cdiv);
+        const irr::video::SColor color1(255,
+              (color01.getRed()*cx0 +   color11.getRed()*cx1) / cdiv,
+            (color01.getGreen()*cx0 + color11.getGreen()*cx1) / cdiv,
+             (color01.getBlue()*cx0 +  color11.getBlue()*cx1) / cdiv);
         for (unsigned int y = 0; y < TILE_POINTS_NUM; y++)
         {
-            const unsigned int cdiv = (TILE_POINTS_NUM + 1);
-            const unsigned int cx0 = cdiv - x;
-            const unsigned int cx1 = x;
             const unsigned int cy0 = cdiv - y;
             const unsigned int cy1 = y;
 
-            const unsigned int red = (color00.getRed()*(cx0+cy0)+
-                                      color10.getRed()*(cx1+cy0)+
-                                      color01.getRed()*(cx0+cy1)+
-                                      color11.getRed()*(cx1+cy1)) / (8*cdiv);
-            const unsigned int green = (color00.getGreen()*(cx0+cy0)+
-                                        color10.getGreen()*(cx1+cy0)+
-                                        color01.getGreen()*(cx0+cy1)+
-                                        color11.getGreen()*(cx1+cy1)) / (8*cdiv);
-            const unsigned int blue = (color00.getBlue()*(cx0+cy0)+
-                                       color10.getBlue()*(cx1+cy0)+
-                                       color01.getBlue()*(cx0+cy1)+
-                                       color11.getBlue()*(cx1+cy1)) / (8*cdiv);
-
+            const unsigned int red =     (color0.getRed()*cy0 +   color1.getRed()*cy1) / cdiv;
+            const unsigned int green = (color0.getGreen()*cy0 + color1.getGreen()*cy1) / cdiv;
+            const unsigned int blue =   (color0.getBlue()*cy0 +  color1.getBlue()*cy1) / cdiv;
+            //printf("%u %u %u\n", red, green, blue);
+            //printf("%u ", red);
             colors[x + (TILE_POINTS_NUM*y)].set(255, red, green, blue);
         }
+        //printf("\n\n");
     }
+    printf("tile pos(%u): %u, %u\n", posx + (6750*posy), posx, posy);
+    
+    printf("%u %u %u \n", color00.getRed(), color00.getGreen(), color00.getBlue());
+    printf("%u %u %u \n", color10.getRed(), color10.getGreen(), color10.getBlue());
+    printf("%u %u %u \n", color01.getRed(), color01.getGreen(), color01.getBlue());
+    printf("%u %u %u \n", color11.getRed(), color11.getGreen(), color11.getBlue());
+    printf("\n");
+    
+    //assert(0);
 }
 
 Tile::~Tile()

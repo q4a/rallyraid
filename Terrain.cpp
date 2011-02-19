@@ -6,6 +6,7 @@
 #include "TheEarth.h"
 #include <math.h>
 #include "Shaders.h"
+#include "Settings.h"
 
 class HeightFieldHelper : public hkpSampledHeightFieldShape
 {
@@ -108,9 +109,10 @@ void Terrain::load(TheEarth* earth)
     //terrain->loadHeightMap(file);
     terrain->loadHeightMap(earth, offsetX, offsetY, TILE_POINTS_NUM+1);
 
+    /*
     if (TheGame::getInstance()->getShaders()->getSupportedSMVersion() < 2)
     {
-        terrain->setMaterialFlag(irr::video::EMF_LIGHTING, true);
+        terrain->setMaterialFlag(irr::video::EMF_LIGHTING, Settings::getInstance()->nonshaderLight);
     }
     else
     {
@@ -120,6 +122,7 @@ void Terrain::load(TheEarth* earth)
     //terrain->setMaterialTexture(0, terrain->getGeneratedTexture());
     //terrain->setMaterialTexture(1, TheGame::getInstance()->getDriver()->getTexture("data/earthdata/detailmap.jpg"));
     //terrain->setMaterialType(TheGame::getInstance()->getShaders()->materialMap["terrain"]);
+    */
     
     // precache body
     /*
@@ -169,9 +172,22 @@ void Terrain::setVisible(bool p_visible)
         {
             char textureMapPartName[255];
             sprintf_s(textureMapPartName, "textureMapPart_%d_%d", offsetX, offsetY);
+            TheGame::getInstance()->getSmgr()->getVideoDriver()->setTextureCreationFlag(irr::video::ETCF_CREATE_MIP_MAPS, false);
             irr::video::ITexture* texture = TheGame::getInstance()->getSmgr()->getVideoDriver()->addTexture(textureMapPartName, terrain->getGeneratedImage());
+            TheGame::getInstance()->getSmgr()->getVideoDriver()->setTextureCreationFlag(irr::video::ETCF_CREATE_MIP_MAPS, true);
             terrain->setMaterialTexture(0, texture);
             terrain->setMaterialTexture(1, TheGame::getInstance()->getDriver()->getTexture("data/earthdata/detailmap.jpg"));
+            if (TheGame::getInstance()->getShaders()->getSupportedSMVersion() < 2)
+            {
+                terrain->setMaterialFlag(irr::video::EMF_LIGHTING, Settings::getInstance()->nonshaderLight);
+            }
+            else
+            {
+                terrain->setMaterialFlag(irr::video::EMF_LIGHTING, false);
+            }
+            //terrain->setMaterialFlag(irr::video::EMF_TEXTURE_WRAP, true);
+            terrain->scaleTexture(1.0f, /*TILE_SIZE_F*/(float)TILE_POINTS_NUM);
+            terrain->setMaterialType(TheGame::getInstance()->getShaders()->materialMap["terrain"]);
             //image->drop();
         }
     }

@@ -27,6 +27,7 @@ public:
     bool                    preloadObjects;
     bool                    cacheObjects;
     unsigned int            targetFps;
+    bool                    nonshaderLight;
 };
 
 #endif // SETTINGS_H

@@ -25,9 +25,10 @@ void Settings::finalize()
 
 
 Settings::Settings()
-    : preloadObjects(true),
+    : preloadObjects(false),
       cacheObjects(true),
-      targetFps(60)
+      targetFps(60),
+      nonshaderLight(false)
 {
 }
 
@@ -59,13 +60,16 @@ void Settings::read()
 
             if (keyName == "preload_objects")
             {
-                preloadObjects = StringConverter::parseBool(valName, true);
+                preloadObjects = StringConverter::parseBool(valName, false);
             } else if (keyName == "cache_objects")
             {
                 cacheObjects = StringConverter::parseBool(valName, true);
             } else if (keyName == "target_fps")
             {
                 targetFps = StringConverter::parseUnsignedInt(valName, 60);
+            } else if (keyName == "nonshader_light")
+            {
+                nonshaderLight = StringConverter::parseBool(valName, false);
             }
         }
     }
@@ -88,6 +92,7 @@ void Settings::write()
     ret = fprintf(f, "preload_objects=%s\n", preloadObjects?"yes":"no");
     ret = fprintf(f, "cache_objects=%s\n", cacheObjects?"yes":"no");
     ret = fprintf(f, "target_fps=%u\n", targetFps);
+    ret = fprintf(f, "nonshader_light=%s\n", nonshaderLight?"yes":"no");
 
     fclose(f);
 }

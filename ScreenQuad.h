@@ -6,14 +6,16 @@
 class ScreenQuad
 {
 public:
-    ScreenQuad(irr::video::IVideoDriver* driver, const irr::core::position2di& pos, const irr::core::dimension2du size)
+    ScreenQuad(irr::video::IVideoDriver* driver, const irr::core::position2di& pos, const irr::core::dimension2du size, bool antialiasing = true)
         : driver(driver)
     {
+        Material.AntiAliasing = antialiasing;
         Material.Wireframe = false;
         Material.Lighting = false;
         Material.ZWriteEnable = false;
         Material.BackfaceCulling = false;
         Material.ZBuffer = irr::video::ECFN_ALWAYS/*ECFN_NEVER*/;
+        Material.setFlag(irr::video::EMF_TEXTURE_WRAP, true);
         //Material.setFlag(EMF_BILINEAR_FILTER, false);
         bool flip_vert = true;
         /*

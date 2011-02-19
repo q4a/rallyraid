@@ -44,6 +44,9 @@ public:
     void setInUse() {inUse = true;}
     void clearInUse() {inUse = false;}
 
+    unsigned int getPosX() {return posx;}
+    unsigned int getPosY() {return posy;}
+
 private:
     bool setHeight(unsigned int x, unsigned int y, unsigned short val);
     bool read();

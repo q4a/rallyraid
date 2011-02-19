@@ -17,6 +17,9 @@ namespace irr
 }
 class Terrain;
 
+#define MINIMAP_SIZE 128
+#define MINIMAP_HSIZE (MINIMAP_SIZE / 2)
+
 class TheEarth : public MyThread
 {
 public:
@@ -42,6 +45,7 @@ private:
     bool setIsLoaded(unsigned int x, unsigned int y, bool val);
     bool setHasDetailTex(unsigned int x, unsigned int y, bool val);
     bool setEarthDensity(unsigned int x, unsigned int y, const irr::video::SColor& val);
+    void refreshMiniMap();
     
 public:
     unsigned short getTileHeight(unsigned int x, unsigned int y);
@@ -79,6 +83,8 @@ public:
     void update(const irr::core::vector3df& pos, const irr::core::vector3df& dir);
     void registerVisual();
 
+    irr::video::ITexture* getMiniMapTexture() {return miniMapTexture;}
+
 private:
     // common data
     
@@ -108,6 +114,9 @@ private:
     irr::core::vector3df    lastCenterPos;
     irr::core::vector3di    lastCenterPosi;
 
+    irr::video::IImage*     miniMap;
+    irr::video::ITexture*   miniMapTexture;
+    irr::core::dimension2di lastMiniMapPos;
     
     
     // store data - reveresed Z coord
@@ -124,6 +133,7 @@ private:
     unsigned short      minHeight;
     
     tileMap_t           tileMap;
+
 };
 
 #endif // THEEARTH_H

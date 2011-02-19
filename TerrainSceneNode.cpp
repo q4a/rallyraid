@@ -102,7 +102,7 @@ namespace scene
 		//const u32 startTime = os::Timer::getRealTime();
         if (!image)
         {
-            image = SceneManager->getVideoDriver()->createImage(irr::video::ECF_A8R8G8B8, irr::core::dimension2du(size-1, size-1));
+            image = SceneManager->getVideoDriver()->createImage(irr::video::ECF_R8G8B8, irr::core::dimension2du(size-1, size-1));
         }
 
 		// Get the dimension of the heightmap data
@@ -185,11 +185,11 @@ namespace scene
 
                 if (x < TerrainData.Size - 1 && z < TerrainData.Size - 1)
                 {
-                    image->setPixel(x, z, vertex.Color);
+                    image->setPixel(TerrainData.Size - x - 1, z, vertex.Color);
                 }
 
 				vertex.TCoords.X = vertex.TCoords2.X = fx2; //1.f-fx2;
-				vertex.TCoords.Y = vertex.TCoords2.Y = fz2;
+				vertex.TCoords.Y = vertex.TCoords2.Y = /*1.f -*/ fz2;
 
 				++fz;
 				fz2 += tdSize;
