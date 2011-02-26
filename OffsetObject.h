@@ -12,7 +12,7 @@ class OffsetObjectUpdateCB
 {
 protected:
     friend class OffsetObject;
-    virtual void handleUpdatePos(const irr::core::vector3df& newPos);
+    virtual void handleUpdatePos(bool phys) = 0;
 };
 
 class OffsetObject

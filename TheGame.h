@@ -7,6 +7,8 @@ class EventReceiver;
 class Shaders;
 class OffsetManager;
 class TheEarth;
+class VehicleTypeManager;
+class VehicleManager;
 
 class TheGame
 {
@@ -57,6 +59,8 @@ private:
     Shaders*                        shaders;
     OffsetManager*                  offsetManager;
     TheEarth*                       earth;
+    VehicleTypeManager*             vehicleTypeManager;
+    VehicleManager*                 vehicleManager;
 
     bool                            terminate;
     size_t                          windowId;

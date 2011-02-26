@@ -134,9 +134,9 @@ void ObjectPoolManager::read()
     }
 }
 
-OffsetObject* ObjectPoolManager::getObject(const std::string& objectPoolName, const irr::core::vector3df& apos)
+OffsetObject* ObjectPoolManager::getObject(const std::string& objectPoolName, const irr::core::vector3df& apos, const irr::core::vector3df& scale, bool addToOffsetManager)
 {
-    return objectPoolMap[objectPoolName]->getObject(apos);
+    return objectPoolMap[objectPoolName]->getObject(apos, scale, addToOffsetManager);
 }
 
 void ObjectPoolManager::putObject(OffsetObject* offsetObject)

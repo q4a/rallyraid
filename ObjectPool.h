@@ -39,7 +39,7 @@ public:
         float friction, float mass);
     ~ObjectPool();
 
-    OffsetObject* getObject(const irr::core::vector3df& apos);
+    OffsetObject* getObject(const irr::core::vector3df& apos, const irr::core::vector3df& scale = irr::core::vector3df(1.0f, 1.0f, 1.0f), bool addToOffsetManager = true);
     void putObject(OffsetObject* object);
 
     OffsetObject* createNewInstance();

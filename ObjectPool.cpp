@@ -105,7 +105,7 @@ ObjectPool::~ObjectPool()
     }
 }
 
-OffsetObject* ObjectPool::getObject(const irr::core::vector3df& apos)
+OffsetObject* ObjectPool::getObject(const irr::core::vector3df& apos, const irr::core::vector3df& scale, bool addToOffsetManager)
 {
     OffsetObject* offsetObject = 0;
     if (objectList.size() > 0)
@@ -120,6 +120,7 @@ OffsetObject* ObjectPool::getObject(const irr::core::vector3df& apos)
 
     offsetObject->setPos(apos);
     offsetObject->getNode()->setPosition(apos);
+    offsetObject->getNode()->setScale(scale);
 
     if (hkShape)
     {
@@ -152,7 +153,10 @@ OffsetObject* ObjectPool::getObject(const irr::core::vector3df& apos)
 
     offsetObject->setPool(this);
 
-    offsetObject->addToManager();
+    if (addToOffsetManager)
+    {
+        offsetObject->addToManager();
+    }
     offsetObject->getNode()->setVisible(true);
     return offsetObject;
 }

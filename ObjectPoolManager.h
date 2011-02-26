@@ -29,7 +29,7 @@ private:
     void read();
 
 public:
-    OffsetObject* getObject(const std::string& objectPoolName, const irr::core::vector3df& apos);
+    OffsetObject* getObject(const std::string& objectPoolName, const irr::core::vector3df& apos, const irr::core::vector3df& scale = irr::core::vector3df(1.0f, 1.0f, 1.0f), bool addToOffsetManager = true);
     void putObject(OffsetObject* offsetObject);
 
 private:

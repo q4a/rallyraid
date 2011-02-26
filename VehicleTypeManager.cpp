@@ -24,12 +24,6 @@ void VehicleTypeManager::finalize()
     }
 }
 
-VehicleTypeManager* VehicleTypeManager::getInstance()
-{
-    return vehicleTypeManager;
-}
-
-
 VehicleTypeManager::VehicleTypeManager()
     : vehicleTypeMap()
 {

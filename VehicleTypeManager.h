@@ -14,7 +14,7 @@ public:
     static void initialize();
     static void finalize();
     
-    static VehicleTypeManager* getInstance();
+    static VehicleTypeManager* getInstance() {return vehicleTypeManager;}
 
     typedef std::map<std::string, VehicleType*> vehicleTypeMap_t;
 

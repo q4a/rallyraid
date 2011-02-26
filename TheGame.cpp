@@ -10,6 +10,8 @@
 #include "hk.h"
 #include "ObjectPoolManager.h"
 #include "TheEarth.h"
+#include "VehicleTypeManager.h"
+#include "VehicleManager.h"
 
 // static stuff
 TheGame* TheGame::theGame = 0;
@@ -43,6 +45,8 @@ TheGame::TheGame()
       shaders(0),
       offsetManager(0),
       earth(0),
+      vehicleTypeManager(0),
+      vehicleManager(0),
       terminate(true),
       windowId(0),
       lastScreenSize(),
@@ -98,6 +102,12 @@ TheGame::TheGame()
         dprintf(MY_DEBUG_NOTE, "Initialize earth\n");
         TheEarth::initialize();
         earth = TheEarth::getInstance();
+        dprintf(MY_DEBUG_NOTE, "Initialize VehicleTypeManager\n");
+        VehicleTypeManager::initialize();
+        vehicleTypeManager = VehicleTypeManager::getInstance();
+        dprintf(MY_DEBUG_NOTE, "Initialize VehicleManager\n");
+        VehicleManager::initialize();
+        vehicleManager = VehicleManager::getInstance();
 
         testText = env->addStaticText(L"", irr::core::recti(10, 10, 790, 30), false, true, 0, -1, true);
     }
@@ -123,10 +133,20 @@ TheGame::~TheGame()
     fps_camera = fix_camera = camera = 0;
     offsetManager = 0;
     earth = 0;
+    vehicleManager = 0;
+    vehicleTypeManager = 0;
 
+    dprintf(MY_DEBUG_NOTE, "Finalize vehicleManager\n");
+    VehicleManager::finalize();
+    dprintf(MY_DEBUG_NOTE, "Finalize vehicleTypeManager\n");
+    VehicleTypeManager::finalize();
+    dprintf(MY_DEBUG_NOTE, "Finalize earth\n");
     TheEarth::finalize();
+    dprintf(MY_DEBUG_NOTE, "Finalize offsetManager\n");
     OffsetManager::finalize();
+    dprintf(MY_DEBUG_NOTE, "Finalize objectPoolManager\n");
     ObjectPoolManager::finalize();
+    dprintf(MY_DEBUG_NOTE, "Finalize settings\n");
     Settings::finalize();
     if (driver)
     {

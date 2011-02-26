@@ -104,7 +104,7 @@ void OffsetObject::update(const irr::core::vector3df& offset, const irr::core::v
     }
     if (updateCB)
     {
-        updateCB->handleUpdatePos(node->getPosition());
+        updateCB->handleUpdatePos(false);
     }
 }
 
@@ -141,7 +141,7 @@ void OffsetObject::setUpdateCB(OffsetObjectUpdateCB* p_updateCB)
             
             if ((*it)->updateCB)
             {
-                (*it)->updateCB->handleUpdatePos(newPos);
+                (*it)->updateCB->handleUpdatePos(true);
             }
         }
     }
