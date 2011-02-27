@@ -133,9 +133,9 @@ OffsetObject* ObjectPool::getObject(const irr::core::vector3df& apos, const irr:
             groundInfo.m_motionType = hkpMotion::MOTION_BOX_INERTIA;
             groundInfo.m_mass = mass;
             // TODO
-            groundInfo.m_position.set(0.0f, 0.0f, 0.0f);
+            //groundInfo.m_position.set(0.0f, 0.0f, 0.0f);
             groundInfo.m_inertiaTensor.setDiagonal(1.0f, 1.0f, 1.0f);
-            groundInfo.m_centerOfMass.set(/*engine_center_of_mass*/0.0f, /*-center_of_mass*/0.0f, 0.0f);
+            groundInfo.m_centerOfMass.set(/*engine_center_of_mass*/0.1f, /*-center_of_mass*/0.1f, 0.0f);
         }
         else
         {
@@ -145,7 +145,10 @@ OffsetObject* ObjectPool::getObject(const irr::core::vector3df& apos, const irr:
         hkpRigidBody* hkBody = new hkpRigidBody(groundInfo);
         //hkpPropertyValue val(1);
         //hkBody->addProperty(treeID, val);
-        hk::hkWorld->addEntity(hkBody);
+        if (objectType != Vehicle)
+        {
+            hk::hkWorld->addEntity(hkBody);
+        }
         hk::unlock();
         offsetObject->setBody(hkBody);
         //hkBody->activate();
@@ -169,7 +172,10 @@ void ObjectPool::putObject(OffsetObject* object)
     {
         hk::lock();
         hkBody->removeReference();
-        hk::hkWorld->removeEntity(hkBody);
+        if (objectType != Vehicle)
+        {
+            hk::hkWorld->removeEntity(hkBody);
+        }
         hk::unlock();
         hkBody = 0;
         object->setBody(0);

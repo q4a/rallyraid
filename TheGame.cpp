@@ -12,6 +12,7 @@
 #include "TheEarth.h"
 #include "VehicleTypeManager.h"
 #include "VehicleManager.h"
+#include "Vehicle.h"
 
 // static stuff
 TheGame* TheGame::theGame = 0;
@@ -182,7 +183,7 @@ void TheGame::loop()
     /* test */
     //irr::core::vector3df initialPos(4190208.f, 1000.f, -6414336.f);
     //irr::core::vector3df initialPos(4190225.f, 95.f, -6411350.f);
-    irr::core::vector3df initialPos(4190225.f, 430.f, -6401350.f);
+    irr::core::vector3df initialPos(4190225.f, 215.f, -6401350.f);
     irr::core::vector3df initialDir(20.f, -20.f, 20.f);
     camera->setPosition(initialPos);
     camera->setTarget(camera->getPosition()+initialDir);
@@ -225,9 +226,10 @@ void TheGame::loop()
         irr::core::dimension2du(MINIMAP_SIZE, MINIMAP_SIZE), false);
     miniMapQuad.getMaterial().MaterialType = shaders->materialMap["quad2d"];
 
-    OffsetObject* car = ObjectPoolManager::getInstance()->getObject("vw3", initialPos+initialDir);
-    printf("car off: %f, %f (%f, %f)\n", offsetManager->getOffset().X, offsetManager->getOffset().Z,
-        car->getNode()->getPosition().X, car->getNode()->getPosition().Z);
+    //OffsetObject* car = ObjectPoolManager::getInstance()->getObject("vw3", initialPos+initialDir);
+    //printf("car off: %f, %f (%f, %f)\n", offsetManager->getOffset().X, offsetManager->getOffset().Z,
+    //    car->getNode()->getPosition().X, car->getNode()->getPosition().Z);
+    Vehicle* car = new Vehicle("vw3", initialPos+initialDir, irr::core::vector3df());
 
     while (device->run() && !terminate)
     {

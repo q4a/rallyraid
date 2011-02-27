@@ -38,6 +38,8 @@ VehicleType::VehicleType(const std::string& vehicleTypeName, const std::string& 
       engineSoundFilename(),
       maxBrakeForce(100.f),
       maxSpeed(100.f),
+      maxTorque(5000.0f),
+      maxTorqueRate(200.0f),
       changeGearTime(20),
       maxSteerAngle(35.0f),
       maxSteerRate(0.1f)
@@ -69,10 +71,11 @@ bool VehicleType::read(const std::string& vehicleTypeFilename)
 
         sectionName = seci.peekNextKey();
         dprintf(MY_DEBUG_NOTE, "\tVehicle section: %s\n", sectionName.c_str());
-        if (sectionName == "tyre")
+        /*if (sectionName == "tyre")
         {
             currentTyre = new VehicleTypeTyre();
-        } else if (sectionName == "front_right_tyre")
+        } else*/
+        if (sectionName == "front_right_tyre")
         {
             currentTyre = new VehicleTypeTyre(0);
         } else if (sectionName == "front_left_tyre")
@@ -84,9 +87,60 @@ bool VehicleType::read(const std::string& vehicleTypeFilename)
         } else if (sectionName == "rear_left_tyre")
         {
             currentTyre = new VehicleTypeTyre(3);
-        } else if (sectionName == "gear")
+        } else if (sectionName == "tyre_0")
+        {
+            currentTyre = new VehicleTypeTyre(0);
+        } else if (sectionName == "tyre_1")
+        {
+            currentTyre = new VehicleTypeTyre(1);
+        } else if (sectionName == "tyre_2")
+        {
+            currentTyre = new VehicleTypeTyre(2);
+        } else if (sectionName == "tyre_3")
+        {
+            currentTyre = new VehicleTypeTyre(3);
+        } else if (sectionName == "tyre_4")
+        {
+            currentTyre = new VehicleTypeTyre(4);
+        } else if (sectionName == "tyre_5")
+        {
+            currentTyre = new VehicleTypeTyre(5);
+        } else if (sectionName == "tyre_6")
+        {
+            currentTyre = new VehicleTypeTyre(6);
+        } else if (sectionName == "tyre_7")
+        {
+            currentTyre = new VehicleTypeTyre(7);
+        } else if (sectionName == "tyre_8")
+        {
+            currentTyre = new VehicleTypeTyre(8);
+        } else if (sectionName == "tyre_9")
+        {
+            currentTyre = new VehicleTypeTyre(9);
+        } else if (sectionName == "gear_1")
         {
             gear = true;
+            gearId = 1;
+        } else if (sectionName == "gear_2")
+        {
+            gear = true;
+            gearId = 2;
+        } else if (sectionName == "gear_3")
+        {
+            gear = true;
+            gearId = 3;
+        } else if (sectionName == "gear_4")
+        {
+            gear = true;
+            gearId = 4;
+        } else if (sectionName == "gear_5")
+        {
+            gear = true;
+            gearId = 5;
+        } else if (sectionName == "gear_6")
+        {
+            gear = true;
+            gearId = 6;
         }
         ConfigFile::SettingsMultiMap *settings = seci.getNext();
         for (ConfigFile::SettingsMultiMap::iterator i = settings->begin(); i != settings->end(); ++i)
@@ -166,6 +220,12 @@ bool VehicleType::read(const std::string& vehicleTypeFilename)
                 } else if (keyName == "max_speed")
                 {
                     maxSpeed = StringConverter::parseFloat(valueName, 100.f);
+                } else if (keyName == "max_torque")
+                {
+                    maxTorque = StringConverter::parseFloat(valueName, 5000.0f);
+                } else if (keyName == "max_torque_rate")
+                {
+                    maxTorqueRate = StringConverter::parseFloat(valueName, 200.0f);
                 } else if (keyName == "change_gear_time")
                 {
                     changeGearTime = StringConverter::parseUnsignedInt(valueName, 20);
@@ -253,7 +313,7 @@ bool VehicleType::read(const std::string& vehicleTypeFilename)
         
         if (currentTyre)
         {
-            if (currentTyre->id != (unsigned int)-1)
+            if (currentTyre->id != (unsigned int)-1 && currentTyre->id < 10)
             {
                 if (vehicleTypeTyreMap.find(currentTyre->id) == vehicleTypeTyreMap.end())
                 {

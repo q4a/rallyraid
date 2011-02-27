@@ -48,6 +48,8 @@ private:
     std::string             engineSoundFilename;
     float                   maxBrakeForce;
     float                   maxSpeed;
+    float                   maxTorque;
+    float                   maxTorqueRate;
     unsigned int            changeGearTime;
     float                   maxSteerAngle;
     float                   maxSteerRate;

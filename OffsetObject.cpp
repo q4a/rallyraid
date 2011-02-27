@@ -3,6 +3,7 @@
 //#include "TerrainPool.h"
 //#include "gameplay.h"
 #include <stdio.h>
+#include "stdafx.h"
 
 OffsetObject::dynamicObjectSet_t OffsetObject::dynamicObjectSet;
 irr::core::matrix4 OffsetObject::helperMatrix;
@@ -10,11 +11,13 @@ irr::core::matrix4 OffsetObject::helperMatrix;
 OffsetObject::OffsetObject()
     : node(0), hkBody(0), pos(), iterator(), dynamic(false), offsetManager(OffsetManager::getInstance()), pool(0), updateCB(0)
 {
+    dprintf(MY_DEBUG_NOTE, "OffsetObject::OffsetObject(1): %p\n", this);
 }
 
 OffsetObject::OffsetObject(irr::scene::ISceneNode* node)
     : node(node), hkBody(0), pos(), iterator(), dynamic(false), offsetManager(OffsetManager::getInstance()), pool(0), updateCB(0)
 {
+    dprintf(MY_DEBUG_NOTE, "OffsetObject::OffsetObject(2): %p\n", this);
     if (node)
     {
         pos = node->getPosition();
@@ -24,6 +27,7 @@ OffsetObject::OffsetObject(irr::scene::ISceneNode* node)
 OffsetObject::OffsetObject(irr::scene::ISceneNode* node, hkpRigidBody* hkBody)
     : node(node), hkBody(hkBody), pos(), iterator(), dynamic(false), offsetManager(OffsetManager::getInstance()), pool(0), updateCB(0)
 {
+    dprintf(MY_DEBUG_NOTE, "OffsetObject::OffsetObject(3): %p\n", this);
     if (node)
     {
         pos = node->getPosition();
@@ -33,6 +37,7 @@ OffsetObject::OffsetObject(irr::scene::ISceneNode* node, hkpRigidBody* hkBody)
 OffsetObject::OffsetObject(irr::scene::ISceneNode* node, bool dynamic)
     : node(node), hkBody(0), pos(), iterator(), dynamic(dynamic), offsetManager(OffsetManager::getInstance()), pool(0), updateCB(0)
 {
+    dprintf(MY_DEBUG_NOTE, "OffsetObject::OffsetObject(4): %p\n", this);
     if (dynamic)
     {
         dynamicObjectSet.insert(this);
@@ -48,6 +53,7 @@ OffsetObject::OffsetObject(irr::scene::ISceneNode* node, bool dynamic)
 OffsetObject::OffsetObject(irr::scene::ISceneNode* node, hkpRigidBody* hkBody, bool dynamic)
     : node(node), hkBody(hkBody), pos(), iterator(), dynamic(dynamic), offsetManager(OffsetManager::getInstance()), pool(0), updateCB(0)
 {
+    dprintf(MY_DEBUG_NOTE, "OffsetObject::OffsetObject(5): %p\n", this);
     if (dynamic)
     {
         dynamicObjectSet.insert(this);
@@ -62,6 +68,7 @@ OffsetObject::OffsetObject(irr::scene::ISceneNode* node, hkpRigidBody* hkBody, b
 
 OffsetObject::~OffsetObject()
 {
+    dprintf(MY_DEBUG_NOTE, "OffsetObject::~OffsetObject(): %p\n", this);
     if (iterator != offsetObjectList_t::Iterator())
     {
         printf("offsetObject is in list but under deletion\n");
@@ -89,6 +96,7 @@ void OffsetObject::update(const irr::core::vector3df& offset, const irr::core::v
             node->setPosition(pos-offset);
         }
     }
+    printf("update: %p body %p\n", this, hkBody);
     if (hkBody)
     {
         irr::core::vector3df tv;
@@ -102,6 +110,7 @@ void OffsetObject::update(const irr::core::vector3df& offset, const irr::core::v
         }
         hkBody->setPosition(hkVector4(tv.X, tv.Y, tv.Z));
     }
+    printf("update: %p body %p end\n", this, hkBody);
     if (updateCB)
     {
         updateCB->handleUpdatePos(false);
