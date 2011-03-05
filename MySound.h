@@ -23,6 +23,14 @@ class MySound;
 class MySoundEngine
 {
 public:
+    static void initialize();
+    static void finalize();
+    static MySoundEngine* getInstance() {return soundEngine;}
+
+private:
+    static MySoundEngine* soundEngine;
+
+public:
     MySoundEngine();
     ~MySoundEngine();
     

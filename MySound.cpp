@@ -8,7 +8,28 @@
 
 #include "stdafx.h"
 
-MySoundEngine::MySoundEngine() : initialized(false), soundFileNameBuffer()
+MySoundEngine* MySoundEngine::soundEngine = 0;
+
+void MySoundEngine::initialize()
+{
+    if (soundEngine == 0)
+    {
+        soundEngine = new MySoundEngine();
+    }
+}
+
+void MySoundEngine::finalize()
+{
+    if (soundEngine)
+    {
+        delete soundEngine;
+        soundEngine = 0;
+    }
+}
+
+MySoundEngine::MySoundEngine()
+    : initialized(false),
+      soundFileNameBuffer()
 {
     dprintf(MY_DEBUG_INFO, "Initialize OpenAL\n");
 

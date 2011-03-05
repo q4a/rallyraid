@@ -2,6 +2,7 @@
 #define THEGAME_H
 
 #include "stdafx.h"
+#include "OffsetObject.h"
 
 class EventReceiver;
 class Shaders;
@@ -9,8 +10,9 @@ class OffsetManager;
 class TheEarth;
 class VehicleTypeManager;
 class VehicleManager;
+class MySoundEngine;
 
-class TheGame
+class TheGame : public OffsetObjectUpdateCB
 {
 public:
     static void initialize();
@@ -44,6 +46,7 @@ private:
     static TheGame*                 theGame;
 
     void readSettings(irr::SIrrlichtCreationParameters& params);
+    virtual void handleUpdatePos(bool phys);
 
 private:
     // members
@@ -61,6 +64,7 @@ private:
     TheEarth*                       earth;
     VehicleTypeManager*             vehicleTypeManager;
     VehicleManager*                 vehicleManager;
+    MySoundEngine*                  soundEngine;
 
     bool                            terminate;
     size_t                          windowId;
@@ -70,6 +74,7 @@ private:
     unsigned int                    lastPhysTick;
     unsigned int                    lastSlowTick;
     bool                            physicsOngoing;
+    OffsetObject*                   cameraOffsetObject;
 
     irr::gui::IGUIStaticText*       testText;
 };

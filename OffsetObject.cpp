@@ -18,20 +18,24 @@ OffsetObject::OffsetObject(irr::scene::ISceneNode* node)
     : node(node), hkBody(0), pos(), iterator(), dynamic(false), offsetManager(OffsetManager::getInstance()), pool(0), updateCB(0)
 {
     dprintf(MY_DEBUG_NOTE, "OffsetObject::OffsetObject(2): %p\n", this);
+    /*
     if (node)
     {
         pos = node->getPosition();
     }
+    */
 }
 
 OffsetObject::OffsetObject(irr::scene::ISceneNode* node, hkpRigidBody* hkBody)
     : node(node), hkBody(hkBody), pos(), iterator(), dynamic(false), offsetManager(OffsetManager::getInstance()), pool(0), updateCB(0)
 {
     dprintf(MY_DEBUG_NOTE, "OffsetObject::OffsetObject(3): %p\n", this);
+    /*
     if (node)
     {
         pos = node->getPosition();
     }
+    */
 }
 
 OffsetObject::OffsetObject(irr::scene::ISceneNode* node, bool dynamic)
@@ -84,30 +88,30 @@ void OffsetObject::update(const irr::core::vector3df& offset, const irr::core::v
 {
     if (node)
     {
-        if (dynamic)
-        {
+        //if (dynamic)
+        //{
             pos = node->getPosition();
             //printf("update dyn before: pos: %f, %f loffset: %f, %f\n", pos.X, pos.Z, loffset.X, loffset.Z);
             node->setPosition(pos-loffset);
             //printf("update dyn after: pos: %f, %f \n", node->getPosition().X, node->getPosition().Z);
-        }
-        else
-        {
-            node->setPosition(pos-offset);
-        }
+        //}
+        //else
+        //{
+        //    node->setPosition(pos-offset);
+        //}
     }
     printf("update: %p body %p\n", this, hkBody);
     if (hkBody)
     {
         irr::core::vector3df tv;
-        if (dynamic)
-        {
+        //if (dynamic)
+        //{
             tv = pos-loffset;
-        }
-        else
-        {
-            tv = pos-offset;
-        }
+        //}
+        //else
+        //{
+        //    tv = pos-offset;
+        //}
         hkBody->setPosition(hkVector4(tv.X, tv.Y, tv.Z));
     }
     printf("update: %p body %p end\n", this, hkBody);

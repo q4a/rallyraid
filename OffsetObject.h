@@ -54,8 +54,8 @@ public:
     
     void update(const irr::core::vector3df& offset, const irr::core::vector3df& loffset);
     
-    void setPos(const irr::core::vector3df& apos) {pos = apos;}
-    irr::core::vector3df& getPos() {return pos;}
+    //void setPos(const irr::core::vector3df& apos) {pos = apos;}
+    //irr::core::vector3df& getPos() {return pos;}
 
     ObjectPool* getPool() {return pool;}
     void setPool(ObjectPool* p_pool) {pool = p_pool;}

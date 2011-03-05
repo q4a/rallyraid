@@ -118,9 +118,20 @@ OffsetObject* ObjectPool::getObject(const irr::core::vector3df& apos, const irr:
         offsetObject = createNewInstance();
     }
 
-    offsetObject->setPos(apos);
+    //offsetObject->setPos(apos);
     offsetObject->getNode()->setPosition(apos);
     offsetObject->getNode()->setScale(scale);
+    offsetObject->getNode()->setMaterialType(material);
+    if (TheGame::getInstance()->getShaders()->getSupportedSMVersion() < 2)
+    {
+        offsetObject->getNode()->setMaterialFlag(irr::video::EMF_LIGHTING, Settings::getInstance()->nonshaderLight);
+    }
+    else
+    {
+        offsetObject->getNode()->setMaterialFlag(irr::video::EMF_LIGHTING, false);
+    }
+    printf("-------------- texture: %p\n", texture);
+    offsetObject->getNode()->setMaterialTexture(0, texture);
 
     if (hkShape)
     {

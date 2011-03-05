@@ -56,6 +56,9 @@ VehicleTyre::VehicleTyre(VehicleTypeTyre* vehicleTypeTyre, const irr::core::vect
 {
     offsetObject = ObjectPoolManager::getInstance()->getObject(tyreType->objectName, apos, tyreType->scale);
     node = offsetObject->getNode();
+    
+    node->setMaterialTexture(0, tyreType->texture);
+
     localMatrix.setTranslation(tyreType->localPos);
 
     irr::core::aabbox3d<float> bbox = node->getBoundingBox();
@@ -110,6 +113,8 @@ Vehicle::Vehicle(const std::string& vehicleTypeName, const irr::core::vector3df&
     offsetObject->setUpdateCB(this);
     node = offsetObject->getNode();
     hkBody = offsetObject->getBody();
+
+    node->setMaterialTexture(0, vehicleType->texture);
 
     matrix.setTranslation(node->getPosition());
     matrix.setRotationDegrees(rotation);

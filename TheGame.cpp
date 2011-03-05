@@ -6,13 +6,13 @@
 #include "ScreenQuad.h"
 #include "ShadersSM20.h"
 #include "OffsetManager.h"
-#include "OffsetObject.h"
 #include "hk.h"
 #include "ObjectPoolManager.h"
 #include "TheEarth.h"
 #include "VehicleTypeManager.h"
 #include "VehicleManager.h"
 #include "Vehicle.h"
+#include "MySound.h"
 
 // static stuff
 TheGame* TheGame::theGame = 0;
@@ -48,12 +48,14 @@ TheGame::TheGame()
       earth(0),
       vehicleTypeManager(0),
       vehicleManager(0),
+      soundEngine(0),
       terminate(true),
       windowId(0),
       lastScreenSize(),
       failed_render(0),
       tick(0),
       physicsOngoing(false),
+      cameraOffsetObject(0),
       testText(0)
 {
     dprintf(MY_DEBUG_INFO, "TheGame::TheGame(): this: %p\n", this);
@@ -109,6 +111,9 @@ TheGame::TheGame()
         dprintf(MY_DEBUG_NOTE, "Initialize VehicleManager\n");
         VehicleManager::initialize();
         vehicleManager = VehicleManager::getInstance();
+        dprintf(MY_DEBUG_NOTE, "Initialize SoundEngine\n");
+        MySoundEngine::initialize();
+        soundEngine = MySoundEngine::getInstance();
 
         testText = env->addStaticText(L"", irr::core::recti(10, 10, 790, 30), false, true, 0, -1, true);
     }
@@ -132,11 +137,20 @@ TheGame::~TheGame()
     windowId = 0;
     smgr = 0;
     fps_camera = fix_camera = camera = 0;
+    if (cameraOffsetObject)
+    {
+        cameraOffsetObject->removeFromManager();
+        delete cameraOffsetObject;
+        cameraOffsetObject = 0;
+    }
     offsetManager = 0;
     earth = 0;
     vehicleManager = 0;
     vehicleTypeManager = 0;
+    soundEngine = 0;
 
+    dprintf(MY_DEBUG_NOTE, "Finalize soundEngine\n");
+    MySoundEngine::finalize();
     dprintf(MY_DEBUG_NOTE, "Finalize vehicleManager\n");
     VehicleManager::finalize();
     dprintf(MY_DEBUG_NOTE, "Finalize vehicleTypeManager\n");
@@ -189,9 +203,10 @@ void TheGame::loop()
     camera->setTarget(camera->getPosition()+initialDir);
     //earth->createFirst(initialPos, irr::core::vector3df(1.f, 2.f, 1.f));
 
-    OffsetObject* cameraOObject = new OffsetObject(camera, true);
-    cameraOObject->addToManager();
+    cameraOffsetObject = new OffsetObject(camera, true);
+    cameraOffsetObject->addToManager();
     offsetManager->update(camera->getPosition());
+    cameraOffsetObject->setUpdateCB(this);
     earth->createFirst(initialPos, irr::core::vector3df(1.f, 2.f, 1.f));
 
 
@@ -263,6 +278,8 @@ void TheGame::loop()
             //assert(0);
             //car->getBody()->activate();
 
+            car->setHandbrake(0.0f);
+            car->setTorque(-0.2f);
             bool physUpdateDone = false;
             physUpdate = (tick - lastPhysTick) / step_ms;
             if (physUpdate > 10) physUpdate = 10;
@@ -271,10 +288,10 @@ void TheGame::loop()
                 if (physicsOngoing)
                 {
                     hk::hkWorld->stepDeltaTime(step_sec);
+                    physUpdateDone = true;
                 }
                 lastPhysTick += 16;
                 physUpdate--;
-                physUpdateDone = true;
             }
             /*
             update dynamic object position
@@ -282,6 +299,7 @@ void TheGame::loop()
             if (physUpdateDone)
             {
                 OffsetObject::updateDynamicToPhys();
+                handleUpdatePos(true); // update the camera to the player position
             }
 
             if (lastSlowTick < tick || tick < slowStep_ms)
@@ -360,4 +378,14 @@ void TheGame::switchCamera()
     smgr->setActiveCamera(camera);
     camera->setPosition(pos);
     camera->setTarget(tar);
+    cameraOffsetObject->setNode(camera);
+}
+
+void TheGame::handleUpdatePos(bool phys)
+{
+    if (phys && camera != fps_camera)
+    {
+        // update the camera pos to the player pos
+    }
+    soundEngine->setListenerPosition(camera->getPosition(), camera->getTarget()-camera->getPosition());
 }
