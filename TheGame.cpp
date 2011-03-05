@@ -280,6 +280,7 @@ void TheGame::loop()
 
             car->setHandbrake(0.0f);
             car->setTorque(-0.2f);
+            car->setSteer(-0.4f);
             bool physUpdateDone = false;
             physUpdate = (tick - lastPhysTick) / step_ms;
             if (physUpdate > 10) physUpdate = 10;

@@ -370,8 +370,8 @@ Vehicle::Vehicle(const std::string& vehicleTypeName, const irr::core::vector3df&
     hk::hkWorld->addAction(hkVehicle);
     hk::unlock();
     
-    hkBody->setLinearVelocity(hkVector4());
-    hkBody->setAngularVelocity(hkVector4());
+    //hkBody->setLinearVelocity(hkVector4());
+    //hkBody->setAngularVelocity(hkVector4());
     setSteer(0.0f);
     setTorque(0.0f);
     setHandbrake(0.0f);
