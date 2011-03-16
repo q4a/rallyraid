@@ -11,6 +11,7 @@ class TheEarth;
 class VehicleTypeManager;
 class VehicleManager;
 class MySoundEngine;
+class ObjectWire;
 
 class TheGame : public OffsetObjectUpdateCB
 {
@@ -65,6 +66,7 @@ private:
     VehicleTypeManager*             vehicleTypeManager;
     VehicleManager*                 vehicleManager;
     MySoundEngine*                  soundEngine;
+    ObjectWire*                     objectWire;
 
     bool                            terminate;
     size_t                          windowId;

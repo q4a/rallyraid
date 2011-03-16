@@ -154,11 +154,16 @@ OffsetObject* ObjectPool::getObject(const irr::core::vector3df& apos, const irr:
         }
         groundInfo.m_friction = friction;
         hkpRigidBody* hkBody = new hkpRigidBody(groundInfo);
-        //hkpPropertyValue val(1);
-        //hkBody->addProperty(treeID, val);
         if (objectType != Vehicle)
         {
             hk::hkWorld->addEntity(hkBody);
+            hkpPropertyValue val(1);
+            hkBody->addProperty(hk::materialType::treeId, val);
+        }
+        else
+        {
+            hkpPropertyValue val(1);
+            hkBody->addProperty(hk::materialType::vehicleId, val);
         }
         hk::unlock();
         offsetObject->setBody(hkBody);

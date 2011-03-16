@@ -28,6 +28,8 @@ public:
     bool                    cacheObjects;
     unsigned int            targetFps;
     bool                    nonshaderLight;
+    float                   objectWireSize;
+    unsigned int            objectWireNum;
 };
 
 #endif // SETTINGS_H

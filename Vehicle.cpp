@@ -394,6 +394,7 @@ Vehicle::~Vehicle()
     tyres.clear();
 
     //printf("r1\n");
+    hk::lock();
     hk::hkWorld->removeAction(hkVehicle);
     //printf("r2\n");
     hkVehicle->removeFromWorld();
@@ -401,6 +402,7 @@ Vehicle::~Vehicle()
     hkVehicle->removeReference();
     //printf("r4\n");
     hkVehicle = 0;
+    hk::unlock();
 }
 
 void Vehicle::handleUpdatePos(bool phys)

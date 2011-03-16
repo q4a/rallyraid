@@ -28,7 +28,9 @@ Settings::Settings()
     : preloadObjects(false),
       cacheObjects(true),
       targetFps(60),
-      nonshaderLight(false)
+      nonshaderLight(false),
+      objectWireSize(100.f),
+      objectWireNum(11)
 {
 }
 
@@ -70,6 +72,12 @@ void Settings::read()
             } else if (keyName == "nonshader_light")
             {
                 nonshaderLight = StringConverter::parseBool(valName, false);
+            } else if (keyName == "object_wire_size")
+            {
+                objectWireSize = StringConverter::parseFloat(valName, 100);
+            } else if (keyName == "object_wire_num")
+            {
+                objectWireNum = StringConverter::parseUnsignedInt(valName, 11);
             }
         }
     }
@@ -93,6 +101,8 @@ void Settings::write()
     ret = fprintf(f, "cache_objects=%s\n", cacheObjects?"yes":"no");
     ret = fprintf(f, "target_fps=%u\n", targetFps);
     ret = fprintf(f, "nonshader_light=%s\n", nonshaderLight?"yes":"no");
+    ret = fprintf(f, "object_wire_size=%f\n", objectWireSize);
+    ret = fprintf(f, "object_wire_num=%u\n", objectWireNum);
 
     fclose(f);
 }

@@ -15,6 +15,14 @@
 class hk
 {
 public:
+    class materialType
+    {
+    public:
+        const static unsigned int vehicleId     = 1;
+        const static unsigned int treeId        = 2;
+        const static unsigned int terrainId     = 3;
+    };
+public:
     static void initialize();
     static void finalize();
 

@@ -135,8 +135,8 @@ void Terrain::load(TheEarth* earth)
         groundInfo.m_motionType = hkpMotion::MOTION_FIXED;
         groundInfo.m_friction = 0.7f;
         hkpRigidBody* hkBody = new hkpRigidBody(groundInfo);
-        //hkpPropertyValue val(1);
-        //hkBody->addProperty(terrainID, val);
+        hkpPropertyValue val(1);
+        hkBody->addProperty(hk::materialType::terrainId, val);
         hk::hkWorld->addEntity(hkBody);
         hk::unlock();
         offsetObject->setBody(hkBody);
@@ -162,8 +162,8 @@ void Terrain::setVisible(bool p_visible)
             groundInfo.m_motionType = hkpMotion::MOTION_FIXED;
             groundInfo.m_friction = 0.7f;
             hkpRigidBody* hkBody = new hkpRigidBody(groundInfo);
-            //hkpPropertyValue val(1);
-            //hkBody->addProperty(terrainID, val);
+            hkpPropertyValue val(1);
+            hkBody->addProperty(hk::materialType::terrainId, val);
             hk::hkWorld->addEntity(hkBody);
             hk::unlock();
             offsetObject->setBody(hkBody);

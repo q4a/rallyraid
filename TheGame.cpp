@@ -13,6 +13,7 @@
 #include "VehicleManager.h"
 #include "Vehicle.h"
 #include "MySound.h"
+#include "ObjectWire.h"
 
 // static stuff
 TheGame* TheGame::theGame = 0;
@@ -49,6 +50,7 @@ TheGame::TheGame()
       vehicleTypeManager(0),
       vehicleManager(0),
       soundEngine(0),
+      objectWire(0),
       terminate(true),
       windowId(0),
       lastScreenSize(),
@@ -114,6 +116,9 @@ TheGame::TheGame()
         dprintf(MY_DEBUG_NOTE, "Initialize SoundEngine\n");
         MySoundEngine::initialize();
         soundEngine = MySoundEngine::getInstance();
+        dprintf(MY_DEBUG_NOTE, "Initialize object wire\n");
+        ObjectWire::initialize();
+        objectWire = ObjectWire::getInstance();
 
         testText = env->addStaticText(L"", irr::core::recti(10, 10, 790, 30), false, true, 0, -1, true);
     }
@@ -148,7 +153,10 @@ TheGame::~TheGame()
     vehicleManager = 0;
     vehicleTypeManager = 0;
     soundEngine = 0;
+    objectWire = 0;
 
+    dprintf(MY_DEBUG_NOTE, "Finalize object wire\n");
+    ObjectWire::finalize();
     dprintf(MY_DEBUG_NOTE, "Finalize soundEngine\n");
     MySoundEngine::finalize();
     dprintf(MY_DEBUG_NOTE, "Finalize vehicleManager\n");
