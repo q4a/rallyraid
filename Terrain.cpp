@@ -61,7 +61,7 @@ Terrain::Terrain(const irr::core::vector3di& posi, TheEarth* earth)
         irr::scene::ETPS_17,
         irr::core::vector3df((float)posi.X, 0.0f, (float)posi.Z),
         irr::core::vector3df(),
-        irr::core::vector3df(TILE_SCALE, 1.0f, TILE_SCALE));
+        irr::core::vector3df(TILE_SCALE_F, 1.0f, TILE_SCALE_F));
     terrain->setVisible(false);
     offsetObject = new OffsetObject(terrain);
     //terrain = TheGame::getInstance()->getSmgr()->addTerrainSceneNode("data/earthdata/detailmap.jpg");

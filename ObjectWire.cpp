@@ -2,10 +2,15 @@
 #include "ObjectWire.h"
 #include "OffsetObject.h"
 #include "ObjectPoolManager.h"
+#include "ObjectPool.h"
 #include "Settings.h"
+#include "TheEarth.h"
+#include "Terrain_defs.h"
+#include "stdafx.h"
 #include <list>
 #include <assert.h>
 #include <string.h>
+#include <math.h>
 
 
 
@@ -17,7 +22,59 @@ private:
           rpos(rpos),
           objectList()
     {
-    
+        const unsigned int objectWireNum = Settings::getInstance()->objectWireNum;
+        const unsigned int objectWireSize = Settings::getInstance()->objectWireSize;
+        // TODO: we need more detailed density maps.
+        irr::video::SColor density = TheEarth::getInstance()->getEarthDensity(
+            (unsigned int)abs((int)apos.X/TILE_SIZE), (unsigned int)abs((int)apos.Y/TILE_SIZE));
+
+        const ObjectPoolManager::objectPoolMap_t& objectPoolMap = ObjectPoolManager::getInstance()->getObjectPoolMap();
+        
+        for (ObjectPoolManager::objectPoolMap_t::const_iterator opIt = objectPoolMap.begin();
+             opIt != objectPoolMap.end();
+             opIt++)
+        {
+            ObjectPool* objectPool = opIt->second;
+            unsigned int num = objectPool->getNum();
+            unsigned int category = objectPool->getCategory();
+            
+            unsigned int rep = 0;
+            
+            if ((category & 1) == 1)
+            {
+                rep += density.getRed();
+            }
+            if ((category & 2) == 2)
+            {
+                rep += density.getGreen();
+            }
+            if ((category & 4) == 4)
+            {
+                rep += density.getBlue();
+            }
+            if (rep > 255) rep = 255;
+            
+            unsigned int cnt = (rep * num * Settings::getInstance()->objectDensity) / (255*100);
+            
+            for (unsigned int i = 0; i < cnt; i++)
+            {
+                irr::core::vector3df objectPos = irr::core::vector3df(
+                    (float)(rand()%(objectWireSize*10)) / 10.0f + apos.X,
+                    -50.f,
+                    (float)(rand()%(objectWireSize*10)) / 10.0f + apos.Y);
+                
+                objectPos.Y = TheEarth::getInstance()->getHeight(objectPos);
+                
+                if (objectPos.Y > 0.f)
+                {                
+                    OffsetObject* oo = objectPool->getObject(objectPos);
+                    if (oo)
+                    {
+                        objectList.push_back(oo);
+                    }
+                }
+            }
+        }
     }
     
     ~ObjectWireTile()
@@ -83,14 +140,16 @@ ObjectWire::~ObjectWire()
 
 bool ObjectWire::update(const irr::core::vector3df& newPos, bool force = false)
 {
-    unsigned int objectWireNum = Settings::getInstance()->objectWireNum;
-    unsigned int objectWireSize = Settings::getInstance()->objectWireSize;
+    const unsigned int objectWireNum = Settings::getInstance()->objectWireNum;
+    const unsigned int objectWireSize = Settings::getInstance()->objectWireSize;
     assert(objectWireNum);
     
     irr::core::vector2di newWireCenter = irr::core::vector2di((int)newPos.X/objectWireSize, (int)newPos.Z/objectWireSize);
     
     if (newWireCenter != lastWireCenter)
     {
+        dprintf(MY_DEBUG_NOTE, "ObjectWire::update(): (%d, %d) -> (%d, %d)\n",
+            lastWireCenter.X, lastWireCenter.Y, newWireCenter.X, newWireCenter.Y);
         irr::core::vector2di offset = newWireCenter - lastWireCenter;
         ObjectWireTile* newTiles = new ObjectWireTile[objectWireNum*objectWireNum];
         memset(newTiles, 0, objectWireNum*objectWireNum*sizeof(ObjectWireTile*))

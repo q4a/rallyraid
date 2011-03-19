@@ -27,7 +27,8 @@ ObjectPool::ObjectPool(const std::string& meshFilename, const std::string& textu
                        const std::string& texture2Filename,
                        bool physics, ObjectType objectType,
                        const std::string& materialName, const std::string& material2Name,
-                       unsigned int num, unsigned int category, float friction, float mass)
+                       unsigned int num, unsigned int category, float friction, float mass,
+                       const irr::core::vector3df& center)
     : objectList(),
       objectMesh(0),
       hkShape(0),
@@ -38,7 +39,9 @@ ObjectPool::ObjectPool(const std::string& meshFilename, const std::string& textu
       material(irr::video::EMT_SOLID),
       material2(irr::video::EMT_SOLID),
       friction(friction),
-      mass(mass)
+      mass(mass),
+      center(center),
+      num(num)
 {
     if (meshFilename == "" && objectType == Grass)
     {
@@ -146,7 +149,7 @@ OffsetObject* ObjectPool::getObject(const irr::core::vector3df& apos, const irr:
             // TODO
             //groundInfo.m_position.set(0.0f, 0.0f, 0.0f);
             groundInfo.m_inertiaTensor.setDiagonal(1.0f, 1.0f, 1.0f);
-            groundInfo.m_centerOfMass.set(/*engine_center_of_mass*/0.1f, /*-center_of_mass*/0.1f, 0.0f);
+            groundInfo.m_centerOfMass.set(center.X, center.Y, center.Z);
         }
         else
         {

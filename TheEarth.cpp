@@ -131,6 +131,25 @@ void TheEarth::VisualMembers::registerMembers()
     }
 }
 
+float TheEarth::VisualMembers::getHeight(float x, float z)
+{
+    const float height = -50.f;
+    float tmp;
+    
+    for (unsigned int i = 0; i < 3; i++)
+    {
+        for (unsigned int j = 0; j < 3; j++)
+        {
+            if (terrainCircle[i][j])
+            {
+                tmp = terrainCircle[i][j]->getHeight(x, z);
+                if (tmp > height) return tmp;
+            }
+        }
+    }
+    return height;
+}
+
 
 TheEarth* TheEarth::theEarth = 0;
 irr::video::SColor TheEarth::baseColor;
@@ -360,6 +379,47 @@ void TheEarth::getTileHeightAndTexture(unsigned int x, unsigned int y,
     {
         height = 0;
         textureColor = /*irr::video::SColor(0, 0, 0, 255);//*/baseColor;
+    }
+}
+
+const irr::video::SColor& TheEarth::getTileFineTexture(unsigned int x, unsigned int y)
+{
+    const unsigned int tileX = x / TILE_FINE_POINTS_NUM;
+    const unsigned int tileY = y / TILE_FINE_POINTS_NUM;
+    const unsigned int inX = x % TILE_FINE_POINTS_NUM;
+    const unsigned int inY = y % TILE_FINE_POINTS_NUM;
+
+    if (tileX < xsize && tileY < ysize)
+    {
+        Tile* tile;
+        if (getIsLoaded(tileX, tileY))
+        {
+            tile = tileMap[tileX + (xsize*tileY)];
+            tile->setInUse();
+        }
+        else
+        {
+            if (getHasDetail(tileX, tileY))
+            {
+                tile = new Tile(tileX, tileY,
+                    getEarthTexture(tileX, tileY),
+                    getEarthTexture(tileX+1, tileY),
+                    getEarthTexture(tileX, tileY+1),
+                    getEarthTexture(tileX+1, tileY+1));
+                tileMap[tileX + (xsize*tileY)] = tile;
+                setIsLoaded(tileX, tileY, true);
+            }
+            else
+            {
+                baseColor = getEarthTexture(tileX, tileY);
+                return baseColor;
+            }
+        }
+        return tile->getFineColor(inX, inY);
+    }
+    else
+    {
+        return baseColor;
     }
 }
 
@@ -1087,4 +1147,19 @@ void TheEarth::refreshMiniMap()
         miniMapTexture = TheGame::getInstance()->getDriver()->addTexture(miniMapName, miniMap);
         //TheGame::getInstance()->getSmgr()->getVideoDriver()->setTextureCreationFlag(irr::video::ETCF_CREATE_MIP_MAPS, true);
 #endif
+}
+
+float TheEarth::getHeight(float x, float z)
+{
+    return visualPart->getHeight(x, z);
+}
+
+float TheEarth::getHeight(const irr::core::vector3df& pos)
+{
+    return getHeight(pos.X, pos.Z);
+}
+
+float TheEarth::getHeight(const irr::core::vector2df& pos)
+{
+    return getHeight(pos.X, pos.Y);
 }

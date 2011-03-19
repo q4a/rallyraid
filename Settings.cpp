@@ -30,7 +30,8 @@ Settings::Settings()
       targetFps(60),
       nonshaderLight(false),
       objectWireSize(100.f),
-      objectWireNum(11)
+      objectWireNum(11),
+      objectDensity(10)
 {
 }
 
@@ -78,6 +79,9 @@ void Settings::read()
             } else if (keyName == "object_wire_num")
             {
                 objectWireNum = StringConverter::parseUnsignedInt(valName, 11);
+            } else if (keyName == "object_density")
+            {
+                objectDensity = StringConverter::parseUnsignedInt(valName, 10);
             }
         }
     }
@@ -103,6 +107,7 @@ void Settings::write()
     ret = fprintf(f, "nonshader_light=%s\n", nonshaderLight?"yes":"no");
     ret = fprintf(f, "object_wire_size=%f\n", objectWireSize);
     ret = fprintf(f, "object_wire_num=%u\n", objectWireNum);
+    ret = fprintf(f, "object_density=%u\n", objectDensity);
 
     fclose(f);
 }

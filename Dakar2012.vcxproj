@@ -99,6 +99,7 @@
     <ClInclude Include="MyThread.h" />
     <ClInclude Include="ObjectPool.h" />
     <ClInclude Include="ObjectPoolManager.h" />
+    <ClInclude Include="ObjectWire.h" />
     <ClInclude Include="OffsetManager.h" />
     <ClInclude Include="OffsetObject.h" />
     <ClInclude Include="ScreenQuad.h" />
@@ -132,6 +133,7 @@
     <ClCompile Include="MyThread.cpp" />
     <ClCompile Include="ObjectPool.cpp" />
     <ClCompile Include="ObjectPoolManager.cpp" />
+    <ClCompile Include="ObjectWire.cpp" />
     <ClCompile Include="OffsetManager.cpp" />
     <ClCompile Include="OffsetObject.cpp" />
     <ClCompile Include="Settings.cpp" />

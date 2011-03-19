@@ -38,6 +38,18 @@ public:
             return baseColor;
         }
     }
+
+    const irr::video::SColor& getFineColor(unsigned int x, unsigned int y) const
+    {
+        if (colors && x < TILE_FINE_POINTS_NUM && y < TILE_FINE_POINTS_NUM)
+        {
+            return fineColors[x + (TILE_FINE_POINTS_NUM*y)];
+        }
+        else
+        {
+            return baseColor;
+        }
+    }
     
     bool getInUse() {return inUse;}
     bool isInUse() {return inUse;}
@@ -61,6 +73,7 @@ private:
     unsigned short* height;
     bool inUse;
     irr::video::SColor* colors;
+    irr::video::SColor* fineColors;
 
     static const irr::video::SColor baseColor;
 };

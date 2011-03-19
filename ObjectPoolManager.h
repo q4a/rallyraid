@@ -31,6 +31,8 @@ private:
 public:
     OffsetObject* getObject(const std::string& objectPoolName, const irr::core::vector3df& apos, const irr::core::vector3df& scale = irr::core::vector3df(1.0f, 1.0f, 1.0f), bool addToOffsetManager = true);
     void putObject(OffsetObject* offsetObject);
+    
+    const objectPoolMap_t& getObjectPoolMap() {return objectPoolMap;}
 
 private:
     objectPoolMap_t objectPoolMap;

@@ -28,6 +28,8 @@ public:
 
     void registerTerrain();
 
+    float getHeight(float x, float z);
+
 private:
     irr::scene::TerrainSceneNode*   terrain;
     hkpShape*                       hkShape;
@@ -36,5 +38,11 @@ private:
     int                             offsetX;
     int                             offsetY;
 };
+
+
+inline float Terrain::getHeight(float x, float z)
+{
+    return terrain->getHeight(x, z);
+}
 
 #endif // TERRAIN_H

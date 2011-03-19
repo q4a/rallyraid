@@ -30,6 +30,7 @@ public:
     bool                    nonshaderLight;
     float                   objectWireSize;
     unsigned int            objectWireNum;
+    unsigned int            objectDensity;
 };
 
 #endif // SETTINGS_H

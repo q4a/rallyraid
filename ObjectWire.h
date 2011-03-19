@@ -21,7 +21,7 @@ public:
     bool update(const irr::core::vector3df& newPos, bool force = false);
 
 private:
-    ObjectWireTile*         tiles;
+    ObjectWireTile**        tiles;
     irr::core::vector2di    lastWireCenter;
 };
 

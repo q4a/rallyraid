@@ -36,13 +36,16 @@ public:
         bool physics, ObjectType objectType,
         const std::string& materialName, const std::string& material2Name,
         unsigned int num, unsigned int category,
-        float friction, float mass);
+        float friction, float mass, const irr::core::vector3df& center);
     ~ObjectPool();
 
     OffsetObject* getObject(const irr::core::vector3df& apos, const irr::core::vector3df& scale = irr::core::vector3df(1.0f, 1.0f, 1.0f), bool addToOffsetManager = true);
     void putObject(OffsetObject* object);
 
     OffsetObject* createNewInstance();
+    
+    int getCategory() {return category;}
+    unsigned int getNum() {return num;}
     
     static irr::scene::SAnimatedMesh* readMySimpleObject(const std::string& meshFilename);
     static hkpShape* calculateCollisionMesh(irr::scene::IAnimatedMesh* objectMesh, bool box = false);
@@ -62,6 +65,8 @@ private:
     irr::video::E_MATERIAL_TYPE material2;
     float                       friction;
     float                       mass;
+    irr::core::vector3df        center;
+    unsigned int                num;
 };
 
 #endif // OBJECTPOOL_H

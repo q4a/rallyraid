@@ -52,7 +52,8 @@ public:
     const irr::video::SColor& getTileTexture(unsigned int x, unsigned int y);
     void getTileHeightAndTexture(unsigned int x, unsigned int y,
         unsigned short& height, irr::video::SColor& textureColor);
-
+    const irr::video::SColor& getTileFineTexture(unsigned int x, unsigned int y); // x and y is not devided by TILE_SCALE, but TILE_FINE_SCALE
+        
     unsigned short getEarthHeight(unsigned int x, unsigned int y) const;
     bool getHasDetail(unsigned int x, unsigned int y) const;
     bool getIsLoaded(unsigned int x, unsigned int y) const;
@@ -85,6 +86,10 @@ public:
 
     irr::video::ITexture* getMiniMapTexture() {return miniMapTexture;}
 
+    float getHeight(float x, float z);
+    float getHeight(const irr::core::vector3df& pos);
+    float getHeight(const irr::core::vector2df& pos);
+
 private:
     // common data
     
@@ -100,6 +105,7 @@ private:
         void loadMembers(TheEarth* earth);
         void finalizeMembers();
         void registerMembers();
+        float getHeight(float x, float z);
         
         Terrain* terrainCircle[3][3];
         static const irr::core::vector3di terrainPos[3][3];

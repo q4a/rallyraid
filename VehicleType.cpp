@@ -87,10 +87,14 @@ bool VehicleType::read(const std::string& vehicleTypeFilename)
         } else if (sectionName == "rear_left_tyre")
         {
             currentTyre = new VehicleTypeTyre(3);
-        } else if (sectionName == "tyre_0")
+        } else if (sectionName.find("tyre") == 0 && sectionName.size() > 5)
         {
-            currentTyre = new VehicleTypeTyre(0);
-        } else if (sectionName == "tyre_1")
+            unsigned int num = StringConverter::parseUnsignedInt(sectionName.substr(5), 0xffffffff);
+            if (num != 0xffffffff)
+            {
+                currentTyre = new VehicleTypeTyre(num);
+            }
+/*        } else if (sectionName == "tyre_1")
         {
             currentTyre = new VehicleTypeTyre(1);
         } else if (sectionName == "tyre_2")
@@ -117,11 +121,12 @@ bool VehicleType::read(const std::string& vehicleTypeFilename)
         } else if (sectionName == "tyre_9")
         {
             currentTyre = new VehicleTypeTyre(9);
-        } else if (sectionName == "gear_1")
+*/
+        } else if (sectionName.find("gear") == 0 && sectionName.size() > 5)
         {
-            gear = true;
-            gearId = 1;
-        } else if (sectionName == "gear_2")
+            gearId = StringConverter::parseUnsignedInt(sectionName.substr(5), 0);
+            if (gearId != 0) gear = true;
+/*        } else if (sectionName == "gear_2")
         {
             gear = true;
             gearId = 2;
@@ -141,6 +146,7 @@ bool VehicleType::read(const std::string& vehicleTypeFilename)
         {
             gear = true;
             gearId = 6;
+*/
         }
         ConfigFile::SettingsMultiMap *settings = seci.getNext();
         for (ConfigFile::SettingsMultiMap::iterator i = settings->begin(); i != settings->end(); ++i)
