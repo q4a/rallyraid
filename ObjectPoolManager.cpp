@@ -124,7 +124,7 @@ void ObjectPoolManager::read()
             } else if (keyName == "mass")
             {
                 mass = StringConverter::parseFloat(valName, 0.0f);
-            } else if (keyName == "mass")
+            } else if (keyName == "center")
             {
                 StringConverter::parseFloat3(valName, center.X, center.Y, center.Z);
             }
@@ -132,7 +132,7 @@ void ObjectPoolManager::read()
         
         if (objectName != "")
         {
-            objectPoolMap[objectName] = new ObjectPool(meshFilename, textureFilename, texture2Filename,
+            objectPoolMap[objectName] = new ObjectPool(objectName, meshFilename, textureFilename, texture2Filename,
                 physics, objectType, material, material2, num, category, friction, mass, center);
         }
     }

@@ -28,7 +28,7 @@ public:
     bool                    cacheObjects;
     unsigned int            targetFps;
     bool                    nonshaderLight;
-    float                   objectWireSize;
+    unsigned int            objectWireSize;
     unsigned int            objectWireNum;
     unsigned int            objectDensity;
 };

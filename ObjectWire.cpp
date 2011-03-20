@@ -1,6 +1,7 @@
 
 #include "ObjectWire.h"
 #include "OffsetObject.h"
+#include "OffsetManager.h"
 #include "ObjectPoolManager.h"
 #include "ObjectPool.h"
 #include "Settings.h"
@@ -22,6 +23,7 @@ private:
           rpos(rpos),
           objectList()
     {
+        //printf("ObjectWireTile::ObjectWireTile()\n");
         const unsigned int objectWireNum = Settings::getInstance()->objectWireNum;
         const unsigned int objectWireSize = Settings::getInstance()->objectWireSize;
         // TODO: we need more detailed density maps.
@@ -55,6 +57,8 @@ private:
             if (rep > 255) rep = 255;
             
             unsigned int cnt = (rep * num * Settings::getInstance()->objectDensity) / (255*100);
+
+            printf("%s: %u\n", objectPool->getName().c_str(), cnt);
             
             for (unsigned int i = 0; i < cnt; i++)
             {
@@ -63,7 +67,8 @@ private:
                     -50.f,
                     (float)(rand()%(objectWireSize*10)) / 10.0f + apos.Y);
                 
-                objectPos.Y = TheEarth::getInstance()->getHeight(objectPos);
+                objectPos.Y = TheEarth::getInstance()->getHeight(objectPos-OffsetManager::getInstance()->getOffset());
+                //printf("opos: %f %f %f\n", objectPos.X, objectPos.Y, objectPos.Z);
                 
                 if (objectPos.Y > 0.f)
                 {                
@@ -125,8 +130,8 @@ ObjectWire::ObjectWire()
     unsigned int objectWireNum = Settings::getInstance()->objectWireNum;
     assert(objectWireNum);
     
-    tiles = new ObjectWireTile[objectWireNum*objectWireNum];
-    memset(tiles, 0, objectWireNum*objectWireNum*sizeof(ObjectWireTile*))
+    tiles = new ObjectWireTile*[objectWireNum*objectWireNum];
+    memset(tiles, 0, objectWireNum*objectWireNum*sizeof(ObjectWireTile*));
 }
 
 ObjectWire::~ObjectWire()
@@ -138,21 +143,21 @@ ObjectWire::~ObjectWire()
     }
 }
 
-bool ObjectWire::update(const irr::core::vector3df& newPos, bool force = false)
+bool ObjectWire::update(const irr::core::vector3df& newPos, bool force)
 {
     const unsigned int objectWireNum = Settings::getInstance()->objectWireNum;
     const unsigned int objectWireSize = Settings::getInstance()->objectWireSize;
     assert(objectWireNum);
     
-    irr::core::vector2di newWireCenter = irr::core::vector2di((int)newPos.X/objectWireSize, (int)newPos.Z/objectWireSize);
+    irr::core::vector2di newWireCenter = irr::core::vector2di((int)newPos.X/(int)objectWireSize, (int)newPos.Z/(int)objectWireSize);
     
     if (newWireCenter != lastWireCenter)
     {
         dprintf(MY_DEBUG_NOTE, "ObjectWire::update(): (%d, %d) -> (%d, %d)\n",
             lastWireCenter.X, lastWireCenter.Y, newWireCenter.X, newWireCenter.Y);
         irr::core::vector2di offset = newWireCenter - lastWireCenter;
-        ObjectWireTile* newTiles = new ObjectWireTile[objectWireNum*objectWireNum];
-        memset(newTiles, 0, objectWireNum*objectWireNum*sizeof(ObjectWireTile*))
+        ObjectWireTile** newTiles = new ObjectWireTile*[objectWireNum*objectWireNum];
+        memset(newTiles, 0, objectWireNum*objectWireNum*sizeof(ObjectWireTile*));
         
         // search for overlap in old tiles, if no overlap delete
         for (unsigned int x = 0; x < objectWireNum; x++)
@@ -165,7 +170,7 @@ bool ObjectWire::update(const irr::core::vector3df& newPos, bool force = false)
                 {
                     // overlap
                     newTiles[newX + objectWireNum*newY] = tiles[x + objectWireNum*y];
-                    newTiles[newX + objectWireNum*newY].rpos = irr::core::vector2di(newX, newY);
+                    newTiles[newX + objectWireNum*newY]->rpos = irr::core::vector2di(newX, newY);
                 }
                 else
                 {
@@ -191,11 +196,13 @@ bool ObjectWire::update(const irr::core::vector3df& newPos, bool force = false)
                 {
                     tiles[x + objectWireNum*y] = new ObjectWireTile(
                         irr::core::vector2df(
-                            (float)((lastWireCenter.X-objectWireNum/2+x)*objectWireSize),
-                            (float)((lastWireCenter.Y+objectWireNum/2-y)*objectWireSize)),
+                            (float)((lastWireCenter.X-(int)(objectWireNum/2)+(int)x)*(int)objectWireSize),
+                            (float)((lastWireCenter.Y+(int)(objectWireNum/2)-(int)y)*(int)objectWireSize)),
                         irr::core::vector2di(x, y));
                 }
             }
         }
+        return true;
     }
+    return false;
 }

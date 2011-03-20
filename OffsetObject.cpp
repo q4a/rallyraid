@@ -100,7 +100,7 @@ void OffsetObject::update(const irr::core::vector3df& offset, const irr::core::v
         //    node->setPosition(pos-offset);
         //}
     }
-    printf("update: %p body %p\n", this, hkBody);
+    //printf("update: %p body %p\n", this, hkBody);
     if (hkBody)
     {
         irr::core::vector3df tv;
@@ -114,7 +114,7 @@ void OffsetObject::update(const irr::core::vector3df& offset, const irr::core::v
         //}
         hkBody->setPosition(hkVector4(tv.X, tv.Y, tv.Z));
     }
-    printf("update: %p body %p end\n", this, hkBody);
+    //printf("update: %p body %p end\n", this, hkBody);
     if (updateCB)
     {
         updateCB->handleUpdatePos(false);

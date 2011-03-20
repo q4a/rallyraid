@@ -52,7 +52,7 @@ public:
     const irr::video::SColor& getTileTexture(unsigned int x, unsigned int y);
     void getTileHeightAndTexture(unsigned int x, unsigned int y,
         unsigned short& height, irr::video::SColor& textureColor);
-    const irr::video::SColor& getTileFineTexture(unsigned int x, unsigned int y); // x and y is not devided by TILE_SCALE, but TILE_FINE_SCALE
+    const irr::video::SColor& getTileFineTexture(unsigned int x, unsigned int y); // x and y is not devided by TILE_SCALE, but TILE_FINE_SCALE
         
     unsigned short getEarthHeight(unsigned int x, unsigned int y) const;
     bool getHasDetail(unsigned int x, unsigned int y) const;

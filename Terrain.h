@@ -42,7 +42,9 @@ private:
 
 inline float Terrain::getHeight(float x, float z)
 {
-    return terrain->getHeight(x, z);
+    float h = terrain->getHeight(x, z);
+    //printf("getHeight(%f, %f) = %f (%f, %f - %f %f)\n", x ,z, h, terrain->getPosition().X, terrain->getPosition().Z, terrain->getPosition().X+2048.f, terrain->getPosition().Z+2048.f);
+    return h;
 }
 
 #endif // TERRAIN_H

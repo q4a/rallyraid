@@ -4,6 +4,7 @@
 #include "TheGame.h"
 #include "Settings.h"
 #include "Shaders.h"
+#include "stdafx.h"
 
 /*
     enum ObjectType
@@ -23,13 +24,15 @@
     typedef std::list<OffsetObject*> objectList_t;
 */
 
-ObjectPool::ObjectPool(const std::string& meshFilename, const std::string& textureFilename,
+ObjectPool::ObjectPool(const std::string& name, 
+                       const std::string& meshFilename, const std::string& textureFilename,
                        const std::string& texture2Filename,
                        bool physics, ObjectType objectType,
                        const std::string& materialName, const std::string& material2Name,
                        unsigned int num, unsigned int category, float friction, float mass,
                        const irr::core::vector3df& center)
-    : objectList(),
+    : name(name),
+      objectList(),
       objectMesh(0),
       hkShape(0),
       category(category),
@@ -110,6 +113,7 @@ ObjectPool::~ObjectPool()
 
 OffsetObject* ObjectPool::getObject(const irr::core::vector3df& apos, const irr::core::vector3df& scale, bool addToOffsetManager)
 {
+    dprintf(MY_DEBUG_NOTE, "ObjectPool::getObject(): %s\n", name.c_str());
     OffsetObject* offsetObject = 0;
     if (objectList.size() > 0)
     {
@@ -133,7 +137,7 @@ OffsetObject* ObjectPool::getObject(const irr::core::vector3df& apos, const irr:
     {
         offsetObject->getNode()->setMaterialFlag(irr::video::EMF_LIGHTING, false);
     }
-    printf("-------------- texture: %p\n", texture);
+    //printf("-------------- texture: %p\n", texture);
     offsetObject->getNode()->setMaterialTexture(0, texture);
 
     if (hkShape)
@@ -185,6 +189,7 @@ OffsetObject* ObjectPool::getObject(const irr::core::vector3df& apos, const irr:
 
 void ObjectPool::putObject(OffsetObject* object)
 {
+    dprintf(MY_DEBUG_NOTE, "ObjectPool::putObject(): %s\n", name.c_str());
     object->getNode()->setVisible(false);
     hkpRigidBody* hkBody = object->getBody();
     if (hkBody)

@@ -31,7 +31,8 @@ public:
     typedef std::list<OffsetObject*> objectList_t;
 
 public:
-    ObjectPool(const std::string& meshFilename, const std::string& textureFilename,
+    ObjectPool(const std::string& name,
+        const std::string& meshFilename, const std::string& textureFilename,
         const std::string& texture2Filename,
         bool physics, ObjectType objectType,
         const std::string& materialName, const std::string& material2Name,
@@ -46,13 +47,15 @@ public:
     
     int getCategory() {return category;}
     unsigned int getNum() {return num;}
+    const std::string& getName() {return name;}
     
     static irr::scene::SAnimatedMesh* readMySimpleObject(const std::string& meshFilename);
     static hkpShape* calculateCollisionMesh(irr::scene::IAnimatedMesh* objectMesh, bool box = false);
     static irr::scene::SAnimatedMesh* generateGrassMesh();
 
 private:
-    objectList_t objectList;
+    std::string                 name;
+    objectList_t                objectList;
 
     irr::scene::IAnimatedMesh*  objectMesh;
     hkpShape*                   hkShape;

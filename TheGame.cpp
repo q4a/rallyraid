@@ -281,6 +281,7 @@ void TheGame::loop()
             //printf("off: %f, %f (%f, %f)\n", offsetManager->getOffset().X, offsetManager->getOffset().Z,
             //    camera->getPosition().X, camera->getPosition().Z);
             offsetManager->update(offsetManager->getOffset()+camera->getPosition());
+            objectWire->update(offsetManager->getOffset()+camera->getPosition());
             //printf("off: %f, %f (%f, %f)\n", offsetManager->getOffset().X, offsetManager->getOffset().Z,
             //    camera->getPosition().X, camera->getPosition().Z);
             //assert(0);
