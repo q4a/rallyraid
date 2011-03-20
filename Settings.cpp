@@ -29,7 +29,7 @@ Settings::Settings()
       cacheObjects(true),
       targetFps(60),
       nonshaderLight(false),
-      objectWireSize(100),
+      objectWireSize(200),
       objectWireNum(11),
       objectDensity(10)
 {
@@ -75,7 +75,7 @@ void Settings::read()
                 nonshaderLight = StringConverter::parseBool(valName, false);
             } else if (keyName == "object_wire_size")
             {
-                objectWireSize = StringConverter::parseUnsignedInt(valName, 100);
+                objectWireSize = StringConverter::parseUnsignedInt(valName, 200);
             } else if (keyName == "object_wire_num")
             {
                 objectWireNum = StringConverter::parseUnsignedInt(valName, 11);
