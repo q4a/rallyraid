@@ -3,6 +3,7 @@
 #include "VehicleTypeManager.h"
 #include "VehicleType.h"
 #include "ConfigFile.h"
+#include "ConfigDirectory.h"
 #include "stdafx.h"
 
 VehicleTypeManager* VehicleTypeManager::vehicleTypeManager = 0;
@@ -44,6 +45,7 @@ VehicleTypeManager::~VehicleTypeManager()
 void VehicleTypeManager::read()
 {
 
+#if 0
     ConfigFile cf;
     cf.load("data/vehicles/vehicletypes.cfg");
 
@@ -78,5 +80,36 @@ void VehicleTypeManager::read()
         }
         
     }
+#else
+    ConfigDirectory::fileList_t fileList;
+    
+    dprintf(MY_DEBUG_NOTE, "Read vehicle types directory:\n");
+
+    bool ret = ConfigDirectory::load("data/vehicles", "", fileList);
+    
+    if (!ret)
+    {
+        dprintf(MY_DEBUG_WARNING, "unable to read vehicle directory\n");
+        return;
+    }
+    
+    for (ConfigDirectory::fileList_t::const_iterator it = fileList.begin();
+         it != fileList.end();
+         it++)
+    {
+        std::string vehicleTypeName = it->c_str();
+        std::string vehicleTypeFilename = std::string("data/vehicles/")+vehicleTypeName+"/"+vehicleTypeName+".cfg";
+        VehicleType* vehicleType = new VehicleType(vehicleTypeName, vehicleTypeFilename, ret);
+        if (!ret)
+        {
+            delete vehicleType;
+        }
+        else
+        {
+            vehicleTypeMap[vehicleTypeName] = vehicleType;
+        }
+    }
+    assert(0);
+#endif
 }
 

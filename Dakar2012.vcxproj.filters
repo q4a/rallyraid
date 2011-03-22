@@ -120,6 +120,9 @@
     <ClInclude Include="ObjectWire.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ConfigDirectory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -204,6 +207,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ObjectWire.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ConfigDirectory.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -85,6 +85,7 @@
     <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ConfigDirectory.h" />
     <ClInclude Include="ConfigFile.h" />
     <ClInclude Include="EventReceiver.h" />
     <ClInclude Include="hk.h" />
@@ -121,6 +122,7 @@
     <ClInclude Include="VehicleTypeManager.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ConfigDirectory.cpp" />
     <ClCompile Include="ConfigFile.cpp" />
     <ClCompile Include="Dakar2012.cpp" />
     <ClCompile Include="EventReceiver.cpp" />
