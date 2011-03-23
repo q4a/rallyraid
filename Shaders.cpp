@@ -6,8 +6,30 @@
 #include "IrrCg.h"
 #include "TheGame.h"
 #include "ConfigFile.h"
+#include "ShadersSM20.h"
 
 using namespace IrrCg;
+
+
+Shaders* Shaders::shaders;
+
+void Shaders::initialize()
+{
+    if (shaders == 0)
+    {
+        shaders = new ShadersSM20();
+    }
+}
+
+void Shaders::finalize()
+{
+    if (shaders)
+    {
+        delete shaders;
+        shaders = 0;
+    }
+}
+
 
 Shaders::Shaders()
     : gpu(0),

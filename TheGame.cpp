@@ -96,7 +96,8 @@ TheGame::TheGame()
         dprintf(MY_DEBUG_NOTE, "Initialize event receiver\n");
         eventReceiver = new EventReceiver();
         dprintf(MY_DEBUG_NOTE, "Initialize shaders\n");
-        shaders = new ShadersSM20();
+        Shaders::initialize();
+        shaders = Shaders::getInstance();
         dprintf(MY_DEBUG_NOTE, "Initialize Havok\n");
         hk::initialize();
         dprintf(MY_DEBUG_NOTE, "Initialize offset manager\n");
@@ -133,12 +134,8 @@ TheGame::~TheGame()
         delete eventReceiver;
         eventReceiver = 0;
     }
-    if (shaders)
-    {
-        delete shaders;
-        shaders = 0;
-    }
 
+    shaders = 0;
     windowId = 0;
     smgr = 0;
     fps_camera = fix_camera = camera = 0;
@@ -169,6 +166,8 @@ TheGame::~TheGame()
     OffsetManager::finalize();
     dprintf(MY_DEBUG_NOTE, "Finalize objectPoolManager\n");
     ObjectPoolManager::finalize();
+    dprintf(MY_DEBUG_NOTE, "Finalize shaders\n");
+    Shaders::finalize();
     dprintf(MY_DEBUG_NOTE, "Finalize settings\n");
     Settings::finalize();
     if (driver)

@@ -110,7 +110,7 @@ void Terrain::load(TheEarth* earth)
     terrain->loadHeightMap(earth, offsetX, offsetY, TILE_POINTS_NUM+1);
 
     /*
-    if (TheGame::getInstance()->getShaders()->getSupportedSMVersion() < 2)
+    if (Shaders::getInstance()->getSupportedSMVersion() < 2)
     {
         terrain->setMaterialFlag(irr::video::EMF_LIGHTING, Settings::getInstance()->nonshaderLight);
     }
@@ -121,7 +121,7 @@ void Terrain::load(TheEarth* earth)
     terrain->scaleTexture(1.0f, TILE_SIZE_F);
     //terrain->setMaterialTexture(0, terrain->getGeneratedTexture());
     //terrain->setMaterialTexture(1, TheGame::getInstance()->getDriver()->getTexture("data/earthdata/detailmap.jpg"));
-    //terrain->setMaterialType(TheGame::getInstance()->getShaders()->materialMap["terrain"]);
+    //terrain->setMaterialType(Shaders::getInstance()->materialMap["terrain"]);
     */
     
     // precache body
@@ -177,7 +177,7 @@ void Terrain::setVisible(bool p_visible)
             TheGame::getInstance()->getSmgr()->getVideoDriver()->setTextureCreationFlag(irr::video::ETCF_CREATE_MIP_MAPS, true);
             terrain->setMaterialTexture(0, texture);
             terrain->setMaterialTexture(1, TheGame::getInstance()->getDriver()->getTexture("data/earthdata/detailmap_03.png"));
-            if (TheGame::getInstance()->getShaders()->getSupportedSMVersion() < 2)
+            if (Shaders::getInstance()->getSupportedSMVersion() < 2)
             {
                 terrain->setMaterialFlag(irr::video::EMF_LIGHTING, Settings::getInstance()->nonshaderLight);
             }
@@ -187,7 +187,7 @@ void Terrain::setVisible(bool p_visible)
             }
             //terrain->setMaterialFlag(irr::video::EMF_TEXTURE_WRAP, true);
             terrain->scaleTexture(1.0f, /*TILE_SIZE_F*/(float)TILE_POINTS_NUM);
-            terrain->setMaterialType(TheGame::getInstance()->getShaders()->materialMap["terrain"]);
+            terrain->setMaterialType(Shaders::getInstance()->materialMap["terrain"]);
             //image->drop();
         }
     }

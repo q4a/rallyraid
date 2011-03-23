@@ -73,11 +73,11 @@ ObjectPool::ObjectPool(const std::string& name,
     }
     if (materialName != "")
     {
-        material = TheGame::getInstance()->getShaders()->materialMap[materialName];
+        material = Shaders::getInstance()->materialMap[materialName];
     }
     if (material2Name != "")
     {
-        material2 = TheGame::getInstance()->getShaders()->materialMap[material2Name];
+        material2 = Shaders::getInstance()->materialMap[material2Name];
     }
 
     if (Settings::getInstance()->preloadObjects)
@@ -129,7 +129,7 @@ OffsetObject* ObjectPool::getObject(const irr::core::vector3df& apos, const irr:
     offsetObject->getNode()->setPosition(apos);
     offsetObject->getNode()->setScale(scale);
     offsetObject->getNode()->setMaterialType(material);
-    if (TheGame::getInstance()->getShaders()->getSupportedSMVersion() < 2)
+    if (Shaders::getInstance()->getSupportedSMVersion() < 2)
     {
         offsetObject->getNode()->setMaterialFlag(irr::video::EMF_LIGHTING, Settings::getInstance()->nonshaderLight);
     }

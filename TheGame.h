@@ -32,7 +32,7 @@ public:
     const irr::core::dimension2du&  getScreenSize();
     unsigned int                    getTick();
     void                            switchCamera();
-    Shaders*                        getShaders();
+    //Shaders*                        getShaders();
 
     bool                            getPhysicsOngoing() {return physicsOngoing;}
     void                            setPhysicsOngoing(bool newValue) {physicsOngoing = newValue;}
@@ -121,9 +121,9 @@ inline unsigned int TheGame::getTick()
     return tick;
 }
 
-inline Shaders* TheGame::getShaders()
-{
-    return shaders;
-}
+//inline Shaders* TheGame::getShaders()
+//{
+//    return shaders;
+//}
 
 #endif // THEGAME_H
