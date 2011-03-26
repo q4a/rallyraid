@@ -4,6 +4,8 @@
 #include "KeyConfig.h"
 #include "ConfigFile.h"
 #include "StringConverter.h"
+#include "Player.h"
+#include "Vehicle.h"
 
 #include "stdafx.h"
 
@@ -45,10 +47,10 @@ EventReceiver::EventReceiver()
     keyMap[RIGHT] = kp;
     keyNameMap["clutch"] = CLUTCH;
     keyMap[CLUTCH] = kp;
-    keyNameMap["physics"] = PHYSICS;
-    keyMap[PHYSICS] = kp;
 
     kp.continous = false;
+    keyNameMap["physics"] = PHYSICS;
+    keyMap[PHYSICS] = kp;
     keyNameMap["fps_camera"] = FPS_CAMERA;
     keyMap[FPS_CAMERA] = kp;
 
@@ -306,13 +308,19 @@ void EventReceiver::checkEvents()
        )
     {
         //dprintf(MY_DEBUG_NOTE, "accelerate pressed\n");
+        Player::getInstance()->getVehicle()->setTorque(-1);
     }
-
+    else
     if ((keyMap[BRAKE].primaryKeyConfig && keyMap[BRAKE].primaryKeyConfig->getPercentage(keyboard, joystickState)) ||
         (keyMap[BRAKE].secondaryKeyConfig && keyMap[BRAKE].secondaryKeyConfig->getPercentage(keyboard, joystickState))
        )
     {
         //dprintf(MY_DEBUG_NOTE, "brake pressed\n");
+        Player::getInstance()->getVehicle()->setTorque(1);
+    }
+    else
+    {
+        Player::getInstance()->getVehicle()->setTorque(0);
     }
 
     if ((keyMap[LEFT].primaryKeyConfig && keyMap[LEFT].primaryKeyConfig->getPercentage(keyboard, joystickState)) ||
@@ -320,25 +328,39 @@ void EventReceiver::checkEvents()
        )
     {
         //dprintf(MY_DEBUG_NOTE, "left pressed\n");
+        Player::getInstance()->getVehicle()->setSteer(-1);
     }
-
+    else
     if ((keyMap[RIGHT].primaryKeyConfig && keyMap[RIGHT].primaryKeyConfig->getPercentage(keyboard, joystickState)) ||
         (keyMap[RIGHT].secondaryKeyConfig && keyMap[RIGHT].secondaryKeyConfig->getPercentage(keyboard, joystickState))
        )
     {
         //dprintf(MY_DEBUG_NOTE, "right pressed\n");
+        Player::getInstance()->getVehicle()->setSteer(1);
+    }
+    else
+    {
+        Player::getInstance()->getVehicle()->setSteer(0);
     }
 
     if ((keyMap[PHYSICS].primaryKeyConfig && keyMap[PHYSICS].primaryKeyConfig->getPercentage(keyboard, joystickState)) ||
         (keyMap[PHYSICS].secondaryKeyConfig && keyMap[PHYSICS].secondaryKeyConfig->getPercentage(keyboard, joystickState))
        )
     {
-        TheGame::getInstance()->setPhysicsOngoing(true);
+        TheGame::getInstance()->setPhysicsOngoing(!TheGame::getInstance()->getPhysicsOngoing());
     }
-    else
+    /*else
     {
         TheGame::getInstance()->setPhysicsOngoing(false);
+    }*/
+
+    if ((keyMap[FPS_CAMERA].primaryKeyConfig && keyMap[FPS_CAMERA].primaryKeyConfig->getPercentage(keyboard, joystickState)) ||
+        (keyMap[FPS_CAMERA].secondaryKeyConfig && keyMap[FPS_CAMERA].secondaryKeyConfig->getPercentage(keyboard, joystickState))
+       )
+    {
+        TheGame::getInstance()->switchCamera();
     }
+
 #endif // 0 or 1
 }
 

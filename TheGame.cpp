@@ -58,7 +58,7 @@ TheGame::TheGame()
       lastScreenSize(),
       failed_render(0),
       tick(0),
-      physicsOngoing(false),
+      physicsOngoing(true),
       cameraOffsetObject(0),
       testText(0)
 {
