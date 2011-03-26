@@ -11,7 +11,7 @@
 using namespace IrrCg;
 
 
-Shaders* Shaders::shaders;
+Shaders* Shaders::shaders = 0;
 
 void Shaders::initialize()
 {

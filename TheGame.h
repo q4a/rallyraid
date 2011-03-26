@@ -12,6 +12,7 @@ class VehicleTypeManager;
 class VehicleManager;
 class MySoundEngine;
 class ObjectWire;
+class Player;
 
 class TheGame : public OffsetObjectUpdateCB
 {
@@ -32,6 +33,7 @@ public:
     const irr::core::dimension2du&  getScreenSize();
     unsigned int                    getTick();
     void                            switchCamera();
+    bool                            isFpsCamera();
     //Shaders*                        getShaders();
 
     bool                            getPhysicsOngoing() {return physicsOngoing;}
@@ -67,6 +69,7 @@ private:
     VehicleManager*                 vehicleManager;
     MySoundEngine*                  soundEngine;
     ObjectWire*                     objectWire;
+    Player*                         player;
 
     bool                            terminate;
     size_t                          windowId;
@@ -119,6 +122,11 @@ inline const irr::core::dimension2du& TheGame::getScreenSize()
 inline unsigned int TheGame::getTick()
 {
     return tick;
+}
+
+inline bool TheGame::isFpsCamera()
+{
+    return camera == fps_camera;
 }
 
 //inline Shaders* TheGame::getShaders()

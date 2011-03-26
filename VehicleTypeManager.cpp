@@ -109,7 +109,7 @@ void VehicleTypeManager::read()
             vehicleTypeMap[vehicleTypeName] = vehicleType;
         }
     }
-    assert(0);
+//    assert(0);
 #endif
 }
 

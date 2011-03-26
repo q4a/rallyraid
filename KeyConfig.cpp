@@ -263,6 +263,12 @@ float KeyConfigKeyboard::getPercentage(OIS::Keyboard* keyboard, const OIS::JoySt
     return KeyConfig::getPercentage((int)(keyboard->isKeyDown((OIS::KeyCode)key)));
 }
 
+void KeyConfigKeyboard::writeToFile(FILE* f, const std::string& prefix)
+{
+    fprintf_s(f, "%s_type=%u\n", prefix.c_str(), (unsigned int)type);
+    fprintf_s(f, "%s_key=%u\n", prefix.c_str(), key);
+}
+
 // class KeyConfigJoystickButton : public KeyConfig
 KeyConfigJoystickButton::KeyConfigJoystickButton()
     : KeyConfig(KeyConfig::JoystickButton)
@@ -278,6 +284,12 @@ float KeyConfigJoystickButton::getPercentage(OIS::Keyboard* keyboard, const OIS:
     return KeyConfig::getPercentage(joystickState.mButtons[key]);
 }
 
+void KeyConfigJoystickButton::writeToFile(FILE* f, const std::string& prefix)
+{
+    fprintf_s(f, "%s_type=%u\n", prefix.c_str(), (unsigned int)type);
+    fprintf_s(f, "%s_key=%u\n", prefix.c_str(), key);
+}
+
 // class KeyConfigJoystickPov : public KeyConfig
 KeyConfigJoystickPov::KeyConfigJoystickPov()
     : KeyConfig(KeyConfig::JoystickPov), key2((unsigned int)-1)
@@ -291,6 +303,13 @@ KeyConfigJoystickPov::~KeyConfigJoystickPov()
 float KeyConfigJoystickPov::getPercentage(OIS::Keyboard* keyboard, const OIS::JoyStickState& joystickState)
 {
     return KeyConfig::getPercentage((int)(joystickState.mPOV[key].direction == key2));
+}
+
+void KeyConfigJoystickPov::writeToFile(FILE* f, const std::string& prefix)
+{
+    fprintf_s(f, "%s_type=%u\n", prefix.c_str(), (unsigned int)type);
+    fprintf_s(f, "%s_key=%u\n", prefix.c_str(), key);
+    fprintf_s(f, "%s_key2=%u\n", prefix.c_str(), key2);
 }
 
 // class KeyConfigJoystickAxis : public KeyConfig
@@ -340,6 +359,15 @@ float KeyConfigJoystickAxis::getPercentage(int state)
         return (float)(max - state) / (float)(max - min);
     }
 }
+
+void KeyConfigJoystickAxis::writeToFile(FILE* f, const std::string& prefix)
+{
+    fprintf_s(f, "%s_type=%u\n", prefix.c_str(), (unsigned int)type);
+    fprintf_s(f, "%s_key=%u\n", prefix.c_str(), key);
+    fprintf_s(f, "%s_from=%u\n", prefix.c_str(), from);
+    fprintf_s(f, "%s_to=%u\n", prefix.c_str(), to);
+}
+
 
 // class KeyConfigJoystickSliderX : public KeyConfigJoystickAxis
 KeyConfigJoystickSliderX::KeyConfigJoystickSliderX()

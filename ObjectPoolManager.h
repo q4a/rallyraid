@@ -15,7 +15,7 @@ public:
     static void initialize();
     static void finalize();
     
-    static ObjectPoolManager* getInstance();
+    static ObjectPoolManager* getInstance() {return objectPoolManager;}
 
     typedef std::map<std::string, ObjectPool*> objectPoolMap_t;
 

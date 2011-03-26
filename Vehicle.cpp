@@ -108,6 +108,7 @@ Vehicle::Vehicle(const std::string& vehicleTypeName, const irr::core::vector3df&
 {
     dprintf(MY_DEBUG_NOTE, "Vehicle::Vehicle(): %p, [%s]\n", this, vehicleTypeName.c_str());
     vehicleType = VehicleTypeManager::getInstance()->getVehicleType(vehicleTypeName);
+    assert(vehicleType);
 
     offsetObject = ObjectPoolManager::getInstance()->getObject(vehicleType->objectName, apos);
     offsetObject->setUpdateCB(this);

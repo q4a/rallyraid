@@ -66,7 +66,7 @@ private:
             
             for (unsigned int i = 0; i < num; i++)
             {
-                if (rep >= 255*100 || (rand()%(255*100)) < req)
+                if (req >= 255*100 || (unsigned int)(rand()%(255*100)) < req)
                 {
                     irr::core::vector3df objectPos = irr::core::vector3df(
                         (float)(rand()%(objectWireSize*10)) / 10.0f + apos.X,

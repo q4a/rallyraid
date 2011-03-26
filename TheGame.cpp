@@ -14,6 +14,7 @@
 #include "Vehicle.h"
 #include "MySound.h"
 #include "ObjectWire.h"
+#include "Player.h"
 
 // static stuff
 TheGame* TheGame::theGame = 0;
@@ -51,6 +52,7 @@ TheGame::TheGame()
       vehicleManager(0),
       soundEngine(0),
       objectWire(0),
+      player(0),
       terminate(true),
       windowId(0),
       lastScreenSize(),
@@ -120,6 +122,9 @@ TheGame::TheGame()
         dprintf(MY_DEBUG_NOTE, "Initialize object wire\n");
         ObjectWire::initialize();
         objectWire = ObjectWire::getInstance();
+        dprintf(MY_DEBUG_NOTE, "Initialize player\n");
+        Player::initialize();
+        player = Player::getInstance();
 
         testText = env->addStaticText(L"", irr::core::recti(10, 10, 790, 30), false, true, 0, -1, true);
     }
@@ -151,7 +156,10 @@ TheGame::~TheGame()
     vehicleTypeManager = 0;
     soundEngine = 0;
     objectWire = 0;
+    player = 0;
 
+    dprintf(MY_DEBUG_NOTE, "Finalize player\n");
+    Player::finalize();
     dprintf(MY_DEBUG_NOTE, "Finalize object wire\n");
     ObjectWire::finalize();
     dprintf(MY_DEBUG_NOTE, "Finalize soundEngine\n");
@@ -251,7 +259,8 @@ void TheGame::loop()
     //OffsetObject* car = ObjectPoolManager::getInstance()->getObject("vw3", initialPos+initialDir);
     //printf("car off: %f, %f (%f, %f)\n", offsetManager->getOffset().X, offsetManager->getOffset().Z,
     //    car->getNode()->getPosition().X, car->getNode()->getPosition().Z);
-    Vehicle* car = new Vehicle("vw3", initialPos+initialDir, irr::core::vector3df());
+    //Vehicle* car = new Vehicle("vw3", initialPos+initialDir, irr::core::vector3df());
+    player->initializeVehicle(initialPos+initialDir, irr::core::vector3df());
 
     while (device->run() && !terminate)
     {
@@ -286,9 +295,9 @@ void TheGame::loop()
             //assert(0);
             //car->getBody()->activate();
 
-            car->setHandbrake(0.0f);
-            car->setTorque(-0.2f);
-            car->setSteer(-0.4f);
+            //car->setHandbrake(0.0f);
+            //car->setTorque(-0.2f);
+            //car->setSteer(-0.4f);
             bool physUpdateDone = false;
             physUpdate = (tick - lastPhysTick) / step_ms;
             if (physUpdate > 10) physUpdate = 10;

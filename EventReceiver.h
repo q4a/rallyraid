@@ -31,6 +31,7 @@ private:
         RIGHT,
         CLUTCH,
         PHYSICS,
+        FPS_CAMERA,
         NUMBER_OF_KEYNAMES
     };
     struct KeyProperty

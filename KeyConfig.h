@@ -12,6 +12,7 @@ namespace OIS
 }
 
 #include <OISJoyStick.h>
+#include <string>
 
 class KeyConfig
 {
@@ -39,6 +40,7 @@ public:
 public:
     //virtual bool isPressed(OIS::Keyboard* keyboard, const OIS::JoyStickState& joystickState) = 0;
     virtual float getPercentage(OIS::Keyboard* keyboard, const OIS::JoyStickState& joystickState) = 0;
+    virtual void writeToFile(FILE* f, const std::string& prefix) = 0;
 
 protected:
     virtual float getPercentage(int state);
@@ -61,6 +63,7 @@ public:
 
     //virtual bool isPressed(OIS::Keyboard* keyboard, const OIS::JoyStickState& joystickState);
     virtual float getPercentage(OIS::Keyboard* keyboard, const OIS::JoyStickState& joystickState);
+    virtual void writeToFile(FILE* f, const std::string& prefix);
 };
 
 class KeyConfigJoystickButton : public KeyConfig
@@ -71,6 +74,7 @@ public:
 
     //virtual bool isPressed(OIS::Keyboard* keyboard, const OIS::JoyStickState& joystickState);
     virtual float getPercentage(OIS::Keyboard* keyboard, const OIS::JoyStickState& joystickState);
+    virtual void writeToFile(FILE* f, const std::string& prefix);
 };
 
 class KeyConfigJoystickPov : public KeyConfig
@@ -81,6 +85,7 @@ public:
 
     //virtual bool isPressed(OIS::Keyboard* keyboard, const OIS::JoyStickState& joystickState);
     virtual float getPercentage(OIS::Keyboard* keyboard, const OIS::JoyStickState& joystickState);
+    virtual void writeToFile(FILE* f, const std::string& prefix);
 
 public:
     unsigned int key2;
@@ -98,6 +103,9 @@ protected:
 private:
     //virtual bool isPressed(OIS::Keyboard* keyboard, const OIS::JoyStickState& joystickState);
     virtual float getPercentage(OIS::Keyboard* keyboard, const OIS::JoyStickState& joystickState);
+
+public:
+    virtual void writeToFile(FILE* f, const std::string& prefix);
 
 protected:
     virtual float getPercentage(int state);

@@ -25,11 +25,6 @@ void ObjectPoolManager::finalize()
     }
 }
 
-ObjectPoolManager* ObjectPoolManager::getInstance()
-{
-    return objectPoolManager;
-}
-
 
 ObjectPoolManager::ObjectPoolManager()
     : objectPoolMap()
