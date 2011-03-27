@@ -2,7 +2,7 @@
 
 #include "Player.h"
 #include "Vehicle.h"
-#include "assert.h"
+#include <assert.h>
 
 Player* Player::player = 0;
 
@@ -26,7 +26,10 @@ void Player::finalize()
     
 Player::Player()
     : vehicle(0),
-      vehicleTypeName("vw3")
+      vehicleTypeName("vw3"),
+      viewNum(VIEW_0),
+      viewMask(VIEW_CENTER),
+      recenterView(true)
 {
 }
 
@@ -40,6 +43,7 @@ void Player::initializeVehicle(const irr::core::vector3df& apos, const irr::core
 {
     assert(vehicle == 0);
     vehicle = new Vehicle(vehicleTypeName, apos, rotation);
+    recenterView = true;
 }
 
 void Player::finalizeVehicle()

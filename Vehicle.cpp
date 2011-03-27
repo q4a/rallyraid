@@ -471,7 +471,7 @@ void Vehicle::reset(const irr::core::vector3df& pos)
     updateToMatrix();
 }
 
-float Vehicle::getAngle()
+float Vehicle::getAngle() const
 {
     irr::core::vector3df rot = matrix.getRotationDegrees();
     //dprintf(printf("reset car: orig rot: %f %f %f\n", rot.X, rot.Y, rot.Z));
@@ -485,6 +485,18 @@ float Vehicle::getAngle()
     rot.Z = rot.X = 0.f;
     //dprintf(printf("reset car:  mod rot: %f %f %f\n", rot.X, rot.Y, rot.Z));
     return rot.Y;
+}
+
+const irr::core::matrix4& Vehicle::getViewPos(unsigned int num) const
+{
+    assert(vehicleType && num < VIEW_SIZE);
+    return vehicleType->viewPos[num];
+}
+
+const irr::core::matrix4& Vehicle::getViewDest(unsigned int num) const
+{
+    assert(vehicleType && num < VIEW_SIZE);
+    return vehicleType->viewDest[num];
 }
 
 void Vehicle::updateToMatrix()

@@ -60,6 +60,7 @@ TheGame::TheGame()
       tick(0),
       physicsOngoing(true),
       cameraOffsetObject(0),
+      dynCamDist(2.f),
       testText(0)
 {
     dprintf(MY_DEBUG_INFO, "TheGame::TheGame(): this: %p\n", this);
@@ -91,7 +92,7 @@ TheGame::TheGame()
         env = device->getGUIEnvironment();
         fix_camera = smgr->addCameraSceneNode();
         fps_camera = smgr->addCameraSceneNodeFPS(0, 100.f, 0.1f);
-        camera = fps_camera;
+        camera = fix_camera;
         smgr->setActiveCamera(camera);
         lastScreenSize = getScreenSize();
 
@@ -323,7 +324,11 @@ void TheGame::loop()
             if (lastSlowTick < tick || tick < slowStep_ms)
             {
                 lastSlowTick += slowStep_ms;
-                irr::core::stringw str = L"Pos: ";
+                irr::core::stringw str = L"Speed: ";
+                str += (int)player->getVehicleSpeed();
+                str += L" km/h (";
+                str += player->getVehicleGear();
+                str += L"),     Pos: ";
                 str += (int)camera->getPosition().X;
                 str += L", ";
                 str += (int)camera->getPosition().Y;
@@ -333,7 +338,7 @@ void TheGame::loop()
                 str += (int)offsetManager->getOffset().X;
                 str += L", ";
                 str += (int)offsetManager->getOffset().Z;
-                str += "\nTile pos: ";
+                str += ",     Tile pos: ";
                 str += ((int)offsetManager->getOffset().X+(int)camera->getPosition().X)/TILE_SIZE;
                 str += L", ";
                 str += abs((int)offsetManager->getOffset().Z+(int)camera->getPosition().Z)/TILE_SIZE;
@@ -392,7 +397,7 @@ void TheGame::switchCamera()
 {
     irr::core::vector3df pos = camera->getPosition();
     irr::core::vector3df tar = camera->getTarget();
-    camera = camera == fix_camera ? fix_camera : fps_camera;
+    camera = ((camera == fix_camera) ? fps_camera : fix_camera);
     smgr->setActiveCamera(camera);
     camera->setPosition(pos);
     camera->setTarget(tar);
@@ -404,6 +409,47 @@ void TheGame::handleUpdatePos(bool phys)
     if (phys && camera != fps_camera)
     {
         // update the camera pos to the player pos
+        const irr::core::matrix4& viewPos = player->getViewPos();
+        const irr::core::matrix4& viewDest = player->getViewDest();
+        irr::core::vector3df campos;
+        irr::core::vector3df camtar;
+        irr::core::vector3df centar;
+        irr::core::vector3df camup = irr::core::vector3df(0.f, 1.f, 0.f);
+        irr::core::vector3df carrot;
+        irr::core::matrix4 tcentar;
+        tcentar.setTranslation(irr::core::vector3df(viewDest[12], viewPos[13], viewDest[14]));
+
+        campos = (player->getVehicleMatrix() * viewPos).getTranslation();
+        camtar = (player->getVehicleMatrix() * viewDest).getTranslation();
+        centar = (player->getVehicleMatrix() * tcentar).getTranslation();
+        carrot = player->getVehicleMatrix().getRotationDegrees();
+
+        camera->setTarget(camtar);
+        if (player->getViewNum() == VIEW_0)
+        {
+            camera->setUpVector(camup);
+        }
+        else
+        {
+            camera->setUpVector(carrot.rotationToDirection(camup));
+        }
+        if ((player->getViewNum()+player->getViewMask())!=CALC_VIEW(VIEW_0, VIEW_CENTER) /*|| !useDynCam*/ || player->getRecenterView())
+        {
+            camera->setPosition(campos);
+            dynCamDist = fabsf((centar - campos).getLength());
+            player->clearRecenterView();
+        }
+        else
+        {
+            irr::core::vector3df dir = (camera->getPosition() - centar).normalize();
+                   
+            float fact = fabsf(player->getVehicle()->getSpeed())*0.01f;
+                   
+            dir = dir * (dynCamDist + fact * fact) ;
+                   
+            if (dir.Y < 0.05f) dir.Y = 0.05f;
+            camera->setPosition(centar + dir);
+        }
     }
     soundEngine->setListenerPosition(camera->getPosition(), camera->getTarget()-camera->getPosition());
 }

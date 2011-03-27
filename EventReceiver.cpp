@@ -47,12 +47,18 @@ EventReceiver::EventReceiver()
     keyMap[RIGHT] = kp;
     keyNameMap["clutch"] = CLUTCH;
     keyMap[CLUTCH] = kp;
+    keyNameMap["look_left"] = LOOK_LEFT;
+    keyMap[LOOK_LEFT] = kp;
+    keyNameMap["look_right"] = LOOK_RIGHT;
+    keyMap[LOOK_RIGHT] = kp;
 
     kp.continous = false;
     keyNameMap["physics"] = PHYSICS;
     keyMap[PHYSICS] = kp;
     keyNameMap["fps_camera"] = FPS_CAMERA;
     keyMap[FPS_CAMERA] = kp;
+    keyNameMap["change_view"] = CHANGE_VIEW;
+    keyMap[CHANGE_VIEW] = kp;
 
     loadKeyMapping();
     //saveKeyMapping();
@@ -244,14 +250,54 @@ void EventReceiver::loadKeyMapping()
             assert(kn < NUMBER_OF_KEYNAMES);
             if (primary)
             {
-                keyMap[kn].primaryKeyConfig = KeyConfig::getKeyConfig((KeyConfig::type_t)p_type, p_key, p_key2, p_from, p_to);
+                keyMap[kn].primaryKeyConfig = KeyConfig::getKeyConfig((KeyConfig::type_t)p_type, p_key, p_key2, p_from, p_to, keyMap[kn].continous);
             }
             if (secondary)
             {
-                keyMap[kn].secondaryKeyConfig = KeyConfig::getKeyConfig((KeyConfig::type_t)s_type, s_key, s_key2, s_from, s_to);
+                keyMap[kn].secondaryKeyConfig = KeyConfig::getKeyConfig((KeyConfig::type_t)s_type, s_key, s_key2, s_from, s_to, keyMap[kn].continous);
             }
         }
     }
+}
+
+#define IS_PRESSED(BUTTON) ((keyMap[BUTTON].primaryKeyConfig && keyMap[BUTTON].primaryKeyConfig->getPercentage(keyboard, joystickState)) || \
+    (keyMap[BUTTON].secondaryKeyConfig && keyMap[BUTTON].secondaryKeyConfig->getPercentage(keyboard, joystickState)))
+
+float EventReceiver::getPercentage(EventReceiver::KeyName BUTTON, const OIS::JoyStickState& joystickState)
+{
+    float PERC = 0.0f;
+    if (keyMap[BUTTON].primaryKeyConfig)
+        PERC = keyMap[BUTTON].primaryKeyConfig->getPercentage(keyboard, joystickState);
+    
+    if (keyMap[BUTTON].secondaryKeyConfig)
+    {
+        float p2 = 0.0f;
+        p2 = keyMap[BUTTON].secondaryKeyConfig->getPercentage(keyboard, joystickState);
+        if (p2 > PERC) PERC = p2;
+    }
+    return PERC;
+}
+
+bool EventReceiver::getPressed(EventReceiver::KeyName BUTTON)
+{
+    bool p1 = false;
+    bool p2 = false;
+    if (keyMap[BUTTON].primaryKeyConfig)
+        p1 = keyMap[BUTTON].primaryKeyConfig->getPressed();
+    if (keyMap[BUTTON].secondaryKeyConfig)
+        p2 = keyMap[BUTTON].secondaryKeyConfig->getPressed();
+    return p1 || p2;
+}
+
+bool EventReceiver::getReleased(EventReceiver::KeyName BUTTON)
+{
+    bool p1 = false;
+    bool p2 = false;
+    if (keyMap[BUTTON].primaryKeyConfig)
+        p1 = keyMap[BUTTON].primaryKeyConfig->getReleased();
+    if (keyMap[BUTTON].secondaryKeyConfig)
+        p2 = keyMap[BUTTON].secondaryKeyConfig->getReleased();
+    return p1 || p2;
 }
 
 void EventReceiver::checkEvents()
@@ -303,17 +349,13 @@ void EventReceiver::checkEvents()
     */
 #else // 0 or 1
     // the real event check
-    if ((keyMap[ACCELERATE].primaryKeyConfig && keyMap[ACCELERATE].primaryKeyConfig->getPercentage(keyboard, joystickState)) ||
-        (keyMap[ACCELERATE].secondaryKeyConfig && keyMap[ACCELERATE].secondaryKeyConfig->getPercentage(keyboard, joystickState))
-       )
+    if (IS_PRESSED(ACCELERATE))
     {
         //dprintf(MY_DEBUG_NOTE, "accelerate pressed\n");
         Player::getInstance()->getVehicle()->setTorque(-1);
     }
     else
-    if ((keyMap[BRAKE].primaryKeyConfig && keyMap[BRAKE].primaryKeyConfig->getPercentage(keyboard, joystickState)) ||
-        (keyMap[BRAKE].secondaryKeyConfig && keyMap[BRAKE].secondaryKeyConfig->getPercentage(keyboard, joystickState))
-       )
+    if (IS_PRESSED(BRAKE))
     {
         //dprintf(MY_DEBUG_NOTE, "brake pressed\n");
         Player::getInstance()->getVehicle()->setTorque(1);
@@ -323,17 +365,13 @@ void EventReceiver::checkEvents()
         Player::getInstance()->getVehicle()->setTorque(0);
     }
 
-    if ((keyMap[LEFT].primaryKeyConfig && keyMap[LEFT].primaryKeyConfig->getPercentage(keyboard, joystickState)) ||
-        (keyMap[LEFT].secondaryKeyConfig && keyMap[LEFT].secondaryKeyConfig->getPercentage(keyboard, joystickState))
-       )
+    if (IS_PRESSED(LEFT))
     {
         //dprintf(MY_DEBUG_NOTE, "left pressed\n");
         Player::getInstance()->getVehicle()->setSteer(-1);
     }
     else
-    if ((keyMap[RIGHT].primaryKeyConfig && keyMap[RIGHT].primaryKeyConfig->getPercentage(keyboard, joystickState)) ||
-        (keyMap[RIGHT].secondaryKeyConfig && keyMap[RIGHT].secondaryKeyConfig->getPercentage(keyboard, joystickState))
-       )
+    if (IS_PRESSED(RIGHT))
     {
         //dprintf(MY_DEBUG_NOTE, "right pressed\n");
         Player::getInstance()->getVehicle()->setSteer(1);
@@ -343,9 +381,7 @@ void EventReceiver::checkEvents()
         Player::getInstance()->getVehicle()->setSteer(0);
     }
 
-    if ((keyMap[PHYSICS].primaryKeyConfig && keyMap[PHYSICS].primaryKeyConfig->getPercentage(keyboard, joystickState)) ||
-        (keyMap[PHYSICS].secondaryKeyConfig && keyMap[PHYSICS].secondaryKeyConfig->getPercentage(keyboard, joystickState))
-       )
+    if (IS_PRESSED(PHYSICS))
     {
         TheGame::getInstance()->setPhysicsOngoing(!TheGame::getInstance()->getPhysicsOngoing());
     }
@@ -354,11 +390,33 @@ void EventReceiver::checkEvents()
         TheGame::getInstance()->setPhysicsOngoing(false);
     }*/
 
-    if ((keyMap[FPS_CAMERA].primaryKeyConfig && keyMap[FPS_CAMERA].primaryKeyConfig->getPercentage(keyboard, joystickState)) ||
-        (keyMap[FPS_CAMERA].secondaryKeyConfig && keyMap[FPS_CAMERA].secondaryKeyConfig->getPercentage(keyboard, joystickState))
-       )
+    if (IS_PRESSED(FPS_CAMERA))
     {
+        printf("switch camera\n");
         TheGame::getInstance()->switchCamera();
+    }
+
+    if (IS_PRESSED(LOOK_LEFT) && getPressed(LOOK_LEFT))
+    {
+        Player::getInstance()->lookLeft(true);
+    }
+    else if (getReleased(LOOK_LEFT))
+    {
+        Player::getInstance()->lookLeft(false);
+    }
+
+    if (IS_PRESSED(LOOK_RIGHT) && getPressed(LOOK_RIGHT))
+    {
+        Player::getInstance()->lookRight(true);
+    }
+    else if (getReleased(LOOK_RIGHT))
+    {
+        Player::getInstance()->lookRight(false);
+    }
+
+    if (IS_PRESSED(CHANGE_VIEW))
+    {
+        Player::getInstance()->lookRight(true);
     }
 
 #endif // 0 or 1

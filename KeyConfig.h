@@ -34,13 +34,16 @@ public:
 
 public:
     static KeyConfig* getKeyConfig(OIS::Keyboard* keyboard, const OIS::JoyStickState& joystickState, float deadZone, bool continous = true);
-    static KeyConfig* getKeyConfig(type_t p_type, unsigned int p_key, unsigned int p_key2, int p_from, int p_to);
+    static KeyConfig* getKeyConfig(type_t p_type, unsigned int p_key, unsigned int p_key2, int p_from, int p_to, bool continous = true);
     static void recalibrate(OIS::JoyStick* joystick);
 
 public:
     //virtual bool isPressed(OIS::Keyboard* keyboard, const OIS::JoyStickState& joystickState) = 0;
     virtual float getPercentage(OIS::Keyboard* keyboard, const OIS::JoyStickState& joystickState) = 0;
     virtual void writeToFile(FILE* f, const std::string& prefix) = 0;
+
+    bool getPressed() {return lastActive == false && active == true;}
+    bool getReleased() {return lastActive == true && active == false;}
 
 protected:
     virtual float getPercentage(int state);
@@ -51,6 +54,7 @@ public:
 public:
     bool continous;
     bool active;
+    bool lastActive;
     type_t type;
     unsigned int key;
 };

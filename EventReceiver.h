@@ -13,6 +13,7 @@ namespace OIS
     class Mouse;
     class Keyboard;
     class JoyStick;
+    class JoyStickState;
 }
 
 class KeyConfig;
@@ -32,6 +33,9 @@ private:
         CLUTCH,
         PHYSICS,
         FPS_CAMERA,
+        LOOK_LEFT,
+        LOOK_RIGHT,
+        CHANGE_VIEW,
         NUMBER_OF_KEYNAMES
     };
     struct KeyProperty
@@ -58,6 +62,9 @@ public:
 private:
     void clearKeyMapping();
     void loadKeyMapping();
+    float getPercentage(KeyName BUTTON, const OIS::JoyStickState& joystickState);
+    bool getPressed(KeyName BUTTON);
+    bool getReleased(KeyName BUTTON);
 
 private:
     //OIS Input devices

@@ -4,6 +4,7 @@
 #include <string>
 #include <irrlicht.h>
 #include <map>
+#include "Player_defs.h"
 
 class VehicleTypeTyre
 {
@@ -53,8 +54,8 @@ private:
     unsigned int            changeGearTime;
     float                   maxSteerAngle;
     float                   maxSteerRate;
-    irr::core::matrix4      viewPos[12];
-    irr::core::matrix4      viewDest[12];
+    irr::core::matrix4      viewPos[VIEW_SIZE];
+    irr::core::matrix4      viewDest[VIEW_SIZE];
 
     friend class Vehicle;
 };

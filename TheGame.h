@@ -80,6 +80,7 @@ private:
     unsigned int                    lastSlowTick;
     bool                            physicsOngoing;
     OffsetObject*                   cameraOffsetObject;
+    float                           dynCamDist;
 
     irr::gui::IGUIStaticText*       testText;
 };
