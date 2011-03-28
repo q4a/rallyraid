@@ -115,9 +115,9 @@ OffsetObject* ObjectPool::getObject(const irr::core::vector3df& apos, const irr:
 {
     dprintf(MY_DEBUG_NOTE, "ObjectPool::getObject(): %s\n", name.c_str());
     OffsetObject* offsetObject = 0;
-    if (objectList.size() > 0)
+    if (!objectList.empty())
     {
-        offsetObject = *objectList.begin();
+        offsetObject = objectList.front(); // *objectList.begin();
         objectList.erase(objectList.begin());
     }
     else

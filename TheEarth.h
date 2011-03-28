@@ -89,6 +89,9 @@ public:
     float getHeight(float x, float z);
     float getHeight(const irr::core::vector3df& pos);
     float getHeight(const irr::core::vector2df& pos);
+    
+    unsigned int getSizeX() {return xsize;}
+    unsigned int getSizeY() {return ysize;}
 
 private:
     // common data

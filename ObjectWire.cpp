@@ -132,7 +132,8 @@ void ObjectWire::finalize()
 
 ObjectWire::ObjectWire()
     : tiles(0),
-      lastWireCenter()
+      lastWireCenter(),
+      globalObjectWire()
 {
     unsigned int objectWireNum = Settings::getInstance()->objectWireNum;
     assert(objectWireNum);
@@ -148,6 +149,20 @@ ObjectWire::~ObjectWire()
         delete tiles;
         tiles = 0;
     }
+     // clear globals
+     for (globalObjectWire_t::iterator it = globalObjectWire.begin();
+          it != globalObjectWire.end();
+          it++)
+     {
+         for (globalObjectSet_t::const_iterator oit = it->second.begin();
+              oit != it->second.end();
+              oit++)
+         {
+             delete (*oit);
+         }
+         it->second.clear();
+     }
+     globalObjectWire.clear();
 }
 
 bool ObjectWire::update(const irr::core::vector3df& newPos, bool force)
@@ -185,6 +200,18 @@ bool ObjectWire::update(const irr::core::vector3df& newPos, bool force)
                     {
                         delete tiles[x + objectWireNum*y];
                         tiles[x + objectWireNum*y] = 0;
+                        
+                        // check globals
+                        globalObjectWire_t::const_iterator it = globalObjectWire.find(x + (TheEarth::getInstance()->getSizeX() * y));
+                        if (it != globalObjectWire.end())
+                        {
+                            for (globalObjectSet_t::const_iterator oit = it->second.begin();
+                                 oit != it->second.end();
+                                 oit++)
+                            {
+                                (*oit)->setVisible(false);
+                            }
+                        }
                     }
                 }
             }
@@ -206,10 +233,73 @@ bool ObjectWire::update(const irr::core::vector3df& newPos, bool force)
                             (float)((lastWireCenter.X-(int)(objectWireNum/2)+(int)x)*(int)objectWireSize),
                             (float)((lastWireCenter.Y-1+(int)(objectWireNum/2)-(int)y)*(int)objectWireSize)),
                         irr::core::vector2di(x, y));
+
+                    // check globals
+                    globalObjectWire_t::const_iterator it = globalObjectWire.find(x + (TheEarth::getInstance()->getSizeX() * y));
+                    if (it != globalObjectWire.end())
+                    {
+                        for (globalObjectSet_t::const_iterator oit = it->second.begin();
+                             oit != it->second.end();
+                             oit++)
+                        {
+                            (*oit)->setVisible(true);
+                        }
+                    }
                 }
             }
         }
         return true;
     }
     return false;
+}
+
+ObjectWireGlobalObject* ObjectWire::addGlobalObject(const std::string& objectPoolName,
+    const irr::core::vector3df& apos,
+    const irr::core::vector3df& rot,
+    const irr::core::vector3df& scale)
+{
+    const unsigned int objectWireSize = Settings::getInstance()->objectWireSize;
+    int x = (int)apos.X / (int)objectWireSize;
+    int y = (int)apos.Z / (int)objectWireSize;
+    
+    ObjectPool* objectPool = 0;
+    ObjectPoolManager::objectPoolMap_t::const_iterator poolIt = ObjectPoolManager::getInstance()->getObjectPoolMap().find(objectPoolName);
+    if (poolIt != ObjectPoolManager::getInstance()->getObjectPoolMap().end())
+    {
+        objectPool = poolIt->second;
+    }
+    else
+    {
+        dprintf(MY_DEBUG_WARNING, "no object pool for %s\n", objectPoolName.c_str());
+    }
+    //assert(objectPool);
+    ObjectWireGlobalObject* globalObject = new ObjectWireGlobalObject(objectPool, apos, rot, scale);
+    globalObjectWire[x + (TheEarth::getInstance()->getSizeX() * y)].insert(globalObject);
+    return globalObject;
+}
+    
+void ObjectWire::removeGlobalObject(ObjectWireGlobalObject* globalObject, bool deleteObject)
+{
+    if (globalObject)
+    {
+        const unsigned int objectWireSize = Settings::getInstance()->objectWireSize;
+        int x = (int)globalObject->apos.X / (int)objectWireSize;
+        int y = (int)globalObject->apos.Z / (int)objectWireSize;
+        
+        
+        globalObjectWire_t::const_iterator it = globalObjectWire.find(x + (TheEarth::getInstance()->getSizeX() * y));
+        if (it != globalObjectWire.end())
+        {
+            it->second.erase(globalObject);
+            if (it->second.empty())
+            {
+                globalObjectWire.erase(it);
+            }
+        }
+        
+        if (deleteObject)
+        {
+            delete globalObject;
+        }
+    }
 }

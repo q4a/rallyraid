@@ -116,6 +116,7 @@ Vehicle::Vehicle(const std::string& vehicleTypeName, const irr::core::vector3df&
     hkBody = offsetObject->getBody();
 
     node->setMaterialTexture(0, vehicleType->texture);
+    node->setRotation(rotation);
 
     matrix.setTranslation(node->getPosition());
     matrix.setRotationDegrees(rotation);
