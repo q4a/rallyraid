@@ -202,7 +202,8 @@ bool ObjectWire::update(const irr::core::vector3df& newPos, bool force)
                         tiles[x + objectWireNum*y] = 0;
                         
                         // check globals
-                        globalObjectWire_t::const_iterator it = globalObjectWire.find(x + (TheEarth::getInstance()->getSizeX() * y));
+                        globalObjectWire_t::const_iterator it = globalObjectWire.find((lastWireCenter.X-(int)(objectWireNum/2)+(int)x) +
+                                               (TheEarth::getInstance()->getSizeX() * (lastWireCenter.Y+(int)(objectWireNum/2)-(int)y)));
                         if (it != globalObjectWire.end())
                         {
                             for (globalObjectSet_t::const_iterator oit = it->second.begin();
@@ -235,7 +236,8 @@ bool ObjectWire::update(const irr::core::vector3df& newPos, bool force)
                         irr::core::vector2di(x, y));
 
                     // check globals
-                    globalObjectWire_t::const_iterator it = globalObjectWire.find(x + (TheEarth::getInstance()->getSizeX() * y));
+                    globalObjectWire_t::const_iterator it = globalObjectWire.find((lastWireCenter.X-(int)(objectWireNum/2)+(int)x) +
+                                           (TheEarth::getInstance()->getSizeX() * (lastWireCenter.Y+(int)(objectWireNum/2)-(int)y)));
                     if (it != globalObjectWire.end())
                     {
                         for (globalObjectSet_t::const_iterator oit = it->second.begin();
