@@ -2,37 +2,39 @@
 #include "Race.h"
 #include "RaceManager.h"
 #include "Day.h"
+#include "Stage.h"
 #include "ConfigDirectory.h"
 #include "ConfigFile.h"
 #include "stdafx.h"
 
 
-Race::Race(const std::string& raceName, bool& ret)
+Day::Day(const std::string& raceName, const std::string& dayName, bool& ret)
     : raceName(raceName),
-      raceLongName(),
+      dayName(dayName),
+      dayLongName(),
       shortDescription(),
-      dayMap()
+      stageMap()
 {
     ret = read();
 }
 
-Race::~Race()
+Day::~Day()
 {
-    for (dayMap_t::const_iterator dit = dayMap.begin();
-         dit != dayMap.end();
-         dit++)
+    for (stageMap_t::const_iterator sit = stageMap.begin();
+         sit != stageMap.end();
+         sit++)
     {
-        delete dit->second;
+        delete sit->second;
     }
-    dayMap.clear();
+    stageMap.clear();
 }
     
-bool Race::read()
+bool Day::read()
 {
     bool ret = readCfg();
     if (ret)
     {
-        ret = readDays();
+        ret = readStages();
         if (ret)
         {
             readShortDescription();
@@ -41,12 +43,12 @@ bool Race::read()
     return ret;
 }
 
-bool Race::readCfg()
+bool Day::readCfg()
 {
     ConfigFile cf;
-    cf.load(RACE_DIR(raceName)+"/"+RACE_CFG);
+    cf.load(DAY_DIR(raceName, dayName)+"/"+DAY_CFG);
 
-    dprintf(MY_DEBUG_NOTE, "Read race cfg file: %s\n", raceName.c_str());
+    dprintf(MY_DEBUG_NOTE, "Read day cfg file: %s / %s\n", raceName.c_str(), dayName.c_str());
     // Go through all sections & settings in the file
     ConfigFile::SectionIterator seci = cf.getSectionIterator();
 
@@ -65,7 +67,7 @@ bool Race::readCfg()
 
             if (keyName == "long_name")
             {
-                raceLongName = valName.c_str();
+                dayLongName = valName.c_str();
             }/* else if (keyName == "cache_objects")
             {
                 cacheObjects = StringConverter::parseBool(valName, true);
@@ -75,17 +77,17 @@ bool Race::readCfg()
     return true;
 }
 
-bool Race::readDays()
+bool Day::readStages()
 {
     ConfigDirectory::fileList_t fileList;
     
-    dprintf(MY_DEBUG_NOTE, "Read race (%s) directory:\n", raceName.c_str());
+    dprintf(MY_DEBUG_NOTE, "Read day (%s / %s) directory:\n", raceName.c_str(), dayName.c_str());
 
-    bool ret = ConfigDirectory::load(RACE_DIR(raceName), DAY_CFG, fileList);
+    bool ret = ConfigDirectory::load(DAY_DIR(raceName, dayName), STAGE_CFG, fileList);
     
     if (!ret)
     {
-        dprintf(MY_DEBUG_WARNING, "unable to read race (%s) directory\n", raceName.c_str());
+        dprintf(MY_DEBUG_WARNING, "unable to read day (%s / %s) directory\n", raceName.c_str(), dayName.c_str());
         return;
     }
     
@@ -93,21 +95,21 @@ bool Race::readDays()
          it != fileList.end();
          it++)
     {
-        std::string dayName = it->c_str();
-        Day* day = new Race(raceName, dayName, ret);
+        std::string stageName = it->c_str();
+        Stage* stage = new Stage(raceName, dayName, stageName, ret);
         if (!ret)
         {
-            delete day;
+            delete stage;
         }
         else
         {
-            dayMap[dayName] = day;
+            stageMap[stageName] = stage;
         }
     }
     return true;
 }
 
-void Race::readShortDescription()
+void Day::readShortDescription()
 {
-    RaceManager::readShortDescription(RACE_DIR(raceName) + "/description.txt", shortDescription);
+    RaceManager::readShortDescription(DAY_DIR(raceName, dayName) + "/description.txt", shortDescription);
 }

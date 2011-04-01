@@ -25,11 +25,17 @@ private:
 public:
     Day* getDay(const std::string& dayName); // inline
     const dayMap_t& getDayMap(); // inline
+    const std::string& getName(); // inline
+    const std::string& getLongName(); // inline
+    const std::string& getShortDescription(); // inline
 
 private:
     std::string     raceName;
+    std::string     raceLongName;
     std::string     shortDescription;
     dayMap_t        dayMap;
+    
+    friend class RaceManager;
 };
 
 
