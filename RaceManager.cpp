@@ -2,6 +2,7 @@
 #include "RaceManager.h"
 #include "Race.h"
 #include "stdafx.h"
+#include "ConfigDirectory.h"
 
 
 RaceManager* RaceManager::raceManager = 0;
@@ -71,3 +72,26 @@ void RaceManager::read()
     }
 }
 
+/* static */ void RaceManager::readShortDescription(const std::string& fileName, std::string& shortDescription)
+{
+    FILE* f;
+    const unsigned int sdSize = 4096;
+    char* tmp = new char[sdSize];
+    memset(tmp, 0, sdSize);
+    
+    errno_t error = fopen_s(&f, fileName.c_str(), "rb");
+    if (error)
+    {
+        printf("unable to open file for read %s\n", fileName.c_str());
+        delete tmp;
+        return;
+    }
+
+    size_t ret = fread(tmp, sizeof(char), sdSize - 1, f);
+    if (ret)
+    {
+        shortDescription = tmp;
+    }
+    fclose(f);
+    delete tmp;
+}

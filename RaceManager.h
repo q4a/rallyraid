@@ -40,11 +40,30 @@ private:
     void read();
 
 public:
-    Race* getRace(const std::string& raceName);
-    const raceMap_t& getRaceMap() {return raceMap;}
+    Race* getRace(const std::string& raceName); // inline
+    const raceMap_t& getRaceMap(); // inline
+    
+
+    static void readShortDescription(const std::string& fileName, std::string& shortDescription);
 
 private:
     raceMap_t raceMap;
 };
+
+
+inline Race* RaceManager::getRace(const std::string& raceName)
+{
+    raceMap_t rit = raceMap.find(raceName);
+    if (rit == raceMap.end())
+    {
+        return 0;
+    }
+    return rit->second;
+}
+
+inline const raceMap_t& RaceManager::getRaceMap()
+{
+    return raceMap;
+}
 
 #endif // RACEMANAGER_H
