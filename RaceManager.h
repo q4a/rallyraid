@@ -53,7 +53,7 @@ private:
 
 inline Race* RaceManager::getRace(const std::string& raceName)
 {
-    raceMap_t rit = raceMap.find(raceName);
+    raceMap_t::const_iterator rit = raceMap.find(raceName);
     if (rit == raceMap.end())
     {
         return 0;
@@ -61,7 +61,7 @@ inline Race* RaceManager::getRace(const std::string& raceName)
     return rit->second;
 }
 
-inline const raceMap_t& RaceManager::getRaceMap()
+inline const RaceManager::raceMap_t& RaceManager::getRaceMap()
 {
     return raceMap;
 }

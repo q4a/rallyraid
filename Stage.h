@@ -32,5 +32,15 @@ private:
     friend class RaceManager;
 };
 
+inline const std::string& Stage::getLongName()
+{
+    return stageLongName;
+}
+
+inline const std::string& Stage::getShortDescription()
+{
+    return shortDescription;
+}
+
 
 #endif // STAGE_H

@@ -34,6 +34,7 @@ VehicleType::VehicleType(const std::string& vehicleTypeName, const std::string& 
       vehicleTypeTyreMap(),
       gearMap(),
       objectName(),
+      vehicleLongName(),
       texture(0),
       engineSoundFilename(),
       maxBrakeForce(100.f),
@@ -214,6 +215,9 @@ bool VehicleType::read(const std::string& vehicleTypeFilename)
                 if (keyName == "object_name")
                 {
                     objectName = valueName;
+                } else if (keyName == "long_name")
+                {
+                    vehicleLongName = valueName;
                 } else if (keyName == "texture")
                 {
                     texture = TheGame::getInstance()->getDriver()->getTexture(valueName.c_str());

@@ -11,7 +11,7 @@ void RaceManager::initialize()
 {
     if (raceManager == 0)
     {
-        raceManager = new RaceManager();        
+        raceManager = new RaceManager();
     }
 }
 
@@ -47,7 +47,7 @@ void RaceManager::read()
     
     dprintf(MY_DEBUG_NOTE, "Read races directory:\n");
 
-    bool ret = ConfigDirectory::load(RACES_DIR, RACE_CFG, fileList);
+    bool ret = ConfigDirectory::load(RACES_DIR.c_str(), RACE_CFG.c_str(), fileList);
     
     if (!ret)
     {

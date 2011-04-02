@@ -4,6 +4,7 @@
 #include "OffsetManager.h"
 #include "ObjectPoolManager.h"
 #include "ObjectPool.h"
+#include "ObjectWireGlobalObject.h"
 #include "Settings.h"
 #include "TheEarth.h"
 #include "Terrain_defs.h"
@@ -289,7 +290,7 @@ void ObjectWire::removeGlobalObject(ObjectWireGlobalObject* globalObject, bool d
         int y = (int)globalObject->apos.Z / (int)objectWireSize;
         
         
-        globalObjectWire_t::const_iterator it = globalObjectWire.find(x + (TheEarth::getInstance()->getSizeX() * y));
+        globalObjectWire_t::iterator it = globalObjectWire.find(x + (TheEarth::getInstance()->getSizeX() * y));
         if (it != globalObjectWire.end())
         {
             it->second.erase(globalObject);

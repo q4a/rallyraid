@@ -42,7 +42,7 @@ private:
 
 inline Stage* Day::getStage(const std::string& stageName)
 {
-    stageMap_t sit = stageMap.find(stageName);
+    stageMap_t::const_iterator sit = stageMap.find(stageName);
     if (sit == stageMap.end())
     {
         return 0;
@@ -50,9 +50,19 @@ inline Stage* Day::getStage(const std::string& stageName)
     return sit->second;
 }
 
-inline const stageMap_t& Day::getStageMap()
+inline const Day::stageMap_t& Day::getStageMap()
 {
     return stageMap;
+}
+
+inline const std::string& Day::getLongName()
+{
+    return dayLongName;
+}
+
+inline const std::string& Day::getShortDescription()
+{
+    return shortDescription;
 }
 
 #endif // DAY_H

@@ -83,12 +83,12 @@ bool Day::readStages()
     
     dprintf(MY_DEBUG_NOTE, "Read day (%s / %s) directory:\n", raceName.c_str(), dayName.c_str());
 
-    bool ret = ConfigDirectory::load(DAY_DIR(raceName, dayName), STAGE_CFG, fileList);
+    bool ret = ConfigDirectory::load(DAY_DIR(raceName, dayName).c_str(), STAGE_CFG.c_str(), fileList);
     
     if (!ret)
     {
         dprintf(MY_DEBUG_WARNING, "unable to read day (%s / %s) directory\n", raceName.c_str(), dayName.c_str());
-        return;
+        return false;
     }
     
     for (ConfigDirectory::fileList_t::const_iterator it = fileList.begin();

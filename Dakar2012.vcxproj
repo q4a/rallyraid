@@ -85,8 +85,10 @@
     <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Competitor.h" />
     <ClInclude Include="ConfigDirectory.h" />
     <ClInclude Include="ConfigFile.h" />
+    <ClInclude Include="Day.h" />
     <ClInclude Include="EventReceiver.h" />
     <ClInclude Include="hk.h" />
     <ClInclude Include="IrrCg.h" />
@@ -106,10 +108,13 @@
     <ClInclude Include="OffsetObject.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Player_defs.h" />
+    <ClInclude Include="Race.h" />
+    <ClInclude Include="RaceManager.h" />
     <ClInclude Include="ScreenQuad.h" />
     <ClInclude Include="Settings.h" />
     <ClInclude Include="Shaders.h" />
     <ClInclude Include="ShadersSM20.h" />
+    <ClInclude Include="Stage.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="StringConverter.h" />
     <ClInclude Include="targetver.h" />
@@ -125,9 +130,11 @@
     <ClInclude Include="VehicleTypeManager.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Competitor.cpp" />
     <ClCompile Include="ConfigDirectory.cpp" />
     <ClCompile Include="ConfigFile.cpp" />
     <ClCompile Include="Dakar2012.cpp" />
+    <ClCompile Include="Day.cpp" />
     <ClCompile Include="EventReceiver.cpp" />
     <ClCompile Include="hk.cpp" />
     <ClCompile Include="IrrCg.cpp" />
@@ -143,9 +150,12 @@
     <ClCompile Include="OffsetManager.cpp" />
     <ClCompile Include="OffsetObject.cpp" />
     <ClCompile Include="Player.cpp" />
+    <ClCompile Include="Race.cpp" />
+    <ClCompile Include="RaceManager.cpp" />
     <ClCompile Include="Settings.cpp" />
     <ClCompile Include="Shaders.cpp" />
     <ClCompile Include="ShadersSM20.cpp" />
+    <ClCompile Include="Stage.cpp" />
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="Terrain.cpp" />
     <ClCompile Include="TerrainSceneNode.cpp" />

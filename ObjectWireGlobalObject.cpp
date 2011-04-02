@@ -54,5 +54,5 @@ void ObjectWireGlobalObject::setVisible(bool p_visible)
         }
     }
     
-    updateVisble();
+    updateVisible();
 }

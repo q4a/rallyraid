@@ -36,6 +36,8 @@ public:
     VehicleType(const std::string& vehicleTypeName, const std::string& vehicleTypeFilename, bool& ret);
     ~VehicleType();
 
+    const std::string& getLongName(); // inline
+
 private:
     bool read(const std::string& vehicleTypeFilename);
 
@@ -45,6 +47,7 @@ private:
     gearMap_t               gearMap;
 
     std::string             objectName;
+    std::string             vehicleLongName;
     irr::video::ITexture*   texture;
     std::string             engineSoundFilename;
     float                   maxBrakeForce;
@@ -59,5 +62,10 @@ private:
 
     friend class Vehicle;
 };
+
+inline const std::string& VehicleType::getLongName()
+{
+    return vehicleLongName;
+}
 
 #endif // VEHICLETYPE_H

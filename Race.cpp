@@ -81,12 +81,12 @@ bool Race::readDays()
     
     dprintf(MY_DEBUG_NOTE, "Read race (%s) directory:\n", raceName.c_str());
 
-    bool ret = ConfigDirectory::load(RACE_DIR(raceName), DAY_CFG, fileList);
+    bool ret = ConfigDirectory::load(RACE_DIR(raceName).c_str(), DAY_CFG.c_str(), fileList);
     
     if (!ret)
     {
         dprintf(MY_DEBUG_WARNING, "unable to read race (%s) directory\n", raceName.c_str());
-        return;
+        return false;
     }
     
     for (ConfigDirectory::fileList_t::const_iterator it = fileList.begin();
@@ -94,7 +94,7 @@ bool Race::readDays()
          it++)
     {
         std::string dayName = it->c_str();
-        Day* day = new Race(raceName, dayName, ret);
+        Day* day = new Day(raceName, dayName, ret);
         if (!ret)
         {
             delete day;

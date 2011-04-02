@@ -41,7 +41,7 @@ private:
 
 inline Day* Race::getDay(const std::string& dayName)
 {
-    dayMap_t dit = dayMap.find(dayName);
+    dayMap_t::const_iterator dit = dayMap.find(dayName);
     if (dit == dayMap.end())
     {
         return 0;
@@ -49,9 +49,19 @@ inline Day* Race::getDay(const std::string& dayName)
     return dit->second;
 }
 
-inline const dayMap_t& Race::getDayMap()
+inline const Race::dayMap_t& Race::getDayMap()
 {
     return dayMap;
+}
+
+inline const std::string& Race::getLongName()
+{
+    return raceLongName;
+}
+
+inline const std::string& Race::getShortDescription()
+{
+    return shortDescription;
 }
 
 #endif // RACE_H
