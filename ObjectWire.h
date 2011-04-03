@@ -29,6 +29,8 @@ public:
         const irr::core::vector3df& rot = irr::core::vector3df(0.0f, 0.0f, 0.0f),
         const irr::core::vector3df& scale = irr::core::vector3df(1.0f, 1.0f, 1.0f));
         
+    ObjectWireGlobalObject* addGlobalObject(ObjectWireGlobalObject* globalObject);
+
     void removeGlobalObject(ObjectWireGlobalObject* globalObject, bool deleteObject = true);
     
 private:

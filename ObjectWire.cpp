@@ -281,6 +281,17 @@ ObjectWireGlobalObject* ObjectWire::addGlobalObject(const std::string& objectPoo
     return globalObject;
 }
     
+ObjectWireGlobalObject* ObjectWire::addGlobalObject(ObjectWireGlobalObject* globalObject)
+{
+    const unsigned int objectWireSize = Settings::getInstance()->objectWireSize;
+    int x = (int)globalObject->getPos().X / (int)objectWireSize;
+    int y = (int)globalObject->getPos().Z / (int)objectWireSize;
+    
+    globalObjectWire[x + (TheEarth::getInstance()->getSizeX() * y)].insert(globalObject);
+
+    return globalObject;
+}
+
 void ObjectWire::removeGlobalObject(ObjectWireGlobalObject* globalObject, bool deleteObject)
 {
     if (globalObject)

@@ -20,6 +20,11 @@ public:
 
     void setVisible(bool p_visible);
     bool getVisible() {return visible;}
+
+    ObjectPool* getObjectPool() {return objectPool;}
+    const irr::core::vector3df& getPos() {return apos;}
+    const irr::core::vector3df& getRot() {return rot;}
+    const irr::core::vector3df& getScale() {return scale;}
     
 protected:
     virtual void updateVisible() {} 

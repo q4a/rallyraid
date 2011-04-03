@@ -5,6 +5,8 @@
 #include <string>
 #include <map>
 #include <irrlicht.h>
+#include "RaceManager.h"
+
 
 class Stage;
 
@@ -21,6 +23,7 @@ private:
     bool readCfg();
     bool readStages();
     void readShortDescription();
+    void readGlobalObjects();
 
 public:
     Stage* getStage(const std::string& stageName); // inline
@@ -29,12 +32,17 @@ public:
     const std::string& getLongName(); // inline
     const std::string& getShortDescription(); // inline
 
+    void activate();
+    void deactivate();
+
 private:
-    std::string     raceName;
-    std::string     dayName;
-    std::string     dayLongName;
-    std::string     shortDescription;
-    stageMap_t      stageMap;
+    std::string                     raceName;
+    std::string                     dayName;
+    std::string                     dayLongName;
+    std::string                     shortDescription;
+    stageMap_t                      stageMap;
+    RaceManager::globalObjectList_t globalObjectList;
+    bool                            active;
     
     friend class RaceManager;
 };

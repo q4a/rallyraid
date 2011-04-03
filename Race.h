@@ -5,8 +5,11 @@
 #include <string>
 #include <map>
 #include <irrlicht.h>
+#include "RaceManager.h"
+
 
 class Day;
+class Competitor;
 
 class Race
 {
@@ -15,12 +18,15 @@ public:
     ~Race();
     
     typedef std::map<std::string, Day*> dayMap_t;
+    typedef std::map<unsigned int, Competitor*> competitorMap_t;
 
 private:
     bool read();
     bool readCfg();
     bool readDays();
     void readShortDescription();
+    bool readCompetitors();
+    void readGlobalObjects();
 
 public:
     Day* getDay(const std::string& dayName); // inline
@@ -28,12 +34,19 @@ public:
     const std::string& getName(); // inline
     const std::string& getLongName(); // inline
     const std::string& getShortDescription(); // inline
+    const competitorMap_t& getCompetitorMap(); // inline
+
+    void activate();
+    void deactivate();
 
 private:
-    std::string     raceName;
-    std::string     raceLongName;
-    std::string     shortDescription;
-    dayMap_t        dayMap;
+    std::string                     raceName;
+    std::string                     raceLongName;
+    std::string                     shortDescription;
+    dayMap_t                        dayMap;
+    competitorMap_t                 competitorMap;
+    RaceManager::globalObjectList_t globalObjectList;
+    bool                            active;
     
     friend class RaceManager;
 };
@@ -62,6 +75,11 @@ inline const std::string& Race::getLongName()
 inline const std::string& Race::getShortDescription()
 {
     return shortDescription;
+}
+
+inline const Race::competitorMap_t& Race::getCompetitorMap()
+{
+    return competitorMap;
 }
 
 #endif // RACE_H

@@ -1,6 +1,5 @@
 
 #include "Race.h"
-#include "RaceManager.h"
 #include "Day.h"
 #include "Stage.h"
 #include "ConfigFile.h"
@@ -12,15 +11,19 @@ Stage::Stage(const std::string& raceName, const std::string& dayName, const std:
       dayName(dayName),
       stageName(stageName),
       stageLongName(),
-      shortDescription()
+      shortDescription(),
+      globalObjectList(),
+      active(false)
 {
     ret = read();
 }
 
 Stage::~Stage()
 {
+    deactivate();
+    RaceManager::clearGlobalObjects(globalObjectList);
 }
-    
+
 bool Stage::read()
 {
     bool ret = readCfg();
@@ -55,7 +58,7 @@ bool Stage::readCfg()
 
             if (keyName == "long_name")
             {
-                stageLongName = valName.c_str();
+                stageLongName = valName;
             }/* else if (keyName == "cache_objects")
             {
                 cacheObjects = StringConverter::parseBool(valName, true);
@@ -68,4 +71,25 @@ bool Stage::readCfg()
 void Stage::readShortDescription()
 {
     RaceManager::readShortDescription(STAGE_DIR(raceName, dayName, stageName) + "/description.txt", shortDescription);
+}
+
+void Stage::readGlobalObjects()
+{
+    RaceManager::readGlobalObjects(STAGE_DIR(raceName, dayName, stageName) + "/" + OBJECTS_CFG, globalObjectList);
+}
+
+void Stage::activate()
+{
+    if (active) return;
+
+    RaceManager::addGlobalObjectsToObjectWire(globalObjectList);
+    active = true;
+}
+
+void Stage::deactivate()
+{
+    if (!active) return;
+
+    RaceManager::removeGlobalObjectsFromObjectWire(globalObjectList);
+    active = false;
 }

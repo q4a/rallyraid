@@ -1,17 +1,20 @@
 
 #include "Race.h"
-#include "RaceManager.h"
 #include "Day.h"
+#include "Competitor.h"
 #include "ConfigDirectory.h"
 #include "ConfigFile.h"
 #include "stdafx.h"
-
+#include "StringConverter.h"
 
 Race::Race(const std::string& raceName, bool& ret)
     : raceName(raceName),
       raceLongName(),
       shortDescription(),
-      dayMap()
+      dayMap(),
+      competitorMap(),
+      globalObjectList(),
+      active(false)
 {
     ret = read();
 }
@@ -25,6 +28,17 @@ Race::~Race()
         delete dit->second;
     }
     dayMap.clear();
+
+    for (competitorMap_t::const_iterator cit = competitorMap.begin();
+         cit != competitorMap.end();
+         cit++)
+    {
+        delete cit->second;
+    }
+    competitorMap.clear();
+
+    deactivate();
+    RaceManager::clearGlobalObjects(globalObjectList);
 }
     
 bool Race::read()
@@ -35,7 +49,12 @@ bool Race::read()
         ret = readDays();
         if (ret)
         {
-            readShortDescription();
+            ret = readCompetitors();
+            if (ret)
+            {
+                readShortDescription();
+                readGlobalObjects();
+            }
         }
     }
     return ret;
@@ -65,7 +84,7 @@ bool Race::readCfg()
 
             if (keyName == "long_name")
             {
-                raceLongName = valName.c_str();
+                raceLongName = valName;
             }/* else if (keyName == "cache_objects")
             {
                 cacheObjects = StringConverter::parseBool(valName, true);
@@ -110,4 +129,86 @@ bool Race::readDays()
 void Race::readShortDescription()
 {
     RaceManager::readShortDescription(RACE_DIR(raceName) + "/description.txt", shortDescription);
+}
+
+bool Race::readCompetitors()
+{
+    ConfigFile cf;
+    cf.load(RACE_DIR(raceName)+"/"+RACE_CFG);
+
+    dprintf(MY_DEBUG_NOTE, "Read race-competitors cfg file: %s\n", raceName.c_str());
+    // Go through all sections & settings in the file
+    ConfigFile::SectionIterator seci = cf.getSectionIterator();
+
+    std::string secName, keyName, valName;
+    while (seci.hasMoreElements())
+    {
+        unsigned int num = 0;
+        std::string name;
+        std::string coName;
+        std::string teamName;
+        std::string vehicleTypeName;
+        unsigned int strength = 0;
+
+        secName = seci.peekNextKey();
+        dprintf(MY_DEBUG_NOTE, "\tSection: %s\n", secName.c_str());
+
+        num = StringConverter::parseUnsignedInt(secName, 0);
+
+        if (num > 0)
+        {
+            ConfigFile::SettingsMultiMap *settings = seci.getNext();
+            ConfigFile::SettingsMultiMap::iterator i;
+            for (i = settings->begin(); i != settings->end(); ++i)
+            {
+                keyName = i->first;
+                valName = i->second;
+                dprintf(MY_DEBUG_NOTE, "\t\tkey: %s, value: %s\n", keyName.c_str(), valName.c_str());
+
+                if (keyName == "name")
+                {
+                    name = valName;
+                } else if (keyName == "co_name")
+                {
+                    coName = valName;
+                } else if (keyName == "team_name")
+                {
+                    teamName = valName;
+                } else if (keyName == "vehicle_type")
+                {
+                    vehicleTypeName = valName;
+                } else if (keyName == "strength")
+                {
+                    strength = StringConverter::parseUnsignedInt(valName, 0);
+                }
+            }
+            if (strength > 0)
+            {
+                Competitor* c = new Competitor(num, name, coName, teamName, vehicleTypeName, strength);
+                competitorMap[num] = c;
+            }
+        }
+    }
+    return true;
+}
+
+void Race::readGlobalObjects()
+{
+    RaceManager::readGlobalObjects(RACE_DIR(raceName) + "/" + OBJECTS_CFG, globalObjectList);
+}
+
+void Race::activate()
+{
+    if (active) return;
+
+    RaceManager::addGlobalObjectsToObjectWire(globalObjectList);
+    active = true;
+}
+
+void Race::deactivate()
+{
+    if (!active) return;
+
+    RaceManager::removeGlobalObjectsFromObjectWire(globalObjectList);
+    active = false;
 }
