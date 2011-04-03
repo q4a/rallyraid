@@ -16,6 +16,8 @@
 #include <Common/Base/Thread/Job/ThreadPool/Spu/hkSpuJobThreadPool.h>
 #include <Common/Base/Thread/JobQueue/hkJobQueue.h>
 
+#include <Physics/Collide/Dispatch/hkpAgentRegisterUtil.h>
+
 #include <Common/Base/keycode.cxx>
 
 #undef HK_FEATURE_PRODUCT_AI
@@ -128,6 +130,16 @@ void hk::initialize()
     winfo.setBroadPhaseWorldSize(20050.0f);
     winfo.setupSolverInfo(hkpWorldCinfo::SOLVER_TYPE_4ITERS_MEDIUM);
     hkWorld = new hkpWorld(winfo);
+
+    hk::lock();
+// Register all agents.
+    hkpAgentRegisterUtil::registerAllAgents(hkWorld->getCollisionDispatcher());
+    hkpGroupFilter* filter = new hkpGroupFilter();
+    filter->disableCollisionsBetween(materialType::vehicleId, materialType::wheelId);
+    hkWorld->setCollisionFilter(filter);
+    filter->removeReference();
+    hk::unlock();
+
     printf("initialize Havok end\n");
 }
 

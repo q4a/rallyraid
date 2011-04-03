@@ -11,6 +11,7 @@
 #include <Common/Internal/ConvexHull/hkGeometryUtility.h>
 #include <Physics/Vehicle/hkpVehicleInstance.h>
 #include <Physics/Vehicle/hkpVehicle.h>
+#include <Physics/Collide/Filter/Group/hkpGroupFilter.h>
 
 class hk
 {
@@ -19,8 +20,9 @@ public:
     {
     public:
         const static unsigned int vehicleId     = 1;
-        const static unsigned int treeId        = 2;
-        const static unsigned int terrainId     = 3;
+        const static unsigned int wheelId       = 2;
+        const static unsigned int treeId        = 3;
+        const static unsigned int terrainId     = 4;
     };
 public:
     static void initialize();

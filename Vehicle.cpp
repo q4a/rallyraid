@@ -349,8 +349,9 @@ Vehicle::Vehicle(const std::string& vehicleTypeName, const irr::core::vector3df&
     // ------------------------------------------------
     hkpVehicleRayCastWheelCollide* wheelCollide = static_cast< hkpVehicleRayCastWheelCollide*>(hkVehicle->m_wheelCollide);
     // Set the wheels to have the same collision filter info as the chassis.
-    wheelCollide->m_wheelCollisionFilterInfo = /*vehicle.getChassis()*/hkBody->getCollisionFilterInfo();
-    
+    //wheelCollide->m_wheelCollisionFilterInfo = /*vehicle.getChassis()*/hkBody->getCollisionFilterInfo();
+    wheelCollide->m_wheelCollisionFilterInfo = hkpGroupFilter::calcFilterInfo(hk::materialType::wheelId);
+
     // ------------------------------------------------
     // setupTyremarks( *hkVehicle->m_data, *static_cast< hkpTyremarksInfo*>(hkVehicle->m_tyreMarks) );
     // ------------------------------------------------

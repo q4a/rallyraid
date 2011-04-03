@@ -154,10 +154,12 @@ OffsetObject* ObjectPool::getObject(const irr::core::vector3df& apos, const irr:
             //groundInfo.m_position.set(0.0f, 0.0f, 0.0f);
             groundInfo.m_inertiaTensor.setDiagonal(1.0f, 1.0f, 1.0f);
             groundInfo.m_centerOfMass.set(center.X, center.Y, center.Z);
+            groundInfo.m_collisionFilterInfo = hkpGroupFilter::calcFilterInfo(hk::materialType::vehicleId);
         }
         else
         {
             groundInfo.m_motionType = hkpMotion::MOTION_FIXED;
+            groundInfo.m_collisionFilterInfo = hkpGroupFilter::calcFilterInfo(hk::materialType::treeId);
         }
         groundInfo.m_friction = friction;
         hkpRigidBody* hkBody = new hkpRigidBody(groundInfo);

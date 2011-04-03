@@ -15,6 +15,7 @@
 #include "MySound.h"
 #include "ObjectWire.h"
 #include "Player.h"
+#include "RaceManager.h"
 
 // static stuff
 TheGame* TheGame::theGame = 0;
@@ -53,6 +54,7 @@ TheGame::TheGame()
       soundEngine(0),
       objectWire(0),
       player(0),
+      raceManager(0),
       terminate(true),
       windowId(0),
       lastScreenSize(),
@@ -126,6 +128,9 @@ TheGame::TheGame()
         dprintf(MY_DEBUG_NOTE, "Initialize player\n");
         Player::initialize();
         player = Player::getInstance();
+        dprintf(MY_DEBUG_NOTE, "Initialize race manager\n");
+        RaceManager::initialize();
+        raceManager = RaceManager::getInstance();
 
         testText = env->addStaticText(L"", irr::core::recti(10, 10, 790, 30), false, true, 0, -1, true);
     }
@@ -158,7 +163,10 @@ TheGame::~TheGame()
     soundEngine = 0;
     objectWire = 0;
     player = 0;
+    raceManager = 0;
 
+    dprintf(MY_DEBUG_NOTE, "Finalize race manager\n");
+    RaceManager::finalize();
     dprintf(MY_DEBUG_NOTE, "Finalize player\n");
     Player::finalize();
     dprintf(MY_DEBUG_NOTE, "Finalize object wire\n");

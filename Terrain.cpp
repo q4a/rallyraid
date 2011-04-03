@@ -161,6 +161,7 @@ void Terrain::setVisible(bool p_visible)
             groundInfo.m_position.set(terrain->getPosition().X, terrain->getPosition().Y, terrain->getPosition().Z);
             groundInfo.m_motionType = hkpMotion::MOTION_FIXED;
             groundInfo.m_friction = 0.7f;
+            groundInfo.m_collisionFilterInfo = hkpGroupFilter::calcFilterInfo(hk::materialType::terrainId);
             hkpRigidBody* hkBody = new hkpRigidBody(groundInfo);
             hkpPropertyValue val(1);
             hkBody->addProperty(hk::materialType::terrainId, val);
