@@ -11,7 +11,7 @@ protected:
     virtual ~MenuPageBase();
 
 protected:
-    virtual bool OnEvent (const irr::SEvent &event) = 0;
+    virtual bool OnEvent(const irr::SEvent &event) = 0;
     virtual void open() = 0;
     virtual void close() = 0;
 

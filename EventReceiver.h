@@ -36,6 +36,7 @@ private:
         LOOK_LEFT,
         LOOK_RIGHT,
         CHANGE_VIEW,
+        OPEN_EDITOR,
         NUMBER_OF_KEYNAMES
     };
     struct KeyProperty

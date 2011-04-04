@@ -97,6 +97,9 @@
     <ClInclude Include="IrrCgSceneNode.h" />
     <ClInclude Include="IteratorWrapper.h" />
     <ClInclude Include="KeyConfig.h" />
+    <ClInclude Include="MenuManager.h" />
+    <ClInclude Include="MenuPageBase.h" />
+    <ClInclude Include="MenuPageEditor.h" />
     <ClInclude Include="MyLock.h" />
     <ClInclude Include="MySound.h" />
     <ClInclude Include="MyThread.h" />
@@ -141,6 +144,9 @@
     <ClCompile Include="IrrCgMaterial.cpp" />
     <ClCompile Include="IrrCgSceneNode.cpp" />
     <ClCompile Include="KeyConfig.cpp" />
+    <ClCompile Include="MenuManager.cpp" />
+    <ClCompile Include="MenuPageBase.cpp" />
+    <ClCompile Include="MenuPageEditor.cpp" />
     <ClCompile Include="MySound.cpp" />
     <ClCompile Include="MyThread.cpp" />
     <ClCompile Include="ObjectPool.cpp" />

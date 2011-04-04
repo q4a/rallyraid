@@ -6,6 +6,7 @@
 #include "StringConverter.h"
 #include "Player.h"
 #include "Vehicle.h"
+#include "MenuManager.h"
 
 #include "stdafx.h"
 
@@ -59,6 +60,8 @@ EventReceiver::EventReceiver()
     keyMap[FPS_CAMERA] = kp;
     keyNameMap["change_view"] = CHANGE_VIEW;
     keyMap[CHANGE_VIEW] = kp;
+    keyNameMap["open_editor"] = OPEN_EDITOR;
+    keyMap[OPEN_EDITOR] = kp;
 
     loadKeyMapping();
     //saveKeyMapping();
@@ -348,7 +351,11 @@ void EventReceiver::checkEvents()
     }
     */
 #else // 0 or 1
+    
+    if (MenuManager::getInstance()->isInMenu()) return;
+
     // the real event check
+
     if (IS_PRESSED(ACCELERATE))
     {
         //dprintf(MY_DEBUG_NOTE, "accelerate pressed\n");
@@ -416,7 +423,12 @@ void EventReceiver::checkEvents()
 
     if (IS_PRESSED(CHANGE_VIEW))
     {
-        Player::getInstance()->lookRight(true);
+        Player::getInstance()->switchToNextView();
+    }
+
+    if (IS_PRESSED(OPEN_EDITOR))
+    {
+        MenuManager::getInstance()->open(MenuManager::MP_EDITOR);
     }
 
 #endif // 0 or 1

@@ -16,6 +16,7 @@
 #include "ObjectWire.h"
 #include "Player.h"
 #include "RaceManager.h"
+#include "MenuManager.h"
 
 // static stuff
 TheGame* TheGame::theGame = 0;
@@ -55,6 +56,7 @@ TheGame::TheGame()
       objectWire(0),
       player(0),
       raceManager(0),
+      menuManager(0),
       terminate(true),
       windowId(0),
       lastScreenSize(),
@@ -131,6 +133,9 @@ TheGame::TheGame()
         dprintf(MY_DEBUG_NOTE, "Initialize race manager\n");
         RaceManager::initialize();
         raceManager = RaceManager::getInstance();
+        dprintf(MY_DEBUG_NOTE, "Initialize menu manager\n");
+        MenuManager::initialize();
+        menuManager = MenuManager::getInstance();
 
         testText = env->addStaticText(L"", irr::core::recti(10, 10, 790, 30), false, true, 0, -1, true);
     }
@@ -164,7 +169,10 @@ TheGame::~TheGame()
     objectWire = 0;
     player = 0;
     raceManager = 0;
+    menuManager = 0;
 
+    dprintf(MY_DEBUG_NOTE, "Finalize menu manager\n");
+    MenuManager::finalize();
     dprintf(MY_DEBUG_NOTE, "Finalize race manager\n");
     RaceManager::finalize();
     dprintf(MY_DEBUG_NOTE, "Finalize player\n");

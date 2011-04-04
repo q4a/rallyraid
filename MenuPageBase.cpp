@@ -1,11 +1,9 @@
 
 #include "MenuPageBase.h"
 
-class MenuPageBase : public irr::IEventReceiver
-{
 
 MenuPageBase::MenuPageBase()
-    : parentMenuPage(0)
+    : parentMenuPage(0),
       opened(false)
 {
 }
@@ -14,13 +12,13 @@ MenuPageBase::~MenuPageBase()
 {
 }
 
-void MenuPageBase::openMenu(MenuPageBase* parent)
+bool MenuPageBase::openMenu(MenuPageBase* parent)
 {
     if (!opened)
     {
         parentMenuPage = parent;
-        open();
         opened = true;
+        open();
         return true;
     }
     return false;
@@ -33,6 +31,7 @@ MenuPageBase* MenuPageBase::closeMenu()
         MenuPageBase* ret = parentMenuPage;
         close();
         parentMenuPage = 0;
+        opened = false;
         return ret;
     }
     return 0;

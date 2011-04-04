@@ -3,6 +3,8 @@
 #define MENUMANAGER_H
 
 
+#define MAX_MENU_ITEMS 100
+
 class MenuPageBase;
 
 class MenuManager
@@ -19,7 +21,7 @@ private:
 public:
     enum MenuPageId
     {
-        MP_EDITOR = 0
+        MP_EDITOR = 0,
         NUMBER_OF_MENUPAGES
     };
 
@@ -27,15 +29,26 @@ private:
     MenuManager();
     ~MenuManager();
 
+    void refreshEventReceiver();
+
 public:
     
-    void open();
+    void open(MenuPageId menuPageId);
     void close();
+    void closeAll();
+
+    bool isInMenu(); // inline
 
 private:
     MenuPageBase*   currentMenuPage;
     
     MenuPageBase*   menuPages[NUMBER_OF_MENUPAGES];
 };
+
+
+inline bool MenuManager::isInMenu()
+{
+    return (currentMenuPage != 0);
+}
 
 #endif // MENUMANAGER_H
