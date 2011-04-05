@@ -32,6 +32,7 @@ private:
     static TheEarth* theEarth;
     static irr::video::SColor baseColor;
     
+public:
     typedef std::map<unsigned int, Tile*> tileMap_t;
 
 private:
@@ -92,6 +93,8 @@ public:
     
     unsigned int getSizeX() {return xsize;}
     unsigned int getSizeY() {return ysize;}
+
+    const tileMap_t& getTileMap() {return tileMap;}
 
 private:
     // common data

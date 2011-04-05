@@ -352,85 +352,89 @@ void EventReceiver::checkEvents()
     */
 #else // 0 or 1
     
-    if (MenuManager::getInstance()->isInMenu()) return;
-
-    // the real event check
-
-    if (IS_PRESSED(ACCELERATE))
+    if (MenuManager::getInstance()->isInMenu())
     {
-        //dprintf(MY_DEBUG_NOTE, "accelerate pressed\n");
-        Player::getInstance()->getVehicle()->setTorque(-1);
-    }
-    else
-    if (IS_PRESSED(BRAKE))
-    {
-        //dprintf(MY_DEBUG_NOTE, "brake pressed\n");
-        Player::getInstance()->getVehicle()->setTorque(1);
     }
     else
     {
-        Player::getInstance()->getVehicle()->setTorque(0);
-    }
+    
+        // the real event check
 
-    if (IS_PRESSED(LEFT))
-    {
-        //dprintf(MY_DEBUG_NOTE, "left pressed\n");
-        Player::getInstance()->getVehicle()->setSteer(-1);
-    }
-    else
-    if (IS_PRESSED(RIGHT))
-    {
-        //dprintf(MY_DEBUG_NOTE, "right pressed\n");
-        Player::getInstance()->getVehicle()->setSteer(1);
-    }
-    else
-    {
-        Player::getInstance()->getVehicle()->setSteer(0);
-    }
+        if (IS_PRESSED(ACCELERATE))
+        {
+            //dprintf(MY_DEBUG_NOTE, "accelerate pressed\n");
+            Player::getInstance()->getVehicle()->setTorque(-1);
+        }
+        else
+        if (IS_PRESSED(BRAKE))
+        {
+            //dprintf(MY_DEBUG_NOTE, "brake pressed\n");
+            Player::getInstance()->getVehicle()->setTorque(1);
+        }
+        else
+        {
+            Player::getInstance()->getVehicle()->setTorque(0);
+        }
 
-    if (IS_PRESSED(PHYSICS))
-    {
-        TheGame::getInstance()->setPhysicsOngoing(!TheGame::getInstance()->getPhysicsOngoing());
-    }
-    /*else
-    {
-        TheGame::getInstance()->setPhysicsOngoing(false);
-    }*/
+        if (IS_PRESSED(LEFT))
+        {
+            //dprintf(MY_DEBUG_NOTE, "left pressed\n");
+            Player::getInstance()->getVehicle()->setSteer(-1);
+        }
+        else
+        if (IS_PRESSED(RIGHT))
+        {
+            //dprintf(MY_DEBUG_NOTE, "right pressed\n");
+            Player::getInstance()->getVehicle()->setSteer(1);
+        }
+        else
+        {
+            Player::getInstance()->getVehicle()->setSteer(0);
+        }
 
-    if (IS_PRESSED(FPS_CAMERA))
-    {
-        printf("switch camera\n");
-        TheGame::getInstance()->switchCamera();
-    }
+        if (IS_PRESSED(PHYSICS))
+        {
+            TheGame::getInstance()->setPhysicsOngoing(!TheGame::getInstance()->getPhysicsOngoing());
+        }
+        /*else
+        {
+            TheGame::getInstance()->setPhysicsOngoing(false);
+        }*/
 
-    if (IS_PRESSED(LOOK_LEFT) && getPressed(LOOK_LEFT))
-    {
-        Player::getInstance()->lookLeft(true);
-    }
-    else if (getReleased(LOOK_LEFT))
-    {
-        Player::getInstance()->lookLeft(false);
-    }
+        if (IS_PRESSED(FPS_CAMERA))
+        {
+            printf("switch camera\n");
+            TheGame::getInstance()->switchCamera();
+        }
 
-    if (IS_PRESSED(LOOK_RIGHT) && getPressed(LOOK_RIGHT))
-    {
-        Player::getInstance()->lookRight(true);
-    }
-    else if (getReleased(LOOK_RIGHT))
-    {
-        Player::getInstance()->lookRight(false);
-    }
+        if (IS_PRESSED(LOOK_LEFT) && getPressed(LOOK_LEFT))
+        {
+            Player::getInstance()->lookLeft(true);
+        }
+        else if (getReleased(LOOK_LEFT))
+        {
+            Player::getInstance()->lookLeft(false);
+        }
 
-    if (IS_PRESSED(CHANGE_VIEW))
-    {
-        Player::getInstance()->switchToNextView();
-    }
+        if (IS_PRESSED(LOOK_RIGHT) && getPressed(LOOK_RIGHT))
+        {
+            Player::getInstance()->lookRight(true);
+        }
+        else if (getReleased(LOOK_RIGHT))
+        {
+            Player::getInstance()->lookRight(false);
+        }
 
-    if (IS_PRESSED(OPEN_EDITOR))
-    {
-        MenuManager::getInstance()->open(MenuManager::MP_EDITOR);
-    }
+        if (IS_PRESSED(CHANGE_VIEW))
+        {
+            Player::getInstance()->switchToNextView();
+        }
 
+        if (IS_PRESSED(OPEN_EDITOR))
+        {
+            MenuManager::getInstance()->open(MenuManager::MP_EDITOR);
+        }
+    }
 #endif // 0 or 1
 }
 

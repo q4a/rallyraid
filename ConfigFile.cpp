@@ -48,6 +48,7 @@ void ConfigFile::loadDirect(const std::string& filename, const std::string& sepa
 
     load(fp, separators, trimWhitespace);
 
+    fp.close();
 }
 //-----------------------------------------------------------------------
 void ConfigFile::load(std::ifstream& stream, const std::string& separators, bool trimWhitespace)
