@@ -34,14 +34,14 @@ MySoundEngine::MySoundEngine()
     dprintf(MY_DEBUG_INFO, "Initialize OpenAL\n");
 
     ALboolean ret = alutInit(0, 0);
-    int err = alGetError();
+    int err = alutGetError();
     if (ret == AL_TRUE && err == 0)
     {
-        printf("OpenAL initialized successfully\n");
+        dprintf(MY_DEBUG_INFO, "OpenAL initialized successfully\n");
     }
     else
     {
-        printf("OpenAL initialize failed ret %d (err: %d)\n", ret, err);
+        dprintf(MY_DEBUG_WARNING, "OpenAL initialize failed ret %d (err: %d - %s)\n", ret, err, alutGetErrorString(err));
     }
     
     alGetError();
@@ -54,6 +54,7 @@ MySoundEngine::MySoundEngine()
     listenerUp = irr::core::vector3df(0.f,1.f,0.f);;
 
     updateListener();
+    //assert(0);
 }
 
 MySoundEngine::~MySoundEngine()
@@ -91,12 +92,15 @@ MySound* MySoundEngine::play3D(const std::string& soundFileName, irr::core::vect
     {
         dprintf(MY_DEBUG_NOTE, "AL: buffer not found\n");
 
+        /*
         alGenBuffers(1, &buffer);
+        dprintf(MY_DEBUG_NOTE, "AL: buffer (1): %u\n", buffer);
         if (alGetError() != AL_NO_ERROR)
         {
             dprintf(MY_DEBUG_NOTE, "AL: could not create buffer\n");
             return 0;
         }
+        */
         
 //        ALenum format;
 //        ALsizei size;
@@ -107,7 +111,15 @@ MySound* MySoundEngine::play3D(const std::string& soundFileName, irr::core::vect
 //        alutLoadWAVFile(newElem->filename, &format, &data, &size, &freq, &loop);
 //        alBufferData(newElem->buffer, format, data, size, freq);
 //        alutUnloadWAV(format, data, size, freq);
-        alGetError();
+        //alGetError();
+        dprintf(MY_DEBUG_NOTE, "AL: buffer (2): %u (%s)\n", buffer, soundFileName.c_str());
+        int err = alutGetError();
+        if (err != ALUT_ERROR_NO_ERROR)
+        {
+            dprintf(MY_DEBUG_INFO, "AL: could not create buffer for %s, err: %d - %s\n",
+                soundFileName.c_str(), err, alutGetErrorString(err));
+            //return 0;
+        }
 
         soundFileNameBuffer[soundFileName] = buffer;
     }
@@ -131,8 +143,8 @@ MySound* MySoundEngine::play2D(const std::string& soundFileName, bool playLooped
 }
 
 void MySoundEngine::setListenerPosition(const irr::core::vector3df &pos, const irr::core::vector3df &lookdir,
-                                        const irr::core::vector3df &velPerSecond,
-                                        const irr::core::vector3df &upVector)
+                                        const irr::core::vector3df &upVector,
+                                        const irr::core::vector3df &velPerSecond)
 {
     listenerPos = pos;
     listenerVel = velPerSecond;
@@ -171,7 +183,7 @@ MySound::MySound(unsigned int newBuffer, bool plooped, irr::core::vector3df &pos
         return;
     }
 
-    dprintf(MY_DEBUG_NOTE, "create sound %u\n", source);
+    dprintf(MY_DEBUG_NOTE, "create sound source: %u, buffer: %u\n", source, buffer);
 
     soundSourceVel = irr::core::vector3df(0.f,0.f,0.f);
     
@@ -182,7 +194,12 @@ MySound::MySound(unsigned int newBuffer, bool plooped, irr::core::vector3df &pos
     alSourcefv(source, AL_POSITION, &soundSourcePos.X);
     alSourcefv(source, AL_VELOCITY, &soundSourceVel.X);
     alSourcei (source, AL_LOOPING,  looped     );
-    alGetError();
+    err = alGetError();
+    if (err != AL_NO_ERROR)
+    {
+        dprintf(MY_DEBUG_INFO, "create sound failed (2): %d\n", err);
+        return;
+    }
 }
 
 MySound::~MySound()

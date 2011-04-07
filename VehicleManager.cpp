@@ -1,4 +1,6 @@
 #include "VehicleManager.h"
+#include "Vehicle.h"
+#include "stdafx.h"
 
 VehicleManager* VehicleManager::vehicleManager = 0;
 
@@ -40,3 +42,28 @@ void VehicleManager::removeVehicle(Vehicle* vehicle)
 {
     vehicleSet.erase(vehicle);
 }
+
+void VehicleManager::pause()
+{
+    dprintf(MY_DEBUG_INFO, "VehicleManager::pause(): vehicle num: %lu\n", vehicleSet.size());
+
+    for (vehicleSet_t::const_iterator vit = vehicleSet.begin();
+         vit != vehicleSet.end();
+         vit++)
+    {
+        (*vit)->pause();
+    }
+}
+
+void VehicleManager::resume()
+{
+    dprintf(MY_DEBUG_INFO, "VehicleManager::resume(): vehicle num: %lu\n", vehicleSet.size());
+
+    for (vehicleSet_t::const_iterator vit = vehicleSet.begin();
+         vit != vehicleSet.end();
+         vit++)
+    {
+        (*vit)->resume();
+    }
+}
+

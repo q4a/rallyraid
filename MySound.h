@@ -39,8 +39,9 @@ public:
     MySound* play2D(const std::string& soundFileName, bool playLooped=false,
                       bool startPaused=false, bool track=false);
     void setListenerPosition(const irr::core::vector3df &pos, const irr::core::vector3df &lookdir,
-                             const irr::core::vector3df &velPerSecond=irr::core::vector3df(0, 0, 0),
-                             const irr::core::vector3df &upVector=irr::core::vector3df(0, 1, 0));
+                             const irr::core::vector3df &upVector=irr::core::vector3df(0, 1, 0),
+                             const irr::core::vector3df &velPerSecond=irr::core::vector3df(0, 0, 0)
+                             );
 
     irr::core::vector3df getListenerPosition() const;
     

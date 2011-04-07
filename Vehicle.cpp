@@ -3,6 +3,7 @@
 #include "Vehicle.h"
 #include "VehicleTypeManager.h"
 #include "ObjectPoolManager.h"
+#include "MySound.h"
 #include "stdafx.h"
 
 #include <Physics/Vehicle/WheelCollide/RayCast/hkpVehicleRayCastWheelCollide.h>
@@ -104,7 +105,9 @@ Vehicle::Vehicle(const std::string& vehicleTypeName, const irr::core::vector3df&
       hkBody(0),
       offsetObject(0),
       tyres(),
-      hkVehicle(0)
+      hkVehicle(0),
+      engineSound(0),
+      linearVelocity()
 {
     dprintf(MY_DEBUG_NOTE, "Vehicle::Vehicle(): %p, [%s]\n", this, vehicleTypeName.c_str());
     vehicleType = VehicleTypeManager::getInstance()->getVehicleType(vehicleTypeName);
@@ -378,6 +381,18 @@ Vehicle::Vehicle(const std::string& vehicleTypeName, const irr::core::vector3df&
     setSteer(0.0f);
     setTorque(0.0f);
     setHandbrake(0.0f);
+    
+    if (!vehicleType->engineSoundFilename.empty())
+    {
+        engineSound = MySoundEngine::getInstance()->play3D(vehicleType->engineSoundFilename, irr::core::vector3df(), true, false, true);
+    }
+    
+    if (engineSound)
+    {
+        engineSound->setMinDistance(4.0f);
+        // engineSound->setIsPaused(true);
+    }
+    //assert(0);
 }
 
 Vehicle::~Vehicle()
@@ -386,6 +401,13 @@ Vehicle::~Vehicle()
     vehicleType = 0;
     node = 0;
     hkBody = 0;
+    
+    pause();
+    if (engineSound)
+    {
+        delete engineSound;
+        engineSound = 0;
+    }
 
     ObjectPoolManager::getInstance()->putObject(offsetObject);
     offsetObject = 0;
@@ -410,21 +432,37 @@ Vehicle::~Vehicle()
 
 void Vehicle::handleUpdatePos(bool phys)
 {
-    hkVector4 hkPos = /*hkVehicle->getChassis()*/hkBody->getPosition();
-    hkQuaternion hkQuat = /*hkVehicle->getChassis()*/hkBody->getRotation();
-    irr::core::quaternion(hkQuat.m_vec(0), hkQuat.m_vec(1), hkQuat.m_vec(2), hkQuat.m_vec(3)).getMatrix(matrix,
-        irr::core::vector3df(hkPos(0), hkPos(1), hkPos(2)));
-    node->setPosition(matrix.getTranslation());
-    node->setRotation(matrix.getRotationDegrees());
-
-    float speed = getSpeed();
-    float angularVelocity = fabsf(speed);
-    float soundSpeed = angularVelocity/80.f+1.0f;
-    float soundSpeed2 = (hkVehicle->calcRPM() * 1.5f) / vehicleType->maxTorque;
-    irr::core::matrix4 tyreMatrix;
-
     if (phys)
     {
+        hkVector4 hkLV = hkBody->getLinearVelocity();
+        hkVector4 hkPos = /*hkVehicle->getChassis()*/hkBody->getPosition();
+        hkQuaternion hkQuat = /*hkVehicle->getChassis()*/hkBody->getRotation();
+        irr::core::quaternion(hkQuat.m_vec(0), hkQuat.m_vec(1), hkQuat.m_vec(2), hkQuat.m_vec(3)).getMatrix(matrix,
+            irr::core::vector3df(hkPos(0), hkPos(1), hkPos(2)));
+        node->setPosition(matrix.getTranslation());
+        node->setRotation(matrix.getRotationDegrees());
+        
+        linearVelocity.X = hkLV(0);
+        linearVelocity.Y = hkLV(1);
+        linearVelocity.Z = hkLV(2);
+
+        float speed = getSpeed();
+        float angularVelocity = fabsf(speed);
+        float ssSpeed = angularVelocity/80.f+1.0f;
+        float ssGear = (hkVehicle->calcRPM() * 1.5f) / vehicleType->maxTorque + 1.0f;
+
+        if (ssGear > 2.5f) ssGear = 2.5f;
+
+        const irr::core::vector3df soundPos = node->getPosition(); //(matrix*soundMatrix).getTranslation();
+        if (engineSound)
+        {
+            engineSound->setPosition(soundPos);
+            engineSound->setPlaybackSpeed(ssGear);
+            engineSound->setVelocity(linearVelocity);
+        }
+        
+        // tyre update
+        irr::core::matrix4 tyreMatrix;
         bool onGround = false;
         for (unsigned int i = 0; i < tyres.size(); i++)
         {
@@ -449,6 +487,14 @@ void Vehicle::handleUpdatePos(bool phys)
             {
                 onGround = true;
             }
+        }
+    }
+    else
+    {
+        const irr::core::vector3df soundPos = node->getPosition(); //(matrix*soundMatrix).getTranslation();
+        if (engineSound)
+        {
+            engineSound->setPosition(soundPos);
         }
     }
 }
@@ -528,5 +574,23 @@ void Vehicle::setHandbrake(float value)
 {
     hkpVehicleDriverInputAnalogStatus* deviceStatus = (hkpVehicleDriverInputAnalogStatus*)hkVehicle->m_deviceStatus;
     deviceStatus->m_handbrakeButtonPressed = value > 0.1f;
+}
+
+void Vehicle::pause()
+{
+    if (engineSound)
+    {
+        engineSound->setPlaybackSpeed(1.f);
+        engineSound->setVelocity(irr::core::vector3df());
+        engineSound->setIsPaused(true);
+    }
+}
+
+void Vehicle::resume()
+{
+    if (engineSound)
+    {
+        engineSound->setIsPaused(false);
+    }
 }
 

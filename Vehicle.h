@@ -21,6 +21,7 @@
 
 class VehicleType;
 class VehicleTypeTyre;
+class MySound;
 
 
 // -------------------------------------------------------
@@ -65,6 +66,7 @@ public:
     float getAngle() const;
     int getGear() const {return hkVehicle->m_currentGear+1;}
     float getSpeed() const {return hkVehicle->calcKMPH();}
+    const irr::core::vector3df& getLinearVelocity() {return linearVelocity;}
     //VehicleType* getVehicleType() {return vehicleType;}
     const irr::core::matrix4& getViewPos(unsigned int num) const;
     const irr::core::matrix4& getViewDest(unsigned int num) const;
@@ -73,6 +75,9 @@ public:
     void setSteer(float value);
     void setTorque(float value);
     void setHandbrake(float value);
+    
+    void pause();
+    void resume();
 
 private:
     virtual void handleUpdatePos(bool phys);
@@ -87,6 +92,8 @@ private:
     OffsetObject*               offsetObject;
     tyreVector_t                tyres;
     hkpVehicleInstance*         hkVehicle;
+    MySound*                    engineSound;
+    irr::core::vector3df        linearVelocity;
 
     friend class FrictionMapVehicleRaycastWheelCollide;
     friend class VehicleTyre;

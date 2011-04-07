@@ -26,6 +26,9 @@ public:
     
     void addVehicle(Vehicle* vehicle);
     void removeVehicle(Vehicle* vehicle);
+    
+    void pause();
+    void resume();
 
 private:
     vehicleSet_t        vehicleSet;

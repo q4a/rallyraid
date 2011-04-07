@@ -467,5 +467,7 @@ void TheGame::handleUpdatePos(bool phys)
             camera->setPosition(centar + dir);
         }
     }
-    soundEngine->setListenerPosition(camera->getPosition(), camera->getTarget()-camera->getPosition());
+    irr::core::vector3df velocity;
+    if (camera != fps_camera) velocity = player->getVehicle()->getLinearVelocity();
+    soundEngine->setListenerPosition(camera->getPosition(), camera->getTarget()-camera->getPosition(), camera->getUpVector(), velocity);
 }

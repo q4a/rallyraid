@@ -221,7 +221,7 @@ bool VehicleType::read(const std::string& vehicleTypeFilename)
                 } else if (keyName == "texture")
                 {
                     texture = TheGame::getInstance()->getDriver()->getTexture(valueName.c_str());
-                } else if (keyName == "enginesound")
+                } else if (keyName == "engine_sound")
                 {
                     engineSoundFilename = valueName;
                 } else if (keyName == "max_brake_force")
