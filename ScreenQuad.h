@@ -43,6 +43,8 @@ public:
         origPos[1] = pos; origPos[1].Y += size.Height;
         origPos[2] = pos; origPos[2].Y += size.Height; origPos[2].X += size.Width;
         origPos[3] = pos; origPos[3].X += size.Width;
+        centerPos = pos; centerPos.Y += size.Height / 2; centerPos.X += size.Width / 2;
+        
 
         for (unsigned int i = 0; i < 4; i++)
         {
@@ -94,11 +96,17 @@ public:
         }
     }
 
+    void rotate(float angle)
+    {
+        rotate(angle, centerPos);
+    }
+
 private:
     irr::video::S3DVertex           Vertices[4];
     irr::video::SMaterial           Material;
     irr::video::IVideoDriver*       driver;
     irr::core::vector2di            origPos[4];
+    irr::core::vector2di            centerPos;
     bool                            visible;
 };
 

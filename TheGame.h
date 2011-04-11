@@ -85,6 +85,8 @@ private:
     bool                            physicsOngoing;
     OffsetObject*                   cameraOffsetObject;
     float                           dynCamDist;
+    irr::core::vector3df            cameraDirection;
+    float                           cameraAngle;
 
     irr::gui::IGUIStaticText*       testText;
 };

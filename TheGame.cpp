@@ -65,6 +65,8 @@ TheGame::TheGame()
       physicsOngoing(true),
       cameraOffsetObject(0),
       dynCamDist(2.f),
+      cameraDirection(),
+      cameraAngle(0.0f),
       testText(0)
 {
     dprintf(MY_DEBUG_INFO, "TheGame::TheGame(): this: %p\n", this);
@@ -273,6 +275,12 @@ void TheGame::loop()
         irr::core::dimension2du(MINIMAP_SIZE, MINIMAP_SIZE), false);
     miniMapQuad.getMaterial().MaterialType = shaders->materialMap["quad2d"];
 
+    ScreenQuad compassQuad(driver,
+        irr::core::position2di(10, driver->getScreenSize().Height - MINIMAP_SIZE - 10),
+        irr::core::dimension2du(MINIMAP_SIZE, MINIMAP_SIZE), false);
+    compassQuad.getMaterial().MaterialType = shaders->materialMap["quad2d_t"];
+    compassQuad.getMaterial().setTexture(0, driver->getTexture("data/hud/compass.png"));
+
     //OffsetObject* car = ObjectPoolManager::getInstance()->getObject("vw3", initialPos+initialDir);
     //printf("car off: %f, %f (%f, %f)\n", offsetManager->getOffset().X, offsetManager->getOffset().Z,
     //    car->getNode()->getPosition().X, car->getNode()->getPosition().Z);
@@ -391,6 +399,8 @@ void TheGame::loop()
             //testQuad.render();
             miniMapQuad.getMaterial().setTexture(0, earth->getMiniMapTexture());
             miniMapQuad.render();
+            compassQuad.rotate(cameraAngle-90.f);
+            compassQuad.render();
 
             driver->endScene();
             //printf("5\n");
@@ -467,7 +477,12 @@ void TheGame::handleUpdatePos(bool phys)
             camera->setPosition(centar + dir);
         }
     }
+    
+    cameraDirection = camera->getTarget()-camera->getPosition();
+    // calculate cameraAngle
+    cameraAngle = (float)(irr::core::vector2df(cameraDirection.X, cameraDirection.Z)).getAngleTrig();
+    
     irr::core::vector3df velocity;
     if (camera != fps_camera) velocity = player->getVehicle()->getLinearVelocity();
-    soundEngine->setListenerPosition(camera->getPosition(), camera->getTarget()-camera->getPosition(), camera->getUpVector(), velocity);
+    soundEngine->setListenerPosition(camera->getPosition(), cameraDirection, camera->getUpVector(), velocity);
 }
