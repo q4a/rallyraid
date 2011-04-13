@@ -67,12 +67,33 @@ private:
             
             for (unsigned int i = 0; i < num; i++)
             {
-                if (req >= 255*100 || (unsigned int)(rand()%(255*100)) < req)
+                irr::core::vector3df objectPos = irr::core::vector3df(
+                     (float)(rand()%(objectWireSize*10)) / 10.0f + apos.X,
+                     -50.f,
+                     (float)(rand()%(objectWireSize*10)) / 10.0f + apos.Y);
+                
+                irr::video::SColor fineDensity = TheEarth::getInstance()->getTileFineDensity(
+                    (unsigned int)abs((int)objectPos.X/TILE_FINE_SCALE), (unsigned int)abs((int)objectPos.Z/TILE_FINE_SCALE));
+                
+                unsigned int newRep = 0;
+                
+                if ((category & 1) == 1)
                 {
-                    irr::core::vector3df objectPos = irr::core::vector3df(
-                        (float)(rand()%(objectWireSize*10)) / 10.0f + apos.X,
-                        -50.f,
-                        (float)(rand()%(objectWireSize*10)) / 10.0f + apos.Y);
+                    newRep += fineDensity.getRed();
+                }
+                if ((category & 2) == 2)
+                {
+                    newRep += fineDensity.getGreen();
+                }
+                if ((category & 4) == 4)
+                {
+                    newRep += fineDensity.getBlue();
+                }
+                if (rep > 255) rep = 255;
+                
+                const unsigned int newReq = newRep * objectDensity;
+                if (newReq >= 255*100 || (unsigned int)(rand()%(255*100)) < newReq)
+                {
                 
                     objectPos.Y = TheEarth::getInstance()->getHeight(objectPos-OffsetManager::getInstance()->getOffset());
                     //printf("opos: %f %f %f\n", objectPos.X, objectPos.Y, objectPos.Z);

@@ -189,7 +189,7 @@ TheEarth::TheEarth()
       density(0),
       hasDetail(0),
       isLoaded(0),
-      hasDetailTex(0),
+      //hasDetailTex(0),
       maxHeight(0),
       minHeight(0xFFFF),
       tileMap()
@@ -225,11 +225,11 @@ TheEarth::~TheEarth()
         delete [] hasDetail;
         hasDetail = 0;
     }
-    if (hasDetailTex)
+    /*if (hasDetailTex)
     {
         delete [] hasDetailTex;
         hasDetailTex = 0;
-    }
+    }*/
     
     if (visualPart)
     {
@@ -261,26 +261,27 @@ unsigned short TheEarth::getTileHeight(unsigned int x, unsigned int y)
     const unsigned int tileY = y / TILE_POINTS_NUM;
     const unsigned int inX = x % TILE_POINTS_NUM;
     const unsigned int inY = y % TILE_POINTS_NUM;
+    const unsigned int tileNum = tileX + (xsize*tileY);
 
     if (tileX < xsize && tileY < ysize)
     {
         Tile* tile;
-        if (getIsLoaded(tileX, tileY))
+        if (getIsLoaded(tileNum))
         {
-            tile = tileMap[tileX + (xsize*tileY)];
+            tile = tileMap[tileNum];
             tile->setInUse();
         }
         else
         {
-            if (getHasDetail(tileX, tileY))
+            if (getHasDetail(tileNum))
             {
                 tile = new Tile(tileX, tileY,
                     getEarthTexture(tileX, tileY),
                     getEarthTexture(tileX+1, tileY),
                     getEarthTexture(tileX, tileY+1),
                     getEarthTexture(tileX+1, tileY+1));
-                tileMap[tileX + (xsize*tileY)] = tile;
-                setIsLoaded(tileX, tileY, true);
+                tileMap[tileNum] = tile;
+                setIsLoaded(tileNum, true);
             }
             else
             {
@@ -301,30 +302,31 @@ const irr::video::SColor& TheEarth::getTileTexture(unsigned int x, unsigned int 
     const unsigned int tileY = y / TILE_POINTS_NUM;
     const unsigned int inX = x % TILE_POINTS_NUM;
     const unsigned int inY = y % TILE_POINTS_NUM;
+    const unsigned int tileNum = tileX + (xsize*tileY);
 
     if (tileX < xsize && tileY < ysize)
     {
         Tile* tile;
-        if (getIsLoaded(tileX, tileY))
+        if (getIsLoaded(tileNum))
         {
-            tile = tileMap[tileX + (xsize*tileY)];
+            tile = tileMap[tileNum];
             tile->setInUse();
         }
         else
         {
-            if (getHasDetail(tileX, tileY))
+            if (getHasDetail(tileNum))
             {
                 tile = new Tile(tileX, tileY,
                     getEarthTexture(tileX, tileY),
                     getEarthTexture(tileX+1, tileY),
                     getEarthTexture(tileX, tileY+1),
                     getEarthTexture(tileX+1, tileY+1));
-                tileMap[tileX + (xsize*tileY)] = tile;
-                setIsLoaded(tileX, tileY, true);
+                tileMap[tileNum] = tile;
+                setIsLoaded(tileNum, true);
             }
             else
             {
-                baseColor = getEarthTexture(tileX, tileY);
+                baseColor = getEarthTexture(tileNum);
                 return baseColor;
             }
         }
@@ -343,31 +345,32 @@ void TheEarth::getTileHeightAndTexture(unsigned int x, unsigned int y,
     const unsigned int tileY = y / TILE_POINTS_NUM;
     const unsigned int inX = x % TILE_POINTS_NUM;
     const unsigned int inY = y % TILE_POINTS_NUM;
+    const unsigned int tileNum = tileX + (xsize*tileY);
 
     if (tileX < xsize && tileY < ysize)
     {
         Tile* tile;
-        if (getIsLoaded(tileX, tileY))
+        if (getIsLoaded(tileNum))
         {
-            tile = tileMap[tileX + (xsize*tileY)];
+            tile = tileMap[tileNum];
             tile->setInUse();
         }
         else
         {
-            if (getHasDetail(tileX, tileY))
+            if (getHasDetail(tileNum))
             {
                 tile = new Tile(tileX, tileY,
                     getEarthTexture(tileX, tileY),
                     getEarthTexture(tileX+1, tileY),
                     getEarthTexture(tileX, tileY+1),
                     getEarthTexture(tileX+1, tileY+1));
-                tileMap[tileX + (xsize*tileY)] = tile;
-                setIsLoaded(tileX, tileY, true);
+                tileMap[tileNum] = tile;
+                setIsLoaded(tileNum, true);
             }
             else
             {
                 height = 0;
-                textureColor = /*irr::video::SColor(0, 0, 255, 0);//*/getEarthTexture(tileX, tileY);
+                textureColor = /*irr::video::SColor(0, 0, 255, 0);//*/getEarthTexture(tileNum);
                 return;
             }
         }
@@ -388,30 +391,31 @@ const irr::video::SColor& TheEarth::getTileFineTexture(unsigned int x, unsigned 
     const unsigned int tileY = y / TILE_FINE_POINTS_NUM;
     const unsigned int inX = x % TILE_FINE_POINTS_NUM;
     const unsigned int inY = y % TILE_FINE_POINTS_NUM;
+    const unsigned int tileNum = tileX + (xsize*tileY);
 
     if (tileX < xsize && tileY < ysize)
     {
         Tile* tile;
-        if (getIsLoaded(tileX, tileY))
+        if (getIsLoaded(tileNum))
         {
-            tile = tileMap[tileX + (xsize*tileY)];
+            tile = tileMap[tileNum];
             tile->setInUse();
         }
         else
         {
-            if (getHasDetail(tileX, tileY))
+            if (getHasDetail(tileNum))
             {
                 tile = new Tile(tileX, tileY,
                     getEarthTexture(tileX, tileY),
                     getEarthTexture(tileX+1, tileY),
                     getEarthTexture(tileX, tileY+1),
                     getEarthTexture(tileX+1, tileY+1));
-                tileMap[tileX + (xsize*tileY)] = tile;
-                setIsLoaded(tileX, tileY, true);
+                tileMap[tileNum] = tile;
+                setIsLoaded(tileNum, true);
             }
             else
             {
-                baseColor = getEarthTexture(tileX, tileY);
+                baseColor = getEarthTexture(tileNum);
                 return baseColor;
             }
         }
@@ -423,142 +427,35 @@ const irr::video::SColor& TheEarth::getTileFineTexture(unsigned int x, unsigned 
     }
 }
 
-unsigned short TheEarth::getEarthHeight(unsigned int x, unsigned int y) const
+const irr::video::SColor& TheEarth::getTileFineDensity(unsigned int x, unsigned int y)
 {
-    if (height && x < xsize && y < ysize)
-    {
-        return height[x + (xsize*y)];
-    }
-    else
-    {
-        return 0;
-    }
-}
+    const unsigned int tileX = x / TILE_FINE_POINTS_NUM;
+    const unsigned int tileY = y / TILE_FINE_POINTS_NUM;
+    const unsigned int inX = x % TILE_FINE_POINTS_NUM;
+    const unsigned int inY = y % TILE_FINE_POINTS_NUM;
+    const unsigned int tileNum = tileX + (xsize*tileY);
 
-bool TheEarth::setEarthHeight(unsigned int x, unsigned int y, unsigned short val)
-{
-    if (height && x < xsize && y < ysize)
+    if (tileX < xsize && tileY < ysize)
     {
-        height[x + (xsize*y)] = val;
-        if (val < minHeight) minHeight = val;
-        if (val > maxHeight) maxHeight = val;
-        return true;
-    }
-    else
-    {
-        return false;
-    }
-}
-
-bool TheEarth::getHasDetail(unsigned int x, unsigned int y) const
-{
-    unsigned int pos = (x + (xsize*y));
-    if (hasDetail && x < xsize && y < ysize)
-    {
-        return (hasDetail[pos/8] & (0x1 << (pos%8))) == (0x1 << (pos%8));
-    }
-    else
-    {
-        return false;
-    }
-}
-
-bool TheEarth::setHasDetail(unsigned int x, unsigned int y, bool val)
-{
-    unsigned int pos = (x + (xsize*y));
-    if (hasDetail && x < xsize && y < ysize)
-    {
-        if (val)
+        Tile* tile;
+        if (getIsLoaded(tileNum))
         {
-            hasDetail[pos/8] |= (0x1 << (pos%8));
+            tile = tileMap[tileNum];
+            tile->setInUse();
         }
         else
         {
-            hasDetail[pos/8] &= ~(0x1 << (pos%8));
+            if (getHasDetail(tileNum))
+            {
+                assert(0 && "should be called only on loaded tiles");
+            }
+            else
+            {
+                baseColor = getEarthDensity(tileNum);
+                return baseColor;
+            }
         }
-        return true;
-    }
-    else
-    {
-        return false;
-    }
-}
-
-bool TheEarth::getIsLoaded(unsigned int x, unsigned int y) const
-{
-    unsigned int pos = (x + (xsize*y));
-    if (isLoaded && x < xsize && y < ysize)
-    {
-        return (isLoaded[pos/8] & (0x1 << (pos%8))) == (0x1 << (pos%8));
-    }
-    else
-    {
-        return false;
-    }
-}
-
-bool TheEarth::setIsLoaded(unsigned int x, unsigned int y, bool val)
-{
-    unsigned int pos = (x + (xsize*y));
-    if (isLoaded && x < xsize && y < ysize)
-    {
-        if (val)
-        {
-            isLoaded[pos/8] |= (0x1 << (pos%8));
-        }
-        else
-        {
-            isLoaded[pos/8] &= ~(0x1 << (pos%8));
-        }
-        return true;
-    }
-    else
-    {
-        return false;
-    }
-}
-
-bool TheEarth::getHasDetailTex(unsigned int x, unsigned int y) const
-{
-    unsigned int pos = (x + (xsize*y));
-    if (hasDetailTex && x < xsize && y < ysize)
-    {
-        return (hasDetailTex[pos/8] & (0x1 << (pos%8))) == (0x1 << (pos%8));
-    }
-    else
-    {
-        return false;
-    }
-}
-
-bool TheEarth::setHasDetailTex(unsigned int x, unsigned int y, bool val)
-{
-    unsigned int pos = (x + (xsize*y));
-    if (hasDetailTex && x < xsize && y < ysize)
-    {
-        if (val)
-        {
-            hasDetailTex[pos/8] |= (0x1 << (pos%8));
-        }
-        else
-        {
-            hasDetailTex[pos/8] &= ~(0x1 << (pos%8));
-        }
-        return true;
-    }
-    else
-    {
-        return false;
-    }
-}
-
-irr::video::SColor TheEarth::getEarthDensity(unsigned int x, unsigned int y) const
-{
-    if (density && xsize > 0 && ysize > 0)
-    {
-        if (x >= xsize) x = xsize - 1;
-        if (y >= ysize) y = ysize - 1;
-        return density->getPixel(x, y);
+        return tile->getFineDensity(inX, inY);
     }
     else
     {
@@ -566,32 +463,38 @@ irr::video::SColor TheEarth::getEarthDensity(unsigned int x, unsigned int y) con
     }
 }
 
-bool TheEarth::setEarthDensity(unsigned int x, unsigned int y, const irr::video::SColor& val)
+void TheEarth::setTileFineDensity(unsigned int x, unsigned int y, const irr::video::SColor& val)
 {
-    if (density && xsize > 0 && ysize > 0)
-    {
-        if (x >= xsize) x = xsize - 1;
-        if (y >= ysize) y = ysize - 1;
-        density->setPixel(x, y, val);
-        return true;
-    }
-    else
-    {
-        return false;
-    }
-}
+    const unsigned int tileX = x / TILE_FINE_POINTS_NUM;
+    const unsigned int tileY = y / TILE_FINE_POINTS_NUM;
+    const unsigned int inX = x % TILE_FINE_POINTS_NUM;
+    const unsigned int inY = y % TILE_FINE_POINTS_NUM;
+    const unsigned int tileNum = tileX + (xsize*tileY);
 
-irr::video::SColor TheEarth::getEarthTexture(unsigned int x, unsigned int y) const
-{
-    if (density && xsize > 0 && ysize > 0)
+    if (tileX < xsize && tileY < ysize)
     {
-        if (x >= xsize) x = xsize - 1;
-        if (y >= ysize) y = ysize - 1;
-        return earthTexture->getPixel(x, y);
+        Tile* tile;
+        if (getIsLoaded(tileNum))
+        {
+            tile = tileMap[tileNum];
+            tile->setInUse();
+        }
+        else
+        {
+            if (getHasDetail(tileNum))
+            {
+                assert(0 && "should be called only on loaded tiles");
+            }
+            else
+            {
+                return;
+            }
+        }
+        return tile->setFineDensity(inX, inY, val);
     }
     else
     {
-        return baseColor;
+        return;
     }
 }
 
@@ -601,7 +504,7 @@ bool TheEarth::read()
     bool ret = true;
     ret &= readHeight();
     ret &= readHasDetail();
-    ret &= readHasDetailTex();
+    //ret &= readHasDetailTex();
     ret &= readDensity();
     ret &= readEarthTexture();
     return ret;
@@ -718,7 +621,7 @@ bool TheEarth::readHasDetail()
     return true;
 }
 
-bool TheEarth::readHasDetailTex()
+/*bool TheEarth::readHasDetailTex()
 {
     int rc = 0;
     unsigned int readxsize;
@@ -764,7 +667,7 @@ bool TheEarth::readHasDetailTex()
     fclose(f);
     printf("%ux%u map read hasDetailTex ok\n", xsize, ysize);
     return true;
-}
+}*/
 
 bool TheEarth::readDensity()
 {
@@ -792,7 +695,7 @@ bool TheEarth::write()
     bool ret = true;
     ret &= writeHeight();
     ret &= writeHasDetail();
-    ret &= writeHasDetailTex();
+    //ret &= writeHasDetailTex();
     return ret;
 }
 
@@ -872,7 +775,7 @@ bool TheEarth::writeHasDetail()
     return true;
 }
 
-bool TheEarth::writeHasDetailTex()
+/*bool TheEarth::writeHasDetailTex()
 {
     if (hasDetailTex==0) return false;
     
@@ -908,7 +811,7 @@ bool TheEarth::writeHasDetailTex()
     fclose(f);
     printf("%ux%u map write hasDetailTex ok\n", xsize, ysize);
     return true;
-}
+}*/
 
 bool TheEarth::writeToPNG(irr::IrrlichtDevice* device, irr::video::IVideoDriver* driver) const
 {

@@ -3,7 +3,6 @@
 #include "stdafx.h"
 #include "EventReceiver.h"
 #include "Settings.h"
-#include "ScreenQuad.h"
 #include "ShadersSM20.h"
 #include "OffsetManager.h"
 #include "hk.h"
@@ -17,6 +16,7 @@
 #include "Player.h"
 #include "RaceManager.h"
 #include "MenuManager.h"
+#include "Hud.h"
 
 // static stuff
 TheGame* TheGame::theGame = 0;
@@ -57,6 +57,7 @@ TheGame::TheGame()
       player(0),
       raceManager(0),
       menuManager(0),
+      hud(0),
       terminate(true),
       windowId(0),
       lastScreenSize(),
@@ -138,6 +139,9 @@ TheGame::TheGame()
         dprintf(MY_DEBUG_NOTE, "Initialize menu manager\n");
         MenuManager::initialize();
         menuManager = MenuManager::getInstance();
+        dprintf(MY_DEBUG_NOTE, "Initialize hud\n");
+        Hud::initialize();
+        hud = Hud::getInstance();
 
         testText = env->addStaticText(L"", irr::core::recti(10, 10, 790, 30), false, true, 0, -1, true);
     }
@@ -172,7 +176,10 @@ TheGame::~TheGame()
     player = 0;
     raceManager = 0;
     menuManager = 0;
+    hud = 0;
 
+    dprintf(MY_DEBUG_NOTE, "Finalize hud\n");
+    Hud::finalize();
     dprintf(MY_DEBUG_NOTE, "Finalize menu manager\n");
     MenuManager::finalize();
     dprintf(MY_DEBUG_NOTE, "Finalize race manager\n");
@@ -269,17 +276,6 @@ void TheGame::loop()
     testQuad.getMaterial().MaterialType = shaders->materialMap["quad2d"];
     //testQuad.getMaterial().setTexture(0, driver->getTexture("data/menu_textures/bg_frame_main_1280.png"));
     testQuad.rotate(30.0f, irr::core::position2di(150, 150));*/
-
-    ScreenQuad miniMapQuad(driver,
-        irr::core::position2di(driver->getScreenSize().Width - MINIMAP_SIZE - 10, driver->getScreenSize().Height - MINIMAP_SIZE - 10),
-        irr::core::dimension2du(MINIMAP_SIZE, MINIMAP_SIZE), false);
-    miniMapQuad.getMaterial().MaterialType = shaders->materialMap["quad2d"];
-
-    ScreenQuad compassQuad(driver,
-        irr::core::position2di(10, driver->getScreenSize().Height - MINIMAP_SIZE - 10),
-        irr::core::dimension2du(MINIMAP_SIZE, MINIMAP_SIZE), false);
-    compassQuad.getMaterial().MaterialType = shaders->materialMap["quad2d_t"];
-    compassQuad.getMaterial().setTexture(0, driver->getTexture("data/hud/compass.png"));
 
     //OffsetObject* car = ObjectPoolManager::getInstance()->getObject("vw3", initialPos+initialDir);
     //printf("car off: %f, %f (%f, %f)\n", offsetManager->getOffset().X, offsetManager->getOffset().Z,
@@ -391,16 +387,14 @@ void TheGame::loop()
             driver->setRenderTarget(0, true, true, irr::video::SColor(0, 0, 0, 255));
             //printf("1\n");
             earth->registerVisual();
+            hud->preRender(cameraAngle);
             //printf("2\n");
             smgr->drawAll();
             //printf("3\n");
             env->drawAll();
             //printf("4\n");
             //testQuad.render();
-            miniMapQuad.getMaterial().setTexture(0, earth->getMiniMapTexture());
-            miniMapQuad.render();
-            compassQuad.rotate(cameraAngle-90.f);
-            compassQuad.render();
+            hud->render();
 
             driver->endScene();
             //printf("5\n");
@@ -480,7 +474,7 @@ void TheGame::handleUpdatePos(bool phys)
     
     cameraDirection = camera->getTarget()-camera->getPosition();
     // calculate cameraAngle
-    cameraAngle = (float)(irr::core::vector2df(cameraDirection.X, cameraDirection.Z)).getAngleTrig();
+    cameraAngle = (float)(irr::core::vector2df(cameraDirection.X, cameraDirection.Z)).getAngle();
     
     irr::core::vector3df velocity;
     if (camera != fps_camera) velocity = player->getVehicle()->getLinearVelocity();

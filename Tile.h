@@ -12,6 +12,7 @@ public:
         const irr::video::SColor& color10,
         const irr::video::SColor& color01,
         const irr::video::SColor& color11,
+        const irr::video::SColor& density,
         bool autoRead = true);
     ~Tile();
 
@@ -41,13 +42,33 @@ public:
 
     const irr::video::SColor& getFineColor(unsigned int x, unsigned int y) const
     {
-        if (colors && x < TILE_FINE_POINTS_NUM && y < TILE_FINE_POINTS_NUM)
+        if (fineColors && x < TILE_FINE_POINTS_NUM && y < TILE_FINE_POINTS_NUM)
         {
             return fineColors[x + (TILE_FINE_POINTS_NUM*y)];
         }
         else
         {
             return baseColor;
+        }
+    }
+    
+    const irr::video::SColor& getFineDensity(unsigned int x, unsigned int y) const
+    {
+        if (fineDensity && x < TILE_FINE_POINTS_NUM && y < TILE_FINE_POINTS_NUM)
+        {
+            return fineDensity[x + (TILE_FINE_POINTS_NUM*y)];
+        }
+        else
+        {
+            return baseColor;
+        }
+    }
+    
+    void setFineDensity(unsigned int x, unsigned int y, const irr::video::SColor& val = irr::video::SColor())
+    {
+        if (fineDensity && x < TILE_FINE_POINTS_NUM && y < TILE_FINE_POINTS_NUM)
+        {
+            fineDensity[x + (TILE_FINE_POINTS_NUM*y)] = val;
         }
     }
     
@@ -74,6 +95,7 @@ private:
     bool inUse;
     irr::video::SColor* colors;
     irr::video::SColor* fineColors;
+    irr::video::SColor* fineDensity;
 
     static const irr::video::SColor baseColor;
 };

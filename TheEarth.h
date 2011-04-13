@@ -44,35 +44,47 @@ private:
     bool setEarthHeight(unsigned int x, unsigned int y, unsigned short val);
     bool setHasDetail(unsigned int x, unsigned int y, bool val);
     bool setIsLoaded(unsigned int x, unsigned int y, bool val);
-    bool setHasDetailTex(unsigned int x, unsigned int y, bool val);
+    //bool setHasDetailTex(unsigned int x, unsigned int y, bool val);
     bool setEarthDensity(unsigned int x, unsigned int y, const irr::video::SColor& val);
     void refreshMiniMap();
     
 public:
-    unsigned short getTileHeight(unsigned int x, unsigned int y);
-    const irr::video::SColor& getTileTexture(unsigned int x, unsigned int y);
-    void getTileHeightAndTexture(unsigned int x, unsigned int y,
-        unsigned short& height, irr::video::SColor& textureColor);
-    const irr::video::SColor& getTileFineTexture(unsigned int x, unsigned int y); // x and y is not devided by TILE_SCALE, but TILE_FINE_SCALE
+    unsigned short getTileHeight(unsigned int x, unsigned int y);                 // x and y devide by TILE_SCALE
+    const irr::video::SColor& getTileTexture(unsigned int x, unsigned int y);     // x and y devide by TILE_SCALE
+    void getTileHeightAndTexture(unsigned int x, unsigned int y,                  // x and y devide by TILE_SCALE
+        unsigned short& height, irr::video::SColor& textureColor);                // x and y devide by TILE_SCALE
+    const irr::video::SColor& getTileFineTexture(unsigned int x, unsigned int y);   // x and y are not devided by TILE_SCALE, but TILE_FINE_SCALE
+    const irr::video::SColor& getTileFineDensity(unsigned int x, unsigned int y);   // x and y are not devided by TILE_SCALE, but TILE_FINE_SCALE
+    void setTileFineDensity(unsigned int x, unsigned int y, const irr::video::SColor& val = irr::video::SColor()); // x and y are not devided by TILE_SCALE, but TILE_FINE_SCALE
         
-    unsigned short getEarthHeight(unsigned int x, unsigned int y) const;
-    bool getHasDetail(unsigned int x, unsigned int y) const;
-    bool getIsLoaded(unsigned int x, unsigned int y) const;
-    bool getHasDetailTex(unsigned int x, unsigned int y) const;
-    irr::video::SColor getEarthDensity(unsigned int x, unsigned int y) const;
-    irr::video::SColor getEarthTexture(unsigned int x, unsigned int y) const;
+    unsigned short getEarthHeight(unsigned int x, unsigned int y) const;          // x and y devide by TILE_SCALE * TILE_POINTS_NUM // inline
+    bool getHasDetail(unsigned int x, unsigned int y) const;                      // x and y devide by TILE_SCALE * TILE_POINTS_NUM // inline
+    bool getIsLoaded(unsigned int x, unsigned int y) const;                       // x and y devide by TILE_SCALE * TILE_POINTS_NUM // inline
+    //bool getHasDetailTex(unsigned int x, unsigned int y) const;                   // x and y devide by TILE_SCALE * TILE_POINTS_NUM // inline
+    irr::video::SColor getEarthDensity(unsigned int x, unsigned int y) const;     // x and y devide by TILE_SCALE * TILE_POINTS_NUM // inline
+    irr::video::SColor getEarthTexture(unsigned int x, unsigned int y) const;     // x and y devide by TILE_SCALE * TILE_POINTS_NUM // inline
+
+private:
+    unsigned short getEarthHeight(unsigned int tileNum) const;            // tileNum < xsize*ysize, tileNum = tileX + (xsize*tileY), tileX and tileY are devided by TILE_SCALE * TILE_POINTS_NUM, inline
+    bool getHasDetail(unsigned int tileNum) const;                        // tileNum < xsize*ysize, tileNum = tileX + (xsize*tileY), tileX and tileY are devided by TILE_SCALE * TILE_POINTS_NUM, inline
+    bool getIsLoaded(unsigned int tileNum) const;                         // tileNum < xsize*ysize, tileNum = tileX + (xsize*tileY), tileX and tileY are devided by TILE_SCALE * TILE_POINTS_NUM, inline
+    void setIsLoaded(unsigned int tileNum, bool val);                         // tileNum < xsize*ysize, tileNum = tileX + (xsize*tileY), tileX and tileY are devided by TILE_SCALE * TILE_POINTS_NUM, inline
+    //bool getHasDetailTex(unsigned int tileNum) const;                     // tileNum < xsize*ysize, tileNum = tileX + (xsize*tileY), tileX and tileY are devided by TILE_SCALE * TILE_POINTS_NUM, inline
+
+
+public:
 
     bool read();
     bool readHeight();
     bool readHasDetail();
-    bool readHasDetailTex();
+    //bool readHasDetailTex();
     bool readDensity();
     bool readEarthTexture();
     
     bool write();
     bool writeHeight();
     bool writeHasDetail();
-    bool writeHasDetailTex();
+    //bool writeHasDetailTex();
     
     bool writeToPNG(irr::IrrlichtDevice* device, irr::video::IVideoDriver* driver) const;
     bool writeHeightToPNG(irr::IrrlichtDevice* device, irr::video::IVideoDriver* driver) const;
@@ -139,7 +151,7 @@ private:
     irr::video::IImage* density;
     unsigned char*      hasDetail;
     unsigned char*      isLoaded;
-    unsigned char*      hasDetailTex;
+    //unsigned char*      hasDetailTex;
 
     unsigned short      maxHeight;
     unsigned short      minHeight;
@@ -147,5 +159,211 @@ private:
     tileMap_t           tileMap;
 
 };
+
+
+inline unsigned short TheEarth::getEarthHeight(unsigned int x, unsigned int y) const
+{
+    if (height && x < xsize && y < ysize)
+    {
+        //return height[x + (xsize*y)];
+        return getEarthHeight(x + (xsize*y));
+    }
+    else
+    {
+        return 0;
+    }
+}
+
+inline bool TheEarth::getHasDetail(unsigned int x, unsigned int y) const
+{
+    unsigned int pos = (x + (xsize*y));
+    if (hasDetail && x < xsize && y < ysize)
+    {
+        //return (hasDetail[pos/8] & (0x1 << (pos%8))) == (0x1 << (pos%8));
+        return getHasDetail(pos);
+    }
+    else
+    {
+        return false;
+    }
+}
+
+inline bool TheEarth::getIsLoaded(unsigned int x, unsigned int y) const
+{
+    unsigned int pos = (x + (xsize*y));
+    if (isLoaded && x < xsize && y < ysize)
+    {
+        //return (isLoaded[pos/8] & (0x1 << (pos%8))) == (0x1 << (pos%8));
+        return getIsLoaded(pos);
+    }
+    else
+    {
+        return false;
+    }
+}
+
+/*inline bool TheEarth::getHasDetailTex(unsigned int x, unsigned int y) const
+{
+    unsigned int pos = (x + (xsize*y));
+    if (hasDetailTex && x < xsize && y < ysize)
+    {
+        return (hasDetailTex[pos/8] & (0x1 << (pos%8))) == (0x1 << (pos%8));
+    }
+    else
+    {
+        return false;
+    }
+}*/
+
+inline irr::video::SColor TheEarth::getEarthDensity(unsigned int x, unsigned int y) const
+{
+    if (density && xsize > 0 && ysize > 0)
+    {
+        if (x >= xsize) x = xsize - 1;
+        if (y >= ysize) y = ysize - 1;
+        return density->getPixel(x, y);
+    }
+    else
+    {
+        return baseColor;
+    }
+}
+
+inline irr::video::SColor TheEarth::getEarthTexture(unsigned int x, unsigned int y) const
+{
+    if (density && xsize > 0 && ysize > 0)
+    {
+        if (x >= xsize) x = xsize - 1;
+        if (y >= ysize) y = ysize - 1;
+        return earthTexture->getPixel(x, y);
+    }
+    else
+    {
+        return baseColor;
+    }
+}
+
+inline bool TheEarth::setEarthHeight(unsigned int x, unsigned int y, unsigned short val)
+{
+    if (height && x < xsize && y < ysize)
+    {
+        height[x + (xsize*y)] = val;
+        if (val < minHeight) minHeight = val;
+        if (val > maxHeight) maxHeight = val;
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+inline bool TheEarth::setHasDetail(unsigned int x, unsigned int y, bool val)
+{
+    unsigned int pos = (x + (xsize*y));
+    if (hasDetail && x < xsize && y < ysize)
+    {
+        /*if (val)
+        {
+            hasDetail[pos/8] |= (0x1 << (pos%8));
+        }
+        else
+        {
+            hasDetail[pos/8] &= ~(0x1 << (pos%8));
+        }
+        */
+        setHasDetail(pos, val);
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+inline bool TheEarth::setIsLoaded(unsigned int x, unsigned int y, bool val)
+{
+    unsigned int pos = (x + (xsize*y));
+    if (isLoaded && x < xsize && y < ysize)
+    {
+        if (val)
+        {
+            isLoaded[pos/8] |= (0x1 << (pos%8));
+        }
+        else
+        {
+            isLoaded[pos/8] &= ~(0x1 << (pos%8));
+        }
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+/*inline bool TheEarth::setHasDetailTex(unsigned int x, unsigned int y, bool val)
+{
+    unsigned int pos = (x + (xsize*y));
+    if (hasDetailTex && x < xsize && y < ysize)
+    {
+        if (val)
+        {
+            hasDetailTex[pos/8] |= (0x1 << (pos%8));
+        }
+        else
+        {
+            hasDetailTex[pos/8] &= ~(0x1 << (pos%8));
+        }
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}*/
+
+inline bool TheEarth::setEarthDensity(unsigned int x, unsigned int y, const irr::video::SColor& val)
+{
+    if (density && xsize > 0 && ysize > 0)
+    {
+        if (x >= xsize) x = xsize - 1;
+        if (y >= ysize) y = ysize - 1;
+        density->setPixel(x, y, val);
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+
+unsigned short TheEarth::getEarthHeight(unsigned int tileNum) const
+{
+    return height[tileNum];
+}
+
+bool TheEarth::getHasDetail(unsigned int tileNum) const
+{
+    return (hasDetail[tileNum/8] & (0x1 << (tileNum%8))) == (0x1 << (tileNum%8));
+}
+
+bool TheEarth::getIsLoaded(unsigned int tileNum) const
+{
+    return (isLoaded[tileNum/8] & (0x1 << (tileNum%8))) == (0x1 << (tileNum%8));
+}
+
+void TheEarth::setIsLoaded(unsigned int tileNum, bool val)
+{
+    if (val)
+    {
+        isLoaded[tileNum/8] |= (0x1 << (tileNum%8));
+    }
+    else
+    {
+        isLoaded[tileNum/8] &= ~(0x1 << (tileNum%8));
+    }
+}
 
 #endif // THEEARTH_H

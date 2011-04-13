@@ -15,6 +15,7 @@ class ObjectWire;
 class Player;
 class RaceManager;
 class MenuManager;
+class Hud;
 
 class TheGame : public OffsetObjectUpdateCB
 {
@@ -74,6 +75,7 @@ private:
     Player*                         player;
     RaceManager*                    raceManager;
     MenuManager*                    menuManager;
+    Hud*                            hud;
 
     bool                            terminate;
     size_t                          windowId;

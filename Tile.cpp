@@ -9,13 +9,15 @@ Tile::Tile(unsigned int posx, unsigned int posy,
            const irr::video::SColor& color10,
            const irr::video::SColor& color01,
            const irr::video::SColor& color11,
+           const irr::video::SColor& density,
            bool autoRead)
     : catx(posx/CATDIV), caty(posy/CATDIV),
       posx(posx), posy(posy),
       height(new unsigned short[TILE_POINTS_NUM*TILE_POINTS_NUM]),
       inUse(true),
       colors(new irr::video::SColor[TILE_POINTS_NUM*TILE_POINTS_NUM]),
-      fineColors(new irr::video::SColor[TILE_FINE_POINTS_NUM*TILE_FINE_POINTS_NUM])
+      fineColors(new irr::video::SColor[TILE_FINE_POINTS_NUM*TILE_FINE_POINTS_NUM]),
+      density(new irr::video::SColor[TILE_FINE_POINTS_NUM*TILE_FINE_POINTS_NUM])
 {
     memset(height, 0, (TILE_POINTS_NUM*TILE_POINTS_NUM)*sizeof(unsigned short));
     if (autoRead)
@@ -88,6 +90,14 @@ Tile::Tile(unsigned int posx, unsigned int posy,
             }
         }
         //printf("\n\n");
+    }
+    
+    for (unsigned int x = 0; x < TILE_FINE_POINTS_NUM; x++)
+    {
+        for (unsigned int y = 0; y < TILE_FINE_POINTS_NUM; y++)
+        {
+            fineDensity[x + (TILE_FINE_POINTS_NUM*y)] = density;
+        }
     }
     printf("tile pos(%u): %u, %u\n", posx + (6750*posy), posx, posy);
     
