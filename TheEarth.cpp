@@ -279,7 +279,8 @@ unsigned short TheEarth::getTileHeight(unsigned int x, unsigned int y)
                     getEarthTexture(tileX, tileY),
                     getEarthTexture(tileX+1, tileY),
                     getEarthTexture(tileX, tileY+1),
-                    getEarthTexture(tileX+1, tileY+1));
+                    getEarthTexture(tileX+1, tileY+1),
+                    getEarthDensity(tileX, tileY));
                 tileMap[tileNum] = tile;
                 setIsLoaded(tileNum, true);
             }
@@ -320,13 +321,14 @@ const irr::video::SColor& TheEarth::getTileTexture(unsigned int x, unsigned int 
                     getEarthTexture(tileX, tileY),
                     getEarthTexture(tileX+1, tileY),
                     getEarthTexture(tileX, tileY+1),
-                    getEarthTexture(tileX+1, tileY+1));
+                    getEarthTexture(tileX+1, tileY+1),
+                    getEarthDensity(tileX, tileY));
                 tileMap[tileNum] = tile;
                 setIsLoaded(tileNum, true);
             }
             else
             {
-                baseColor = getEarthTexture(tileNum);
+                baseColor = getEarthTexture(tileX, tileY);
                 return baseColor;
             }
         }
@@ -363,14 +365,15 @@ void TheEarth::getTileHeightAndTexture(unsigned int x, unsigned int y,
                     getEarthTexture(tileX, tileY),
                     getEarthTexture(tileX+1, tileY),
                     getEarthTexture(tileX, tileY+1),
-                    getEarthTexture(tileX+1, tileY+1));
+                    getEarthTexture(tileX+1, tileY+1),
+                    getEarthDensity(tileX, tileY));
                 tileMap[tileNum] = tile;
                 setIsLoaded(tileNum, true);
             }
             else
             {
                 height = 0;
-                textureColor = /*irr::video::SColor(0, 0, 255, 0);//*/getEarthTexture(tileNum);
+                textureColor = /*irr::video::SColor(0, 0, 255, 0);//*/getEarthTexture(tileX, tileY);
                 return;
             }
         }
@@ -409,13 +412,14 @@ const irr::video::SColor& TheEarth::getTileFineTexture(unsigned int x, unsigned 
                     getEarthTexture(tileX, tileY),
                     getEarthTexture(tileX+1, tileY),
                     getEarthTexture(tileX, tileY+1),
-                    getEarthTexture(tileX+1, tileY+1));
+                    getEarthTexture(tileX+1, tileY+1),
+                    getEarthDensity(tileX, tileY));
                 tileMap[tileNum] = tile;
                 setIsLoaded(tileNum, true);
             }
             else
             {
-                baseColor = getEarthTexture(tileNum);
+                baseColor = getEarthTexture(tileX, tileY);
                 return baseColor;
             }
         }
@@ -451,7 +455,7 @@ const irr::video::SColor& TheEarth::getTileFineDensity(unsigned int x, unsigned 
             }
             else
             {
-                baseColor = getEarthDensity(tileNum);
+                baseColor = getEarthDensity(tileX, tileY);
                 return baseColor;
             }
         }

@@ -17,7 +17,7 @@ Tile::Tile(unsigned int posx, unsigned int posy,
       inUse(true),
       colors(new irr::video::SColor[TILE_POINTS_NUM*TILE_POINTS_NUM]),
       fineColors(new irr::video::SColor[TILE_FINE_POINTS_NUM*TILE_FINE_POINTS_NUM]),
-      density(new irr::video::SColor[TILE_FINE_POINTS_NUM*TILE_FINE_POINTS_NUM])
+      fineDensity(new irr::video::SColor[TILE_FINE_POINTS_NUM*TILE_FINE_POINTS_NUM])
 {
     memset(height, 0, (TILE_POINTS_NUM*TILE_POINTS_NUM)*sizeof(unsigned short));
     if (autoRead)

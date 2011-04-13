@@ -36,7 +36,7 @@ Hud::Hud()
         irr::core::dimension2du(MINIMAP_SIZE, MINIMAP_SIZE), false);
     miniMapQuad->getMaterial().MaterialType = Shaders::getInstance()->materialMap["quad2d"];
 
-    ScreenQuad compassQuad(TheGame::getInstance()->getDriver(),
+    compassQuad = new ScreenQuad(TheGame::getInstance()->getDriver(),
         irr::core::position2di(10, TheGame::getInstance()->getDriver()->getScreenSize().Height - MINIMAP_SIZE - 10),
         irr::core::dimension2du(MINIMAP_SIZE, MINIMAP_SIZE), false);
     compassQuad->getMaterial().MaterialType = Shaders::getInstance()->materialMap["quad2d_t"];
@@ -75,7 +75,7 @@ void Hud::preRender(float angle)
     miniMapQuad->getMaterial().setTexture(0, TheEarth::getInstance()->getMiniMapTexture());
     compassQuad->rotate(-angle-90.f);
 }    
-void Hud::render(float angle)
+void Hud::render()
 {
     if (!visible) return;
     
