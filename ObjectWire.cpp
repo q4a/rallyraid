@@ -9,127 +9,115 @@
 #include "TheEarth.h"
 #include "Terrain_defs.h"
 #include "stdafx.h"
-#include <list>
 #include <assert.h>
 #include <string.h>
 #include <math.h>
 
 
 
-class ObjectWireTile
+ObjectWireTile::ObjectWireTile(const irr::core::vector2df& apos, const irr::core::vector2di& rpos)
+    : apos(apos),
+        rpos(rpos),
+        objectList()
 {
-private:
-    ObjectWireTile(const irr::core::vector2df& apos, const irr::core::vector2di& rpos)
-        : apos(apos),
-          rpos(rpos),
-          objectList()
-    {
-        //printf("ObjectWireTile::ObjectWireTile()\n");
-        const unsigned int objectWireNum = Settings::getInstance()->objectWireNum;
-        const unsigned int objectWireSize = Settings::getInstance()->objectWireSize;
-        const unsigned int objectDensity = Settings::getInstance()->objectDensity;
-        // TODO: we need more detailed density maps.
-        irr::video::SColor density = TheEarth::getInstance()->getEarthDensity(
-            (unsigned int)abs((int)apos.X/TILE_SIZE), (unsigned int)abs((int)apos.Y/TILE_SIZE));
+    //printf("ObjectWireTile::ObjectWireTile()\n");
+    const unsigned int objectWireNum = Settings::getInstance()->objectWireNum;
+    const unsigned int objectWireSize = Settings::getInstance()->objectWireSize;
+    const unsigned int objectDensity = Settings::getInstance()->objectDensity;
+    // TODO: we need more detailed density maps.
+    irr::video::SColor density = TheEarth::getInstance()->getEarthDensity(
+        (unsigned int)abs((int)apos.X/TILE_SIZE), (unsigned int)abs((int)apos.Y/TILE_SIZE));
 
-        const ObjectPoolManager::objectPoolMap_t& objectPoolMap = ObjectPoolManager::getInstance()->getObjectPoolMap();
+    const ObjectPoolManager::objectPoolMap_t& objectPoolMap = ObjectPoolManager::getInstance()->getObjectPoolMap();
         
-        for (ObjectPoolManager::objectPoolMap_t::const_iterator opIt = objectPoolMap.begin();
-             opIt != objectPoolMap.end();
-             opIt++)
+    for (ObjectPoolManager::objectPoolMap_t::const_iterator opIt = objectPoolMap.begin();
+            opIt != objectPoolMap.end();
+            opIt++)
+    {
+        ObjectPool* objectPool = opIt->second;
+        unsigned int num = objectPool->getNum();
+        unsigned int category = objectPool->getCategory();
+            
+        unsigned int rep = 0;
+            
+        if ((category & 1) == 1)
         {
-            ObjectPool* objectPool = opIt->second;
-            unsigned int num = objectPool->getNum();
-            unsigned int category = objectPool->getCategory();
+            rep += density.getRed();
+        }
+        if ((category & 2) == 2)
+        {
+            rep += density.getGreen();
+        }
+        if ((category & 4) == 4)
+        {
+            rep += density.getBlue();
+        }
+        if (rep > 255) rep = 255;
             
-            unsigned int rep = 0;
+        //unsigned int cnt = (rep * num /* Settings::getInstance()->objectDensity*/) / (255/*100*/);
+
+        //printf("%s: %u\n", objectPool->getName().c_str(), cnt);
+        const unsigned int req = rep * objectDensity;
+
+        if (req == 0) continue;
             
+        for (unsigned int i = 0; i < num; i++)
+        {
+            irr::core::vector3df objectPos = irr::core::vector3df(
+                    (float)(rand()%(objectWireSize*10)) / 10.0f + apos.X,
+                    -50.f,
+                    (float)(rand()%(objectWireSize*10)) / 10.0f + apos.Y);
+                
+            irr::video::SColor fineDensity = TheEarth::getInstance()->getTileFineDensity(
+                (unsigned int)abs((int)objectPos.X/TILE_FINE_SCALE), (unsigned int)abs((int)objectPos.Z/TILE_FINE_SCALE));
+                
+            unsigned int newRep = 0;
+                
             if ((category & 1) == 1)
             {
-                rep += density.getRed();
+                newRep += fineDensity.getRed();
             }
             if ((category & 2) == 2)
             {
-                rep += density.getGreen();
+                newRep += fineDensity.getGreen();
             }
             if ((category & 4) == 4)
             {
-                rep += density.getBlue();
+                newRep += fineDensity.getBlue();
             }
             if (rep > 255) rep = 255;
-            
-            //unsigned int cnt = (rep * num /* Settings::getInstance()->objectDensity*/) / (255/*100*/);
-
-            //printf("%s: %u\n", objectPool->getName().c_str(), cnt);
-            const unsigned int req = rep * objectDensity;
-
-            if (req == 0) continue;
-            
-            for (unsigned int i = 0; i < num; i++)
+                
+            const unsigned int newReq = newRep * objectDensity;
+            if (newReq >= 255*100 || (unsigned int)(rand()%(255*100)) < newReq)
             {
-                irr::core::vector3df objectPos = irr::core::vector3df(
-                     (float)(rand()%(objectWireSize*10)) / 10.0f + apos.X,
-                     -50.f,
-                     (float)(rand()%(objectWireSize*10)) / 10.0f + apos.Y);
                 
-                irr::video::SColor fineDensity = TheEarth::getInstance()->getTileFineDensity(
-                    (unsigned int)abs((int)objectPos.X/TILE_FINE_SCALE), (unsigned int)abs((int)objectPos.Z/TILE_FINE_SCALE));
+                objectPos.Y = TheEarth::getInstance()->getHeight(objectPos-OffsetManager::getInstance()->getOffset());
+                //printf("opos: %f %f %f\n", objectPos.X, objectPos.Y, objectPos.Z);
                 
-                unsigned int newRep = 0;
-                
-                if ((category & 1) == 1)
-                {
-                    newRep += fineDensity.getRed();
-                }
-                if ((category & 2) == 2)
-                {
-                    newRep += fineDensity.getGreen();
-                }
-                if ((category & 4) == 4)
-                {
-                    newRep += fineDensity.getBlue();
-                }
-                if (rep > 255) rep = 255;
-                
-                const unsigned int newReq = newRep * objectDensity;
-                if (newReq >= 255*100 || (unsigned int)(rand()%(255*100)) < newReq)
-                {
-                
-                    objectPos.Y = TheEarth::getInstance()->getHeight(objectPos-OffsetManager::getInstance()->getOffset());
-                    //printf("opos: %f %f %f\n", objectPos.X, objectPos.Y, objectPos.Z);
-                
-                    if (objectPos.Y > 10.f)
-                    {                
-                        OffsetObject* oo = objectPool->getObject(objectPos);
-                        if (oo)
-                        {
-                            objectList.push_back(oo);
-                        }
+                if (objectPos.Y > 10.f)
+                {                
+                    OffsetObject* oo = objectPool->getObject(objectPos);
+                    if (oo)
+                    {
+                        objectList.push_back(oo);
                     }
                 }
             }
         }
     }
+}
     
-    ~ObjectWireTile()
+ObjectWireTile::~ObjectWireTile()
+{
+    for (std::list<OffsetObject*>::iterator it = objectList.begin();
+            it != objectList.end();
+            it++)
     {
-        for (std::list<OffsetObject*>::iterator it = objectList.begin();
-             it != objectList.end();
-             it++)
-        {
-            ObjectPoolManager::getInstance()->putObject(*it);
-        }
-        objectList.clear();
+        ObjectPoolManager::getInstance()->putObject(*it);
     }
+    objectList.clear();
+}
 
-private:
-    irr::core::vector2df        apos;
-    irr::core::vector2di        rpos;
-    std::list<OffsetObject*>    objectList;
-
-private:
-    friend class ObjectWire;
-};
 
 
 ObjectWire* ObjectWire::objectWire = 0;
@@ -157,7 +145,7 @@ ObjectWire::ObjectWire()
       lastWireCenter(),
       globalObjectWire()
 {
-    unsigned int objectWireNum = Settings::getInstance()->objectWireNum;
+    const unsigned int objectWireNum = Settings::getInstance()->objectWireNum;
     assert(objectWireNum);
     
     tiles = new ObjectWireTile*[objectWireNum*objectWireNum];

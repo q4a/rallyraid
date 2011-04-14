@@ -972,7 +972,8 @@ void TheEarth::update(const irr::core::vector3df& pos, const irr::core::vector3d
 
     if (!lastPosBox.isPointInside(irr::core::vector3df(pos.X, 0.0f, pos.Z)))
     {
-        printf("start create new\n");        
+        printf("start create new\n");
+        
         newVisualPart = new VisualMembers();
         lastCenterPosi = irr::core::vector3di(((int)(pos.X/TILE_SCALE_F))*TILE_SCALE, 0, ((int)(pos.Z/TILE_SCALE_F))*TILE_SCALE);
         //lastCenterPosi = irr::core::vector3di((int)pos.X, 0, (int)pos.Z);

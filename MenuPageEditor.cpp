@@ -7,16 +7,20 @@
 #include "ObjectWire.h"
 #include "ObjectPool.h"
 #include "ObjectPoolManager.h"
+#include "RaceManager.h"
+#include "Race.h"
+#include "Settings.h"
 
 MenuPageEditor::MenuPageEditor()
     : window(0),
       tableTiles(0),
       tableObjectWire(0),
+      tableObjectWireTiles(0),
       tableObjectPool(0),
       tableRaceManager(0)
 {
     window = TheGame::getInstance()->getEnv()->addWindow(
-        irr::core::recti(TheGame::getInstance()->getScreenSize().Width-250, 50, TheGame::getInstance()->getScreenSize().Width-10, TheGame::getInstance()->getScreenSize().Height-150),
+        irr::core::recti(TheGame::getInstance()->getScreenSize().Width-300, 50, TheGame::getInstance()->getScreenSize().Width-10, TheGame::getInstance()->getScreenSize().Height-150),
         false,
         L"Editor",
         0,
@@ -38,7 +42,7 @@ MenuPageEditor::MenuPageEditor()
     // ----------------------------
     // Tiles tab
     // ----------------------------
-    irr::gui::IGUITab* tabTiles = tc->addTab(L"Tiles", MI_TABTILES);
+    irr::gui::IGUITab* tabTiles = tc->addTab(L"Tls", MI_TABTILES);
 
     tableTiles = TheGame::getInstance()->getEnv()->addTable(
         irr::core::recti(irr::core::position2di(0, 0), tabTiles->getRelativePosition().getSize()),
@@ -54,7 +58,7 @@ MenuPageEditor::MenuPageEditor()
     // ----------------------------
     // ObjectWire tab
     // ----------------------------
-    irr::gui::IGUITab* tabObjectWire = tc->addTab(L"ObjectWire", MI_TABOBJECTWIRE);
+    irr::gui::IGUITab* tabObjectWire = tc->addTab(L"OW_G", MI_TABOBJECTWIRE);
 
     tableObjectWire = TheGame::getInstance()->getEnv()->addTable(
         irr::core::recti(irr::core::position2di(0, 0), tabObjectWire->getRelativePosition().getSize()),
@@ -67,9 +71,25 @@ MenuPageEditor::MenuPageEditor()
     tableObjectWire->addColumn(L"objects");
 
     // ----------------------------
+    // ObjectWireTiles tab
+    // ----------------------------
+    irr::gui::IGUITab* tabObjectWireTiles = tc->addTab(L"OW_T", MI_TABOBJECTWIRETILES);
+
+    tableObjectWireTiles = TheGame::getInstance()->getEnv()->addTable(
+        irr::core::recti(irr::core::position2di(0, 0), tabObjectWireTiles->getRelativePosition().getSize()),
+        tabObjectWireTiles,
+        MI_TABLEOBJECTWIRETILES,
+        true);
+
+    tableObjectWireTiles->addColumn(L"#");
+    tableObjectWireTiles->addColumn(L"X");
+    tableObjectWireTiles->addColumn(L"Y");
+    tableObjectWireTiles->addColumn(L"objects");
+
+    // ----------------------------
     // ObjectPool tab
     // ----------------------------
-    irr::gui::IGUITab* tabObjectPool = tc->addTab(L"ObjectPool", MI_TABOBJECTPOOL);
+    irr::gui::IGUITab* tabObjectPool = tc->addTab(L"OPool", MI_TABOBJECTPOOL);
 
     tableObjectPool = TheGame::getInstance()->getEnv()->addTable(
         irr::core::recti(irr::core::position2di(0, 0), tabObjectPool->getRelativePosition().getSize()),
@@ -87,7 +107,7 @@ MenuPageEditor::MenuPageEditor()
     // ----------------------------
     // RaceManager tab
     // ----------------------------
-    irr::gui::IGUITab* tabRaceManager = tc->addTab(L"RaceManager", MI_TABRACEMANAGER);
+    irr::gui::IGUITab* tabRaceManager = tc->addTab(L"RM", MI_TABRACEMANAGER);
 
     tableRaceManager = TheGame::getInstance()->getEnv()->addTable(
         irr::core::recti(irr::core::position2di(0, 0), tabRaceManager->getRelativePosition().getSize()),
@@ -205,7 +225,7 @@ void MenuPageEditor::refresh()
     {
         irr::core::stringw str;
         
-        tableObjectPool->addRow(i);
+        tableObjectWire->addRow(i);
 
         str += i;
         tableObjectWire->setCellText(i, 0, str.c_str());
@@ -217,6 +237,37 @@ void MenuPageEditor::refresh()
         str = L"";
         str += owit->second.size();
         tableObjectWire->setCellText(i, 2, str.c_str());
+    }
+
+    // ----------------------------
+    // ObjectWireTiles
+    // ----------------------------
+    tableObjectWireTiles->clearRows();
+
+    i = 0;
+    const unsigned int objectWireNum = Settings::getInstance()->objectWireNum;
+    while (i < objectWireNum*objectWireNum)
+    {
+        irr::core::stringw str;
+        
+        tableObjectWireTiles->addRow(i);
+
+        str += i;
+        tableObjectWireTiles->setCellText(i, 0, str.c_str());
+
+        str = L"";
+        str += ObjectWire::getInstance()->tiles[i]->rpos.X;
+        tableObjectWireTiles->setCellText(i, 1, str.c_str());
+
+        str = L"";
+        str += ObjectWire::getInstance()->tiles[i]->rpos.Y;
+        tableObjectWireTiles->setCellText(i, 2, str.c_str());
+
+        str = L"";
+        str += ObjectWire::getInstance()->tiles[i]->objectList.size();
+        tableObjectWireTiles->setCellText(i, 3, str.c_str());
+
+        i++;
     }
 
     // ----------------------------
@@ -247,15 +298,15 @@ void MenuPageEditor::refresh()
 
         str = L"";
         str += opit->second->num;
-        tableObjectPool->setCellText(i, 2, str.c_str());
+        tableObjectPool->setCellText(i, 3, str.c_str());
 
         str = L"";
         str += opit->second->inUse;
-        tableObjectPool->setCellText(i, 2, str.c_str());
+        tableObjectPool->setCellText(i, 4, str.c_str());
 
         str = L"";
         str += opit->second->objectList.size();
-        tableObjectPool->setCellText(i, 2, str.c_str());
+        tableObjectPool->setCellText(i, 5, str.c_str());
     }
 
     // ----------------------------
@@ -281,7 +332,7 @@ void MenuPageEditor::refresh()
         tableRaceManager->setCellText(i, 1, str.c_str());
 
         str = L"";
-        str += rit->second->getLongName();
+        str += rit->second->getLongName().c_str();
         tableRaceManager->setCellText(i, 2, str.c_str());
     }
 

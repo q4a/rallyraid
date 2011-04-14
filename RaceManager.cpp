@@ -43,6 +43,7 @@ RaceManager::RaceManager()
       editorDay(0),
       editorStage(0)
 {
+    read();
 }
 
 RaceManager::~RaceManager()
@@ -119,7 +120,6 @@ void RaceManager::read()
     if (error)
     {
         printf("unable to open file for write %s\n", fileName.c_str());
-        delete tmp;
         return false;
     }
 
@@ -129,6 +129,7 @@ void RaceManager::read()
         shortDescription = tmp;
     }*/
     fclose(f);
+    return true;
 }
 
 /* static */ void RaceManager::readGlobalObjects(const std::string& fileName, RaceManager::globalObjectList_t& globalObjectList)

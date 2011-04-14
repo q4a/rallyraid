@@ -61,7 +61,7 @@ bool Day::readCfg()
     while (seci.hasMoreElements())
     {
         secName = seci.peekNextKey();
-        dprintf(MY_DEBUG_NOTE, "\tSection: %s\n", secName.c_str());
+        dprintf(MY_DEBUG_NOTE, "\tSection d: %s\n", secName.c_str());
         ConfigFile::SettingsMultiMap *settings = seci.getNext();
         ConfigFile::SettingsMultiMap::iterator i;
         for (i = settings->begin(); i != settings->end(); ++i)
@@ -144,13 +144,13 @@ bool Day::writeCfg()
         return false;
     }
 
-    ret = fprintf(f, "long_name=%s\n", raceLongName.c_str());
+    ret = fprintf(f, "long_name=%s\n", dayLongName.c_str());
 
     fclose(f);
     return true;
 }
 
-void Day::writeShortDescription()
+bool Day::writeShortDescription()
 {
     return RaceManager::writeShortDescription(DAY_DIR(raceName, dayName) + "/" + DESCRIPTION_TXT, shortDescription);
 }

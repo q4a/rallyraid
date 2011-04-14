@@ -47,7 +47,7 @@ bool Stage::readCfg()
     while (seci.hasMoreElements())
     {
         secName = seci.peekNextKey();
-        dprintf(MY_DEBUG_NOTE, "\tSection: %s\n", secName.c_str());
+        dprintf(MY_DEBUG_NOTE, "\tSection s: %s\n", secName.c_str());
         ConfigFile::SettingsMultiMap *settings = seci.getNext();
         ConfigFile::SettingsMultiMap::iterator i;
         for (i = settings->begin(); i != settings->end(); ++i)
@@ -98,13 +98,13 @@ bool Stage::writeCfg()
         return false;
     }
 
-    ret = fprintf(f, "long_name=%s\n", raceLongName.c_str());
+    ret = fprintf(f, "long_name=%s\n", stageLongName.c_str());
 
     fclose(f);
     return true;
 }
 
-void Stage::writeShortDescription()
+bool Stage::writeShortDescription()
 {
     return RaceManager::writeShortDescription(STAGE_DIR(raceName, dayName, stageName) + "/" + DESCRIPTION_TXT, shortDescription);
 }

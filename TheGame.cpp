@@ -75,6 +75,7 @@ TheGame::TheGame()
 
     irr::SIrrlichtCreationParameters params;
     params.DriverType = irr::video::EDT_DIRECT3D9 /*irr::video::EDT_OPENGL*/;
+    params.WindowSize = irr::core::dimension2du(1280, 800);
 
     readSettings(params);
 

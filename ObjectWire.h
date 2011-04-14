@@ -6,9 +6,26 @@
 #include <map>
 #include <set>
 #include <string>
+#include <list>
 
-class ObjectWireTile;
+class OffsetObject;
 class ObjectWireGlobalObject;
+
+class ObjectWireTile
+{
+private:
+    ObjectWireTile(const irr::core::vector2df& apos, const irr::core::vector2di& rpos);
+    ~ObjectWireTile();
+
+private:
+    irr::core::vector2df        apos;
+    irr::core::vector2di        rpos;
+    std::list<OffsetObject*>    objectList;
+
+
+    friend class ObjectWire;
+    friend class MenuPageEditor;
+};
 
 class ObjectWire
 {
@@ -38,7 +55,8 @@ private:
     typedef std::map<int, globalObjectSet_t> globalObjectWire_t;
 
     ObjectWireTile**        tiles;
-    irr::core::vector2di    lastWireCenter;   // devided by objectWireSize
+    irr::core::vector2di    lastWireCenter;
+   // devided by objectWireSize
     globalObjectWire_t      globalObjectWire;
 
 

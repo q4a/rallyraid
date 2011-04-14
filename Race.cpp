@@ -73,7 +73,7 @@ bool Race::readCfg()
     while (seci.hasMoreElements())
     {
         secName = seci.peekNextKey();
-        dprintf(MY_DEBUG_NOTE, "\tSection: %s\n", secName.c_str());
+        dprintf(MY_DEBUG_NOTE, "\tSection r: %s\n", secName.c_str());
         ConfigFile::SettingsMultiMap *settings = seci.getNext();
         ConfigFile::SettingsMultiMap::iterator i;
         for (i = settings->begin(); i != settings->end(); ++i)
@@ -134,7 +134,7 @@ void Race::readShortDescription()
 bool Race::readCompetitors()
 {
     ConfigFile cf;
-    cf.load(RACE_DIR(raceName)+"/"+RACE_CFG);
+    cf.load(RACE_DIR(raceName)+"/"+COMPETITORS_CFG);
 
     dprintf(MY_DEBUG_NOTE, "Read race-competitors cfg file: %s\n", raceName.c_str());
     // Go through all sections & settings in the file
@@ -151,14 +151,15 @@ bool Race::readCompetitors()
         unsigned int strength = 0;
 
         secName = seci.peekNextKey();
-        dprintf(MY_DEBUG_NOTE, "\tSection: %s\n", secName.c_str());
+        dprintf(MY_DEBUG_NOTE, "\tSection c: %s\n", secName.c_str());
 
         num = StringConverter::parseUnsignedInt(secName, 0);
 
+        ConfigFile::SettingsMultiMap *settings = seci.getNext();
+        ConfigFile::SettingsMultiMap::iterator i;
+
         if (num > 0)
         {
-            ConfigFile::SettingsMultiMap *settings = seci.getNext();
-            ConfigFile::SettingsMultiMap::iterator i;
             for (i = settings->begin(); i != settings->end(); ++i)
             {
                 keyName = i->first;
@@ -223,7 +224,7 @@ bool Race::writeCfg()
     return true;
 }
 
-void Race::writeShortDescription()
+bool Race::writeShortDescription()
 {
     return RaceManager::writeShortDescription(RACE_DIR(raceName) + "/" + DESCRIPTION_TXT, shortDescription);
 }

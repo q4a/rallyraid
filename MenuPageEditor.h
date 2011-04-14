@@ -15,11 +15,13 @@ public:
         MI_TABCONTROL,
         MI_TABTILES,
         MI_TABOBJECTWIRE,
+        MI_TABOBJECTWIRETILES,
         MI_TABOBJECTPOOL,
         MI_TABRACEMANAGER,
         MI_TAB5,
         MI_TABLETILES,
         MI_TABLEOBJECTWIRE,
+        MI_TABLEOBJECTWIRETILES,
         MI_TABLEOBJECTPOOL,
         MI_TABLERACEMANAGER,
         NUMBER_OF_MENUITEMS
@@ -40,6 +42,7 @@ private:
     irr::gui::IGUIWindow*   window;
     irr::gui::IGUITable*    tableTiles;
     irr::gui::IGUITable*    tableObjectWire;
+    irr::gui::IGUITable*    tableObjectWireTiles;
     irr::gui::IGUITable*    tableObjectPool;
     irr::gui::IGUITable*    tableRaceManager;
 };
