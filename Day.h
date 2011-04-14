@@ -25,6 +25,11 @@ private:
     void readShortDescription();
     void readGlobalObjects();
 
+    bool write();
+    bool writeCfg();
+    bool writeShortDescription();
+    bool writeGlobalObjects();
+
 public:
     Stage* getStage(const std::string& stageName); // inline
     const stageMap_t& getStageMap(); // inline
@@ -44,7 +49,12 @@ private:
     RaceManager::globalObjectList_t globalObjectList;
     bool                            active;
     
+
     friend class RaceManager;
+    friend class MenuPageEditor;
+    friend class MenuPageEditorRace;
+    friend class MenuPageEditorDay;
+    friend class MenuPageEditorStage;
 };
 
 

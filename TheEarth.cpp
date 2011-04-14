@@ -966,12 +966,13 @@ void TheEarth::update(const irr::core::vector3df& pos, const irr::core::vector3d
         visualPart = newReadyVisualPart;
         newReadyVisualPart = 0;
         visualPart->setVisible(true);
+        
         return;
     }
 
     if (!lastPosBox.isPointInside(irr::core::vector3df(pos.X, 0.0f, pos.Z)))
     {
-        printf("start create new\n");
+        printf("start create new\n");        
         newVisualPart = new VisualMembers();
         lastCenterPosi = irr::core::vector3di(((int)(pos.X/TILE_SCALE_F))*TILE_SCALE, 0, ((int)(pos.Z/TILE_SCALE_F))*TILE_SCALE);
         //lastCenterPosi = irr::core::vector3di((int)pos.X, 0, (int)pos.Z);
@@ -987,9 +988,13 @@ void TheEarth::update(const irr::core::vector3df& pos, const irr::core::vector3d
 
 void TheEarth::run()
 {
+    clearSetInUseFlagsForTiles();
+        
     newVisualPart->loadMembers(this);
     newReadyVisualPart = newVisualPart;
     newVisualPart = 0;
+    
+    // removeNotInUseTiles();
 }
 
 void TheEarth::registerVisual()
@@ -1069,4 +1074,31 @@ float TheEarth::getHeight(const irr::core::vector3df& pos)
 float TheEarth::getHeight(const irr::core::vector2df& pos)
 {
     return getHeight(pos.X, pos.Y);
+}
+
+void TheEarth::clearSetInUseFlagsForTiles()
+{
+    for (tileMap_t::const_iterator it = tileMap.begin(); it != tileMap.end(); it++)
+    {
+        it->second->clearInUse();
+    }
+}
+
+void TheEarth::removeNotInUseTiles()
+{
+    for (tileMap_t::iterator it = tileMap.begin(); it != tileMap.end(); /*it++*/)
+    {
+        if (!it->second->isInUse())
+        {
+            delete it->second;
+
+            tileMap_t::iterator tmpIt = it;
+            it++;
+            tileMap.erase(tmpIt);
+        }
+        else
+        {
+            it++;
+        }        
+    }
 }

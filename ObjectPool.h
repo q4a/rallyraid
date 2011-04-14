@@ -70,6 +70,11 @@ private:
     float                       mass;
     irr::core::vector3df        center;
     unsigned int                num;
+    
+    unsigned int                inUse;
+    
+    
+    friend class MenuPageEditor;
 };
 
 #endif // OBJECTPOOL_H

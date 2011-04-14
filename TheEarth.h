@@ -32,7 +32,7 @@ private:
     static TheEarth* theEarth;
     static irr::video::SColor baseColor;
     
-public:
+private:
     typedef std::map<unsigned int, Tile*> tileMap_t;
 
 private:
@@ -47,6 +47,8 @@ private:
     //bool setHasDetailTex(unsigned int x, unsigned int y, bool val);
     bool setEarthDensity(unsigned int x, unsigned int y, const irr::video::SColor& val);
     void refreshMiniMap();
+    void clearSetInUseFlagsForTiles();
+    void removeNotInUseTiles();
     
 public:
     unsigned short getTileHeight(unsigned int x, unsigned int y);
@@ -121,6 +123,7 @@ public:
     unsigned int getSizeX() {return xsize;}
     unsigned int getSizeY() {return ysize;}
 
+private:
     const tileMap_t& getTileMap() {return tileMap;}
 
 private:
@@ -172,6 +175,9 @@ private:
     unsigned short      minHeight;
     
     tileMap_t           tileMap;
+    
+    
+    friend class MenuPageEditor;
 
 };
 

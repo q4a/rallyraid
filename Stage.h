@@ -20,6 +20,11 @@ private:
     void readShortDescription();
     void readGlobalObjects();
 
+    bool write();
+    bool writeCfg();
+    bool writeShortDescription();
+    bool writeGlobalObjects();
+
 public:
     const std::string& getName(); // inline
     const std::string& getLongName(); // inline
@@ -37,7 +42,12 @@ private:
     RaceManager::globalObjectList_t globalObjectList;
     bool                            active;
     
+
     friend class RaceManager;
+    friend class MenuPageEditor;
+    friend class MenuPageEditorRace;
+    friend class MenuPageEditorDay;
+    friend class MenuPageEditorStage;
 };
 
 inline const std::string& Stage::getLongName()

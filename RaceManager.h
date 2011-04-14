@@ -20,6 +20,7 @@
 #define STAGE_DIR(RACE, DAY, STAGE) (DAY_DIR(RACE, DAY) + std::string("/") + STAGE) 
 #define STAGE_CFG                   (std::string("stage.cfg"))
 
+#define DESCRIPTION_TXT             (std::string("description.txt"))
 #define COMPETITORS_CFG             (std::string("competitors.cfg"))
 #define OBJECTS_CFG                 (std::string("objects.cfg"))
 
@@ -60,9 +61,12 @@ public:
 
 
     static void readShortDescription(const std::string& fileName, std::string& shortDescription);
+    static bool writeShortDescription(const std::string& fileName, const std::string& shortDescription);
+    
     static void readGlobalObjects(const std::string& fileName, globalObjectList_t& globalObjectList);
     static bool writeGlobalObjects(const std::string& fileName, const globalObjectList_t& globalObjectList);
     static void clearGlobalObjects(globalObjectList_t& globalObjectList);
+    
     static void addGlobalObjectsToObjectWire(const globalObjectList_t& globalObjectList);
     static void removeGlobalObjectsFromObjectWire(const globalObjectList_t& globalObjectList);
 
@@ -75,6 +79,16 @@ private:
     Race*       currentRace;
     Day*        currentDay;
     Stage*      currentStage;
+
+    Race*       editorRace;
+    Day*        editorDay;
+    Stage*      editorStage;
+
+
+    friend class MenuPageEditor;
+    friend class MenuPageEditorRace;
+    friend class MenuPageEditorDay;
+    friend class MenuPageEditorStage;
 };
 
 

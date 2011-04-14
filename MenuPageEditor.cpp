@@ -4,9 +4,16 @@
 #include "stdafx.h"
 
 #include "TheEarth.h"
+#include "ObjectWire.h"
+#include "ObjectPool.h"
+#include "ObjectPoolManager.h"
 
 MenuPageEditor::MenuPageEditor()
-    : window(0)
+    : window(0),
+      tableTiles(0),
+      tableObjectWire(0),
+      tableObjectPool(0),
+      tableRaceManager(0)
 {
     window = TheGame::getInstance()->getEnv()->addWindow(
         irr::core::recti(TheGame::getInstance()->getScreenSize().Width-250, 50, TheGame::getInstance()->getScreenSize().Width-10, TheGame::getInstance()->getScreenSize().Height-150),
@@ -28,8 +35,10 @@ MenuPageEditor::MenuPageEditor()
         true,
         MI_TABCONTROL);
 
+    // ----------------------------
+    // Tiles tab
+    // ----------------------------
     irr::gui::IGUITab* tabTiles = tc->addTab(L"Tiles", MI_TABTILES);
-    irr::gui::IGUITab* tab2 = tc->addTab(L"Empty", MI_TAB2);
 
     tableTiles = TheGame::getInstance()->getEnv()->addTable(
         irr::core::recti(irr::core::position2di(0, 0), tabTiles->getRelativePosition().getSize()),
@@ -41,6 +50,54 @@ MenuPageEditor::MenuPageEditor()
     tableTiles->addColumn(L"X");
     tableTiles->addColumn(L"Y");
     tableTiles->addColumn(L"in use");
+
+    // ----------------------------
+    // ObjectWire tab
+    // ----------------------------
+    irr::gui::IGUITab* tabObjectWire = tc->addTab(L"ObjectWire", MI_TABOBJECTWIRE);
+
+    tableObjectWire = TheGame::getInstance()->getEnv()->addTable(
+        irr::core::recti(irr::core::position2di(0, 0), tabObjectWire->getRelativePosition().getSize()),
+        tabObjectWire,
+        MI_TABLEOBJECTWIRE,
+        true);
+
+    tableObjectWire->addColumn(L"#");
+    tableObjectWire->addColumn(L"pos");
+    tableObjectWire->addColumn(L"objects");
+
+    // ----------------------------
+    // ObjectPool tab
+    // ----------------------------
+    irr::gui::IGUITab* tabObjectPool = tc->addTab(L"ObjectPool", MI_TABOBJECTPOOL);
+
+    tableObjectPool = TheGame::getInstance()->getEnv()->addTable(
+        irr::core::recti(irr::core::position2di(0, 0), tabObjectPool->getRelativePosition().getSize()),
+        tabObjectPool,
+        MI_TABLEOBJECTPOOL,
+        true);
+
+    tableObjectPool->addColumn(L"#");
+    tableObjectPool->addColumn(L"name");
+    tableObjectPool->addColumn(L"cat");
+    tableObjectPool->addColumn(L"num");
+    tableObjectPool->addColumn(L"in use");
+    tableObjectPool->addColumn(L"in cache");
+
+    // ----------------------------
+    // RaceManager tab
+    // ----------------------------
+    irr::gui::IGUITab* tabRaceManager = tc->addTab(L"RaceManager", MI_TABRACEMANAGER);
+
+    tableRaceManager = TheGame::getInstance()->getEnv()->addTable(
+        irr::core::recti(irr::core::position2di(0, 0), tabRaceManager->getRelativePosition().getSize()),
+        tabRaceManager,
+        MI_TABLERACEMANAGER,
+        true);
+
+    tableRaceManager->addColumn(L"#");
+    tableRaceManager->addColumn(L"name");
+    tableRaceManager->addColumn(L"long name");
 
     window->setVisible(false);
 }
@@ -103,9 +160,13 @@ void MenuPageEditor::close()
 
 void MenuPageEditor::refresh()
 {
+
+    // ----------------------------
+    // Tiles
+    // ----------------------------
     tableTiles->clearRows();
 
-    TheEarth::tileMap_t tileMap = TheEarth::getInstance()->getTileMap();
+    const TheEarth::tileMap_t& tileMap = TheEarth::getInstance()->getTileMap();
     unsigned int i = 0;
     for (TheEarth::tileMap_t::const_iterator tit = tileMap.begin();
          tit != tileMap.end();
@@ -130,4 +191,98 @@ void MenuPageEditor::refresh()
         str += tit->second->getInUse() ? L"true" : L"false";
         tableTiles->setCellText(i, 3, str.c_str());
     }
+
+    // ----------------------------
+    // ObjectWire
+    // ----------------------------
+    tableObjectWire->clearRows();
+
+    const ObjectWire::globalObjectWire_t& globalObjectWire = ObjectWire::getInstance()->globalObjectWire;
+    i = 0;
+    for (ObjectWire::globalObjectWire_t::const_iterator owit = globalObjectWire.begin();
+         owit != globalObjectWire.end();
+         owit++, i++)
+    {
+        irr::core::stringw str;
+        
+        tableObjectPool->addRow(i);
+
+        str += i;
+        tableObjectWire->setCellText(i, 0, str.c_str());
+
+        str = L"";
+        str += owit->first;
+        tableObjectWire->setCellText(i, 1, str.c_str());
+
+        str = L"";
+        str += owit->second.size();
+        tableObjectWire->setCellText(i, 2, str.c_str());
+    }
+
+    // ----------------------------
+    // ObjectPool
+    // ----------------------------
+    tableObjectPool->clearRows();
+
+    const ObjectPoolManager::objectPoolMap_t& objectPoolMap = ObjectPoolManager::getInstance()->getObjectPoolMap();
+    i = 0;
+    for (ObjectPoolManager::objectPoolMap_t::const_iterator opit = objectPoolMap.begin();
+         opit != objectPoolMap.end();
+         opit++, i++)
+    {
+        irr::core::stringw str;
+        
+        tableObjectPool->addRow(i);
+
+        str += i;
+        tableObjectPool->setCellText(i, 0, str.c_str());
+
+        str = L"";
+        str += opit->first.c_str();
+        tableObjectPool->setCellText(i, 1, str.c_str());
+
+        str = L"";
+        str += opit->second->category;
+        tableObjectPool->setCellText(i, 2, str.c_str());
+
+        str = L"";
+        str += opit->second->num;
+        tableObjectPool->setCellText(i, 2, str.c_str());
+
+        str = L"";
+        str += opit->second->inUse;
+        tableObjectPool->setCellText(i, 2, str.c_str());
+
+        str = L"";
+        str += opit->second->objectList.size();
+        tableObjectPool->setCellText(i, 2, str.c_str());
+    }
+
+    // ----------------------------
+    // RaceManager
+    // ----------------------------
+    tableRaceManager->clearRows();
+
+    const RaceManager::raceMap_t& raceMap = RaceManager::getInstance()->getRaceMap();
+    i = 0;
+    for (RaceManager::raceMap_t::const_iterator rit = raceMap.begin();
+         rit != raceMap.end();
+         rit++, i++)
+    {
+        irr::core::stringw str;
+        
+        tableRaceManager->addRow(i);
+
+        str += i;
+        tableRaceManager->setCellText(i, 0, str.c_str());
+
+        str = L"";
+        str += rit->first.c_str();
+        tableRaceManager->setCellText(i, 1, str.c_str());
+
+        str = L"";
+        str += rit->second->getLongName();
+        tableRaceManager->setCellText(i, 2, str.c_str());
+    }
+
 }

@@ -38,7 +38,10 @@ RaceManager::RaceManager()
       currentStageName(),
       currentRace(0),
       currentDay(0),
-      currentStage(0)
+      currentStage(0),
+      editorRace(0),
+      editorDay(0),
+      editorStage(0)
 {
 }
 
@@ -106,6 +109,26 @@ void RaceManager::read()
     }
     fclose(f);
     delete tmp;
+}
+
+/* static */ bool RaceManager::writeShortDescription(const std::string& fileName, const std::string& shortDescription)
+{
+    FILE* f;
+    
+    errno_t error = fopen_s(&f, fileName.c_str(), "wb");
+    if (error)
+    {
+        printf("unable to open file for write %s\n", fileName.c_str());
+        delete tmp;
+        return false;
+    }
+
+    /*size_t ret =*/ fwrite(shortDescription.data(), sizeof(char), shortDescription.size(), f);
+    /*if (ret)
+    {
+        shortDescription = tmp;
+    }*/
+    fclose(f);
 }
 
 /* static */ void RaceManager::readGlobalObjects(const std::string& fileName, RaceManager::globalObjectList_t& globalObjectList)

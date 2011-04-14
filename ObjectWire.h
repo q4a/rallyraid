@@ -38,8 +38,11 @@ private:
     typedef std::map<int, globalObjectSet_t> globalObjectWire_t;
 
     ObjectWireTile**        tiles;
-    irr::core::vector2di    lastWireCenter;
+    irr::core::vector2di    lastWireCenter;   // devided by objectWireSize
     globalObjectWire_t      globalObjectWire;
+
+
+    friend class MenuPageEditor;
 };
 
 #endif // OBJECTWIRE_H

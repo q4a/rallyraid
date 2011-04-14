@@ -27,6 +27,11 @@ private:
     void readShortDescription();
     bool readCompetitors();
     void readGlobalObjects();
+    
+    bool write();
+    bool writeCfg();
+    bool writeShortDescription();
+    bool writeGlobalObjects();
 
 public:
     Day* getDay(const std::string& dayName); // inline
@@ -47,8 +52,13 @@ private:
     competitorMap_t                 competitorMap;
     RaceManager::globalObjectList_t globalObjectList;
     bool                            active;
+
     
     friend class RaceManager;
+    friend class MenuPageEditor;
+    friend class MenuPageEditorRace;
+    friend class MenuPageEditorDay;
+    friend class MenuPageEditorStage;
 };
 
 

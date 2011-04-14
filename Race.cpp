@@ -128,7 +128,7 @@ bool Race::readDays()
 
 void Race::readShortDescription()
 {
-    RaceManager::readShortDescription(RACE_DIR(raceName) + "/description.txt", shortDescription);
+    RaceManager::readShortDescription(RACE_DIR(raceName) + "/" + DESCRIPTION_TXT, shortDescription);
 }
 
 bool Race::readCompetitors()
@@ -196,6 +196,43 @@ void Race::readGlobalObjects()
 {
     RaceManager::readGlobalObjects(RACE_DIR(raceName) + "/" + OBJECTS_CFG, globalObjectList);
 }
+
+bool Race::write()
+{
+    bool ret = writeCfg();
+    ret &= writeShortDescription();
+    ret &= writeGlobalObjects();
+    return ret;
+}
+
+bool Race::writeCfg()
+{
+    FILE* f;
+    int ret = 0;
+    std::string fileName = RACE_DIR(raceName)+"/"+RACE_CFG;
+    errno_t error = fopen_s(&f, fileName.c_str(), "w");
+    if (error)
+    {
+        printf("unable to open file for write %s\n", fileName.c_str());
+        return false;
+    }
+
+    ret = fprintf(f, "long_name=%s\n", raceLongName.c_str());
+
+    fclose(f);
+    return true;
+}
+
+void Race::writeShortDescription()
+{
+    return RaceManager::writeShortDescription(RACE_DIR(raceName) + "/" + DESCRIPTION_TXT, shortDescription);
+}
+
+bool Race::writeGlobalObjects()
+{
+    return RaceManager::writeGlobalObjects(RACE_DIR(raceName) + "/" + OBJECTS_CFG, globalObjectList);
+}
+
 
 void Race::activate()
 {

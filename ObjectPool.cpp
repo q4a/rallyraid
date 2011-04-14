@@ -44,7 +44,8 @@ ObjectPool::ObjectPool(const std::string& name,
       friction(friction),
       mass(mass),
       center(center),
-      num(num)
+      num(num),
+      inUse(0)
 {
     if (meshFilename == "" && objectType == Grass)
     {
@@ -180,6 +181,7 @@ OffsetObject* ObjectPool::getObject(const irr::core::vector3df& apos, const irr:
     }
 
     offsetObject->setPool(this);
+    inUse++;
 
     if (addToOffsetManager)
     {
@@ -218,6 +220,7 @@ void ObjectPool::putObject(OffsetObject* object)
         object->setNode(0);
         delete object;
     }
+    inUse--;
 }
 
 OffsetObject* ObjectPool::createNewInstance()

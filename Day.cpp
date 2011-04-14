@@ -116,12 +116,48 @@ bool Day::readStages()
 
 void Day::readShortDescription()
 {
-    RaceManager::readShortDescription(DAY_DIR(raceName, dayName) + "/description.txt", shortDescription);
+    RaceManager::readShortDescription(DAY_DIR(raceName, dayName) + "/" + DESCRIPTION_TXT, shortDescription);
 }
 
 void Day::readGlobalObjects()
 {
     RaceManager::readGlobalObjects(DAY_DIR(raceName, dayName) + "/" + OBJECTS_CFG, globalObjectList);
+}
+
+bool Day::write()
+{
+    bool ret = writeCfg();
+    ret &= writeShortDescription();
+    ret &= writeGlobalObjects();
+    return ret;
+}
+
+bool Day::writeCfg()
+{
+    FILE* f;
+    int ret = 0;
+    std::string fileName = DAY_DIR(raceName, dayName)+"/"+DAY_CFG;
+    errno_t error = fopen_s(&f, fileName.c_str(), "w");
+    if (error)
+    {
+        printf("unable to open file for write %s\n", fileName.c_str());
+        return false;
+    }
+
+    ret = fprintf(f, "long_name=%s\n", raceLongName.c_str());
+
+    fclose(f);
+    return true;
+}
+
+void Day::writeShortDescription()
+{
+    return RaceManager::writeShortDescription(DAY_DIR(raceName, dayName) + "/" + DESCRIPTION_TXT, shortDescription);
+}
+
+bool Day::writeGlobalObjects()
+{
+    return RaceManager::writeGlobalObjects(DAY_DIR(raceName, dayName) + "/" + OBJECTS_CFG, globalObjectList);
 }
 
 void Day::activate()

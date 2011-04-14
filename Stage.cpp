@@ -70,12 +70,48 @@ bool Stage::readCfg()
 
 void Stage::readShortDescription()
 {
-    RaceManager::readShortDescription(STAGE_DIR(raceName, dayName, stageName) + "/description.txt", shortDescription);
+    RaceManager::readShortDescription(STAGE_DIR(raceName, dayName, stageName) + "/" + DESCRIPTION_TXT, shortDescription);
 }
 
 void Stage::readGlobalObjects()
 {
     RaceManager::readGlobalObjects(STAGE_DIR(raceName, dayName, stageName) + "/" + OBJECTS_CFG, globalObjectList);
+}
+
+bool Stage::write()
+{
+    bool ret = writeCfg();
+    ret &= writeShortDescription();
+    ret &= writeGlobalObjects();
+    return ret;
+}
+
+bool Stage::writeCfg()
+{
+    FILE* f;
+    int ret = 0;
+    std::string fileName = STAGE_DIR(raceName, dayName, stageName)+"/"+STAGE_CFG;
+    errno_t error = fopen_s(&f, fileName.c_str(), "w");
+    if (error)
+    {
+        printf("unable to open file for write %s\n", fileName.c_str());
+        return false;
+    }
+
+    ret = fprintf(f, "long_name=%s\n", raceLongName.c_str());
+
+    fclose(f);
+    return true;
+}
+
+void Stage::writeShortDescription()
+{
+    return RaceManager::writeShortDescription(STAGE_DIR(raceName, dayName, stageName) + "/" + DESCRIPTION_TXT, shortDescription);
+}
+
+bool Stage::writeGlobalObjects()
+{
+    return RaceManager::writeGlobalObjects(STAGE_DIR(raceName, dayName, stageName) + "/" + OBJECTS_CFG, globalObjectList);
 }
 
 void Stage::activate()

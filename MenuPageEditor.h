@@ -14,11 +14,14 @@ public:
         MI_BUTTONREFRESH,
         MI_TABCONTROL,
         MI_TABTILES,
-        MI_TAB2,
-        MI_TAB3,
-        MI_TAB4,
+        MI_TABOBJECTWIRE,
+        MI_TABOBJECTPOOL,
+        MI_TABRACEMANAGER,
         MI_TAB5,
         MI_TABLETILES,
+        MI_TABLEOBJECTWIRE,
+        MI_TABLEOBJECTPOOL,
+        MI_TABLERACEMANAGER,
         NUMBER_OF_MENUITEMS
     };
 
@@ -36,6 +39,9 @@ private:
 private:
     irr::gui::IGUIWindow*   window;
     irr::gui::IGUITable*    tableTiles;
+    irr::gui::IGUITable*    tableObjectWire;
+    irr::gui::IGUITable*    tableObjectPool;
+    irr::gui::IGUITable*    tableRaceManager;
 };
 
 #endif // MENUPAGEEDITOR_H
