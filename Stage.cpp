@@ -30,6 +30,7 @@ bool Stage::read()
     if (ret)
     {
         readShortDescription();
+        readGlobalObjects();
     }
     return ret;
 }

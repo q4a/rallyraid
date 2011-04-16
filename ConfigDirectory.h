@@ -14,6 +14,7 @@ public:
     //virtual ~ConfigFile();
     /// load from a filename (not using resource group locations)
     static bool load(const irr::io::path& path, const irr::io::path& cfgFilename, fileList_t& fileList);
+    static bool load(const irr::io::path& path, fileList_t& fileList);
 
 };
 

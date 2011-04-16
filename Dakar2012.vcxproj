@@ -114,6 +114,10 @@
     <ClInclude Include="Player_defs.h" />
     <ClInclude Include="Race.h" />
     <ClInclude Include="RaceManager.h" />
+    <ClInclude Include="Road.h" />
+    <ClInclude Include="RoadManager.h" />
+    <ClInclude Include="RoadType.h" />
+    <ClInclude Include="RoadTypeManager.h" />
     <ClInclude Include="ScreenQuad.h" />
     <ClInclude Include="Settings.h" />
     <ClInclude Include="Shaders.h" />
@@ -160,6 +164,10 @@
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Race.cpp" />
     <ClCompile Include="RaceManager.cpp" />
+    <ClCompile Include="Road.cpp" />
+    <ClCompile Include="RoadManager.cpp" />
+    <ClCompile Include="RoadType.cpp" />
+    <ClCompile Include="RoadTypeManager.cpp" />
     <ClCompile Include="Settings.cpp" />
     <ClCompile Include="Shaders.cpp" />
     <ClCompile Include="ShadersSM20.cpp" />
