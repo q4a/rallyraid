@@ -13,17 +13,23 @@ public:
         MI_WINDOW = MAX_MENU_ITEMS * MenuManager::MP_EDITOR,
         MI_BUTTONREFRESH,
         MI_TABCONTROL,
+
         MI_TABTILES,
         MI_TABOBJECTWIRE,
         MI_TABOBJECTWIRETILES,
         MI_TABOBJECTPOOL,
         MI_TABRACEMANAGER,
-        MI_TAB5,
+        MI_TABROADMANAGER,
+
         MI_TABLETILES,
         MI_TABLEOBJECTWIRE,
         MI_TABLEOBJECTWIRETILES,
         MI_TABLEOBJECTPOOL,
         MI_TABLERACEMANAGER,
+        MI_TABLEROADMANAGERG,
+        MI_TABLEROADMANAGERS,
+        MI_TABLEROADMANAGERV,
+
         NUMBER_OF_MENUITEMS
     };
 
@@ -38,6 +44,13 @@ protected:
 
 private:
     void refresh();
+    void refreshTiles();
+    void refreshObjectWire();
+    void refreshObjectWireTiles();
+    void refreshObjectPool();
+    void refreshRaceManager();
+    void refreshRoadManager();
+
 private:
     irr::gui::IGUIWindow*   window;
     irr::gui::IGUITable*    tableTiles;
@@ -45,6 +58,9 @@ private:
     irr::gui::IGUITable*    tableObjectWireTiles;
     irr::gui::IGUITable*    tableObjectPool;
     irr::gui::IGUITable*    tableRaceManager;
+    irr::gui::IGUITable*    tableRoadManagerG;
+    irr::gui::IGUITable*    tableRoadManagerS;
+    irr::gui::IGUITable*    tableRoadManagerV;
 };
 
 #endif // MENUPAGEEDITOR_H

@@ -3,9 +3,14 @@
 #include "TheGame.h"
 
 RoadType::RoadType(FILE* f, bool& ret)
-    : name()
+    : name(),
+      slicePoints(),
+      sliceIndices(),
+      texture(0),
+      frictionMulti(0.0f),
+      tRate(0.0f)
 {
-    ret = read(f);
+    ret = read(f) && !name.empty();
 }
 
 RoadType::~RoadType()
@@ -27,14 +32,15 @@ bool RoadType::read(FILE* f)
     memset(cname, 0, sizeof(cname));
     memset(textureName, 0, sizeof(textureName));
 
-    ret = fscanf_s(f, "name: %s\n", cname);
+    ret = fscanf_s(f, "name: %s\n", cname, 255);
     if (ret < 1)
     {
         printf("error reading name from road types file\n");
         return false;
     }
+    name = cname;
 
-    ret = fscanf_s(f, "texture: %s\n", textureName);
+    ret = fscanf_s(f, "texture: %s\n", textureName, 255);
     if (ret < 1)
     {
         printf("error reading texture name from road types file\n");

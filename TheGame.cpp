@@ -17,6 +17,8 @@
 #include "RaceManager.h"
 #include "MenuManager.h"
 #include "Hud.h"
+#include "RoadManager.h"
+#include "RoadTypeManager.h"
 
 // static stuff
 TheGame* TheGame::theGame = 0;
@@ -58,6 +60,8 @@ TheGame::TheGame()
       raceManager(0),
       menuManager(0),
       hud(0),
+      roadManager(0),
+      roadTypeManager(0),
       terminate(true),
       windowId(0),
       lastScreenSize(),
@@ -143,6 +147,12 @@ TheGame::TheGame()
         dprintf(MY_DEBUG_NOTE, "Initialize hud\n");
         Hud::initialize();
         hud = Hud::getInstance();
+        dprintf(MY_DEBUG_NOTE, "Initialize road type manager\n");
+        RoadTypeManager::initialize();
+        roadTypeManager = RoadTypeManager::getInstance();
+        dprintf(MY_DEBUG_NOTE, "Initialize road manager\n");
+        RoadManager::initialize();
+        roadManager = RoadManager::getInstance();
 
         testText = env->addStaticText(L"", irr::core::recti(10, 10, 790, 30), false, true, 0, -1, true);
     }
@@ -178,7 +188,13 @@ TheGame::~TheGame()
     raceManager = 0;
     menuManager = 0;
     hud = 0;
+    roadManager = 0;
+    roadTypeManager = 0;
 
+    dprintf(MY_DEBUG_NOTE, "Finalize road manager\n");
+    RoadManager::finalize();
+    dprintf(MY_DEBUG_NOTE, "Finalize road type manager\n");
+    RoadTypeManager::finalize();
     dprintf(MY_DEBUG_NOTE, "Finalize hud\n");
     Hud::finalize();
     dprintf(MY_DEBUG_NOTE, "Finalize menu manager\n");

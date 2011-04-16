@@ -37,7 +37,7 @@ private:
     roadPointVector_t       roadPointVector;
 
 
-    friend class RaceManager;
+    friend class RoadManager;
     friend class MenuPageEditor;
     friend class MenuPageEditorRoad;
 };

@@ -5,7 +5,8 @@
 #include "ConfigDirectory.h"
 #include "ConfigFile.h"
 #include "StringConverter.h"
-
+#include "Terrain_defs.h"
+#include "TheEarth.h"
 
 RoadManager* RoadManager::roadManager = 0;
 
@@ -30,7 +31,7 @@ void RoadManager::finalize()
 RoadManager::RoadManager()
     : roadMap(),
       stageRoadChunkListMap(),
-      visibleRoadChunkListSet(),
+      visibleRoadChunkSet(),
       editorRoad(0)
 {
     read();
@@ -83,5 +84,62 @@ void RoadManager::readRoads(const std::string& dirName, RoadManager::roadMap_t& 
             dprintf(MY_DEBUG_ERROR, "road file is invalid: %s\n", roadFilename.c_str());
             delete road;
         }
+    }
+}
+
+void RoadManager::addStageRoad(Road* road)
+{
+    unsigned long ps = road->roadPointVector.size();
+    if (ps == 0) return;
+
+    RoadRoadChunk currentChunk;
+    currentChunk.road = road;
+    currentChunk.roadChunk = roadChunk_t(0, 0);
+    unsigned int currentTile = TheEarth::getInstance()->calculateTileNum(
+        (unsigned int)abs((int)road->roadPointVector[0].X), (unsigned int)abs((int)road->roadPointVector[0].Z));
+
+    for (unsigned int i = 1; i < ps; i++)
+    {
+        unsigned int newTile = TheEarth::getInstance()->calculateTileNum(
+            (unsigned int)abs((int)road->roadPointVector[i].X), (unsigned int)abs((int)road->roadPointVector[i].Z));
+        if (newTile != currentTile)
+        {
+            currentChunk.roadChunk.second = i - 1;
+            stageRoadChunkListMap[currentTile].push_back(currentChunk);
+
+            currentChunk.roadChunk = roadChunk_t(i, i);
+            currentTile = newTile;
+        }
+    }
+    currentChunk.roadChunk.second = ps - 1;
+    stageRoadChunkListMap[currentTile].push_back(currentChunk);
+}
+
+void RoadManager::clearStageRoads()
+{
+    stageRoadChunkListMap.clear();
+}
+
+void RoadManager::clearVisible()
+{
+    visibleRoadChunkSet.clear();
+}
+
+void RoadManager::addChunkListToVisible(const roadRoadChunkList_t& roadRoadChunkList)
+{
+    for (roadRoadChunkList_t::const_iterator rcit = roadRoadChunkList.begin();
+         rcit != roadRoadChunkList.end();
+         rcit++)
+    {
+        visibleRoadChunkSet.insert(*rcit);
+    }
+}
+
+void RoadManager::setVisibleStageRoad(unsigned int tileNum)
+{
+    stageRoadChunkListMap_t::const_iterator srit = stageRoadChunkListMap.find(tileNum);
+    if (srit != stageRoadChunkListMap.end())
+    {
+        addChunkListToVisible(srit->second);
     }
 }

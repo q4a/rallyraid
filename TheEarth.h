@@ -123,6 +123,8 @@ public:
     unsigned int getSizeX() {return xsize;}
     unsigned int getSizeY() {return ysize;}
 
+    unsigned int calculateTileNum(unsigned int x, unsigned int y) const; // inline
+
 private:
     const tileMap_t& getTileMap() {return tileMap;}
 
@@ -385,6 +387,11 @@ inline void TheEarth::setIsLoaded(unsigned int tileNum, bool val)
     {
         isLoaded[tileNum/8] &= ~(0x1 << (tileNum%8));
     }
+}
+
+inline unsigned int TheEarth::calculateTileNum(unsigned int x, unsigned int y) const
+{
+    return (x + (xsize*y));
 }
 
 #endif // THEEARTH_H

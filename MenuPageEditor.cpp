@@ -10,6 +10,9 @@
 #include "RaceManager.h"
 #include "Race.h"
 #include "Settings.h"
+#include "RoadManager.h"
+#include "Road.h"
+#include "RoadType.h"
 
 MenuPageEditor::MenuPageEditor()
     : window(0),
@@ -17,7 +20,10 @@ MenuPageEditor::MenuPageEditor()
       tableObjectWire(0),
       tableObjectWireTiles(0),
       tableObjectPool(0),
-      tableRaceManager(0)
+      tableRaceManager(0),
+      tableRoadManagerG(0),
+      tableRoadManagerS(0),
+      tableRoadManagerV(0)
 {
     window = TheGame::getInstance()->getEnv()->addWindow(
         irr::core::recti(TheGame::getInstance()->getScreenSize().Width-300, 50, TheGame::getInstance()->getScreenSize().Width-10, TheGame::getInstance()->getScreenSize().Height-150),
@@ -107,7 +113,7 @@ MenuPageEditor::MenuPageEditor()
     // ----------------------------
     // RaceManager tab
     // ----------------------------
-    irr::gui::IGUITab* tabRaceManager = tc->addTab(L"RM", MI_TABRACEMANAGER);
+    irr::gui::IGUITab* tabRaceManager = tc->addTab(L"RaM", MI_TABRACEMANAGER);
 
     tableRaceManager = TheGame::getInstance()->getEnv()->addTable(
         irr::core::recti(irr::core::position2di(0, 0), tabRaceManager->getRelativePosition().getSize()),
@@ -118,6 +124,45 @@ MenuPageEditor::MenuPageEditor()
     tableRaceManager->addColumn(L"#");
     tableRaceManager->addColumn(L"name");
     tableRaceManager->addColumn(L"long name");
+
+    // ----------------------------
+    // RoadManager tab
+    // ----------------------------
+    irr::gui::IGUITab* tabRoadManager = tc->addTab(L"RoM", MI_TABROADMANAGER);
+
+    tableRoadManagerG = TheGame::getInstance()->getEnv()->addTable(
+        irr::core::recti(irr::core::position2di(0, 0), irr::core::dimension2di(tabRoadManager->getRelativePosition().getSize().Width, tabRoadManager->getRelativePosition().getSize().Height/3-2)),
+        tabRoadManager,
+        MI_TABLEROADMANAGERG,
+        true);
+
+    tableRoadManagerG->addColumn(L"#");
+    tableRoadManagerG->addColumn(L"name");
+    tableRoadManagerG->addColumn(L"type");
+    tableRoadManagerG->addColumn(L"loaded");
+    tableRoadManagerG->addColumn(L"filename");
+    tableRoadManagerG->addColumn(L"data");
+
+    tableRoadManagerS = TheGame::getInstance()->getEnv()->addTable(
+        irr::core::recti(irr::core::position2di(0, tabRoadManager->getRelativePosition().getSize().Height/3+1), irr::core::dimension2di(tabRoadManager->getRelativePosition().getSize().Width, tabRoadManager->getRelativePosition().getSize().Height/3-2)),
+        tabRoadManager,
+        MI_TABLEROADMANAGERS,
+        true);
+
+    tableRoadManagerS->addColumn(L"#");
+    tableRoadManagerS->addColumn(L"tile");
+    tableRoadManagerS->addColumn(L"size");
+
+    tableRoadManagerV = TheGame::getInstance()->getEnv()->addTable(
+        irr::core::recti(irr::core::position2di(0, (tabRoadManager->getRelativePosition().getSize().Height*2)/3+2), irr::core::dimension2di(tabRoadManager->getRelativePosition().getSize().Width, tabRoadManager->getRelativePosition().getSize().Height/3-2)),
+        tabRoadManager,
+        MI_TABLEROADMANAGERV,
+        true);
+
+    tableRoadManagerV->addColumn(L"#");
+    tableRoadManagerV->addColumn(L"road");
+    tableRoadManagerV->addColumn(L"begin");
+    tableRoadManagerV->addColumn(L"end");
 
     window->setVisible(false);
 }
@@ -180,7 +225,16 @@ void MenuPageEditor::close()
 
 void MenuPageEditor::refresh()
 {
+    refreshTiles();
+    refreshObjectWire();
+    refreshObjectWireTiles();
+    refreshObjectPool();
+    refreshRaceManager();
+    refreshRoadManager();
+}
 
+void MenuPageEditor::refreshTiles()
+{
     // ----------------------------
     // Tiles
     // ----------------------------
@@ -211,14 +265,17 @@ void MenuPageEditor::refresh()
         str += tit->second->getInUse() ? L"true" : L"false";
         tableTiles->setCellText(i, 3, str.c_str());
     }
+}
 
+void MenuPageEditor::refreshObjectWire()
+{
     // ----------------------------
     // ObjectWire
     // ----------------------------
     tableObjectWire->clearRows();
 
     const ObjectWire::globalObjectWire_t& globalObjectWire = ObjectWire::getInstance()->globalObjectWire;
-    i = 0;
+    unsigned int i = 0;
     for (ObjectWire::globalObjectWire_t::const_iterator owit = globalObjectWire.begin();
          owit != globalObjectWire.end();
          owit++, i++)
@@ -239,12 +296,16 @@ void MenuPageEditor::refresh()
         tableObjectWire->setCellText(i, 2, str.c_str());
     }
 
+}
+
+void MenuPageEditor::refreshObjectWireTiles()
+{
     // ----------------------------
     // ObjectWireTiles
     // ----------------------------
     tableObjectWireTiles->clearRows();
 
-    i = 0;
+    unsigned int i = 0;
     const unsigned int objectWireNum = Settings::getInstance()->objectWireNum;
     while (i < objectWireNum*objectWireNum)
     {
@@ -270,13 +331,17 @@ void MenuPageEditor::refresh()
         i++;
     }
 
+}
+
+void MenuPageEditor::refreshObjectPool()
+{
     // ----------------------------
     // ObjectPool
     // ----------------------------
     tableObjectPool->clearRows();
 
     const ObjectPoolManager::objectPoolMap_t& objectPoolMap = ObjectPoolManager::getInstance()->getObjectPoolMap();
-    i = 0;
+    unsigned int i = 0;
     for (ObjectPoolManager::objectPoolMap_t::const_iterator opit = objectPoolMap.begin();
          opit != objectPoolMap.end();
          opit++, i++)
@@ -308,14 +373,17 @@ void MenuPageEditor::refresh()
         str += opit->second->objectList.size();
         tableObjectPool->setCellText(i, 5, str.c_str());
     }
+}
 
+void MenuPageEditor::refreshRaceManager()
+{
     // ----------------------------
     // RaceManager
     // ----------------------------
     tableRaceManager->clearRows();
 
     const RaceManager::raceMap_t& raceMap = RaceManager::getInstance()->getRaceMap();
-    i = 0;
+    unsigned int i = 0;
     for (RaceManager::raceMap_t::const_iterator rit = raceMap.begin();
          rit != raceMap.end();
          rit++, i++)
@@ -335,5 +403,117 @@ void MenuPageEditor::refresh()
         str += rit->second->getLongName().c_str();
         tableRaceManager->setCellText(i, 2, str.c_str());
     }
+}
 
+void MenuPageEditor::refreshRoadManager()
+{
+    // ----------------------------
+    // RoadManager
+    // ----------------------------
+    tableRoadManagerG->clearRows();
+    /*
+    tableRoadManagerG->addColumn(L"#");
+    tableRoadManagerG->addColumn(L"name");
+    tableRoadManagerG->addColumn(L"type");
+    tableRoadManagerG->addColumn(L"loaded");
+    tableRoadManagerG->addColumn(L"filename");
+    tableRoadManagerG->addColumn(L"data");
+    */
+    const RoadManager::roadMap_t& roadMap = RoadManager::getInstance()->getRoadMap();
+    unsigned int i = 0;
+    for (RoadManager::roadMap_t::const_iterator rit = roadMap.begin();
+         rit != roadMap.end();
+         rit++, i++)
+    {
+        irr::core::stringw str;
+        
+        tableRoadManagerG->addRow(i);
+
+        str += i;
+        tableRoadManagerG->setCellText(i, 0, str.c_str());
+
+        str = L"";
+        str += rit->second->getName().c_str();
+        tableRoadManagerG->setCellText(i, 1, str.c_str());
+
+        str = L"";
+        str += rit->second->roadType->getName().c_str();
+        tableRoadManagerG->setCellText(i, 2, str.c_str());
+
+        str = L"false";
+        if (rit->second->isLoaded())
+        {
+            str = L"true";
+        }
+        tableRoadManagerG->setCellText(i, 3, str.c_str());
+
+        str = L"";
+        str += rit->second->roadFilename.c_str();
+        tableRoadManagerG->setCellText(i, 4, str.c_str());
+
+        str = L"";
+        str += rit->second->roadDataFilename.c_str();
+        tableRoadManagerG->setCellText(i, 5, str.c_str());
+    }
+
+    tableRoadManagerS->clearRows();
+    /*
+    tableRoadManagerS->addColumn(L"#");
+    tableRoadManagerS->addColumn(L"tile");
+    tableRoadManagerS->addColumn(L"size");
+    */
+    const RoadManager::stageRoadChunkListMap_t sMap = RoadManager::getInstance()->stageRoadChunkListMap;
+    i = 0;
+    for (RoadManager::stageRoadChunkListMap_t::const_iterator sit = sMap.begin();
+         sit != sMap.end();
+         sit++, i++)
+    {
+        irr::core::stringw str;
+        
+        tableRoadManagerS->addRow(i);
+
+        str += i;
+        tableRoadManagerS->setCellText(i, 0, str.c_str());
+
+        str = L"";
+        str += sit->first;
+        tableRoadManagerS->setCellText(i, 1, str.c_str());
+
+        str = L"";
+        str += sit->second.size();
+        tableRoadManagerS->setCellText(i, 2, str.c_str());
+    }
+
+    tableRoadManagerV->clearRows();
+    /*
+    tableRoadManagerV->addColumn(L"#");
+    tableRoadManagerV->addColumn(L"road");
+    tableRoadManagerV->addColumn(L"begin");
+    tableRoadManagerV->addColumn(L"end");
+    */
+    const roadRoadChunkSet_t cSet = RoadManager::getInstance()->visibleRoadChunkSet;
+    i = 0;
+    for (roadRoadChunkSet_t::const_iterator cit = cSet.begin();
+         cit != cSet.end();
+         cit++, i++)
+    {
+        irr::core::stringw str;
+        
+        tableRoadManagerV->addRow(i);
+
+        str += i;
+        tableRoadManagerV->setCellText(i, 0, str.c_str());
+
+        str = L"";
+        str += cit->road->getName().c_str();
+        tableRoadManagerV->setCellText(i, 1, str.c_str());
+
+        str = L"";
+        str += cit->roadChunk.first;
+        tableRoadManagerV->setCellText(i, 2, str.c_str());
+
+        str = L"";
+        str += cit->roadChunk.second;
+        tableRoadManagerV->setCellText(i, 3, str.c_str());
+    }
 }

@@ -35,8 +35,8 @@ public:
     
     static RoadManager* getInstance() {return roadManager;}
 
-    typedef std::map<std::string, Road*>        roadMap_t;
-    typedef std::map<int, roadRoadChunkList_t>  stageRoadChunkListMap_t;
+    typedef std::map<std::string, Road*>                roadMap_t;
+    typedef std::map<unsigned int, roadRoadChunkList_t> stageRoadChunkListMap_t;
 
 private:
     static RoadManager* roadManager;
@@ -51,13 +51,21 @@ public:
     Road* getRoad(const std::string& roadName); // inline
     const roadMap_t& getRoadMap(); // inline
 
+    void addStageRoad(Road* road);  // call when start a new stage: add race, day and stage roads
+    void clearStageRoads();         // call when a stage is ended
+
+    // these stuffs are called from the earth visible part builder thread!
+    void clearVisible();                                                        // call when start to build the new visible stuff
+    void addChunkListToVisible(const roadRoadChunkList_t& roadRoadChunkList);   // call when a tile become visible
+    void setVisibleStageRoad(unsigned int tileNum);                             // call from the tile which become visible
+
     static void readRoads(const std::string& dirName, roadMap_t& roadMap, bool doRead = false);
     //static bool writeGlobalObjects(const std::string& fileName, const globalObjectList_t& globalObjectList);
 
 private:
     roadMap_t               roadMap;
     stageRoadChunkListMap_t stageRoadChunkListMap;
-    roadRoadChunkSet_t      visibleRoadChunkListSet;
+    roadRoadChunkSet_t      visibleRoadChunkSet;
 
     Road*                   editorRoad;
 

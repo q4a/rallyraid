@@ -16,6 +16,8 @@ class Player;
 class RaceManager;
 class MenuManager;
 class Hud;
+class RoadManager;
+class RoadTypeManager;
 
 class TheGame : public OffsetObjectUpdateCB
 {
@@ -76,6 +78,8 @@ private:
     RaceManager*                    raceManager;
     MenuManager*                    menuManager;
     Hud*                            hud;
+    RoadManager*                    roadManager;
+    RoadTypeManager*                roadTypeManager;
 
     bool                            terminate;
     size_t                          windowId;
