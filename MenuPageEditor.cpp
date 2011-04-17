@@ -232,14 +232,17 @@ bool MenuPageEditor::OnEvent(const irr::SEvent &event)
                 {
                     case MI_TABLEOBJECTPOOL:
                         ObjectPoolManager::getInstance()->editorPool = (ObjectPool*)tableObjectPool->getCellData(tableObjectPool->getSelected(), 0);
+                        refreshSelected();
                         return true;
                         break;
                     case MI_TABLERACEMANAGER:
                         RaceManager::getInstance()->editorRace = (Race*)tableRaceManager->getCellData(tableRaceManager->getSelected(), 0);
+                        refreshSelected();
                         return true;
                         break;
                     case MI_TABLEROADMANAGERG:
                         RoadManager::getInstance()->editorRoad = (Road*)tableRoadManagerG->getCellData(tableRoadManagerG->getSelected(), 0);
+                        refreshSelected();
                         return true;
                         break;
                 };
@@ -252,6 +255,24 @@ bool MenuPageEditor::OnEvent(const irr::SEvent &event)
                     case MI_TABLERACEMANAGER:
                         RaceManager::getInstance()->editorRace = (Race*)tableRaceManager->getCellData(tableRaceManager->getSelected(), 0);
                         MenuManager::getInstance()->open(MenuManager::MP_EDITORRACE);
+                        return true;
+                        break;
+                    case MI_TABLESELECTED:
+                        switch (tableSelected->getSelected())
+                        {
+                            case 1:
+                                if (RaceManager::getInstance()->editorRace) MenuManager::getInstance()->open(MenuManager::MP_EDITORRACE);
+                                break;
+                            case 2:
+                                if (RaceManager::getInstance()->editorDay) MenuManager::getInstance()->open(MenuManager::MP_EDITORDAY);
+                                break;
+                            case 3:
+                                if (RaceManager::getInstance()->editorStage) MenuManager::getInstance()->open(MenuManager::MP_EDITORSTAGE);
+                                break;
+                            case 4:
+                                //if (RoadManager::getInstance()->editorRoad) MenuManager::getInstance()->open(MenuManager::MP_EDITORROAD);
+                                break;
+                        }
                         return true;
                         break;
                 };
@@ -325,6 +346,7 @@ void MenuPageEditor::refreshSelected()
         str = L"none";
     }
     tableSelected->setCellText(i, 1, str.c_str());
+    tableSelected->setCellData(i, 1, (void*)RaceManager::getInstance()->editorRace);
 
     i = 2;
     tableSelected->addRow(i);
@@ -340,6 +362,7 @@ void MenuPageEditor::refreshSelected()
         str = L"none";
     }
     tableSelected->setCellText(i, 1, str.c_str());
+    tableSelected->setCellData(i, 1, (void*)RaceManager::getInstance()->editorDay);
 
     i = 3;
     tableSelected->addRow(i);
@@ -355,6 +378,7 @@ void MenuPageEditor::refreshSelected()
         str = L"none";
     }
     tableSelected->setCellText(i, 1, str.c_str());
+    tableSelected->setCellData(i, 1, (void*)RaceManager::getInstance()->editorStage);
 
     i = 4;
     tableSelected->addRow(i);
@@ -370,6 +394,7 @@ void MenuPageEditor::refreshSelected()
         str = L"none";
     }
     tableSelected->setCellText(i, 1, str.c_str());
+    tableSelected->setCellData(i, 1, (void*)RoadManager::getInstance()->editorRoad);
 }
 
 void MenuPageEditor::refreshTiles()

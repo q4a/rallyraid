@@ -5,6 +5,8 @@
 
 #include "MenuPageEditor.h"
 #include "MenuPageEditorRace.h"
+#include "MenuPageEditorDay.h"
+#include "MenuPageEditorStage.h"
 
 #include <string.h>
 
@@ -34,6 +36,8 @@ MenuManager::MenuManager()
     memset(menuPages, 0, sizeof(menuPages));
     menuPages[MP_EDITOR] = new MenuPageEditor();
     menuPages[MP_EDITORRACE] = new MenuPageEditorRace();
+    menuPages[MP_EDITORDAY] = new MenuPageEditorDay();
+    menuPages[MP_EDITORSTAGE] = new MenuPageEditorStage();
 }
 
 MenuManager::~MenuManager()

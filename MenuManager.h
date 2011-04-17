@@ -23,6 +23,8 @@ public:
     {
         MP_EDITOR = 0,
         MP_EDITORRACE,
+        MP_EDITORDAY,
+        MP_EDITORSTAGE,
         NUMBER_OF_MENUPAGES
     };
 

@@ -101,7 +101,9 @@
     <ClInclude Include="MenuManager.h" />
     <ClInclude Include="MenuPageBase.h" />
     <ClInclude Include="MenuPageEditor.h" />
+    <ClInclude Include="MenuPageEditorDay.h" />
     <ClInclude Include="MenuPageEditorRace.h" />
+    <ClInclude Include="MenuPageEditorStage.h" />
     <ClInclude Include="MyLock.h" />
     <ClInclude Include="MySound.h" />
     <ClInclude Include="MyThread.h" />
@@ -155,7 +157,9 @@
     <ClCompile Include="MenuManager.cpp" />
     <ClCompile Include="MenuPageBase.cpp" />
     <ClCompile Include="MenuPageEditor.cpp" />
+    <ClCompile Include="MenuPageEditorDay.cpp" />
     <ClCompile Include="MenuPageEditorRace.cpp" />
+    <ClCompile Include="MenuPageEditorStage.cpp" />
     <ClCompile Include="MySound.cpp" />
     <ClCompile Include="MyThread.cpp" />
     <ClCompile Include="ObjectPool.cpp" />

@@ -3,6 +3,9 @@
 #include "TheGame.h"
 #include "stdafx.h"
 
+#include <direct.h>
+#include <errno.h>
+
 bool ConfigDirectory::load(const irr::io::path& path, const irr::io::path& cfgFilename, ConfigDirectory::fileList_t& fileList)
 {
     irr::io::IFileSystem* fs = TheGame::getInstance()->getDevice()->getFileSystem();
@@ -78,5 +81,25 @@ bool ConfigDirectory::load(const irr::io::path& path, ConfigDirectory::fileList_
     }    
     
     fs->changeWorkingDirectoryTo(baseDir);
+    return true;
+}
+
+bool ConfigDirectory::mkdir(const std::string& directory)
+{
+    std::string dir = directory;
+    int rc = _mkdir(dir.c_str());
+    if (rc < 0)
+    {
+        int err = errno;
+        if (err != EEXIST)
+        {
+            printf("unable to create directory: %s, errno: %d\n", dir.c_str(), err);
+            return false;
+        }
+        else
+        {
+            printf("directory already exist: %s\n", dir.c_str());
+        }
+    }
     return true;
 }

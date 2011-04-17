@@ -177,6 +177,12 @@
     <ClInclude Include="WStringConverter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="MenuPageEditorDay.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MenuPageEditorStage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -312,6 +318,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="MenuPageEditorRace.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MenuPageEditorDay.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MenuPageEditorStage.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
