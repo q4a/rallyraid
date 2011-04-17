@@ -14,6 +14,7 @@ public:
         MI_BUTTONREFRESH,
         MI_TABCONTROL,
 
+        MI_TABSELECTED,
         MI_TABTILES,
         MI_TABOBJECTWIRE,
         MI_TABOBJECTWIRETILES,
@@ -21,6 +22,7 @@ public:
         MI_TABRACEMANAGER,
         MI_TABROADMANAGER,
 
+        MI_TABLESELECTED,
         MI_TABLETILES,
         MI_TABLEOBJECTWIRE,
         MI_TABLEOBJECTWIRETILES,
@@ -44,6 +46,7 @@ protected:
 
 private:
     void refresh();
+    void refreshSelected();
     void refreshTiles();
     void refreshObjectWire();
     void refreshObjectWireTiles();
@@ -53,6 +56,7 @@ private:
 
 private:
     irr::gui::IGUIWindow*   window;
+    irr::gui::IGUITable*    tableSelected;
     irr::gui::IGUITable*    tableTiles;
     irr::gui::IGUITable*    tableObjectWire;
     irr::gui::IGUITable*    tableObjectWireTiles;

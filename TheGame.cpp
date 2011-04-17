@@ -102,6 +102,14 @@ TheGame::TheGame()
         driver = device->getVideoDriver();
         smgr = device->getSceneManager();
         env = device->getGUIEnvironment();
+        {
+            for (unsigned int i = 0; i < irr::gui::EGDC_COUNT ; ++i)
+            {
+                irr::video::SColor col = env->getSkin()->getColor(/*irr::gui::EGDC_WINDOW*/(irr::gui::EGUI_DEFAULT_COLOR)i);
+                col.setAlpha(255);
+                env->getSkin()->setColor(/*irr::gui::EGDC_WINDOW*/(irr::gui::EGUI_DEFAULT_COLOR)i, col);
+            }
+        }
         fix_camera = smgr->addCameraSceneNode();
         fps_camera = smgr->addCameraSceneNodeFPS(0, 100.f, 0.1f);
         camera = fix_camera;

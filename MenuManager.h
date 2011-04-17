@@ -22,6 +22,7 @@ public:
     enum MenuPageId
     {
         MP_EDITOR = 0,
+        MP_EDITORRACE,
         NUMBER_OF_MENUPAGES
     };
 

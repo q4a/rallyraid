@@ -10,10 +10,17 @@ class WStringConverter
 public:
     static void WStringConverter::toString(const irr::core::stringw& wstr, std::string& ret)
     {
-        const wchar_t* orig = str.c_str();
+        const wchar_t* orig = wstr.c_str();
+        toString(orig, ret);
+        //ret.resize(origsize);
+    }
+
+    static void WStringConverter::toString(const wchar_t* orig, std::string& ret)
+    {
+        size_t convertedSize;
         size_t origsize = wcslen(orig) + 1;
         char* tmp = new char[origsize];
-        wcstombs(tmp, orig, origsize);
+        wcstombs_s(&convertedSize, tmp, origsize, orig, origsize);
         ret = tmp;
         delete tmp;
         //ret.resize(origsize);

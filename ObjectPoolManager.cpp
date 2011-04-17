@@ -27,7 +27,8 @@ void ObjectPoolManager::finalize()
 
 
 ObjectPoolManager::ObjectPoolManager()
-    : objectPoolMap()
+    : objectPoolMap(),
+      editorPool(0)
 {
     read();
 }

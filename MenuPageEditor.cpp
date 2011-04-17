@@ -12,10 +12,13 @@
 #include "Settings.h"
 #include "RoadManager.h"
 #include "Road.h"
+#include "Day.h"
+#include "Stage.h"
 #include "RoadType.h"
 
 MenuPageEditor::MenuPageEditor()
     : window(0),
+      tableSelected(0),
       tableTiles(0),
       tableObjectWire(0),
       tableObjectWireTiles(0),
@@ -44,6 +47,20 @@ MenuPageEditor::MenuPageEditor()
         true,
         true,
         MI_TABCONTROL);
+
+    // ----------------------------
+    // Selected tab
+    // ----------------------------
+    irr::gui::IGUITab* tabSelected = tc->addTab(L"S", MI_TABSELECTED);
+
+    tableSelected = TheGame::getInstance()->getEnv()->addTable(
+        irr::core::recti(irr::core::position2di(0, 0), tabSelected->getRelativePosition().getSize()),
+        tabSelected,
+        MI_TABLESELECTED,
+        true);
+
+    tableSelected->addColumn(L"item");
+    tableSelected->addColumn(L"selected");
 
     // ----------------------------
     // Tiles tab
@@ -175,7 +192,7 @@ MenuPageEditor::~MenuPageEditor()
 
 bool MenuPageEditor::OnEvent(const irr::SEvent &event)
 {
-    dprintf(MY_DEBUG_NOTE, "MenuPageEditor::OnEvent()\n");
+    //dprintf(MY_DEBUG_NOTE, "MenuPageEditor::OnEvent()\n");
     if (event.EventType == irr::EET_GUI_EVENT)
     {
         int id = event.GUIEvent.Caller->getID();
@@ -187,8 +204,11 @@ bool MenuPageEditor::OnEvent(const irr::SEvent &event)
                 switch (id)
                 {
                     case MI_WINDOW:
-                        dprintf(MY_DEBUG_NOTE, "event on close editor window\n");
+                        //dprintf(MY_DEBUG_NOTE, "event on close editor window\n");
                         MenuManager::getInstance()->close();
+                        return true;
+                        break;
+                    default:
                         return true;
                         break;
                 };
@@ -199,8 +219,39 @@ bool MenuPageEditor::OnEvent(const irr::SEvent &event)
                 switch (id)
                 {
                     case MI_BUTTONREFRESH:
-                        dprintf(MY_DEBUG_NOTE, "editor::refreshbutton clicked\n");
+                        //dprintf(MY_DEBUG_NOTE, "editor::refreshbutton clicked\n");
                         refresh();
+                        return true;
+                        break;
+                };
+                break;
+            }
+            case irr::gui::EGET_TABLE_CHANGED:
+            {
+                switch (id)
+                {
+                    case MI_TABLEOBJECTPOOL:
+                        ObjectPoolManager::getInstance()->editorPool = (ObjectPool*)tableObjectPool->getCellData(tableObjectPool->getSelected(), 0);
+                        return true;
+                        break;
+                    case MI_TABLERACEMANAGER:
+                        RaceManager::getInstance()->editorRace = (Race*)tableRaceManager->getCellData(tableRaceManager->getSelected(), 0);
+                        return true;
+                        break;
+                    case MI_TABLEROADMANAGERG:
+                        RoadManager::getInstance()->editorRoad = (Road*)tableRoadManagerG->getCellData(tableRoadManagerG->getSelected(), 0);
+                        return true;
+                        break;
+                };
+                break;
+            }
+            case irr::gui::EGET_TABLE_SELECTED_AGAIN:
+            {
+                switch (id)
+                {
+                    case MI_TABLERACEMANAGER:
+                        RaceManager::getInstance()->editorRace = (Race*)tableRaceManager->getCellData(tableRaceManager->getSelected(), 0);
+                        MenuManager::getInstance()->open(MenuManager::MP_EDITORRACE);
                         return true;
                         break;
                 };
@@ -215,6 +266,7 @@ void MenuPageEditor::open()
 {
     dprintf(MY_DEBUG_NOTE, "MenuPageEditor::open()\n");
     window->setVisible(true);
+    TheGame::getInstance()->getEnv()->setFocus(window);
 }
 
 void MenuPageEditor::close()
@@ -225,12 +277,99 @@ void MenuPageEditor::close()
 
 void MenuPageEditor::refresh()
 {
+    refreshSelected();
     refreshTiles();
     refreshObjectWire();
     refreshObjectWireTiles();
     refreshObjectPool();
     refreshRaceManager();
     refreshRoadManager();
+}
+
+void MenuPageEditor::refreshSelected()
+{
+    // ----------------------------
+    // Selected
+    // ----------------------------
+    tableSelected->clearRows();
+
+    const TheEarth::tileMap_t& tileMap = TheEarth::getInstance()->getTileMap();
+    unsigned int i = 0;
+    irr::core::stringw str;
+        
+    tableSelected->addRow(i);
+    str = L"object";
+    tableSelected->setCellText(i, 0, str.c_str());
+    str = L"";
+    if (ObjectPoolManager::getInstance()->editorPool)
+    {
+        str += ObjectPoolManager::getInstance()->editorPool->getName().c_str();
+    }
+    else
+    {
+        str = L"none";
+    }
+    tableSelected->setCellText(i, 1, str.c_str());
+
+    i = 1;
+    tableSelected->addRow(i);
+    str = L"race";
+    tableSelected->setCellText(i, 0, str.c_str());
+    str = L"";
+    if (RaceManager::getInstance()->editorRace)
+    {
+        str += RaceManager::getInstance()->editorRace->getName().c_str();
+    }
+    else
+    {
+        str = L"none";
+    }
+    tableSelected->setCellText(i, 1, str.c_str());
+
+    i = 2;
+    tableSelected->addRow(i);
+    str = L"day";
+    tableSelected->setCellText(i, 0, str.c_str());
+    str = L"";
+    if (RaceManager::getInstance()->editorDay)
+    {
+        str += RaceManager::getInstance()->editorDay->getName().c_str();
+    }
+    else
+    {
+        str = L"none";
+    }
+    tableSelected->setCellText(i, 1, str.c_str());
+
+    i = 3;
+    tableSelected->addRow(i);
+    str = L"stage";
+    tableSelected->setCellText(i, 0, str.c_str());
+    str = L"";
+    if (RaceManager::getInstance()->editorStage)
+    {
+        str += RaceManager::getInstance()->editorStage->getName().c_str();
+    }
+    else
+    {
+        str = L"none";
+    }
+    tableSelected->setCellText(i, 1, str.c_str());
+
+    i = 4;
+    tableSelected->addRow(i);
+    str = L"road";
+    tableSelected->setCellText(i, 0, str.c_str());
+    str = L"";
+    if (RoadManager::getInstance()->editorRoad)
+    {
+        str += RoadManager::getInstance()->editorRoad->getName().c_str();
+    }
+    else
+    {
+        str = L"none";
+    }
+    tableSelected->setCellText(i, 1, str.c_str());
 }
 
 void MenuPageEditor::refreshTiles()
@@ -352,6 +491,7 @@ void MenuPageEditor::refreshObjectPool()
 
         str += i;
         tableObjectPool->setCellText(i, 0, str.c_str());
+        tableObjectPool->setCellData(i, 0, (void*)opit->second);
 
         str = L"";
         str += opit->first.c_str();
@@ -394,6 +534,7 @@ void MenuPageEditor::refreshRaceManager()
 
         str += i;
         tableRaceManager->setCellText(i, 0, str.c_str());
+        tableRaceManager->setCellData(i, 0, (void*)rit->second);
 
         str = L"";
         str += rit->first.c_str();
@@ -431,6 +572,7 @@ void MenuPageEditor::refreshRoadManager()
 
         str += i;
         tableRoadManagerG->setCellText(i, 0, str.c_str());
+        tableRoadManagerG->setCellData(i, 0, (void*)rit->second);
 
         str = L"";
         str += rit->second->getName().c_str();

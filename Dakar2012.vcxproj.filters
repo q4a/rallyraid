@@ -171,6 +171,12 @@
     <ClInclude Include="RoadType.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="MenuPageEditorRace.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WStringConverter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -303,6 +309,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Road.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MenuPageEditorRace.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

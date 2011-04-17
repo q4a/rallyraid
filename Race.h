@@ -77,6 +77,11 @@ inline const Race::dayMap_t& Race::getDayMap()
     return dayMap;
 }
 
+inline const std::string& Race::getName()
+{
+    return raceName;
+}
+
 inline const std::string& Race::getLongName()
 {
     return raceLongName;

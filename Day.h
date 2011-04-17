@@ -73,6 +73,11 @@ inline const Day::stageMap_t& Day::getStageMap()
     return stageMap;
 }
 
+inline const std::string& Day::getName()
+{
+    return dayName;
+}
+
 inline const std::string& Day::getLongName()
 {
     return dayLongName;

@@ -36,6 +36,11 @@ public:
 
 private:
     objectPoolMap_t objectPoolMap;
+
+    ObjectPool*     editorPool;
+
+
+    friend class MenuPageEditor;
 };
 
 #endif // OBJECTPOOLMANAGER_H

@@ -101,6 +101,7 @@
     <ClInclude Include="MenuManager.h" />
     <ClInclude Include="MenuPageBase.h" />
     <ClInclude Include="MenuPageEditor.h" />
+    <ClInclude Include="MenuPageEditorRace.h" />
     <ClInclude Include="MyLock.h" />
     <ClInclude Include="MySound.h" />
     <ClInclude Include="MyThread.h" />
@@ -136,6 +137,7 @@
     <ClInclude Include="VehicleManager.h" />
     <ClInclude Include="VehicleType.h" />
     <ClInclude Include="VehicleTypeManager.h" />
+    <ClInclude Include="WStringConverter.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Competitor.cpp" />
@@ -153,6 +155,7 @@
     <ClCompile Include="MenuManager.cpp" />
     <ClCompile Include="MenuPageBase.cpp" />
     <ClCompile Include="MenuPageEditor.cpp" />
+    <ClCompile Include="MenuPageEditorRace.cpp" />
     <ClCompile Include="MySound.cpp" />
     <ClCompile Include="MyThread.cpp" />
     <ClCompile Include="ObjectPool.cpp" />

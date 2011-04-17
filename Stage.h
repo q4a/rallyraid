@@ -50,6 +50,11 @@ private:
     friend class MenuPageEditorStage;
 };
 
+inline const std::string& Stage::getName()
+{
+    return stageName;
+}
+
 inline const std::string& Stage::getLongName()
 {
     return stageLongName;
