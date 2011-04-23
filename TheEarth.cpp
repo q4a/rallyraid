@@ -11,7 +11,8 @@
 //#include <sys/types.h>
 //#include <direct.h>
 #include <errno.h>
-#include "Terrain.h"
+#include "TerrainDetail.h"
+#include "TerrainCircle.h"
 
 
 const irr::core::vector3di TheEarth::VisualMembers::terrainPos[3][3] =
@@ -96,7 +97,15 @@ void TheEarth::VisualMembers::createMembers(const irr::core::vector3di& centerPo
         for (unsigned int j = 0; j < 3; j++)
         {
             assert(terrainCircle[i][j] == 0);
-            terrainCircle[i][j] = new Terrain(centerPosi+terrainPos[i][j], earth);
+            if (i == 1 && j == 1)
+            {
+                //terrainCircle[i][j] = new TerrainDetail(centerPosi+terrainPos[i][j], earth);
+                terrainCircle[i][j] = new TerrainCircle(centerPosi+terrainPos[i][j], earth, true);
+            }
+            else
+            {
+                terrainCircle[i][j] = new TerrainCircle(centerPosi+terrainPos[i][j], earth, false);
+            }
         }
     }
 }
@@ -464,6 +473,41 @@ const irr::video::SColor& TheEarth::getTileFineDensity(unsigned int x, unsigned 
     else
     {
         return baseColor;
+    }
+}
+
+void TheEarth::setTileFineTexture(unsigned int x, unsigned int y, const irr::video::SColor& val)
+{
+    const unsigned int tileX = x / TILE_FINE_POINTS_NUM;
+    const unsigned int tileY = y / TILE_FINE_POINTS_NUM;
+    const unsigned int inX = x % TILE_FINE_POINTS_NUM;
+    const unsigned int inY = y % TILE_FINE_POINTS_NUM;
+    const unsigned int tileNum = tileX + (xsize*tileY);
+
+    if (tileX < xsize && tileY < ysize)
+    {
+        Tile* tile;
+        if (getIsLoaded(tileNum))
+        {
+            tile = tileMap[tileNum];
+            tile->setInUse();
+        }
+        else
+        {
+            if (getHasDetail(tileNum))
+            {
+                assert(0 && "should be called only on loaded tiles");
+            }
+            else
+            {
+                return;
+            }
+        }
+        return tile->setFineColor(inX, inY, val);
+    }
+    else
+    {
+        return;
     }
 }
 
@@ -956,23 +1000,24 @@ void TheEarth::update(const irr::core::vector3df& pos, const irr::core::vector3d
 #else // 0
     if (newVisualPart)
     {
-        printf("under construction\n");
+        //printf("under construction\n");
         return;
     }
     else if (newReadyVisualPart)
     {
-        printf("switch to new\n");
+        printf("switch to new, set visible true ... \n");
         delete visualPart;
         visualPart = newReadyVisualPart;
         newReadyVisualPart = 0;
         visualPart->setVisible(true);
+        printf("switch to new, set visible true ... done\n");
         
         return;
     }
 
     if (!lastPosBox.isPointInside(irr::core::vector3df(pos.X, 0.0f, pos.Z)))
     {
-        printf("start create new\n");
+        printf("start create new ...\n");
         
         newVisualPart = new VisualMembers();
         lastCenterPosi = irr::core::vector3di(((int)(pos.X/TILE_SCALE_F))*TILE_SCALE, 0, ((int)(pos.Z/TILE_SCALE_F))*TILE_SCALE);
@@ -981,6 +1026,7 @@ void TheEarth::update(const irr::core::vector3df& pos, const irr::core::vector3d
         lastPosBox = irr::core::aabbox3df(lastCenterPos.X-VISUAL_BOX_HSIZE_F, -1000.0f, lastCenterPos.Z-VISUAL_BOX_HSIZE_F,
         lastCenterPos.X+VISUAL_BOX_HSIZE_F, 10000.0f, lastCenterPos.Z+VISUAL_BOX_HSIZE_F);
         newVisualPart->createMembers(lastCenterPosi, this);
+        printf("start create new ... done\n");
         execute();
         refreshMiniMap();
     }
@@ -990,8 +1036,9 @@ void TheEarth::update(const irr::core::vector3df& pos, const irr::core::vector3d
 void TheEarth::run()
 {
     clearSetInUseFlagsForTiles();
-        
+    printf("loading visual part ...\n");
     newVisualPart->loadMembers(this);
+    printf("loading visual part ... done\n");
     newReadyVisualPart = newVisualPart;
     newVisualPart = 0;
     

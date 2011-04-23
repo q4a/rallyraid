@@ -64,6 +64,14 @@ public:
         }
     }
     
+    void setFineColor(unsigned int x, unsigned int y, const irr::video::SColor& val = irr::video::SColor())
+    {
+        if (fineColors && x < TILE_FINE_POINTS_NUM && y < TILE_FINE_POINTS_NUM)
+        {
+            fineColors[x + (TILE_FINE_POINTS_NUM*y)] = val;
+        }
+    }
+    
     void setFineDensity(unsigned int x, unsigned int y, const irr::video::SColor& val = irr::video::SColor())
     {
         if (fineDensity && x < TILE_FINE_POINTS_NUM && y < TILE_FINE_POINTS_NUM)

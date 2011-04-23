@@ -387,6 +387,10 @@ void TheGame::loop()
                 str += ((int)offsetManager->getOffset().X+(int)camera->getPosition().X)/TILE_SIZE;
                 str += L", ";
                 str += abs((int)offsetManager->getOffset().Z+(int)camera->getPosition().Z)/TILE_SIZE;
+                if (TheEarth::getInstance()->threadIsRunning())
+                {
+                    str += L"       thread is running";
+                }
                 testText->setText(str.c_str());
 
                 earth->update(offsetManager->getOffset()+camera->getPosition(), initialDir);

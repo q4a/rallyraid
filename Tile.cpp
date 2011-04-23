@@ -1,6 +1,7 @@
 
 #include "TheGame.h"
 #include "Tile.h"
+#include "TheEarth.h"
 
 const irr::video::SColor Tile::baseColor;
 
@@ -24,6 +25,8 @@ Tile::Tile(unsigned int posx, unsigned int posy,
     {
         read();
     }
+#if 0
+    // x first
     for (unsigned int x = 0; x < TILE_POINTS_NUM; x++)
     {
         const unsigned int cdiv = (TILE_POINTS_NUM + 1);
@@ -99,14 +102,122 @@ Tile::Tile(unsigned int posx, unsigned int posy,
             fineDensity[x + (TILE_FINE_POINTS_NUM*y)] = density;
         }
     }
-    printf("tile pos(%u): %u, %u\n", posx + (6750*posy), posx, posy);
+#else // if 0
+// y first
+
+    const unsigned int cdiv = (TILE_POINTS_NUM + 1);
+    for (unsigned int y = 0, fy = 0; y < TILE_POINTS_NUM; y++, fy+=TILE_POINTS_NUM)
+    {
+        const unsigned int cy0 = cdiv - y;
+        const unsigned int cy1 = /*cdiv -*/ y;
+        const irr::video::SColor color0(255,
+              (color00.getRed()*cy0 +   color01.getRed()*cy1) / cdiv,
+            (color00.getGreen()*cy0 + color01.getGreen()*cy1) / cdiv,
+             (color00.getBlue()*cy0 +  color01.getBlue()*cy1) / cdiv);
+        const irr::video::SColor color1(255,
+              (color10.getRed()*cy0 +   color11.getRed()*cy1) / cdiv,
+            (color10.getGreen()*cy0 + color11.getGreen()*cy1) / cdiv,
+             (color10.getBlue()*cy0 +  color11.getBlue()*cy1) / cdiv);
+        for (unsigned int x = 0; x < TILE_POINTS_NUM; x++)
+        {
+            const unsigned int cx0 = cdiv - x;
+            const unsigned int cx1 = x;
+
+            const unsigned int red =     (color0.getRed()*cx0 +   color1.getRed()*cx1) / cdiv;
+            const unsigned int green = (color0.getGreen()*cx0 + color1.getGreen()*cx1) / cdiv;
+            const unsigned int blue =   (color0.getBlue()*cx0 +  color1.getBlue()*cx1) / cdiv;
+            //printf("%u %u %u\n", red, green, blue);
+            //printf("%u ", red);
+            colors[x + fy].set(255, red, green, blue);
+        }
+        //printf("\n\n");
+    }
+
+    const unsigned int cdivf = (TILE_FINE_POINTS_NUM + 1);
+    for (unsigned int y = 0, fy = 0; y < TILE_FINE_POINTS_NUM; y++, fy+=TILE_FINE_POINTS_NUM)
+    {
+        const unsigned int cy0 = cdivf - y;
+        const unsigned int cy1 = /*cdiv -*/ y;
+        const irr::video::SColor color0(255,
+              (color00.getRed()*cy0 +   color01.getRed()*cy1) / cdivf,
+            (color00.getGreen()*cy0 + color01.getGreen()*cy1) / cdivf,
+             (color00.getBlue()*cy0 +  color01.getBlue()*cy1) / cdivf);
+        const irr::video::SColor color1(255,
+              (color10.getRed()*cy0 +   color11.getRed()*cy1) / cdivf,
+            (color10.getGreen()*cy0 + color11.getGreen()*cy1) / cdivf,
+             (color10.getBlue()*cy0 +  color11.getBlue()*cy1) / cdivf);
+        for (unsigned int x = 0; x < TILE_FINE_POINTS_NUM; x++)
+        {
+            const unsigned int cx0 = cdivf - x;
+            const unsigned int cx1 = x;
+
+            const unsigned int red =     (color0.getRed()*cx0 +   color1.getRed()*cx1) / cdivf;
+            const unsigned int green = (color0.getGreen()*cx0 + color1.getGreen()*cx1) / cdivf;
+            const unsigned int blue =   (color0.getBlue()*cx0 +  color1.getBlue()*cx1) / cdivf;
+            //printf("%u %u %u\n", red, green, blue);
+            //printf("%u ", red);
+            fineColors[x + fy].set(255, red, green, blue);
+        }
+        //printf("\n\n");
+    }
+
+#if 0
+    const unsigned int cdivf = (TILE_FINE_RATE + 1);
+    for (unsigned int y = 0, yy = 0; y < TILE_POINTS_NUM-1; y++, yy += TILE_FINE_RATE)
+    {
+        for (unsigned int x = 0, xx = 0; x < TILE_POINTS_NUM-1; x++, xx+=TILE_FINE_RATE)
+        {
+            const irr::video::SColor& fcolor00 = getColor(x, y);
+            const irr::video::SColor& fcolor10 = getColor(x + 1, y);
+            const irr::video::SColor& fcolor01 = getColor(x, y + 1);
+            const irr::video::SColor& fcolor11 = getColor(x + 1, y + 1);
+            
+            for (unsigned int fy = 0, ffy = yy * TILE_FINE_POINTS_NUM; fy < TILE_FINE_RATE; fy++, ffy+=TILE_FINE_POINTS_NUM)
+            {
+                const unsigned int cy0 = cdivf - fy;
+                const unsigned int cy1 = /*cdiv -*/ fy;
+                const irr::video::SColor color0(255,
+                      (fcolor00.getRed()*cy0 +   fcolor01.getRed()*cy1) / cdivf,
+                    (fcolor00.getGreen()*cy0 + fcolor01.getGreen()*cy1) / cdivf,
+                     (fcolor00.getBlue()*cy0 +  fcolor01.getBlue()*cy1) / cdivf);
+                const irr::video::SColor color1(255,
+                      (fcolor10.getRed()*cy0 +   fcolor11.getRed()*cy1) / cdivf,
+                    (fcolor10.getGreen()*cy0 + fcolor11.getGreen()*cy1) / cdivf,
+                     (fcolor10.getBlue()*cy0 +  fcolor11.getBlue()*cy1) / cdivf);
+                for (unsigned int fx = 0; fx < TILE_POINTS_NUM; fx++)
+                {
+                    const unsigned int cx0 = cdivf - fx;
+                    const unsigned int cx1 = fx;
     
+                    const unsigned int red =     (color0.getRed()*cx0 +   color1.getRed()*cx1) / cdivf;
+                    const unsigned int green = (color0.getGreen()*cx0 + color1.getGreen()*cx1) / cdivf;
+                    const unsigned int blue =   (color0.getBlue()*cx0 +  color1.getBlue()*cx1) / cdivf;
+                    //printf("%u %u %u\n", red, green, blue);
+                    //printf("%u ", red);
+                    fineColors[xx + fx + ffy].set(255, red, green, blue);
+                }
+                //printf("\n\n");
+            }
+        }
+        //printf("\n\n");
+    }
+#endif
+    for (unsigned int y = 0, fy = 0; y < TILE_FINE_POINTS_NUM; y++, fy+=TILE_FINE_POINTS_NUM)
+    {
+        for (unsigned int x = 0; x < TILE_FINE_POINTS_NUM; x++)
+        {
+            fineDensity[x + fy] = density;
+        }
+    }
+#endif // if 0
+    printf("tile pos(%u): %u, %u\n", posx + (TheEarth::getInstance()->getSizeX()*posy), posx, posy);
+    /*
     printf("%u %u %u \n", color00.getRed(), color00.getGreen(), color00.getBlue());
     printf("%u %u %u \n", color10.getRed(), color10.getGreen(), color10.getBlue());
     printf("%u %u %u \n", color01.getRed(), color01.getGreen(), color01.getBlue());
     printf("%u %u %u \n", color11.getRed(), color11.getGreen(), color11.getBlue());
     printf("\n");
-    
+    */
     //assert(0);
 }
 

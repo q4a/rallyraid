@@ -114,7 +114,7 @@ ObjectPool::~ObjectPool()
 
 OffsetObject* ObjectPool::getObject(const irr::core::vector3df& apos, const irr::core::vector3df& scale, bool addToOffsetManager)
 {
-    dprintf(MY_DEBUG_NOTE, "ObjectPool::getObject(): %s\n", name.c_str());
+    //dprintf(MY_DEBUG_NOTE, "ObjectPool::getObject(): %s\n", name.c_str());
     OffsetObject* offsetObject = 0;
     if (!objectList.empty())
     {
@@ -193,7 +193,7 @@ OffsetObject* ObjectPool::getObject(const irr::core::vector3df& apos, const irr:
 
 void ObjectPool::putObject(OffsetObject* object)
 {
-    dprintf(MY_DEBUG_NOTE, "ObjectPool::putObject(): %s\n", name.c_str());
+    //dprintf(MY_DEBUG_NOTE, "ObjectPool::putObject(): %s\n", name.c_str());
     object->getNode()->setVisible(false);
     hkpRigidBody* hkBody = object->getBody();
     if (hkBody)

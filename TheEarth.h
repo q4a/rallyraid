@@ -61,6 +61,7 @@ public:
                 // x and y devide by TILE_SCALE
     const irr::video::SColor& getTileFineTexture(unsigned int x, unsigned int y);   // x and y are not devided by TILE_SCALE, but TILE_FINE_SCALE
     const irr::video::SColor& getTileFineDensity(unsigned int x, unsigned int y);   // x and y are not devided by TILE_SCALE, but TILE_FINE_SCALE
+    void setTileFineTexture(unsigned int x, unsigned int y, const irr::video::SColor& val = irr::video::SColor()); // x and y are not devided by TILE_SCALE, but TILE_FINE_SCALE
     void setTileFineDensity(unsigned int x, unsigned int y, const irr::video::SColor& val = irr::video::SColor()); // x and y are not devided by TILE_SCALE, but TILE_FINE_SCALE
         
     unsigned short getEarthHeight(unsigned int x, unsigned int y) const;
@@ -124,6 +125,7 @@ public:
     unsigned int getSizeY() {return ysize;}
 
     unsigned int calculateTileNum(unsigned int x, unsigned int y) const; // inline
+    bool threadIsRunning() {return newVisualPart!=0;}
 
 private:
     const tileMap_t& getTileMap() {return tileMap;}

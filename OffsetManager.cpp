@@ -70,6 +70,7 @@ bool OffsetManager::update(const irr::core::vector3df& newPos, bool force)
     
     if (last.X != new_.X || last.Z != new_.Z || force)
     {
+        printf("offset manager start update ... \n");
         irr::core::vector3df loffset((float)(new_.X-last.X)*OFFSET_UNIT, 0.f, (float)(new_.Z-last.Z)*OFFSET_UNIT);
         last.X = new_.X;
         last.Z = new_.Z;
@@ -81,6 +82,7 @@ bool OffsetManager::update(const irr::core::vector3df& newPos, bool force)
             (*it)->update(offset, loffset);
             updated++;
         }
+        printf("offset manager start update ... done\n");
         return true;
     }
     else

@@ -12,6 +12,7 @@
 #include "TerrainSceneNode.h"
 #include "NTerrainSceneNode.h"
 #include "hk.h"
+#include <string>
 
 class OffsetObject;
 class TheEarth;
@@ -19,24 +20,26 @@ class TheEarth;
 class Terrain
 {
 public:
-    Terrain(const irr::core::vector3di& posi, TheEarth* earth);
+    Terrain(const std::string& prefix);
     virtual ~Terrain();
 
-    void load(TheEarth* earth);
-
+    virtual void load(TheEarth* earth) = 0;
+    
     void setVisible(bool visible);
 
     void registerTerrain();
+ // inline
+    float getHeight(float x, float z); // inline
 
-    float getHeight(float x, float z);
-
-private:
+protected:
     irr::scene::TerrainSceneNode*   terrain;
     hkpShape*                       hkShape;
     OffsetObject*                   offsetObject;
     bool                            visible;
     int                             offsetX;
     int                             offsetY;
+    std::string                     prefix;
+    irr::video::IImage*             image;
 };
 
 
@@ -45,6 +48,11 @@ inline float Terrain::getHeight(float x, float z)
     float h = terrain->getHeight(x, z);
     //printf("getHeight(%f, %f) = %f (%f, %f - %f %f)\n", x ,z, h, terrain->getPosition().X, terrain->getPosition().Z, terrain->getPosition().X+2048.f, terrain->getPosition().Z+2048.f);
     return h;
+}
+
+inline void Terrain::registerTerrain()
+{
+    terrain->OnRegisterSceneNode();
 }
 
 #endif // TERRAIN_H

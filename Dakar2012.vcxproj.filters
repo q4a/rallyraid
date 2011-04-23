@@ -183,6 +183,12 @@
     <ClInclude Include="MenuPageEditorStage.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="TerrainCircle.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TerrainDetail.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -324,6 +330,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="MenuPageEditorStage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TerrainCircle.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TerrainDetail.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

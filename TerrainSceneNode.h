@@ -11,6 +11,7 @@
 #include <ETerrainElements.h>
 
 class TheEarth;
+class TerrainDetail;
 
 namespace irr
 {
@@ -55,9 +56,10 @@ namespace scene
 
 		virtual ~TerrainSceneNode();
 
-		virtual bool loadHeightMap(TheEarth* earth, int offsetX, int offsetY, unsigned int size);
+        virtual bool loadHeightMap(TheEarth* earth, int offsetX, int offsetY, unsigned int size, irr::video::IImage* image);
+		virtual bool loadHeightMap(TerrainDetail* td, TheEarth* earth, int offsetX, int offsetY, unsigned int size, irr::video::IImage* image);
         //irr::video::ITexture* getGeneratedTexture() {return texture;}
-        irr::video::IImage* getGeneratedImage() {return image;}
+        //irr::video::IImage* getGeneratedImage() {return image;}
 #if 1
 		//! Initializes the terrain data.  Loads the vertices from the heightMapFile.
 		virtual bool loadHeightMap(io::IReadFile* file,
@@ -336,7 +338,7 @@ namespace scene
 		io::path HeightmapFile;
 		io::IFileSystem* FileSystem;
         //video::ITexture* texture;
-        video::IImage* image;
+        //video::IImage* image;
 	};
 
 

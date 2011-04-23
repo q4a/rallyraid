@@ -7,6 +7,7 @@
 #include "Player.h"
 #include "Vehicle.h"
 #include "MenuManager.h"
+#include "TheEarth.h"
 
 #include "stdafx.h"
 
@@ -62,6 +63,8 @@ EventReceiver::EventReceiver()
     keyMap[CHANGE_VIEW] = kp;
     keyNameMap["open_editor"] = OPEN_EDITOR;
     keyMap[OPEN_EDITOR] = kp;
+    keyNameMap["reset_vehicle"] = RESET_VEHICLE;
+    keyMap[RESET_VEHICLE] = kp;
 
     loadKeyMapping();
     //saveKeyMapping();
@@ -434,6 +437,18 @@ void EventReceiver::checkEvents()
         {
             MenuManager::getInstance()->open(MenuManager::MP_EDITOR);
         }
+
+        if (IS_PRESSED(RESET_VEHICLE))
+        {
+            if (Player::getInstance()->getVehicle())
+            {
+                Player::getInstance()->getVehicle()->reset(irr::core::vector3df(
+                    TheGame::getInstance()->getCamera()->getPosition().X,
+                    TheEarth::getInstance()->getHeight(TheGame::getInstance()->getCamera()->getPosition())+2.5f,
+                    TheGame::getInstance()->getCamera()->getPosition().Z));
+            }
+        }
+
     }
 #endif // 0 or 1
 }
