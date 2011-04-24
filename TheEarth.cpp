@@ -1068,19 +1068,19 @@ void TheEarth::refreshMiniMap()
         if (generateFrom.Width + MINIMAP_SIZE > (int)xsize) generateFrom.Width = xsize - MINIMAP_SIZE;
         if (generateFrom.Height + MINIMAP_SIZE > (int)ysize) generateFrom.Height = ysize - MINIMAP_SIZE;
 
+        irr::video::SColor color;
+
         for (int x = generateFrom.Width; x < generateFrom.Width + MINIMAP_SIZE; x++)
         {
             for (int y = generateFrom.Height; y < generateFrom.Height + MINIMAP_SIZE; y++)
             {
-                if (x == currentPos.Width && y == currentPos.Height)
+                color = getEarthTexture(x, y);
+                if (x == currentPos.Width || y == currentPos.Height)
                 //if (x == generateFrom.Width+MINIMAP_SIZE-1 || y == generateFrom.Height+MINIMAP_SIZE-1)
                 {
-                    miniMap->setPixel(x - generateFrom.Width, y - generateFrom.Height, irr::video::SColor(255, 255, 0, 0));
+                    color.setRed(255);
                 }
-                else
-                {
-                    miniMap->setPixel(x - generateFrom.Width, y - generateFrom.Height, getEarthTexture(x, y));
-                }
+                miniMap->setPixel(x - generateFrom.Width, y - generateFrom.Height, color);
             }
         }
 

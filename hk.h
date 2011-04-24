@@ -27,15 +27,30 @@ public:
 public:
     static void initialize();
     static void finalize();
+    static void step(float step_sec);
 
     static void lock()
     {
-        hkWorld->lock();
+        //hkWorld->lock();
+        hkWorld->markForWrite();
     }
 
     static void unlock()
     {
-        hkWorld->unlock();
+        hkWorld->unmarkForWrite();
+        //hkWorld->unlock();
+    }
+
+    static void lockRead()
+    {
+        //hkWorld->lock();
+        hkWorld->markForRead();
+    }
+
+    static void unlockRead()
+    {
+        hkWorld->unmarkForRead();
+        //hkWorld->unlock();
     }
 
 public:

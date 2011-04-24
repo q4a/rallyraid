@@ -3,6 +3,7 @@
 #include "Terrain_defs.h"
 #include "TheGame.h"
 #include "OffsetObject.h"
+#include "OffsetManager.h"
 #include "TheEarth.h"
 #include <math.h>
 #include "Shaders.h"
@@ -60,7 +61,7 @@ TerrainDetail::TerrainDetail(const irr::core::vector3di& posi, TheEarth* earth)
         -1,
         4,
         irr::scene::ETPS_17,
-        irr::core::vector3df((float)posi.X, 0.0f, (float)posi.Z),
+        irr::core::vector3df((float)posi.X, 0.0f, (float)posi.Z)/*-OffsetManager::getInstance()->getOffset()*/,
         irr::core::vector3df(),
         irr::core::vector3df(TILE_DETAIL_SCALE_F, 1.0f, TILE_DETAIL_SCALE_F));
     terrain->setVisible(visible);
@@ -199,7 +200,7 @@ TerrainDetail::TerrainDetail(const irr::core::vector3di& posi, TheEarth* earth)
                             assert(h==0);
                             hy = get(x+flty) /* 100*/;
                             hyp1 = get(x+fltyp1) /* 100*/;
-                            set(x+fy, (hy*(float)ty+hyp1*(float)typ1+hx*(float)tx+hxp1*(float)txp1)/(TILE_DETAIL_RATE_F*2.0f));
+                            set(x+fy, (hy*(float)ty+hyp1*(float)typ1+hx*(float)tx+hxp1*(float)txp1)/(TILE_DETAIL_RATE_F*2.0f) - 2.5f);
                         }
                         else
                         {
@@ -228,6 +229,7 @@ TerrainDetail::TerrainDetail(const irr::core::vector3di& posi, TheEarth* earth)
 
     hkShape = new HeightFieldHelperDetail(ci, this);
     hk::unlock();
+    postConstruct();
 }
 
 TerrainDetail::~TerrainDetail()
@@ -256,5 +258,6 @@ void TerrainDetail::load(TheEarth* earth)
             }
         }
     }
+    postLoad();
 }
 

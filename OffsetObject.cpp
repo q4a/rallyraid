@@ -9,13 +9,17 @@ OffsetObject::dynamicObjectSet_t OffsetObject::dynamicObjectSet;
 irr::core::matrix4 OffsetObject::helperMatrix;
 
 OffsetObject::OffsetObject()
-    : node(0), hkBody(0), pos(), iterator(), dynamic(false), offsetManager(OffsetManager::getInstance()), pool(0), updateCB(0)
+    : node(0), hkBody(0), pos(), iterator(), dynamic(false),
+      offsetManager(OffsetManager::getInstance()), pool(0), updateCB(0),
+      skipNodeUpdate(false)
 {
     //dprintf(MY_DEBUG_NOTE, "OffsetObject::OffsetObject(1): %p\n", this);
 }
 
 OffsetObject::OffsetObject(irr::scene::ISceneNode* node)
-    : node(node), hkBody(0), pos(), iterator(), dynamic(false), offsetManager(OffsetManager::getInstance()), pool(0), updateCB(0)
+    : node(node), hkBody(0), pos(), iterator(), dynamic(false),
+      offsetManager(OffsetManager::getInstance()), pool(0), updateCB(0),
+      skipNodeUpdate(false)
 {
     //dprintf(MY_DEBUG_NOTE, "OffsetObject::OffsetObject(2): %p\n", this);
     /*
@@ -27,7 +31,9 @@ OffsetObject::OffsetObject(irr::scene::ISceneNode* node)
 }
 
 OffsetObject::OffsetObject(irr::scene::ISceneNode* node, hkpRigidBody* hkBody)
-    : node(node), hkBody(hkBody), pos(), iterator(), dynamic(false), offsetManager(OffsetManager::getInstance()), pool(0), updateCB(0)
+    : node(node), hkBody(hkBody), pos(), iterator(), dynamic(false),
+      offsetManager(OffsetManager::getInstance()), pool(0), updateCB(0),
+      skipNodeUpdate(false)
 {
     //dprintf(MY_DEBUG_NOTE, "OffsetObject::OffsetObject(3): %p\n", this);
     /*
@@ -39,7 +45,9 @@ OffsetObject::OffsetObject(irr::scene::ISceneNode* node, hkpRigidBody* hkBody)
 }
 
 OffsetObject::OffsetObject(irr::scene::ISceneNode* node, bool dynamic)
-    : node(node), hkBody(0), pos(), iterator(), dynamic(dynamic), offsetManager(OffsetManager::getInstance()), pool(0), updateCB(0)
+    : node(node), hkBody(0), pos(), iterator(), dynamic(dynamic),
+      offsetManager(OffsetManager::getInstance()), pool(0), updateCB(0),
+      skipNodeUpdate(false)
 {
     //dprintf(MY_DEBUG_NOTE, "OffsetObject::OffsetObject(4): %p\n", this);
     if (dynamic)
@@ -55,7 +63,9 @@ OffsetObject::OffsetObject(irr::scene::ISceneNode* node, bool dynamic)
 }
 
 OffsetObject::OffsetObject(irr::scene::ISceneNode* node, hkpRigidBody* hkBody, bool dynamic)
-    : node(node), hkBody(hkBody), pos(), iterator(), dynamic(dynamic), offsetManager(OffsetManager::getInstance()), pool(0), updateCB(0)
+    : node(node), hkBody(hkBody), pos(), iterator(), dynamic(dynamic),
+      offsetManager(OffsetManager::getInstance()), pool(0), updateCB(0),
+      skipNodeUpdate(false)
 {
     //dprintf(MY_DEBUG_NOTE, "OffsetObject::OffsetObject(5): %p\n", this);
     if (dynamic)
@@ -92,7 +102,10 @@ void OffsetObject::update(const irr::core::vector3df& offset, const irr::core::v
         //{
             pos = node->getPosition();
             //printf("update dyn before: pos: %f, %f loffset: %f, %f\n", pos.X, pos.Z, loffset.X, loffset.Z);
-            node->setPosition(pos-loffset);
+            if (skipNodeUpdate == false)
+            {
+                node->setPosition(pos-loffset);
+            }
             //printf("update dyn after: pos: %f, %f \n", node->getPosition().X, node->getPosition().Z);
         //}
         //else
@@ -101,7 +114,7 @@ void OffsetObject::update(const irr::core::vector3df& offset, const irr::core::v
         //}
     }
     //printf("update: %p body %p\n", this, hkBody);
-    if (hkBody)
+    if (hkBody && !skipNodeUpdate)
     {
         irr::core::vector3df tv;
         //if (dynamic)
@@ -112,7 +125,9 @@ void OffsetObject::update(const irr::core::vector3df& offset, const irr::core::v
         //{
         //    tv = pos-offset;
         //}
+        //hk::lock();
         hkBody->setPosition(hkVector4(tv.X, tv.Y, tv.Z));
+        //hk::unlock();
     }
     //printf("update: %p body %p end\n", this, hkBody);
     if (updateCB)
@@ -121,9 +136,11 @@ void OffsetObject::update(const irr::core::vector3df& offset, const irr::core::v
     }
 }
 
-void OffsetObject::addToManager()
+void OffsetObject::addToManager(bool p_skipNodeUpdate)
 {
+    skipNodeUpdate = p_skipNodeUpdate;
     offsetManager->addObject(this);
+    skipNodeUpdate = false;
 }
 
 void OffsetObject::removeFromManager()

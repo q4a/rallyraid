@@ -3,6 +3,7 @@
 #include "Terrain_defs.h"
 #include "TheGame.h"
 #include "OffsetObject.h"
+#include "OffsetManager.h"
 #include "TheEarth.h"
 #include <math.h>
 #include "Shaders.h"
@@ -18,6 +19,7 @@ Terrain::Terrain(const std::string& prefix)
       offsetY(0),
       prefix(prefix),
       image(0)
+      /*, loading(false)*/
 {
 }
 
@@ -43,6 +45,15 @@ Terrain::~Terrain()
     delete offsetObject;
 }
 
+void Terrain::postConstruct()
+{
+}
+
+void Terrain::postLoad()
+{
+    //terrain->setPosition(terrain->getPosition()-OffsetManager::getInstance()->getOffset());
+}
+
 void Terrain::setVisible(bool p_visible)
 {
     if (visible == p_visible) return;
@@ -51,6 +62,7 @@ void Terrain::setVisible(bool p_visible)
 
     if (visible)
     {
+        // must be here DO NOT update in thread
         if (hkShape && offsetObject->getBody() == 0)
         {
             //dprintf(MY_DEBUG_NOTE, "create terrain object\n");
@@ -69,7 +81,7 @@ void Terrain::setVisible(bool p_visible)
             offsetObject->setBody(hkBody);
         }
         //printf("add to manager %s ... \n", prefix.c_str());
-        offsetObject->addToManager();
+        offsetObject->addToManager(/*skipUpdate*/);
         //printf("add to manager %s ... done\n", prefix.c_str());
         if (image)
         {
@@ -126,3 +138,7 @@ void Terrain::setVisible(bool p_visible)
     //    offsetObject->getBody()->getPosition()(0), offsetObject->getBody()->getPosition()(1), offsetObject->getBody()->getPosition()(2));
 }
 
+/*void Terrain::handleUpdatePos(bool phys)
+{
+    while (loading) = false;
+}*/

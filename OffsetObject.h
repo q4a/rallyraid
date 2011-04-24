@@ -60,7 +60,7 @@ public:
     ObjectPool* getPool() {return pool;}
     void setPool(ObjectPool* p_pool) {pool = p_pool;}
 
-    void addToManager();
+    void addToManager(bool p_skipNodeUpdate = false);
     void removeFromManager();
 
     void setUpdateCB(OffsetObjectUpdateCB* p_updateCB);
@@ -77,6 +77,7 @@ private:
     OffsetManager*                  offsetManager;
     ObjectPool*                     pool;
     OffsetObjectUpdateCB*           updateCB;
+    bool                            skipNodeUpdate;
     
     typedef std::set<OffsetObject*> dynamicObjectSet_t;
     static dynamicObjectSet_t       dynamicObjectSet;

@@ -241,7 +241,8 @@ namespace scene
 		// Rotate the vertices of the terrain by the rotation
 		// specified. Must be done after calculating the terrain data,
 		// so we know what the current center of the terrain is.
-		setRotation(TerrainData.Rotation);
+		//setRotation(TerrainData.Rotation);
+		ForceRecalculation = true;
 
 		// Pre-allocate memory for indices
 
@@ -401,7 +402,8 @@ namespace scene
 		// Rotate the vertices of the terrain by the rotation
 		// specified. Must be done after calculating the terrain data,
 		// so we know what the current center of the terrain is.
-		setRotation(TerrainData.Rotation);
+		//setRotation(TerrainData.Rotation);
+		ForceRecalculation = true;
 
 		// Pre-allocate memory for indices
 
@@ -844,6 +846,7 @@ namespace scene
 	//! \param scale: New scale of the node
 	void TerrainSceneNode::setScale(const core::vector3df& scale)
 	{
+        assert(0);
 		TerrainData.Scale = scale;
 		applyTransformation();
 		calculateNormals(RenderBuffer);
@@ -856,6 +859,7 @@ namespace scene
 	//! \param rotation: New rotation of the node in degrees.
 	void TerrainSceneNode::setRotation(const core::vector3df& rotation)
 	{
+        assert(0);
 		TerrainData.Rotation = rotation;
 		applyTransformation();
 		ForceRecalculation = true;
@@ -867,6 +871,7 @@ namespace scene
 	//! NOTE: The default for the RotationPivot will be the center of the individual tile.
 	void TerrainSceneNode::setRotationPivot(const core::vector3df& pivot)
 	{
+        assert(0);
 		UseDefaultRotationPivot = false;
 		TerrainData.RotationPivot = pivot;
 	}

@@ -13,11 +13,12 @@
 #include "NTerrainSceneNode.h"
 #include "hk.h"
 #include <string>
+#include "OffsetObject.h"
 
 class OffsetObject;
 class TheEarth;
 
-class Terrain
+class Terrain /*: public OffsetObjectUpdateCB*/
 {
 public:
     Terrain(const std::string& prefix);
@@ -32,6 +33,13 @@ public:
     float getHeight(float x, float z); // inline
 
 protected:
+    void postConstruct();
+    void postLoad();
+
+private:
+    //virtual void handleUpdatePos(bool phys);
+
+protected:
     irr::scene::TerrainSceneNode*   terrain;
     hkpShape*                       hkShape;
     OffsetObject*                   offsetObject;
@@ -40,6 +48,8 @@ protected:
     int                             offsetY;
     std::string                     prefix;
     irr::video::IImage*             image;
+    //bool                            skipUpdate;
+    //volatile bool                   loading;
 };
 
 

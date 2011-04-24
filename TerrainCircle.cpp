@@ -3,6 +3,7 @@
 #include "Terrain_defs.h"
 #include "TheGame.h"
 #include "OffsetObject.h"
+#include "OffsetManager.h"
 #include "TheEarth.h"
 #include <math.h>
 #include "Shaders.h"
@@ -56,7 +57,7 @@ TerrainCircle::TerrainCircle(const irr::core::vector3di& posi, TheEarth* earth, 
         -1,
         4,
         irr::scene::ETPS_17,
-        irr::core::vector3df((float)posi.X, 0.0f, (float)posi.Z),
+        irr::core::vector3df((float)posi.X, 0.0f, (float)posi.Z)/*-OffsetManager::getInstance()->getOffset()*/,
         irr::core::vector3df(),
         irr::core::vector3df(TILE_SCALE_F, 1.0f, TILE_SCALE_F));
     terrain->setVisible(visible);
@@ -73,6 +74,7 @@ TerrainCircle::TerrainCircle(const irr::core::vector3di& posi, TheEarth* earth, 
         hkShape = new HeightFieldHelper(ci, earth, offsetX, offsetY/*posi.X, posi.Z*/);
         hk::unlock();
     }
+    postConstruct();
 }
 
 TerrainCircle::~TerrainCircle()
@@ -101,5 +103,6 @@ void TerrainCircle::load(TheEarth* earth)
             }
         }
     }
+    postLoad();
 }
 

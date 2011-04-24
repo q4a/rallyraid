@@ -67,8 +67,20 @@ hkJobQueue* hk::jobQueue;
 
 static void HK_CALL errorReportFunction(const char* str, void*)
 {
-	printf("%s", str);
+    printf("%s", str);
 }
+
+#include <Common/Base/UnitTest/hkUnitTest.h>
+
+extern hkTestEntry* hkUnitTestDatabase;
+hkTestEntry* hkUnitTestDatabase;
+
+hkBool HK_CALL hkTestReport(hkBool32 cond, const char* desc, const char* file, int line)
+{
+    printf("hkTestReport: %s (%d)\n\t%s\n", file, line, desc);
+    return cond != false;
+}
+
 
 
 void hk::initialize()
@@ -123,7 +135,8 @@ void hk::initialize()
 
     printf("initialize Havok: world\n");
     hkpWorldCinfo winfo;
-    winfo.m_simulationType = hkpWorldCinfo::SIMULATION_TYPE_DISCRETE;
+    //winfo.m_simulationType = hkpWorldCinfo::SIMULATION_TYPE_DISCRETE;
+    winfo.m_simulationType = hkpWorldCinfo::SIMULATION_TYPE_MULTITHREADED;
     winfo.m_enableDeactivation = false;
     winfo.m_collisionTolerance = 0.1f;
     winfo.m_gravity.set(0.0f, -9.8f, 0.0f);
@@ -134,6 +147,7 @@ void hk::initialize()
     hk::lock();
 // Register all agents.
     hkpAgentRegisterUtil::registerAllAgents(hkWorld->getCollisionDispatcher());
+    hkWorld->registerWithJobQueue(jobQueue);
     hkpGroupFilter* filter = new hkpGroupFilter();
     filter->disableCollisionsBetween(materialType::vehicleId, materialType::wheelId);
     hkWorld->setCollisionFilter(filter);
@@ -145,6 +159,7 @@ void hk::initialize()
 
 void hk::finalize()
 {
+    hk::lock();
     if (hkWorld)
     {
         hkBaseSystem::quit();
@@ -155,4 +170,10 @@ void hk::finalize()
 //    threadPool->removeReference();
     //printf("Base system shut down.\n");
     //return result;
+}
+
+void hk::step(float step_sec)
+{
+    //hkWorld->stepDeltaTime(step_sec);
+    hkWorld->stepMultithreaded(jobQueue, threadPool, step_sec);
 }

@@ -351,7 +351,7 @@ void TheGame::loop()
             {
                 if (physicsOngoing)
                 {
-                    hk::hkWorld->stepDeltaTime(step_sec);
+                    hk::step(step_sec);
                     physUpdateDone = true;
                 }
                 lastPhysTick += 16;

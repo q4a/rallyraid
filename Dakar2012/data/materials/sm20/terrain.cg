@@ -44,7 +44,7 @@ void main_v( float4 vPosition 	: POSITION,
   float3 L = normalize(mLightPos - float3(0.0, 0.0, 0.0));
 
   // calculate light color
-  float3 tmp = mLightColor * max(dot(normal, L), 0.0);
+  float3 tmp = mLightColor * max(dot(-L, normal), 0.0);
 
   color = float4(tmp.x, tmp.y, tmp.z, 1.0);
 }
@@ -66,13 +66,12 @@ void main_f( float4 position 	: POSITION,
   float4 col1 = tex2D(tex1, Uv1);  // detailmap
   float4 multip = calc_multip(color, 0.35);
 
-  float4 col = ((col0*0.7) + (col1*0.5)) * 0.5;
-  //float4 col = color;
-  //col *= multip;
+  float4 col = ((col0) + ((col1-0.5)*0.5)) * 1.0;
+  //float4 col = col0 * multip;
+  col *= multip;
   //color + multip;
 
   oColor = col;
   // * 1.5;
   //oColor = float4(1.0, 1.0, 1.0, 1.0);
-
 }
