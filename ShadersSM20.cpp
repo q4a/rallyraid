@@ -11,6 +11,51 @@
 
 using namespace IrrCg;
 
+/*
+#define ADD_TEXTURE_MATRIX_V \
+        ptextureMatrix = cgGetNamedParameter(Vertex, "mTextureMatrix"); \
+        if (ptextureMatrix) \
+        { \
+            core::matrix4 textureMatrix; \
+            textureMatrix = lightCam->getProjectionMatrix(); \
+            textureMatrix *= lightCam->getViewMatrix(); \
+            textureMatrix *= driver->getTransform(video::ETS_WORLD); \
+        	services->setMatrix(ptextureMatrix,ICGT_MATRIX_IDENTITY,textureMatrix); \
+        }
+*/
+#define ADD_WORLD_VIEW_PROJ_V \
+    WorldViewProjection = cgGetNamedParameter(Vertex, "mWorldViewProj"); \
+    irr::core::matrix4 cworldViewProj; \
+    cworldViewProj = driver->getTransform(irr::video::ETS_PROJECTION); \
+    cworldViewProj *= driver->getTransform(irr::video::ETS_VIEW); \
+    cworldViewProj *= driver->getTransform(irr::video::ETS_WORLD); \
+    services->setMatrix(WorldViewProjection,ICGT_MATRIX_IDENTITY,cworldViewProj);
+
+#define ADD_WORLD_V \
+    World = cgGetNamedParameter(Vertex, "mWorld"); \
+    irr::core::matrix4 cworld; \
+    cworld = driver->getTransform(irr::video::ETS_WORLD); \
+    services->setMatrix(World,ICGT_MATRIX_IDENTITY,cworld); 
+
+#define ADD_INV_WORLD_V \
+    InvWorld = cgGetNamedParameter(Vertex, "mInvWorld"); \
+    irr::core::matrix4 cinvWorld = driver->getTransform(irr::video::ETS_WORLD); \
+    cinvWorld.makeInverse(); \
+    services->setMatrix(InvWorld,ICGT_MATRIX_IDENTITY,cinvWorld);
+
+#define ADD_LIGHT_COL_V \
+    lightColor = cgGetNamedParameter(Vertex, "mLightColor"); \
+    services->setParameter3f(lightColor, 0.98f, 0.98f, 0.98f);
+//    irr::video::SColorf col = m_lnode->getLightData().DiffuseColor; \
+//    services->setParameter3f(lightColor, col.r, col.g, col.b);
+
+#define ADD_LIGHT_POS_V \
+    lightPosition = cgGetNamedParameter(Vertex, "mLightPos"); \
+    services->setParameter3f(lightPosition, 0.01f, -1.0f, 0.03f);
+//    irr::core::vector3df pos = m_lnode->getLightData().Position; \
+//    services->setParameter3f(lightPosition, pos.X, pos.Y, pos.Z);
+
+
 
 class SM20_ShaderCallback : public ICgShaderConstantSetCallBack
 {
@@ -43,7 +88,6 @@ public:
 public:
     SM20_ShaderCallback_quad2d()
     {
-
     }
 
     virtual void OnSetConstants(ICgServices* services,const CGeffect& Effect,const CGpass& Pass,const CGprogram& Vertex,const CGprogram& Pixel,const irr::video::SMaterial& Material)
@@ -52,6 +96,26 @@ public:
 
 };
 */
+class SM20_ShaderCallback_terrain : public SM20_ShaderCallback
+{
+public:
+    CGparameter WorldViewProjection, World, InvWorld, ptextureMatrix, lightColor, lightPosition;
+public:
+    SM20_ShaderCallback_terrain()
+    {
+    }
+
+    virtual void OnSetConstants(ICgServices* services,const CGeffect& Effect,const CGpass& Pass,const CGprogram& Vertex,const CGprogram& Pixel,const irr::video::SMaterial& Material)
+    {
+        ADD_WORLD_V
+        ADD_WORLD_VIEW_PROJ_V
+        ADD_INV_WORLD_V
+        //ADD_TEXTURE_MATRIX_V
+        ADD_LIGHT_COL_V
+        ADD_LIGHT_POS_V
+    }
+
+};
 
 std::set<SM20_ShaderCallback*> SM20_ShaderCallback::callbacks;
 
@@ -85,7 +149,7 @@ void ShadersSM20::loadSM20Materials()
     const irr::c8* ogl_ps_version = "arbfp1";
     const irr::c8* d3d_vs_version = "vs_2_0";
     const irr::c8* d3d_ps_version = "ps_2_0";
-
+    bool doAssert = false;
 
     ConfigFile cf;
     cf.load("data/materials/sm20.cfg");
@@ -101,6 +165,11 @@ void ShadersSM20::loadSM20Materials()
         materialName = seci.peekNextKey();
         dprintf(MY_DEBUG_NOTE, "\tMaterial: %s\n", materialName.c_str());
         ConfigFile::SettingsMultiMap *settings = seci.getNext();
+        if (materialName == "assert")
+        {
+            doAssert = true;
+            continue;
+        }
         for (ConfigFile::SettingsMultiMap::iterator i = settings->begin(); i != settings->end(); ++i)
         {
             keyName = i->first;
@@ -121,18 +190,26 @@ void ShadersSM20::loadSM20Materials()
             {
                 baseMaterial = it->second;
             }
-            //if (materialName=="blabla")
-            //{
-            //    use specific shader CB
-            //}
-            //else
+            if (materialName=="terrain")
+            {
+                // use specific shader CB
+                materialMap[materialName] = (irr::video::E_MATERIAL_TYPE)gpu->addCgShaderMaterialFromFiles(CG_SOURCE,
+                    shaderFile.c_str(), "main_v", ogl_vs_version, d3d_vs_version,
+                    shaderFile.c_str(), "main_f", ogl_ps_version, d3d_ps_version,
+                    new SM20_ShaderCallback_terrain(), irr::video::EMT_SOLID/*irr::video::EMT_TRANSPARENT_ALPHA_CHANNEL baseMaterial*/);
+            }
+            else
             {
                 materialMap[materialName] = (irr::video::E_MATERIAL_TYPE)gpu->addCgShaderMaterialFromFiles(CG_SOURCE,
                     shaderFile.c_str(), "main_v", ogl_vs_version, d3d_vs_version,
                     shaderFile.c_str(), "main_f", ogl_ps_version, d3d_ps_version,
-                    new SM20_ShaderCallback(), /*video::EMT_SOLIDirr::video::EMT_TRANSPARENT_ALPHA_CHANNEL*/baseMaterial);
+                    new SM20_ShaderCallback(), /*irr::video::EMT_SOLIDirr::video::EMT_TRANSPARENT_ALPHA_CHANNEL*/baseMaterial);
             }
         }
+    }
+    if (doAssert)
+    {
+        assert(0);
     }
 }
 

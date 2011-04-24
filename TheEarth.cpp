@@ -99,8 +99,8 @@ void TheEarth::VisualMembers::createMembers(const irr::core::vector3di& centerPo
             assert(terrainCircle[i][j] == 0);
             if (i == 1 && j == 1)
             {
-                //terrainCircle[i][j] = new TerrainDetail(centerPosi+terrainPos[i][j], earth);
-                terrainCircle[i][j] = new TerrainCircle(centerPosi+terrainPos[i][j], earth, true);
+                terrainCircle[i][j] = new TerrainDetail(centerPosi+terrainPos[i][j], earth);
+                //terrainCircle[i][j] = new TerrainCircle(centerPosi+terrainPos[i][j], earth, true);
             }
             else
             {

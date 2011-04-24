@@ -92,6 +92,7 @@ void TerrainCircle::load(TheEarth* earth)
         image = TheGame::getInstance()->getDriver()->createImage(irr::video::ECF_R8G8B8, irr::core::dimension2du(TILE_FINE_POINTS_NUM, TILE_FINE_POINTS_NUM));
         int offsetXFine = offsetX * TILE_FINE_RATE;
         int offsetYFine = offsetY * TILE_FINE_RATE;
+        printf("===============================\n%d %d\n===============================\n", offsetXFine, offsetYFine);
         for (int x = 0; x < TILE_FINE_POINTS_NUM; x++)
         {
             for (int z = 0; z < TILE_FINE_POINTS_NUM; z++)

@@ -178,17 +178,22 @@ namespace scene
 			for (s32 z = 0; z < TerrainData.Size; ++z)
 			{
                 unsigned short height = 0;
+                irr::video::SColor color;
 				video::S3DVertex2TCoords& vertex= static_cast<video::S3DVertex2TCoords*>(mb->getVertexBuffer().pointer())[index++];
 				vertex.Normal.set(0.0f, 1.0f, 0.0f);
 				//vertex.Color = vertexColor;
-                earth->getTileHeightAndTexture((unsigned int)abs(offsetX+x), (unsigned int)abs(offsetY+z), height, vertex.Color);
+                //vertex.Color = irr::video::SColor(0/*255*/,128,128,128);
+                //height = earth->getTileHeight((unsigned int)abs(offsetX+x), (unsigned int)abs(offsetY+z));
+                //earth->getTileHeightAndTexture((unsigned int)abs(offsetX+x), (unsigned int)abs(offsetY+z), height, vertex.Color);
+                earth->getTileHeightAndTexture((unsigned int)abs(offsetX+x), (unsigned int)abs(offsetY+z), height, color);
+                vertex.Color = irr::video::SColor(0/*255*/,127,127,127);
 				vertex.Pos.X = fx;
 				vertex.Pos.Y = (f32)height; //Map->getPixel(TerrainData.Size-x-1,z).getLuminance();
 				vertex.Pos.Z = fz;
                 
                 if (image && x < TerrainData.Size - 1 && z < TerrainData.Size - 1)
                 {
-                    image->setPixel(TerrainData.Size - x - 2, z, vertex.Color);
+                    image->setPixel(TerrainData.Size - x - 2, z, color);
                 }
                 
 				vertex.TCoords.X = vertex.TCoords2.X = fx2; //1.f-fx2;
@@ -257,7 +262,7 @@ namespace scene
 	}
 
 	//! Initializes the terrain data. Loads the vertices from terrain detail and earth data
-	bool TerrainSceneNode::loadHeightMap(TerrainDetail* td, TheEarth* earth, int offsetX, int offsetY, unsigned int size, irr::video::IImage* image)
+	bool TerrainSceneNode::loadHeightMap(TerrainDetail* td, int offsetX, int offsetY, unsigned int size/*, irr::video::IImage* image*/)
 	{
 		Mesh->MeshBuffers.clear();
 		//const u32 startTime = os::Timer::getRealTime();
@@ -340,16 +345,17 @@ namespace scene
 				video::S3DVertex2TCoords& vertex= static_cast<video::S3DVertex2TCoords*>(mb->getVertexBuffer().pointer())[index++];
 				vertex.Normal.set(0.0f, 1.0f, 0.0f);
 				//vertex.Color = vertexColor;
-                vertex.Color = earth->getTileFineTexture((unsigned int)abs(offsetX+x), (unsigned int)abs(offsetY+z));
+                //vertex.Color = earth->getTileFineTexture((unsigned int)abs(offsetX+x), (unsigned int)abs(offsetY+z));
+                vertex.Color = irr::video::SColor(0/*255*/,127,127,127);
 				vertex.Pos.X = fx;
                 vertex.Pos.Y = (f32)td->get(x, z);//height; //Map->getPixel(TerrainData.Size-x-1,z).getLuminance();
 				vertex.Pos.Z = fz;
-
+                /*
                 if (x < TerrainData.Size - 1 && z < TerrainData.Size - 1)
                 {
                     image->setPixel(TerrainData.Size - x - 2, z, vertex.Color);
                 }
-
+                */
 				vertex.TCoords.X = vertex.TCoords2.X = fx2; //1.f-fx2;
 				vertex.TCoords.Y = vertex.TCoords2.Y = /*1.f -*/ fz2;
 

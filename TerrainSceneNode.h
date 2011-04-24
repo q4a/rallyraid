@@ -57,7 +57,7 @@ namespace scene
 		virtual ~TerrainSceneNode();
 
         virtual bool loadHeightMap(TheEarth* earth, int offsetX, int offsetY, unsigned int size, irr::video::IImage* image);
-		virtual bool loadHeightMap(TerrainDetail* td, TheEarth* earth, int offsetX, int offsetY, unsigned int size, irr::video::IImage* image);
+		virtual bool loadHeightMap(TerrainDetail* td, int offsetX, int offsetY, unsigned int size);
         //irr::video::ITexture* getGeneratedTexture() {return texture;}
         //irr::video::IImage* getGeneratedImage() {return image;}
 #if 1

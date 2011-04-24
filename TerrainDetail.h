@@ -31,7 +31,7 @@ private:
 
 inline float TerrainDetail::get(int x, int y)
 {
-    return fineHeights[(x+TILE_FINE_RATE) + ((TILE_FINE_POINTS_NUM+(3*TILE_FINE_RATE))*(y+TILE_FINE_RATE))];
+    return fineHeights[(x+TILE_DETAIL_RATE) + ((TILE_DETAIL_POINTS_NUM+(3*TILE_DETAIL_RATE))*(y+TILE_DETAIL_RATE))];
 }
 
 inline float TerrainDetail::get(int pos)
@@ -41,7 +41,7 @@ inline float TerrainDetail::get(int pos)
 
 inline void TerrainDetail::set(int x, int y, float val)
 {
-    fineHeights[(x+TILE_FINE_RATE) + ((TILE_FINE_POINTS_NUM+(3*TILE_FINE_RATE))*(y+TILE_FINE_RATE))] = val;
+    fineHeights[(x+TILE_DETAIL_RATE) + ((TILE_DETAIL_POINTS_NUM+(3*TILE_DETAIL_RATE))*(y+TILE_DETAIL_RATE))] = val;
 }
 
 inline void TerrainDetail::set(int pos, float val)

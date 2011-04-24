@@ -71,13 +71,20 @@ void Terrain::setVisible(bool p_visible)
         //printf("add to manager %s ... \n", prefix.c_str());
         offsetObject->addToManager();
         //printf("add to manager %s ... done\n", prefix.c_str());
+        if (image)
         {
             char textureMapPartName[255];
             sprintf_s(textureMapPartName, "%s_textureMapPart_%d_%d", prefix.c_str(), offsetX, offsetY);
-            TheGame::getInstance()->getSmgr()->getVideoDriver()->setTextureCreationFlag(irr::video::ETCF_CREATE_MIP_MAPS, false);
-            //irr::video::ITexture* texture = TheGame::getInstance()->getSmgr()->getVideoDriver()->addTexture(textureMapPartName, terrain->getGeneratedImage());
-            irr::video::ITexture* texture = TheGame::getInstance()->getSmgr()->getVideoDriver()->addTexture(textureMapPartName, image);
-            TheGame::getInstance()->getSmgr()->getVideoDriver()->setTextureCreationFlag(irr::video::ETCF_CREATE_MIP_MAPS, true);
+            TheGame::getInstance()->getDriver()->setTextureCreationFlag(irr::video::ETCF_CREATE_MIP_MAPS, false);
+            //irr::video::ITexture* texture = TheGame::getInstance()->getDriver()->addTexture(textureMapPartName, terrain->getGeneratedImage());
+            irr::video::ITexture* texture = TheGame::getInstance()->getDriver()->addTexture(textureMapPartName, image);
+            TheGame::getInstance()->getDriver()->setTextureCreationFlag(irr::video::ETCF_CREATE_MIP_MAPS, true);
+            //printf("image found(%p): %s - %u x %u - %u, %u, %u\n",
+            //    texture,
+            //    prefix.c_str(), image->getDimension().Width, image->getDimension().Height,
+            //    image->getPixel(image->getDimension().Width/2,image->getDimension().Height/2).getRed(),
+            //    image->getPixel(image->getDimension().Width/2,image->getDimension().Height/2).getGreen(),
+            //    image->getPixel(image->getDimension().Width/2,image->getDimension().Height/2).getBlue());
             terrain->setMaterialTexture(0, texture);
             terrain->setMaterialTexture(1, TheGame::getInstance()->getDriver()->getTexture("data/earthdata/detailmap_03.png"));
             if (Shaders::getInstance()->getSupportedSMVersion() < 2)
@@ -92,6 +99,10 @@ void Terrain::setVisible(bool p_visible)
             terrain->scaleTexture(1.0f, /*TILE_SIZE_F*/(float)TILE_POINTS_NUM);
             terrain->setMaterialType(Shaders::getInstance()->materialMap["terrain"]);
             //image->drop();
+        }
+        else
+        {
+            printf("no image\n");
         }
         //printf("add to manager %s ... done 2\n", prefix.c_str());
     }
