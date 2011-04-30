@@ -64,7 +64,7 @@ MySoundEngine::~MySoundEngine()
         it != soundFileNameBuffer.end();
         it++)
     {
-        dprintf(MY_DEBUG_INFO, "free up %s\n", it->first);
+        dprintf(MY_DEBUG_INFO, "free up %s\n", it->first.c_str());
         alDeleteBuffers(1, &it->second);
     }
     soundFileNameBuffer.clear();

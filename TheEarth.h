@@ -76,6 +76,9 @@ public:
      // x and y devide by TILE_SCALE * TILE_POINTS_NUM // inline
     irr::video::SColor getEarthTexture(unsigned int x, unsigned int y) const;
      // x and y devide by TILE_SCALE * TILE_POINTS_NUM // inline
+    void getEarthHeightAndTexture(unsigned int x, unsigned int y, unsigned short& p_height, irr::video::SColor& textureColor) const;
+    // x and y devide by TILE_SCALE * TILE_POINTS_NUM // inline
+
 
 private:
     unsigned short getEarthHeight(unsigned int tileNum) const;
@@ -141,15 +144,20 @@ private:
         ~VisualMembers();
         
         void setVisible(bool visible);
-        void createMembers(const irr::core::vector3di& centerPosi, TheEarth* earth);
+        void createMembers(const irr::core::vector3di& centerPosi, const irr::core::vector3di& largeCenterPosi, TheEarth* earth, Terrain* lastTerrainLarge = 0);
         void loadMembers(TheEarth* earth);
         void finalizeMembers();
         void registerMembers();
         float getHeight(float x, float z);
         
         Terrain* terrainCircle[3][3];
+        Terrain* terrainLarge;
+        bool removeLarge;
+        
         static const irr::core::vector3di terrainPos[3][3];
         static const irr::core::vector3df terrainPosf[3][3];
+        static const irr::core::vector3di terrainLargePos;
+        static const irr::core::vector3df terrainLargePosf;
     };
     
     VisualMembers*      visualPart;
@@ -159,6 +167,7 @@ private:
     irr::core::aabbox3df    lastPosBox;
     irr::core::vector3df    lastCenterPos;
     irr::core::vector3di    lastCenterPosi;
+    irr::core::vector3di    lastLargeCenterPosi;
 
     irr::video::IImage*     miniMap;
     irr::video::ITexture*   miniMapTexture;
@@ -256,7 +265,7 @@ inline irr::video::SColor TheEarth::getEarthDensity(unsigned int x, unsigned int
 
 inline irr::video::SColor TheEarth::getEarthTexture(unsigned int x, unsigned int y) const
 {
-    if (density && xsize > 0 && ysize > 0)
+    if (earthTexture && xsize > 0 && ysize > 0)
     {
         if (x >= xsize) x = xsize - 1;
         if (y >= ysize) y = ysize - 1;
@@ -265,6 +274,21 @@ inline irr::video::SColor TheEarth::getEarthTexture(unsigned int x, unsigned int
     else
     {
         return baseColor;
+    }
+}
+
+inline void TheEarth::getEarthHeightAndTexture(unsigned int x, unsigned int y, unsigned short& p_height, irr::video::SColor& textureColor) const
+{
+    if (height && earthTexture && xsize > 0 && ysize > 0)
+    {
+        if (x >= xsize) x = xsize - 1;
+        if (y >= ysize) y = ysize - 1;
+        p_height = getEarthHeight(x + (xsize*y));
+        textureColor = earthTexture->getPixel(x, y);
+    }
+    else
+    {
+        p_height = 0;
     }
 }
 

@@ -122,7 +122,7 @@ TerrainDetail::TerrainDetail(const irr::core::vector3di& posi, TheEarth* earth)
                         //printf("\tb2 = (yim1 - 2*yi + yip1) / 2 = %d\n", b2);
                         b3   = (-hcm1 + 3.0f*hc - 3.0f*hcp1 + hcp2) / 6.0f;
                     }
-                    float t = (float)(i - c) / (float)(cp1 - 0);
+                    float t = (float)(i - c) / (TILE_DETAIL_RATE_F);
                     /*fineHeights[i+fy] =*/set(i+fy, ((((((b3*t)) + b2) * t) + b1) * t) + b0);
                 }
             }
@@ -162,7 +162,7 @@ TerrainDetail::TerrainDetail(const irr::core::vector3di& posi, TheEarth* earth)
                         //printf("\tb2 = (yim1 - 2*yi + yip1) / 2 = %d\n", b2);
                         b3   = (-hcm1 + 3.0f*hc - 3.0f*hcp1 + hcp2) / 6.0f;
                     }
-                    float t = (float)(y - c) / (float)(cp1 - 0);
+                    float t = (float)(y - c) / (TILE_DETAIL_RATE_F);
                     /*fineHeights[x+fy] =*/ set(x+fy, ((((((b3*t)) + b2) * t) + b1) * t) + b0);
                 }
             }
@@ -200,7 +200,7 @@ TerrainDetail::TerrainDetail(const irr::core::vector3di& posi, TheEarth* earth)
                             assert(h==0);
                             hy = get(x+flty) /* 100*/;
                             hyp1 = get(x+fltyp1) /* 100*/;
-                            set(x+fy, (hy*(float)ty+hyp1*(float)typ1+hx*(float)tx+hxp1*(float)txp1)/(TILE_DETAIL_RATE_F*2.0f) - 2.5f);
+                            set(x+fy, (hy*(float)ty+hyp1*(float)typ1+hx*(float)tx+hxp1*(float)txp1)/(TILE_DETAIL_RATE_F*2.0f) /*- 2.5f*/);
                         }
                         else
                         {

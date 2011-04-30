@@ -12,6 +12,7 @@
 
 class TheEarth;
 class TerrainDetail;
+class TerrainLarge;
 
 namespace irr
 {
@@ -58,6 +59,7 @@ namespace scene
 
         virtual bool loadHeightMap(TheEarth* earth, int offsetX, int offsetY, unsigned int size, irr::video::IImage* image);
 		virtual bool loadHeightMap(TerrainDetail* td, int offsetX, int offsetY, unsigned int size);
+		virtual bool loadHeightMap(TerrainLarge* tl, TheEarth* earth, int offsetX, int offsetY, unsigned int size, irr::video::IImage* image);
         //irr::video::ITexture* getGeneratedTexture() {return texture;}
         //irr::video::IImage* getGeneratedImage() {return image;}
 #if 1

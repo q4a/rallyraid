@@ -132,6 +132,7 @@
     <ClInclude Include="Terrain.h" />
     <ClInclude Include="TerrainCircle.h" />
     <ClInclude Include="TerrainDetail.h" />
+    <ClInclude Include="TerrainLarge.h" />
     <ClInclude Include="TerrainSceneNode.h" />
     <ClInclude Include="Terrain_defs.h" />
     <ClInclude Include="TheEarth.h" />
@@ -185,6 +186,7 @@
     <ClCompile Include="Terrain.cpp" />
     <ClCompile Include="TerrainCircle.cpp" />
     <ClCompile Include="TerrainDetail.cpp" />
+    <ClCompile Include="TerrainLarge.cpp" />
     <ClCompile Include="TerrainSceneNode.cpp" />
     <ClCompile Include="TheEarth.cpp" />
     <ClCompile Include="TheGame.cpp" />

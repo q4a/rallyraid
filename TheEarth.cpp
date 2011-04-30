@@ -13,6 +13,7 @@
 #include <errno.h>
 #include "TerrainDetail.h"
 #include "TerrainCircle.h"
+#include "TerrainLarge.h"
 
 
 const irr::core::vector3di TheEarth::VisualMembers::terrainPos[3][3] =
@@ -55,8 +56,13 @@ const irr::core::vector3df TheEarth::VisualMembers::terrainPosf[3][3] =
     }
 };
 
+const irr::core::vector3di TheEarth::VisualMembers::terrainLargePos =
+    irr::core::vector3di(-TILE_LARGE_HSIZE, 0, -TILE_LARGE_HSIZE);
+const irr::core::vector3df TheEarth::VisualMembers::terrainLargePosf =
+    irr::core::vector3df(-TILE_LARGE_HSIZE_F, 0.0f, -TILE_LARGE_HSIZE_F);
 
 TheEarth::VisualMembers::VisualMembers()
+    : terrainLarge(0), removeLarge(true)
 {
     memset(terrainCircle, 0, sizeof(Terrain*)*3*3);
 }
@@ -74,6 +80,11 @@ TheEarth::VisualMembers::~VisualMembers()
             }
         }
     }
+    if (terrainLarge && removeLarge)
+    {
+        delete terrainLarge;
+        terrainLarge = 0;
+    }
 }
 
 void TheEarth::VisualMembers::setVisible(bool visible)
@@ -88,9 +99,14 @@ void TheEarth::VisualMembers::setVisible(bool visible)
             }
         }
     }
+    if (terrainLarge)
+    {
+        terrainLarge->setVisible(visible);
+    }
 }
 
-void TheEarth::VisualMembers::createMembers(const irr::core::vector3di& centerPosi, TheEarth* earth)
+void TheEarth::VisualMembers::createMembers(const irr::core::vector3di& centerPosi, const irr::core::vector3di& largeCenterPosi, 
+    TheEarth* earth, Terrain* lastTerrainLarge)
 {
     for (unsigned int i = 0; i < 3; i++)
     {
@@ -108,6 +124,15 @@ void TheEarth::VisualMembers::createMembers(const irr::core::vector3di& centerPo
             }
         }
     }
+    assert(terrainLarge == 0);
+    if (lastTerrainLarge)
+    {
+        terrainLarge = lastTerrainLarge;
+    }
+    else
+    {
+        terrainLarge = new TerrainLarge(largeCenterPosi+terrainLargePos, earth);
+    }
 }
 
 void TheEarth::VisualMembers::loadMembers(TheEarth* earth)
@@ -120,6 +145,8 @@ void TheEarth::VisualMembers::loadMembers(TheEarth* earth)
             terrainCircle[i][j]->load(earth);
         }
     }
+    assert(terrainLarge);
+    terrainLarge->load(earth);
 }
 
 void TheEarth::VisualMembers::finalizeMembers()
@@ -138,6 +165,10 @@ void TheEarth::VisualMembers::registerMembers()
             }
         }
     }
+    if (terrainLarge)
+    {
+        terrainLarge->registerTerrain();
+    }
 }
 
 float TheEarth::VisualMembers::getHeight(float x, float z)
@@ -155,6 +186,10 @@ float TheEarth::VisualMembers::getHeight(float x, float z)
                 if (tmp > height) return tmp;
             }
         }
+    }
+    if (terrainLarge)
+    {
+        terrainLarge->getHeight(x, z);
     }
     return height;
 }
@@ -189,6 +224,7 @@ TheEarth::TheEarth()
       lastPosBox(),
       lastCenterPos(),
       lastCenterPosi(),
+      lastLargeCenterPosi(),
       miniMap(0),
       miniMapTexture(0),
       lastMiniMapPos(),
@@ -965,6 +1001,7 @@ void TheEarth::createFirst(const irr::core::vector3df& pos, const irr::core::vec
     lastCenterPos = irr::core::vector3df((float)lastCenterPosi.X, (float)lastCenterPosi.Y, (float)lastCenterPosi.Z);
     lastPosBox = irr::core::aabbox3df(lastCenterPos.X-VISUAL_BOX_HSIZE_F, -1000.0f, lastCenterPos.Z-VISUAL_BOX_HSIZE_F,
         lastCenterPos.X+VISUAL_BOX_HSIZE_F, 10000.0f, lastCenterPos.Z+VISUAL_BOX_HSIZE_F);
+    lastLargeCenterPosi = irr::core::vector3di(((int)(pos.X/TILE_LARGE_SCALE_F))*TILE_LARGE_SCALE, 0, ((int)(pos.Z/TILE_LARGE_SCALE_F))*TILE_LARGE_SCALE);
 
     if (visualPart)
     {
@@ -980,7 +1017,7 @@ void TheEarth::createFirst(const irr::core::vector3df& pos, const irr::core::vec
 
     visualPart = new VisualMembers();
     printf("create members ... ");
-    visualPart->createMembers(lastCenterPosi, this);
+    visualPart->createMembers(lastCenterPosi, lastLargeCenterPosi, this);
     printf("done\nload members ... ");
     visualPart->loadMembers(this);
     printf("done\nset visible members ... ");
@@ -1024,8 +1061,23 @@ void TheEarth::update(const irr::core::vector3df& pos, const irr::core::vector3d
         //lastCenterPosi = irr::core::vector3di((int)pos.X, 0, (int)pos.Z);
         lastCenterPos = irr::core::vector3df((float)lastCenterPosi.X, (float)lastCenterPosi.Y, (float)lastCenterPosi.Z);
         lastPosBox = irr::core::aabbox3df(lastCenterPos.X-VISUAL_BOX_HSIZE_F, -1000.0f, lastCenterPos.Z-VISUAL_BOX_HSIZE_F,
-        lastCenterPos.X+VISUAL_BOX_HSIZE_F, 10000.0f, lastCenterPos.Z+VISUAL_BOX_HSIZE_F);
-        newVisualPart->createMembers(lastCenterPosi, this);
+            lastCenterPos.X+VISUAL_BOX_HSIZE_F, 10000.0f, lastCenterPos.Z+VISUAL_BOX_HSIZE_F);
+#if 0
+        irr::core::vector3di newLargeCenterPosi = irr::core::vector3di(((int)(pos.X/TILE_LARGE_SCALE_F))*TILE_LARGE_SCALE, 0, ((int)(pos.Z/TILE_LARGE_SCALE_F))*TILE_LARGE_SCALE);
+        if (lastLargeCenterPosi == newLargeCenterPosi)
+        {
+            newVisualPart->createMembers(lastCenterPosi, lastLargeCenterPosi, this, visualPart->terrainLarge);
+            visualPart->removeLarge = false;
+        }
+        else
+        {
+            lastLargeCenterPosi = newLargeCenterPosi;
+            newVisualPart->createMembers(lastCenterPosi, newLargeCenterPosi, this);
+        }
+#else
+        lastLargeCenterPosi = irr::core::vector3di(((int)(pos.X/TILE_LARGE_SCALE_F))*TILE_LARGE_SCALE, 0, ((int)(pos.Z/TILE_LARGE_SCALE_F))*TILE_LARGE_SCALE);
+        newVisualPart->createMembers(lastCenterPosi, lastLargeCenterPosi, this);
+#endif
         printf("start create new ... done\n");
         execute();
         refreshMiniMap();
