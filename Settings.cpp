@@ -31,7 +31,8 @@ Settings::Settings()
       nonshaderLight(false),
       objectWireSize(200),
       objectWireNum(11),
-      objectDensity(10)
+      objectDensity(10),
+      useTerrainDetail(true)
 {
 }
 
@@ -82,6 +83,9 @@ void Settings::read()
             } else if (keyName == "object_density")
             {
                 objectDensity = StringConverter::parseUnsignedInt(valName, 10);
+            } else if (keyName == "use_terrain_detail")
+            {
+                useTerrainDetail = StringConverter::parseBool(valName, true);
             }
         }
     }
@@ -108,6 +112,7 @@ void Settings::write()
     ret = fprintf(f, "object_wire_size=%u\n", objectWireSize);
     ret = fprintf(f, "object_wire_num=%u\n", objectWireNum);
     ret = fprintf(f, "object_density=%u\n", objectDensity);
+    ret = fprintf(f, "use_terrain_detail=%s\n", useTerrainDetail?"yes":"no");
 
     fclose(f);
 }

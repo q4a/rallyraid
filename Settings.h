@@ -31,6 +31,7 @@ public:
     unsigned int            objectWireSize;
     unsigned int            objectWireNum;
     unsigned int            objectDensity;
+    bool                    useTerrainDetail;
 };
 
 #endif // SETTINGS_H

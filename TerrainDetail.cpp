@@ -123,7 +123,15 @@ TerrainDetail::TerrainDetail(const irr::core::vector3di& posi, TheEarth* earth)
                         b3   = (-hcm1 + 3.0f*hc - 3.0f*hcp1 + hcp2) / 6.0f;
                     }
                     float t = (float)(i - c) / (TILE_DETAIL_RATE_F);
-                    /*fineHeights[i+fy] =*/set(i+fy, ((((((b3*t)) + b2) * t) + b1) * t) + b0);
+                    if (y == TILE_DETAIL_RATE || y == TILE_DETAIL_POINTS_NUM+(1*TILE_DETAIL_RATE) ||
+                        i == TILE_DETAIL_RATE /*|| i == TILE_DETAIL_POINTS_NUM+(1*TILE_DETAIL_RATE)*/)
+                    {
+                        /*fineHeights[i+fy] =*/set(i+fy, (1.0f-t)*hc + t*hcp1);
+                    }
+                    else
+                    {
+                        /*fineHeights[i+fy] =*/set(i+fy, ((((((b3*t)) + b2) * t) + b1) * t) + b0);
+                    }
                 }
             }
             // second interpolate column
@@ -163,7 +171,15 @@ TerrainDetail::TerrainDetail(const irr::core::vector3di& posi, TheEarth* earth)
                         b3   = (-hcm1 + 3.0f*hc - 3.0f*hcp1 + hcp2) / 6.0f;
                     }
                     float t = (float)(y - c) / (TILE_DETAIL_RATE_F);
-                    /*fineHeights[x+fy] =*/ set(x+fy, ((((((b3*t)) + b2) * t) + b1) * t) + b0);
+                    if (x == TILE_DETAIL_RATE || x == TILE_DETAIL_POINTS_NUM+(1*TILE_DETAIL_RATE) ||
+                        y == TILE_DETAIL_RATE /*|| y == TILE_DETAIL_POINTS_NUM+(1*TILE_DETAIL_RATE)*/)
+                    {
+                        /*fineHeights[x+fy] =*/ set(x+fy, (1.0f-t)*hc + t*hcp1);
+                    }
+                    else
+                    {
+                        /*fineHeights[x+fy] =*/ set(x+fy, ((((((b3*t)) + b2) * t) + b1) * t) + b0);
+                    }
                 }
             }
 #endif // 0 v 1

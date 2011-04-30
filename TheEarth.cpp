@@ -14,6 +14,7 @@
 #include "TerrainDetail.h"
 #include "TerrainCircle.h"
 #include "TerrainLarge.h"
+#include "Settings.h"
 
 
 const irr::core::vector3di TheEarth::VisualMembers::terrainPos[3][3] =
@@ -115,8 +116,14 @@ void TheEarth::VisualMembers::createMembers(const irr::core::vector3di& centerPo
             assert(terrainCircle[i][j] == 0);
             if (i == 1 && j == 1)
             {
-                terrainCircle[i][j] = new TerrainDetail(centerPosi+terrainPos[i][j], earth);
-                //terrainCircle[i][j] = new TerrainCircle(centerPosi+terrainPos[i][j], earth, true);
+                if (Settings::getInstance()->useTerrainDetail)
+                {
+                    terrainCircle[i][j] = new TerrainDetail(centerPosi+terrainPos[i][j], earth);
+                }
+                else
+                {
+                    terrainCircle[i][j] = new TerrainCircle(centerPosi+terrainPos[i][j], earth, true);
+                }
             }
             else
             {
@@ -1029,6 +1036,7 @@ void TheEarth::createFirst(const irr::core::vector3df& pos, const irr::core::vec
 
 void TheEarth::update(const irr::core::vector3df& pos, const irr::core::vector3df& dir)
 {
+    //return;
 #if 0
     if (!lastPosBox.isPointInside(irr::core::vector3df(pos.X, 0.0f, pos.Z)))
     {
