@@ -47,10 +47,18 @@ private:
     TerrainDetail* td;
 };
 
+const static float m[4][4] =
+{
+    {1.0f/6.0f, -3.0f/6.0f,  3.0f/6.0f, -1.0f/6.0f},
+    {4.0f/6.0f,       0.0f, -6.0f/6.0f,  3.0f/6.0f},
+    {1.0f/6.0f,  3.0f/6.0f,  3.0f/6.0f, -3.0f/6.0f},
+    {     0.0f,       0.0f,       0.0f,  1.0f/6.0f}
+};
 
 TerrainDetail::TerrainDetail(const irr::core::vector3di& posi, TheEarth* earth)
     : Terrain("detail"),
-      fineHeights(new float[(TILE_DETAIL_POINTS_NUM+(3*TILE_DETAIL_RATE))*(TILE_DETAIL_POINTS_NUM+(3*TILE_DETAIL_RATE))])
+      fineHeights(new float[(TILE_DETAIL_POINTS_NUM+(3*TILE_DETAIL_RATE))*(TILE_DETAIL_POINTS_NUM+(3*TILE_DETAIL_RATE))]),
+      baseHeights(new float[(TILE_POINTS_NUM + 3)*(TILE_POINTS_NUM + 3)])
 {
     offsetX = posi.X / TILE_DETAIL_SCALE;
     offsetY = posi.Z / TILE_DETAIL_SCALE;
@@ -67,21 +75,44 @@ TerrainDetail::TerrainDetail(const irr::core::vector3di& posi, TheEarth* earth)
     terrain->setVisible(visible);
     offsetObject = new OffsetObject(terrain);
 
+    hk::lock();
+    hkpSampledHeightFieldBaseCinfo ci;
+    ci.m_xRes = TILE_DETAIL_POINTS_NUM + 1;
+    ci.m_zRes = TILE_DETAIL_POINTS_NUM + 1;
+    ci.m_scale.set(TILE_DETAIL_SCALE_F, 1.0f, TILE_DETAIL_SCALE_F);
+
+    hkShape = new HeightFieldHelperDetail(ci, this);
+    hk::unlock();
+    postConstruct();
+}
+
+TerrainDetail::~TerrainDetail()
+{
+    if (fineHeights)
+    {
+        delete [] fineHeights;
+        fineHeights = 0;
+    }
+}
+
+void TerrainDetail::load(TheEarth* earth)
+{
     // generate fineHeights
     {
         memset(fineHeights, 0, (TILE_DETAIL_POINTS_NUM+(3*TILE_DETAIL_RATE))*(TILE_DETAIL_POINTS_NUM+(3*TILE_DETAIL_RATE))*sizeof(float));
         
         // first fill the base points + 2 because of the borders for the interpolation.
-        int offsetXOrig = posi.X / TILE_SCALE - 1;
-        int offsetYOrig = posi.Z / TILE_SCALE - 1;
+        int offsetXOrig = /*posi.X / TILE_SCALE*/offsetX / TILE_DETAIL_RATE - 1;
+        int offsetYOrig = /*posi.Z / TILE_SCALE*/offsetY / TILE_DETAIL_RATE - 1;
         bool nonZero = false;
         
-        for (int y = 0, ffy = 0; y < TILE_POINTS_NUM + 3; y++, ffy+=(TILE_DETAIL_POINTS_NUM+(3*TILE_DETAIL_RATE))*TILE_DETAIL_RATE)
+        for (int y = 0, fy= 0, ffy = 0; y < TILE_POINTS_NUM + 3; y++, fy += TILE_POINTS_NUM + 3, ffy+=(TILE_DETAIL_POINTS_NUM+(3*TILE_DETAIL_RATE))*TILE_DETAIL_RATE)
         {
             for (int x = 0, ffx = 0; x < TILE_POINTS_NUM + 3; x++, ffx+=TILE_DETAIL_RATE)
             {
-                unsigned short h = earth->getTileHeight((unsigned int)abs(offsetXOrig+x), (unsigned int)abs(offsetYOrig+y));
-                fineHeights[ffx+ffy] = (float)h;
+                float h = (float)earth->getTileHeight((unsigned int)abs(offsetXOrig+x), (unsigned int)abs(offsetYOrig+y));
+                fineHeights[ffx+ffy] = h;
+                baseHeights[x+fy] = h;
                 nonZero |= (h > 0);
             }
         }
@@ -89,7 +120,7 @@ TerrainDetail::TerrainDetail(const irr::core::vector3di& posi, TheEarth* earth)
         // if we have non-zero height, then do interpolate
         if (nonZero)
         {
-#if 1
+#if 0
             // first interpolate rows
             for (int y = TILE_DETAIL_RATE, fy = (TILE_DETAIL_POINTS_NUM+(3*TILE_DETAIL_RATE))*TILE_DETAIL_RATE;
                  y < TILE_DETAIL_POINTS_NUM+(2*TILE_DETAIL_RATE);
@@ -171,18 +202,18 @@ TerrainDetail::TerrainDetail(const irr::core::vector3di& posi, TheEarth* earth)
                         b3   = (-hcm1 + 3.0f*hc - 3.0f*hcp1 + hcp2) / 6.0f;
                     }
                     float t = (float)(y - c) / (TILE_DETAIL_RATE_F);
-                    if (x == TILE_DETAIL_RATE || x == TILE_DETAIL_POINTS_NUM+(1*TILE_DETAIL_RATE) ||
-                        y == TILE_DETAIL_RATE /*|| y == TILE_DETAIL_POINTS_NUM+(1*TILE_DETAIL_RATE)*/)
-                    {
+                    //if (x == TILE_DETAIL_RATE || x == TILE_DETAIL_POINTS_NUM+(1*TILE_DETAIL_RATE) ||
+                    //    y == TILE_DETAIL_RATE /*|| y == TILE_DETAIL_POINTS_NUM+(1*TILE_DETAIL_RATE)*/)
+                    //{
                         /*fineHeights[x+fy] =*/ set(x+fy, (1.0f-t)*hc + t*hcp1);
-                    }
-                    else
-                    {
-                        /*fineHeights[x+fy] =*/ set(x+fy, ((((((b3*t)) + b2) * t) + b1) * t) + b0);
-                    }
+                    //}
+                    //else
+                    //{
+                    //    /*fineHeights[x+fy] =*/ set(x+fy, ((((((b3*t)) + b2) * t) + b1) * t) + b0);
+                    //}
                 }
             }
-#endif // 0 v 1
+
             // fill other with liner interpolation
             int lty = 0;
             int flty = 0;
@@ -235,30 +266,117 @@ TerrainDetail::TerrainDetail(const irr::core::vector3di& posi, TheEarth* earth)
                     fltyp1 = fy + (TILE_DETAIL_POINTS_NUM+(3*TILE_DETAIL_RATE))*TILE_DETAIL_RATE;
                 }
             }
+#else // 0 v 1
+            int bx = 0;
+            int by = 0;
+            int bfy = 0;
+            int bfym1 = -(TILE_POINTS_NUM + 3);
+            int bfyp1 = TILE_POINTS_NUM + 3;
+            int ty = 0;
+            int tx = 0;
+            //int typ1 = 0;
+            //int txp1 = 0;
+            float inter[4][4];
+            float px[4];
+            float py[4];
+            px[0] = 1.0f;
+            py[0] = 1.0f;
+            for (int y = TILE_DETAIL_RATE, fy = (TILE_DETAIL_POINTS_NUM+(3*TILE_DETAIL_RATE))*TILE_DETAIL_RATE;
+                 y <= TILE_DETAIL_POINTS_NUM+(1*TILE_DETAIL_RATE);
+                 y++, fy+=TILE_DETAIL_POINTS_NUM+(3*TILE_DETAIL_RATE))
+            {
+                ty = y%TILE_DETAIL_RATE;
+                //ty = TILE_DETAIL_RATE - typ1;
+                if (ty == 0)
+                {
+                    by++;
+                    bfy += TILE_POINTS_NUM + 3;
+                    bfym1 += TILE_POINTS_NUM + 3;
+                    bfyp1 += TILE_POINTS_NUM + 3;
+                }
+                {
+                    float t = (float)(ty)/TILE_DETAIL_RATE_F;
+
+                    for (int ky = 1; ky <= 3; ky++)
+                    {
+                        py[ky] = py[ky-1]*t;
+                    }
+                }
+                if (y == TILE_DETAIL_RATE || y == TILE_DETAIL_POINTS_NUM+(1*TILE_DETAIL_RATE))
+                {
+                    bx = 0;
+                    for(int x = TILE_DETAIL_RATE; x < TILE_DETAIL_POINTS_NUM+(1*TILE_DETAIL_RATE); x++)
+                    {
+                        tx = x%TILE_DETAIL_RATE;
+                        float t = (float)(tx) / (TILE_DETAIL_RATE_F);
+                        if (tx == 0)
+                        {
+                            bx++;
+                        }
+                    //if (x == TILE_DETAIL_RATE || x == TILE_DETAIL_POINTS_NUM+(1*TILE_DETAIL_RATE) ||
+                    //    y == TILE_DETAIL_RATE /*|| y == TILE_DETAIL_POINTS_NUM+(1*TILE_DETAIL_RATE)*/)
+                    //{
+                        /*fineHeights[x+fy] =*/
+                        set(x+fy, (1.0f-t)*baseHeights[bx+bfy] + t*baseHeights[bx+1+bfy]);
+                    }
+                }
+                else
+                {
+                    bx = 0;
+                    for(int x = TILE_DETAIL_RATE; x <= TILE_DETAIL_POINTS_NUM+(1*TILE_DETAIL_RATE); x++)
+                    {
+                        tx = x%TILE_DETAIL_RATE;
+                        //tx = TILE_DETAIL_RATE - txp1;
+                        if (tx == 0)
+                        {
+                            bx++;
+                            for (int ky = 0; ky <= 3; ky++)
+                            {
+                                for (int kx = 0; kx <= 3; kx++)
+                                {
+                                    inter[ky][kx] = 0;
+                                    for (int iy = by-1, ify = bfym1, jy = 0; jy <= 3; iy++, ify+=TILE_POINTS_NUM + 3, jy++)
+                                    {
+                                        for (int ix = bx-1, jx = 0; jx <= 3; ix++, jx++)
+                                        {
+                                            inter[ky][kx] += baseHeights[ix+ify]*m[jx][kx]*m[jy][ky];
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        if (x == TILE_DETAIL_RATE || x == TILE_DETAIL_POINTS_NUM+(1*TILE_DETAIL_RATE))
+                        {
+                            float t = (float)(ty)/TILE_DETAIL_RATE_F;
+                            set(x+fy, (1.0f-t)*baseHeights[bx+bfy] + t*baseHeights[bx+bfyp1]);
+                        }
+                        else
+                        {
+                            {
+                                float t = (float)(tx)/TILE_DETAIL_RATE_F;
+
+                                for (int kx = 1; kx <= 3; kx++)
+                                {
+                                    px[kx] = px[kx-1]*t;
+                                }
+                            }
+                            float result = 0.f;
+                            for (int ky = 0; ky <= 3; ky++)
+                            {
+                                for (int kx = 0; kx <= 3; kx++)
+                                {
+                                    result += inter[ky][kx]*px[kx]*py[ky];
+                                }
+                            }
+                            set(x+fy, result);
+                        } // if (x == ...
+                    } // for (x = ...)
+                } // if (y == ...)
+            }
+#endif // 0 v 1
         }
     }
-    hk::lock();
-    hkpSampledHeightFieldBaseCinfo ci;
-    ci.m_xRes = TILE_DETAIL_POINTS_NUM + 1;
-    ci.m_zRes = TILE_DETAIL_POINTS_NUM + 1;
-    ci.m_scale.set(TILE_DETAIL_SCALE_F, 1.0f, TILE_DETAIL_SCALE_F);
 
-    hkShape = new HeightFieldHelperDetail(ci, this);
-    hk::unlock();
-    postConstruct();
-}
-
-TerrainDetail::~TerrainDetail()
-{
-    if (fineHeights)
-    {
-        delete [] fineHeights;
-        fineHeights = 0;
-    }
-}
-
-void TerrainDetail::load(TheEarth* earth)
-{
     terrain->loadHeightMap(this, offsetX, offsetY, TILE_DETAIL_POINTS_NUM+1/*, image*/);
     if (!image)
     {

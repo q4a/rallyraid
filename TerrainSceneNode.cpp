@@ -505,7 +505,7 @@ namespace scene
 			float fz2=0.f;
 			for (s32 z = 0; z < TerrainData.Size; ++z)
 			{
-                unsigned short height = 0;
+                unsigned short h = 0;
                 irr::video::SColor color;
 				video::S3DVertex2TCoords& vertex= static_cast<video::S3DVertex2TCoords*>(mb->getVertexBuffer().pointer())[index++];
 				vertex.Normal.set(0.0f, 1.0f, 0.0f);
@@ -513,44 +513,24 @@ namespace scene
                 //vertex.Color = irr::video::SColor(0/*255*/,128,128,128);
                 //height = earth->getTileHeight((unsigned int)abs(offsetX+x), (unsigned int)abs(offsetY+z));
                 //earth->getTileHeightAndTexture((unsigned int)abs(offsetX+x), (unsigned int)abs(offsetY+z), height, vertex.Color);
-                earth->getEarthHeightAndTexture((unsigned int)abs(offsetX+x), (unsigned int)abs(offsetY+z), height, color);
+                earth->getEarthHeightAndTexture((unsigned int)abs(offsetX+x), (unsigned int)abs(offsetY+z), h, color);
+                float height = (float)h;
                 unsigned int dist = min(abs(x - centerX), abs(z - centerY));
                 if (dist < 3)
                 {
-                    if (height > 50)
+                    height -= 50.f;
+                    if (dist < 2)
                     {
-                        height -= 50;
-                        if (dist < 2)
+                        height -= 75.f;
+                        if (dist < 1)
                         {
-                            if (height > 50)
-                            {
-                                height -= 50;
-                                if (dist < 1)
-                                {
-                                    if (height > 50)
-                                    {
-                                        height -= 50;
-                                    }
-                                    else
-                                    {
-                                        height = 0;
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                height = 0;
-                            }
+                            height -= 75.f;
                         }
-                    }
-                    else
-                    {
-                        height = 0;
                     }
                 }
                 vertex.Color = irr::video::SColor(0/*255*/,127,127,127);
 				vertex.Pos.X = fx;
-				vertex.Pos.Y = (f32)height; //Map->getPixel(TerrainData.Size-x-1,z).getLuminance();
+				vertex.Pos.Y = height; //Map->getPixel(TerrainData.Size-x-1,z).getLuminance();
 				vertex.Pos.Z = fz;
                 
                 if (image && x < TerrainData.Size - 1 && z < TerrainData.Size - 1)

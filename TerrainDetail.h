@@ -24,7 +24,8 @@ private:
 
 private:
     float* fineHeights;
-    
+    float* baseHeights;
+
 
     friend class HeightFieldHelper;
 };
