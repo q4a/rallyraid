@@ -395,7 +395,7 @@ void TheGame::loop()
                 }
                 testText->setText(str.c_str());
 
-                earth->update(offsetManager->getOffset()+camera->getPosition(), initialDir);
+                earth->update(offsetManager->getOffset()+camera->getPosition(), cameraDirection);
             }
 
             // -------------------------------
@@ -504,6 +504,7 @@ void TheGame::handleUpdatePos(bool phys)
     }
     
     cameraDirection = camera->getTarget()-camera->getPosition();
+    cameraDirection.normalize();
     // calculate cameraAngle
     cameraAngle = (float)(irr::core::vector2df(cameraDirection.X, cameraDirection.Z)).getAngle();
     

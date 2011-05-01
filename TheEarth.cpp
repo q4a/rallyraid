@@ -1063,13 +1063,14 @@ void TheEarth::update(const irr::core::vector3df& pos, const irr::core::vector3d
     if (!lastPosBox.isPointInside(irr::core::vector3df(pos.X, 0.0f, pos.Z)))
     {
         printf("start create new ...\n");
-        
+        //irr::core::vector3df compPos = pos;
+        irr::core::vector3df compPos = pos + (dir * 200.0f);
         newVisualPart = new VisualMembers();
-        lastCenterPosi = irr::core::vector3di(((int)(pos.X/TILE_SCALE_F))*TILE_SCALE, 0, ((int)(pos.Z/TILE_SCALE_F))*TILE_SCALE);
+        lastCenterPosi = irr::core::vector3di(((int)(compPos.X/TILE_SCALE_F))*TILE_SCALE, 0, ((int)(compPos.Z/TILE_SCALE_F))*TILE_SCALE);
         //lastCenterPosi = irr::core::vector3di((int)pos.X, 0, (int)pos.Z);
         lastCenterPos = irr::core::vector3df((float)lastCenterPosi.X, (float)lastCenterPosi.Y, (float)lastCenterPosi.Z);
-        lastPosBox = irr::core::aabbox3df(lastCenterPos.X-VISUAL_BOX_HSIZE_F, -1000.0f, lastCenterPos.Z-VISUAL_BOX_HSIZE_F,
-            lastCenterPos.X+VISUAL_BOX_HSIZE_F, 10000.0f, lastCenterPos.Z+VISUAL_BOX_HSIZE_F);
+        lastPosBox = irr::core::aabbox3df(lastCenterPos.X-VISUAL_BOX_HSIZE_F, -100.0f, lastCenterPos.Z-VISUAL_BOX_HSIZE_F,
+            lastCenterPos.X+VISUAL_BOX_HSIZE_F, 9000.0f, lastCenterPos.Z+VISUAL_BOX_HSIZE_F);
 #if 0
         irr::core::vector3di newLargeCenterPosi = irr::core::vector3di(((int)(pos.X/TILE_LARGE_SCALE_F))*TILE_LARGE_SCALE, 0, ((int)(pos.Z/TILE_LARGE_SCALE_F))*TILE_LARGE_SCALE);
         if (lastLargeCenterPosi == newLargeCenterPosi)
@@ -1083,7 +1084,7 @@ void TheEarth::update(const irr::core::vector3df& pos, const irr::core::vector3d
             newVisualPart->createMembers(lastCenterPosi, newLargeCenterPosi, this);
         }
 #else
-        lastLargeCenterPosi = irr::core::vector3di(((int)(pos.X/TILE_LARGE_SCALE_F))*TILE_LARGE_SCALE, 0, ((int)(pos.Z/TILE_LARGE_SCALE_F))*TILE_LARGE_SCALE);
+        lastLargeCenterPosi = irr::core::vector3di(((int)(compPos.X/TILE_LARGE_SCALE_F))*TILE_LARGE_SCALE, 0, ((int)(compPos.Z/TILE_LARGE_SCALE_F))*TILE_LARGE_SCALE);
         newVisualPart->createMembers(lastCenterPosi, lastLargeCenterPosi, this);
 #endif
         printf("start create new ... done\n");
