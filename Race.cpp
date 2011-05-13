@@ -14,7 +14,8 @@ Race::Race(const std::string& raceName, bool& ret)
       dayMap(),
       competitorMap(),
       globalObjectList(),
-      active(false)
+      active(false),
+      roadMap()
 {
     ret = read();
 }
@@ -39,6 +40,7 @@ Race::~Race()
 
     deactivate();
     RaceManager::clearGlobalObjects(globalObjectList);
+    RoadManager::clearRoadMap(roadMap);
 }
     
 bool Race::read()
@@ -54,6 +56,7 @@ bool Race::read()
             {
                 readShortDescription();
                 readGlobalObjects();
+                RoadManager::readRoads(RACE_ROADS(raceName), roadMap, false, true);
             }
         }
     }
@@ -237,6 +240,8 @@ bool Race::writeGlobalObjects()
 
 void Race::activate()
 {
+    RoadManager::getInstance()->addStageRoad(roadMap);
+    
     if (active) return;
 
     RaceManager::addGlobalObjectsToObjectWire(globalObjectList);

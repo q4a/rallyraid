@@ -13,7 +13,8 @@ Stage::Stage(const std::string& raceName, const std::string& dayName, const std:
       stageLongName(),
       shortDescription(),
       globalObjectList(),
-      active(false)
+      active(false),
+      roadMap()
 {
     ret = read();
 }
@@ -22,6 +23,7 @@ Stage::~Stage()
 {
     deactivate();
     RaceManager::clearGlobalObjects(globalObjectList);
+    RoadManager::clearRoadMap(roadMap);
 }
 
 bool Stage::read()
@@ -31,6 +33,7 @@ bool Stage::read()
     {
         readShortDescription();
         readGlobalObjects();
+        RoadManager::readRoads(STAGE_ROADS(raceName, dayName, stageName), roadMap, false, true);
     }
     return ret;
 }
@@ -117,6 +120,8 @@ bool Stage::writeGlobalObjects()
 
 void Stage::activate()
 {
+    RoadManager::getInstance()->addStageRoad(roadMap);
+    
     if (active) return;
 
     RaceManager::addGlobalObjectsToObjectWire(globalObjectList);

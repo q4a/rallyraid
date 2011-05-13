@@ -3,6 +3,7 @@
 
 #include "Terrain_defs.h"
 #include <irrlicht.h>
+#include "RoadManager.h"
 
 class Tile
 {
@@ -104,8 +105,13 @@ private:
     irr::video::SColor* colors;
     irr::video::SColor* fineColors;
     irr::video::SColor* fineDensity;
+    
+    roadRoadChunkList_t roadRoadChunkList;
 
     static const irr::video::SColor baseColor;
+    
+    
+    friend class MenuPageEditor;
 };
 
 #endif // TILE_H

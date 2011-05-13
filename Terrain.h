@@ -10,7 +10,7 @@
 }*/
 #include <irrlicht.h>
 #include "TerrainSceneNode.h"
-#include "NTerrainSceneNode.h"
+//#include "NTerrainSceneNode.h"
 #include "hk.h"
 #include <string>
 #include "OffsetObject.h"

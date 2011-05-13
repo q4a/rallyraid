@@ -8,11 +8,12 @@
 #include <assert.h>
 
 
-Road::Road(const std::string& roadFilename, bool& ret, bool read)
+Road::Road(const std::string& roadFilename, bool& ret, bool global, bool read)
     : roadFilename(roadFilename),
       roadName(),
       roadDataFilename(),
       roadType(0),
+      global(global),
       roadPointVector()
 {
     ret = readHeader();
@@ -20,6 +21,20 @@ Road::Road(const std::string& roadFilename, bool& ret, bool read)
     {
         readData();
     }
+}
+
+Road::Road(const std::string&   roadFilename,
+           const std::string&   roadName,
+           const std::string&   roadDataFilename,
+           RoadType*            roadType,
+           bool                 global)
+    : roadFilename(roadFilename),
+      roadName(roadName),
+      roadDataFilename(roadDataFilename),
+      roadType(roadType),
+      global(global),
+      roadPointVector()
+{
 }
 
 Road::~Road()

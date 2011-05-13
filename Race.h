@@ -6,6 +6,7 @@
 #include <map>
 #include <irrlicht.h>
 #include "RaceManager.h"
+#include "RoadManager.h"
 
 
 class Day;
@@ -40,6 +41,7 @@ public:
     const std::string& getLongName(); // inline
     const std::string& getShortDescription(); // inline
     const competitorMap_t& getCompetitorMap(); // inline
+    const RoadManager::roadMap_t& getRoadMap(); // inline
 
     void activate();
     void deactivate();
@@ -52,6 +54,7 @@ private:
     competitorMap_t                 competitorMap;
     RaceManager::globalObjectList_t globalObjectList;
     bool                            active;
+    RoadManager::roadMap_t          roadMap;
 
     
     friend class RaceManager;
@@ -95,6 +98,11 @@ inline const std::string& Race::getShortDescription()
 inline const Race::competitorMap_t& Race::getCompetitorMap()
 {
     return competitorMap;
+}
+
+inline const RoadManager::roadMap_t& Race::getRoadMap()
+{
+    return roadMap;
 }
 
 #endif // RACE_H

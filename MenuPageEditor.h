@@ -31,6 +31,7 @@ public:
         MI_TABLEROADMANAGERG,
         MI_TABLEROADMANAGERS,
         MI_TABLEROADMANAGERV,
+        MI_TABLEROADTYPES,
 
         NUMBER_OF_MENUITEMS
     };
@@ -65,6 +66,7 @@ private:
     irr::gui::IGUITable*    tableRoadManagerG;
     irr::gui::IGUITable*    tableRoadManagerS;
     irr::gui::IGUITable*    tableRoadManagerV;
+    irr::gui::IGUITable*    tableRoadTypes;
 };
 
 #endif // MENUPAGEEDITOR_H

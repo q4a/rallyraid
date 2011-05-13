@@ -1,77 +1,77 @@
 #include "common.cg"
 
-void main_v( float4 vPosition 	: POSITION,
-             float3 vNormal	: NORMAL,
-	     float2 Uv0     : TEXCOORD0,
-	     float2 Uv1     : TEXCOORD1,
+void main_v(float4 vPosition        : POSITION,
+            float3 vNormal          : NORMAL,
+            float2 Uv0              : TEXCOORD0,
+            float2 Uv1              : TEXCOORD1,
 
-             out float4 oPosition	: POSITION,
-             out float4 color	: COLOR,
-             out float2 oUv0: TEXCOORD0,
-             out float2 oUv1: TEXCOORD1,
-             out float3 objPos: TEXCOORD2,
-             out float3 oNormal: TEXCOORD3,
-//             out float4 oTexCoordProj	: TEXCOORD4,
+            out float4 oPosition    : POSITION,
+            out float4 color        : COLOR,
+            out float2 oUv0         : TEXCOORD0,
+            out float2 oUv1         : TEXCOORD1,
+            out float3 objPos       : TEXCOORD2,
+            out float3 oNormal      : TEXCOORD3,
+//            out float4 oTexCoordProj: TEXCOORD4,
 
-             uniform float4x4 mWorldViewProj,
-             uniform float4x4 mWorld,
-             uniform float4x4 mInvWorld,
-             uniform float3 mLightColor,
-             uniform float3 mLightPos
+            uniform float4x4 mWorldViewProj,
+            uniform float4x4 mWorld,
+            uniform float4x4 mInvWorld,
+            uniform float3   mLightColor,
+            uniform float3   mLightPos
 )
 {
-  oPosition = mul(mWorldViewProj, vPosition);
-  oUv0 = Uv0;
-  oUv1 = Uv1;
-  oNormal = vNormal;
-  objPos = mul(mWorld, vPosition).xyz;
+    oPosition = mul(mWorldViewProj, vPosition);
+    oUv0 = Uv0;
+    oUv1 = Uv1;
+    oNormal = vNormal;
+    objPos = mul(mWorld, vPosition).xyz;
 
-//  oTexCoordProj = mul(mTextureMatrix, vPosition);
-//  oTexCoordProj.xy = float2(oTexCoordProj.x, -oTexCoordProj.y) * 0.5;
+//    oTexCoordProj = mul(mTextureMatrix, vPosition);
+//    oTexCoordProj.xy = float2(oTexCoordProj.x, -oTexCoordProj.y) * 0.5;
 // no need for non d3d calculate shadow
-//  oTexCoordProj.xy = oTexCoordProj.xy / oTexCoordProj.w + float2(0.5, 0.5);
+//    oTexCoordProj.xy = oTexCoordProj.xy / oTexCoordProj.w + float2(0.5, 0.5);
 
-  float3 normal = mul(float4(vNormal,0.0), mInvWorld).xyz;
+    float3 normal = mul(float4(vNormal,0.0), mInvWorld).xyz;
 
-  // renormalize normal 
-  normal = normalize(normal);
+    // renormalize normal 
+    normal = normalize(normal);
 
-  // position in world coodinates
-//  float3 worldpos = mul(mTransWorld, vPosition);
-  float3 worldpos = objPos;
+    // position in world coodinates
+//    float3 worldpos = mul(mTransWorld, vPosition);
+    float3 worldpos = objPos;
 
-  // calculate light vector, vtxpos - lightpos
-  float3 L = normalize(mLightPos - float3(0.0, 0.0, 0.0));
+    // calculate light vector, vtxpos - lightpos
+    float3 L = normalize(mLightPos - float3(0.0, 0.0, 0.0));
 
-  // calculate light color
-  float3 tmp = mLightColor * max(dot(-L, normal), 0.0);
+    // calculate light color
+    float3 tmp = mLightColor * max(dot(-L, normal), 0.0);
 
-  color = float4(tmp.x, tmp.y, tmp.z, 1.0);
+    color = float4(tmp.x, tmp.y, tmp.z, 1.0);
 }
 
-void main_f( float4 position 	: POSITION,
-             float4 color	: COLOR,
-	     float2 Uv0		: TEXCOORD0,
-	     float2 Uv1		: TEXCOORD1,
-             float3 objPos	: TEXCOORD2,
-             float3 normal	: TEXCOORD3,
-//             float4 texCoordProj	: TEXCOORD4,
-	     uniform sampler2D tex0 : register(s0),
-	     uniform sampler2D tex1 : register(s1),
-             out float4 oColor	: COLOR0
+void main_f(float4 position         : POSITION,
+            float4 color            : COLOR,
+            float2 Uv0              : TEXCOORD0,
+            float2 Uv1              : TEXCOORD1,
+            float3 objPos           : TEXCOORD2,
+            float3 normal           : TEXCOORD3,
+//            float4 texCoordProj : TEXCOORD4,
+            uniform sampler2D tex0  : register(s0),
+            uniform sampler2D tex1  : register(s1),
+            out float4 oColor       : COLOR0
 )
 {
-  float4 col0 = tex2D(tex0, Uv0);  // sample color map
-  //float2 Uv1_ = Uv0*128.0; // frac(Uv0*128.0);
-  float4 col1 = tex2D(tex1, Uv1);  // detailmap
-  float4 multip = calc_multip(color, 0.35);
+    float4 col0 = tex2D(tex0, Uv0);  // sample color map
+    //float2 Uv1_ = Uv0*128.0; // frac(Uv0*128.0);
+    float4 col1 = tex2D(tex1, Uv1);  // detailmap
+    float4 multip = calc_multip(color, 0.35);
 
-  float4 col = ((col0) + ((col1-0.5)*0.5)) * 1.0;
-  //float4 col = col0 * multip;
-  col *= multip;
-  //color + multip;
+    float4 col = ((col0) + ((col1-0.5)*0.5)) * 1.0;
+    //float4 col = col0 * multip;
+    col *= multip;
+    //color + multip;
 
-  oColor = col;
-  // * 1.5;
-  //oColor = float4(1.0, 1.0, 1.0, 1.0);
+    oColor = col;
+    // * 1.5;
+    //oColor = float4(1.0, 1.0, 1.0, 1.0);
 }

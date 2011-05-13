@@ -52,6 +52,7 @@ public:
     const roadMap_t& getRoadMap(); // inline
 
     void addStageRoad(Road* road);  // call when start a new stage: add race, day and stage roads
+    void addStageRoad(const roadMap_t& p_roadMap);  // call when start a new stage: add race, day and stage roads
     void clearStageRoads();         // call when a stage is ended
 
     // these stuffs are called from the earth visible part builder thread!
@@ -59,7 +60,10 @@ public:
     void addChunkListToVisible(const roadRoadChunkList_t& roadRoadChunkList);   // call when a tile become visible
     void setVisibleStageRoad(unsigned int tileNum);                             // call from the tile which become visible
 
-    static void readRoads(const std::string& dirName, roadMap_t& roadMap, bool doRead = false);
+    static void readRoads(const std::string& dirName, roadMap_t& roadMap, bool global, bool doRead = false);
+    static bool readRoadRoadChunk(const std::string& fileName, roadRoadChunkList_t& roadRoadChunkList, const RoadManager::roadMap_t& roadMap);
+    static bool writeRoadRoadChunk(const std::string& fileName, const roadRoadChunkList_t& roadRoadChunkList);
+    static void clearRoadMap(roadMap_t& roadMap);
     //static bool writeGlobalObjects(const std::string& fileName, const globalObjectList_t& globalObjectList);
 
 private:

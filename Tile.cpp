@@ -18,7 +18,8 @@ Tile::Tile(unsigned int posx, unsigned int posy,
       inUse(true),
       colors(new irr::video::SColor[TILE_POINTS_NUM*TILE_POINTS_NUM]),
       fineColors(new irr::video::SColor[TILE_FINE_POINTS_NUM*TILE_FINE_POINTS_NUM]),
-      fineDensity(new irr::video::SColor[TILE_FINE_POINTS_NUM*TILE_FINE_POINTS_NUM])
+      fineDensity(new irr::video::SColor[TILE_FINE_POINTS_NUM*TILE_FINE_POINTS_NUM]),
+      roadRoadChunkList()
 {
     memset(height, 0, (TILE_POINTS_NUM*TILE_POINTS_NUM)*sizeof(unsigned short));
     if (autoRead)
@@ -259,11 +260,13 @@ bool Tile::read()
 {
     int rc = 0;
     char filename[256];
+    char filenameRRC[256];
     char zipfilename[256];
     char dirname[256];
     sprintf_s(dirname, "data/earthdata/tiles/%d_%d", catx, caty);
     sprintf_s(zipfilename, "data/earthdata/tiles/%d_%d.zip", catx, caty);
     sprintf_s(filename, "%s/%d_%d.dat", dirname, posx, posy);
+    sprintf_s(filenameRRC, "%s/%d_%d.rrc", dirname, posx, posy);
 
     TheGame::getInstance()->getDevice()->getFileSystem()->addFileArchive(zipfilename, false, false, irr::io::EFAT_ZIP);
     irr::io::IReadFile* file = TheGame::getInstance()->getDevice()->getFileSystem()->createAndOpenFile(filename);
@@ -284,7 +287,10 @@ bool Tile::read()
     file->seek(6);    
     rc = file->read(height, (TILE_POINTS_NUM*TILE_POINTS_NUM)*sizeof(unsigned short));
     file->drop();
-
+    
+    RoadManager::readRoadRoadChunk(filenameRRC, roadRoadChunkList, RoadManager::getInstance()->getRoadMap());
+    RoadManager::getInstance()->addChunkListToVisible(roadRoadChunkList);
+    RoadManager::getInstance()->setVisibleStageRoad(TheEarth::getInstance()->calculateTileNum(posx, posy));
 
     return true;
 }

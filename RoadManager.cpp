@@ -39,22 +39,16 @@ RoadManager::RoadManager()
 
 RoadManager::~RoadManager()
 {
-    for (roadMap_t::const_iterator rit = roadMap.begin();
-         rit != roadMap.end();
-         rit++)
-    {
-        delete rit->second;
-    }
-    roadMap.clear();
+    clearRoadMap(roadMap);
 }
 
 void RoadManager::read()
 {
-    readRoads("data/roads", roadMap, false);
+    readRoads("data/roads", roadMap, true, false);
 }
 
 /* static */
-void RoadManager::readRoads(const std::string& dirName, RoadManager::roadMap_t& roadMap, bool doRead)
+void RoadManager::readRoads(const std::string& dirName, RoadManager::roadMap_t& roadMap, bool global, bool doRead)
 {
     ConfigDirectory::fileList_t fileList;
     
@@ -74,7 +68,7 @@ void RoadManager::readRoads(const std::string& dirName, RoadManager::roadMap_t& 
     {
         std::string roadFilename = it->c_str();
         bool ret = false;
-        Road* road = new Road(roadFilename, ret, doRead);
+        Road* road = new Road(dirName+"/"+roadFilename, ret, global, doRead);
         if (ret)
         {
             roadMap[road->getName()] = road;
@@ -115,6 +109,16 @@ void RoadManager::addStageRoad(Road* road)
     stageRoadChunkListMap[currentTile].push_back(currentChunk);
 }
 
+void RoadManager::addStageRoad(const RoadManager::roadMap_t& p_roadMap)
+{
+    for (roadMap_t::const_iterator it = p_roadMap.begin();
+         it != p_roadMap.end();
+         it++)
+    {
+        addStageRoad(it->second);
+    }
+}
+
 void RoadManager::clearStageRoads()
 {
     stageRoadChunkListMap.clear();
@@ -142,4 +146,85 @@ void RoadManager::setVisibleStageRoad(unsigned int tileNum)
     {
         addChunkListToVisible(srit->second);
     }
+}
+
+/* static */
+bool RoadManager::readRoadRoadChunk(const std::string& fileName, roadRoadChunkList_t& roadRoadChunkList, const RoadManager::roadMap_t& roadMap)
+{
+    FILE* f;
+    int ret = 0;
+    char roadName[256];
+    unsigned int first, second;
+
+    if (!roadRoadChunkList.empty())
+    {
+        dprintf(MY_DEBUG_WARNING, "road roadChunk list already exists for tile %s\n", fileName.c_str());
+        return true;
+    }
+
+    errno_t error = fopen_s(&f, fileName.c_str(), "r");
+    if (error)
+    {
+        printf("road roadChunk file unable to open: %s\n", fileName.c_str());
+        return false;
+    }
+    
+    while (true)
+    {
+        ret = fscanf_s(f, "%s %u %u\n", roadName, &first, &second);
+        if (ret < 3 )
+        {
+            break;
+        }
+        RoadRoadChunk rrc;
+        roadMap_t::const_iterator rit = roadMap.find(roadName);
+        //rrc.road = getRoad(roadName);
+        if (rit != roadMap.end())
+        {
+            rrc.road = rit->second;
+            if (rrc.road)
+            {
+                rrc.roadChunk.first = first;
+                rrc.roadChunk.second = second;
+                roadRoadChunkList.push_back(rrc);
+            }
+        }
+    }
+    fclose(f);
+    return true;
+}
+
+/* static */
+bool RoadManager::writeRoadRoadChunk(const std::string& fileName, const roadRoadChunkList_t& roadRoadChunkList)
+{
+    FILE* f;
+    int ret = 0;
+    errno_t error = fopen_s(&f, fileName.c_str(), "w");
+    if (error)
+    {
+        printf("unable to open road roadChunk file for write %s\n", fileName.c_str());
+        return false;
+    }
+
+    for (roadRoadChunkList_t::const_iterator it = roadRoadChunkList.begin();
+         it != roadRoadChunkList.end();
+         it++)
+    {
+        ret = fprintf(f, "%s %u %u\n", it->road->getName().c_str(), it->roadChunk.first, it->roadChunk.second);
+    }
+
+    fclose(f);
+    return true;
+}
+
+/* static */
+void RoadManager::clearRoadMap(RoadManager::roadMap_t& roadMap)
+{
+    for (roadMap_t::const_iterator rit = roadMap.begin();
+         rit != roadMap.end();
+         rit++)
+    {
+        delete rit->second;
+    }
+    roadMap.clear();
 }
