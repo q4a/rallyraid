@@ -39,6 +39,9 @@ public:
 
     MenuPageEditor();
     virtual ~MenuPageEditor();
+    void refreshSelected();
+
+    static MenuPageEditor* menuPageEditor;
 
 protected:
     virtual bool OnEvent (const irr::SEvent &event);
@@ -47,7 +50,6 @@ protected:
 
 private:
     void refresh();
-    void refreshSelected();
     void refreshTiles();
     void refreshObjectWire();
     void refreshObjectWireTiles();

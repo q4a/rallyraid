@@ -14,6 +14,7 @@ public:
         MI_BUTTONREFRESH,
         MI_BUTTONSAVE,
         MI_BUTTONCREATEDAY,
+        MI_BUTTONCREATEROAD,
         MI_TABCONTROL,
 
         MI_TABDAYS,
@@ -52,6 +53,7 @@ private:
     void refreshGlobalObjects();
     void refreshEditBoxes();
     void refreshRoads();
+    void refreshRoadEditBoxes(const wchar_t* newRoadName = L"");
 
 private:
     irr::gui::IGUIWindow*   window;

@@ -1,5 +1,6 @@
 
 #include "MenuPageEditorRace.h"
+#include "MenuPageEditor.h"
 #include "TheGame.h"
 #include "stdafx.h"
 #include "WStringConverter.h"
@@ -12,6 +13,7 @@
 #include "Race.h"
 #include "Settings.h"
 #include "RoadManager.h"
+#include "RoadTypeManager.h"
 #include "Road.h"
 #include "Day.h"
 #include "Stage.h"
@@ -33,7 +35,7 @@ MenuPageEditorRace::MenuPageEditorRace()
       editBoxNewRoadDataFilename(0)
 {
     window = TheGame::getInstance()->getEnv()->addWindow(
-        irr::core::recti(TheGame::getInstance()->getScreenSize().Width-300, 50, TheGame::getInstance()->getScreenSize().Width-10, TheGame::getInstance()->getScreenSize().Height-150),
+        irr::core::recti(TheGame::getInstance()->getScreenSize().Width-350, 50, TheGame::getInstance()->getScreenSize().Width-10, TheGame::getInstance()->getScreenSize().Height-150),
         false,
         L"Editor - Race",
         0,
@@ -56,6 +58,12 @@ MenuPageEditorRace::MenuPageEditorRace()
         window,
         MI_BUTTONCREATEDAY,
         L"new day");
+
+    TheGame::getInstance()->getEnv()->addButton(
+        irr::core::recti(128,22,168,42),
+        window,
+        MI_BUTTONCREATEROAD,
+        L"new road");
 
     editBoxLongName = TheGame::getInstance()->getEnv()->addEditBox(L"long name",
         irr::core::recti(irr::core::position2di(2, 44), irr::core::dimension2di(window->getRelativePosition().getSize().Width - 4, 20)),
@@ -139,17 +147,17 @@ MenuPageEditorRace::MenuPageEditorRace()
     // ----------------------------
     irr::gui::IGUITab* tabRoads = tc->addTab(L"Roads", MI_TABROADS);
 
-    editBoxNewRoadFilename = TheGame::getInstance()->getEnv()->addEditBox(L"new road filename",
+    editBoxNewRoadName = TheGame::getInstance()->getEnv()->addEditBox(L"new road name",
         irr::core::recti(irr::core::position2di(0, 0), irr::core::dimension2di(tabRoads->getRelativePosition().getSize().Width, 20)),
         true,
         tabRoads,
-        MI_EBNEWROADFILENAME);
+        MI_EBNEWROADNAME);
 
-    editBoxNewRoadName = TheGame::getInstance()->getEnv()->addEditBox(L"new road name",
+    editBoxNewRoadFilename = TheGame::getInstance()->getEnv()->addEditBox(L"new road filename",
         irr::core::recti(irr::core::position2di(0, 22), irr::core::dimension2di(tabRoads->getRelativePosition().getSize().Width, 20)),
         true,
         tabRoads,
-        MI_EBNEWROADNAME);
+        MI_EBNEWROADFILENAME);
 
     editBoxNewRoadDataFilename = TheGame::getInstance()->getEnv()->addEditBox(L"new road data filename",
         irr::core::recti(irr::core::position2di(0, 2*22), irr::core::dimension2di(tabRoads->getRelativePosition().getSize().Width, 20)),
@@ -240,6 +248,33 @@ bool MenuPageEditorRace::OnEvent(const irr::SEvent &event)
                         return true;
                         break;
                     }
+                    case MI_BUTTONCREATEROAD:
+                    {
+                        dprintf(MY_DEBUG_NOTE, "editor::race::newRoad\n");
+                        std::string roadName;
+                        std::string roadFilename;
+                        std::string roadDataFilename;
+                        WStringConverter::toString(editBoxNewRoadFilename->getText(), roadFilename);
+                        WStringConverter::toString(editBoxNewRoadName->getText(), roadName);
+                        WStringConverter::toString(editBoxNewRoadDataFilename->getText(), roadDataFilename);
+                        RoadManager::roadMap_t::const_iterator rit = RaceManager::getInstance()->editorRace->roadMap.find(roadName);
+                        if (rit == RaceManager::getInstance()->editorRace->roadMap.end() &&
+                            !roadName.empty() &&
+                            RoadTypeManager::getInstance()->editorRoadType)
+                        {
+                            bool ret;
+                            ret = ConfigDirectory::mkdir(RACE_ROADS(RaceManager::getInstance()->editorRace->getName())) &&
+                                ConfigDirectory::mkdir(RACE_ROADS_DATA(RaceManager::getInstance()->editorRace->getName()));
+                            if (ret)
+                            {
+                                RaceManager::getInstance()->editorRace->roadMap[roadName] =
+                                    new Road(roadFilename, roadName, roadDataFilename, RoadTypeManager::getInstance()->editorRoadType, false);
+                                refreshRoads();
+                            }
+                        }
+                        return true;
+                        break;
+                    }
                 };
                 break;
             }
@@ -249,6 +284,12 @@ bool MenuPageEditorRace::OnEvent(const irr::SEvent &event)
                 {
                     case MI_TABLEDAYS:
                         RaceManager::getInstance()->editorDay = (Day*)tableDays->getCellData(tableDays->getSelected(), 0);
+                        MenuPageEditor::menuPageEditor->refreshSelected();
+                        return true;
+                        break;
+                    case MI_TABLEROADS:
+                        RoadManager::getInstance()->editorRoad = (Road*)tableRoads->getCellData(tableRoads->getSelected(), 0);
+                        MenuPageEditor::menuPageEditor->refreshSelected();
                         return true;
                         break;
                 };
@@ -260,11 +301,26 @@ bool MenuPageEditorRace::OnEvent(const irr::SEvent &event)
                 {
                     case MI_TABLEDAYS:
                         RaceManager::getInstance()->editorDay = (Day*)tableDays->getCellData(tableDays->getSelected(), 0);
+                        MenuPageEditor::menuPageEditor->refreshSelected();
                         MenuManager::getInstance()->open(MenuManager::MP_EDITORDAY);
+                        return true;
+                        break;
+                    case MI_TABLEROADS:
+                        RoadManager::getInstance()->editorRoad = (Road*)tableRoads->getCellData(tableRoads->getSelected(), 0);
+                        MenuPageEditor::menuPageEditor->refreshSelected();
+                        MenuManager::getInstance()->open(MenuManager::MP_EDITORROAD);
                         return true;
                         break;
                 };
                 break;
+            }
+            case irr::gui::EGET_EDITBOX_CHANGED:
+            {
+                switch (id)
+                {
+                    case MI_EBNEWROADNAME:
+                        refreshRoadEditBoxes(editBoxNewRoadName->getText());
+                }
             }
         };
     }
@@ -440,10 +496,7 @@ void MenuPageEditorRace::refreshEditBoxes()
 
 void MenuPageEditorRace::refreshRoads()
 {
-    irr::core::stringw str;
-
-//    str = L"";
-//    editBox->setText(str.c_str());
+    refreshRoadEditBoxes(editBoxNewRoadName->getText());
 
     tableRoads->clearRows();
     /*
@@ -495,5 +548,24 @@ void MenuPageEditorRace::refreshRoads()
         str += rit->second->roadPointVector.size();
         tableRoads->setCellText(i, 6, str.c_str());
     }
+
+}
+
+void MenuPageEditorRace::refreshRoadEditBoxes(const wchar_t* newRoadName)
+{
+    irr::core::stringw str;
+
+    str = newRoadName;
+    editBoxNewRoadName->setText(str.c_str());
+
+    str = L"";
+    str += (RACE_ROADS(RaceManager::getInstance()->editorRace->getName())+std::string("/")).c_str();
+    str += newRoadName;
+    editBoxNewRoadFilename->setText(str.c_str());
+
+    str = L"";
+    str += (RACE_ROADS_DATA(RaceManager::getInstance()->editorRace->getName())+std::string("/")).c_str();
+    str += newRoadName;
+    editBoxNewRoadDataFilename->setText(str.c_str());
 
 }

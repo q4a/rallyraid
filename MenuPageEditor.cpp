@@ -17,6 +17,8 @@
 #include "RoadType.h"
 #include "RoadTypeManager.h"
 
+MenuPageEditor* MenuPageEditor::menuPageEditor = 0;
+
 MenuPageEditor::MenuPageEditor()
     : window(0),
       tableSelected(0),
@@ -30,8 +32,10 @@ MenuPageEditor::MenuPageEditor()
       tableRoadManagerV(0),
       tableRoadTypes(0)
 {
+    menuPageEditor = this;
+
     window = TheGame::getInstance()->getEnv()->addWindow(
-        irr::core::recti(TheGame::getInstance()->getScreenSize().Width-300, 50, TheGame::getInstance()->getScreenSize().Width-10, TheGame::getInstance()->getScreenSize().Height-150),
+        irr::core::recti(TheGame::getInstance()->getScreenSize().Width-350, 50, TheGame::getInstance()->getScreenSize().Width-10, TheGame::getInstance()->getScreenSize().Height-150),
         false,
         L"Editor",
         0,
@@ -201,6 +205,7 @@ MenuPageEditor::~MenuPageEditor()
 {
     //window->remove();
     close();
+    menuPageEditor = 0;
 }
 
 bool MenuPageEditor::OnEvent(const irr::SEvent &event)

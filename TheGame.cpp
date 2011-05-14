@@ -148,6 +148,12 @@ TheGame::TheGame()
         dprintf(MY_DEBUG_NOTE, "Initialize player\n");
         Player::initialize();
         player = Player::getInstance();
+        dprintf(MY_DEBUG_NOTE, "Initialize road type manager\n");
+        RoadTypeManager::initialize();
+        roadTypeManager = RoadTypeManager::getInstance();
+        dprintf(MY_DEBUG_NOTE, "Initialize road manager\n");
+        RoadManager::initialize();
+        roadManager = RoadManager::getInstance();
         dprintf(MY_DEBUG_NOTE, "Initialize race manager\n");
         RaceManager::initialize();
         raceManager = RaceManager::getInstance();
@@ -157,12 +163,6 @@ TheGame::TheGame()
         dprintf(MY_DEBUG_NOTE, "Initialize hud\n");
         Hud::initialize();
         hud = Hud::getInstance();
-        dprintf(MY_DEBUG_NOTE, "Initialize road type manager\n");
-        RoadTypeManager::initialize();
-        roadTypeManager = RoadTypeManager::getInstance();
-        dprintf(MY_DEBUG_NOTE, "Initialize road manager\n");
-        RoadManager::initialize();
-        roadManager = RoadManager::getInstance();
 
         testText = env->addStaticText(L"", irr::core::recti(10, 10, 790, 30), false, true, 0, -1, true);
     }
@@ -196,21 +196,21 @@ TheGame::~TheGame()
     objectWire = 0;
     player = 0;
     raceManager = 0;
-    menuManager = 0;
-    hud = 0;
     roadManager = 0;
     roadTypeManager = 0;
+    menuManager = 0;
+    hud = 0;
 
-    dprintf(MY_DEBUG_NOTE, "Finalize road manager\n");
-    RoadManager::finalize();
-    dprintf(MY_DEBUG_NOTE, "Finalize road type manager\n");
-    RoadTypeManager::finalize();
     dprintf(MY_DEBUG_NOTE, "Finalize hud\n");
     Hud::finalize();
     dprintf(MY_DEBUG_NOTE, "Finalize menu manager\n");
     MenuManager::finalize();
     dprintf(MY_DEBUG_NOTE, "Finalize race manager\n");
     RaceManager::finalize();
+    dprintf(MY_DEBUG_NOTE, "Finalize road manager\n");
+    RoadManager::finalize();
+    dprintf(MY_DEBUG_NOTE, "Finalize road type manager\n");
+    RoadTypeManager::finalize();
     dprintf(MY_DEBUG_NOTE, "Finalize player\n");
     Player::finalize();
     dprintf(MY_DEBUG_NOTE, "Finalize object wire\n");

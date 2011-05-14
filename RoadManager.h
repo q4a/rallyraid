@@ -76,6 +76,9 @@ private:
 
     friend class MenuPageEditor;
     friend class MenuPageEditorRoad;
+    friend class MenuPageEditorRace;
+    friend class MenuPageEditorDay;
+    friend class MenuPageEditorStage;
 };
 
 

@@ -14,14 +14,17 @@
 #define RACE_DIR(RACE)              (RACES_DIR + std::string("/") + RACE)
 #define RACE_CFG                    (std::string("race.cfg"))
 #define RACE_ROADS(RACE)            (RACES_DIR + std::string("/") + RACE + std::string("/roads"))
+#define RACE_ROADS_DATA(RACE)       (RACES_DIR + std::string("/") + RACE + std::string("/roads/data"))
 
 #define DAY_DIR(RACE, DAY)          (RACE_DIR(RACE) + std::string("/") + DAY) 
 #define DAY_CFG                     (std::string("day.cfg"))
 #define DAY_ROADS(RACE, DAY)        (RACE_DIR(RACE) + std::string("/") + DAY + std::string("/roads")) 
+#define DAY_ROADS_DATA(RACE, DAY)   (RACE_DIR(RACE) + std::string("/") + DAY + std::string("/roads/data")) 
 
 #define STAGE_DIR(RACE, DAY, STAGE) (DAY_DIR(RACE, DAY) + std::string("/") + STAGE) 
 #define STAGE_CFG                   (std::string("stage.cfg"))
 #define STAGE_ROADS(RACE, DAY, STAGE) (DAY_DIR(RACE, DAY) + std::string("/") + STAGE + std::string("/roads"))
+#define STAGE_ROADS_DATA(RACE, DAY, STAGE) (DAY_DIR(RACE, DAY) + std::string("/") + STAGE + std::string("/roads/data"))
 
 #define DESCRIPTION_TXT             (std::string("description.txt"))
 #define COMPETITORS_CFG             (std::string("competitors.cfg"))

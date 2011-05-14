@@ -26,7 +26,7 @@ MenuPageEditorStage::MenuPageEditorStage()
       editBoxShortDescription(0)
 {
     window = TheGame::getInstance()->getEnv()->addWindow(
-        irr::core::recti(TheGame::getInstance()->getScreenSize().Width-300, 50, TheGame::getInstance()->getScreenSize().Width-10, TheGame::getInstance()->getScreenSize().Height-150),
+        irr::core::recti(TheGame::getInstance()->getScreenSize().Width-350, 50, TheGame::getInstance()->getScreenSize().Width-10, TheGame::getInstance()->getScreenSize().Height-150),
         false,
         L"Editor - Stage",
         0,

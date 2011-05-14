@@ -103,6 +103,7 @@
     <ClInclude Include="MenuPageEditor.h" />
     <ClInclude Include="MenuPageEditorDay.h" />
     <ClInclude Include="MenuPageEditorRace.h" />
+    <ClInclude Include="MenuPageEditorRoad.h" />
     <ClInclude Include="MenuPageEditorStage.h" />
     <ClInclude Include="MyLock.h" />
     <ClInclude Include="MySound.h" />
@@ -162,6 +163,7 @@
     <ClCompile Include="MenuPageEditor.cpp" />
     <ClCompile Include="MenuPageEditorDay.cpp" />
     <ClCompile Include="MenuPageEditorRace.cpp" />
+    <ClCompile Include="MenuPageEditorRoad.cpp" />
     <ClCompile Include="MenuPageEditorStage.cpp" />
     <ClCompile Include="MySound.cpp" />
     <ClCompile Include="MyThread.cpp" />

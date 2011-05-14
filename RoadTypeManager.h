@@ -39,6 +39,9 @@ private:
     friend class MenuPageEditor;
     friend class MenuPageEditorRoad;
     friend class MenuPageEditorRoadType;
+    friend class MenuPageEditorRace;
+    friend class MenuPageEditorDay;
+    friend class MenuPageEditorStage;
 };
 
 

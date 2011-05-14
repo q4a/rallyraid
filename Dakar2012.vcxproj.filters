@@ -192,6 +192,9 @@
     <ClInclude Include="TerrainLarge.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="MenuPageEditorRoad.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -342,6 +345,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="TerrainLarge.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MenuPageEditorRoad.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
