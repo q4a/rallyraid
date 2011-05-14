@@ -166,7 +166,7 @@ MenuPageEditorRace::MenuPageEditorRace()
         MI_EBNEWROADDATAFILENAME);
 
     tableRoads = TheGame::getInstance()->getEnv()->addTable(
-        irr::core::recti(irr::core::position2di(0, 3*22), irr::core::dimension2di(tabDays->getRelativePosition().getSize().Width, tabDays->getRelativePosition().getSize().Height-(3*22))),
+        irr::core::recti(irr::core::position2di(0, 3*22), irr::core::dimension2di(tabRoads->getRelativePosition().getSize().Width, tabRoads->getRelativePosition().getSize().Height-(3*22))),
         //irr::core::recti(irr::core::position2di(0, 0), tabRoads->getRelativePosition().getSize()),
         tabRoads,
         MI_TABLEROADS,

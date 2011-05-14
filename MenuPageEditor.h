@@ -12,6 +12,7 @@ public:
     {
         MI_WINDOW = MAX_MENU_ITEMS * MenuManager::MP_EDITOR,
         MI_BUTTONREFRESH,
+        MI_BUTTONCREATEROAD,
         MI_TABCONTROL,
 
         MI_TABSELECTED,
@@ -21,6 +22,7 @@ public:
         MI_TABOBJECTPOOL,
         MI_TABRACEMANAGER,
         MI_TABROADMANAGER,
+        MI_TABROADS,
 
         MI_TABLESELECTED,
         MI_TABLETILES,
@@ -32,6 +34,11 @@ public:
         MI_TABLEROADMANAGERS,
         MI_TABLEROADMANAGERV,
         MI_TABLEROADTYPES,
+        MI_TABLEROADS,
+
+        MI_EBNEWROADFILENAME,
+        MI_EBNEWROADNAME,
+        MI_EBNEWROADDATAFILENAME,
 
         NUMBER_OF_MENUITEMS
     };
@@ -56,6 +63,8 @@ private:
     void refreshObjectPool();
     void refreshRaceManager();
     void refreshRoadManager();
+    void refreshRoads();
+    void refreshRoadEditBoxes(const wchar_t* newRoadName = L"");
 
 private:
     irr::gui::IGUIWindow*   window;
@@ -69,6 +78,10 @@ private:
     irr::gui::IGUITable*    tableRoadManagerS;
     irr::gui::IGUITable*    tableRoadManagerV;
     irr::gui::IGUITable*    tableRoadTypes;
+    irr::gui::IGUITable*    tableRoads;
+    irr::gui::IGUIEditBox*  editBoxNewRoadFilename;
+    irr::gui::IGUIEditBox*  editBoxNewRoadName;
+    irr::gui::IGUIEditBox*  editBoxNewRoadDataFilename;
 };
 
 #endif // MENUPAGEEDITOR_H

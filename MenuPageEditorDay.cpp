@@ -1,5 +1,6 @@
 
 #include "MenuPageEditorDay.h"
+#include "MenuPageEditor.h"
 #include "TheGame.h"
 #include "stdafx.h"
 #include "WStringConverter.h"
@@ -12,6 +13,7 @@
 #include "Race.h"
 #include "Settings.h"
 #include "RoadManager.h"
+#include "RoadTypeManager.h"
 #include "Road.h"
 #include "Day.h"
 #include "Stage.h"
@@ -23,9 +25,13 @@ MenuPageEditorDay::MenuPageEditorDay()
     : window(0),
       tableStages(0),
       tableGlobalObjects(0),
+      tableRoads(0),
       editBoxLongName(0),
       editBoxShortDescription(0),
-      editBoxNewStage(0)
+      editBoxNewStage(0),
+      editBoxNewRoadFilename(0),
+      editBoxNewRoadName(0),
+      editBoxNewRoadDataFilename(0)
 {
     window = TheGame::getInstance()->getEnv()->addWindow(
         irr::core::recti(TheGame::getInstance()->getScreenSize().Width-350, 50, TheGame::getInstance()->getScreenSize().Width-10, TheGame::getInstance()->getScreenSize().Height-150),
@@ -51,6 +57,12 @@ MenuPageEditorDay::MenuPageEditorDay()
         window,
         MI_BUTTONCREATESTAGE,
         L"new stage");
+
+    TheGame::getInstance()->getEnv()->addButton(
+        irr::core::recti(128,22,168,42),
+        window,
+        MI_BUTTONCREATEROAD,
+        L"new road");
 
     editBoxLongName = TheGame::getInstance()->getEnv()->addEditBox(L"long name",
         irr::core::recti(irr::core::position2di(2, 44), irr::core::dimension2di(window->getRelativePosition().getSize().Width - 4, 20)),
@@ -109,6 +121,44 @@ MenuPageEditorDay::MenuPageEditorDay()
     tableGlobalObjects->addColumn(L"X");
     tableGlobalObjects->addColumn(L"Y");
     tableGlobalObjects->addColumn(L"visible");
+
+    // ----------------------------
+    // Roads tab
+    // ----------------------------
+    irr::gui::IGUITab* tabRoads = tc->addTab(L"Roads", MI_TABROADS);
+
+    editBoxNewRoadName = TheGame::getInstance()->getEnv()->addEditBox(L"new road name",
+        irr::core::recti(irr::core::position2di(0, 0), irr::core::dimension2di(tabRoads->getRelativePosition().getSize().Width, 20)),
+        true,
+        tabRoads,
+        MI_EBNEWROADNAME);
+
+    editBoxNewRoadFilename = TheGame::getInstance()->getEnv()->addEditBox(L"new road filename",
+        irr::core::recti(irr::core::position2di(0, 22), irr::core::dimension2di(tabRoads->getRelativePosition().getSize().Width, 20)),
+        true,
+        tabRoads,
+        MI_EBNEWROADFILENAME);
+
+    editBoxNewRoadDataFilename = TheGame::getInstance()->getEnv()->addEditBox(L"new road data filename",
+        irr::core::recti(irr::core::position2di(0, 2*22), irr::core::dimension2di(tabRoads->getRelativePosition().getSize().Width, 20)),
+        true,
+        tabRoads,
+        MI_EBNEWROADDATAFILENAME);
+
+    tableRoads = TheGame::getInstance()->getEnv()->addTable(
+        irr::core::recti(irr::core::position2di(0, 3*22), irr::core::dimension2di(tabRoads->getRelativePosition().getSize().Width, tabRoads->getRelativePosition().getSize().Height-(3*22))),
+        //irr::core::recti(irr::core::position2di(0, 0), tabRoads->getRelativePosition().getSize()),
+        tabRoads,
+        MI_TABLEROADS,
+        true);
+
+    tableRoads->addColumn(L"#");
+    tableRoads->addColumn(L"name");
+    tableRoads->addColumn(L"type");
+    tableRoads->addColumn(L"loaded");
+    tableRoads->addColumn(L"filename");
+    tableRoads->addColumn(L"data");
+    tableRoads->addColumn(L"size");
 
     window->setVisible(false);
 }
@@ -178,6 +228,33 @@ bool MenuPageEditorDay::OnEvent(const irr::SEvent &event)
                         return true;
                         break;
                     }
+                    case MI_BUTTONCREATEROAD:
+                    {
+                        dprintf(MY_DEBUG_NOTE, "editor::race::newRoad\n");
+                        std::string roadName;
+                        std::string roadFilename;
+                        std::string roadDataFilename;
+                        WStringConverter::toString(editBoxNewRoadFilename->getText(), roadFilename);
+                        WStringConverter::toString(editBoxNewRoadName->getText(), roadName);
+                        WStringConverter::toString(editBoxNewRoadDataFilename->getText(), roadDataFilename);
+                        RoadManager::roadMap_t::const_iterator rit = RaceManager::getInstance()->editorRace->roadMap.find(roadName);
+                        if (rit == RaceManager::getInstance()->editorRace->roadMap.end() &&
+                            !roadName.empty() &&
+                            RoadTypeManager::getInstance()->editorRoadType)
+                        {
+                            bool ret;
+                            ret = ConfigDirectory::mkdir(DAY_ROADS(RaceManager::getInstance()->editorRace->getName(),RaceManager::getInstance()->editorDay->getName())) &&
+                                ConfigDirectory::mkdir(DAY_ROADS_DATA(RaceManager::getInstance()->editorRace->getName(),RaceManager::getInstance()->editorDay->getName()));
+                            if (ret)
+                            {
+                                RaceManager::getInstance()->editorRace->roadMap[roadName] =
+                                    new Road(roadFilename, roadName, roadDataFilename, RoadTypeManager::getInstance()->editorRoadType, false);
+                                refreshRoads();
+                            }
+                        }
+                        return true;
+                        break;
+                    }
                 };
                 break;
             }
@@ -187,6 +264,11 @@ bool MenuPageEditorDay::OnEvent(const irr::SEvent &event)
                 {
                     case MI_TABLESTAGES:
                         RaceManager::getInstance()->editorStage = (Stage*)tableStages->getCellData(tableStages->getSelected(), 0);
+                        return true;
+                        break;
+                    case MI_TABLEROADS:
+                        RoadManager::getInstance()->editorRoad = (Road*)tableRoads->getCellData(tableRoads->getSelected(), 0);
+                        MenuPageEditor::menuPageEditor->refreshSelected();
                         return true;
                         break;
                 };
@@ -201,8 +283,22 @@ bool MenuPageEditorDay::OnEvent(const irr::SEvent &event)
                         MenuManager::getInstance()->open(MenuManager::MP_EDITORSTAGE);
                         return true;
                         break;
+                    case MI_TABLEROADS:
+                        RoadManager::getInstance()->editorRoad = (Road*)tableRoads->getCellData(tableRoads->getSelected(), 0);
+                        MenuPageEditor::menuPageEditor->refreshSelected();
+                        MenuManager::getInstance()->open(MenuManager::MP_EDITORROAD);
+                        return true;
+                        break;
                 };
                 break;
+            }
+            case irr::gui::EGET_EDITBOX_CHANGED:
+            {
+                switch (id)
+                {
+                    case MI_EBNEWROADNAME:
+                        refreshRoadEditBoxes(editBoxNewRoadName->getText());
+                }
             }
         };
     }
@@ -227,6 +323,7 @@ void MenuPageEditorDay::refresh()
     refreshStages();
     refreshGlobalObjects();
     refreshEditBoxes();
+    refreshRoads();
 }
 
 void MenuPageEditorDay::refreshStages()
@@ -318,4 +415,80 @@ void MenuPageEditorDay::refreshEditBoxes()
 
     str = L"";
     editBoxNewStage->setText(str.c_str());
+}
+
+void MenuPageEditorDay::refreshRoads()
+{
+    refreshRoadEditBoxes(editBoxNewRoadName->getText());
+
+    tableRoads->clearRows();
+    /*
+    tableRoads->addColumn(L"#");
+    tableRoads->addColumn(L"name");
+    tableRoads->addColumn(L"type");
+    tableRoads->addColumn(L"loaded");
+    tableRoads->addColumn(L"filename");
+    tableRoads->addColumn(L"data");
+    */
+    const RoadManager::roadMap_t& roadMap = RaceManager::getInstance()->editorRace->getRoadMap();
+    unsigned int i = 0;
+    for (RoadManager::roadMap_t::const_iterator rit = roadMap.begin();
+         rit != roadMap.end();
+         rit++, i++)
+    {
+        irr::core::stringw str;
+        
+        tableRoads->addRow(i);
+
+        str += i;
+        tableRoads->setCellText(i, 0, str.c_str());
+        tableRoads->setCellData(i, 0, (void*)rit->second);
+
+        str = L"";
+        str += rit->second->getName().c_str();
+        tableRoads->setCellText(i, 1, str.c_str());
+
+        str = L"";
+        str += rit->second->roadType->getName().c_str();
+        tableRoads->setCellText(i, 2, str.c_str());
+
+        str = L"false";
+        if (rit->second->isLoaded())
+        {
+            str = L"true";
+        }
+        tableRoads->setCellText(i, 3, str.c_str());
+
+        str = L"";
+        str += rit->second->roadFilename.c_str();
+        tableRoads->setCellText(i, 4, str.c_str());
+
+        str = L"";
+        str += rit->second->roadDataFilename.c_str();
+        tableRoads->setCellText(i, 5, str.c_str());
+
+        str = L"";
+        str += rit->second->roadPointVector.size();
+        tableRoads->setCellText(i, 6, str.c_str());
+    }
+
+}
+
+void MenuPageEditorDay::refreshRoadEditBoxes(const wchar_t* newRoadName)
+{
+    irr::core::stringw str;
+
+    str = newRoadName;
+    editBoxNewRoadName->setText(str.c_str());
+
+    str = L"";
+    str += (RACE_ROADS(RaceManager::getInstance()->editorRace->getName())+std::string("/")).c_str();
+    str += newRoadName;
+    editBoxNewRoadFilename->setText(str.c_str());
+
+    str = L"";
+    str += (RACE_ROADS_DATA(RaceManager::getInstance()->editorRace->getName())+std::string("/")).c_str();
+    str += newRoadName;
+    editBoxNewRoadDataFilename->setText(str.c_str());
+
 }
