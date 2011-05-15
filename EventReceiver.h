@@ -38,6 +38,7 @@ private:
         CHANGE_VIEW,
         OPEN_EDITOR,
         RESET_VEHICLE,
+        SWITCH_INPUT,
         NUMBER_OF_KEYNAMES
     };
     struct KeyProperty

@@ -31,7 +31,7 @@ void MenuManager::finalize()
 }
 
 MenuManager::MenuManager()
-    : currentMenuPage(0)
+    : currentMenuPage(0), menuInput(false)
 {
     menuManager = this;
     memset(menuPages, 0, sizeof(menuPages));
@@ -86,4 +86,13 @@ void MenuManager::closeAll()
 void MenuManager::refreshEventReceiver()
 {
     TheGame::getInstance()->getEnv()->setUserEventReceiver(currentMenuPage);
+    menuInput = (currentMenuPage != 0);
+    TheGame::getInstance()->getCamera()->setInputReceiverEnabled(!menuInput);
+}
+
+void MenuManager::clearEventReceiver()
+{
+    TheGame::getInstance()->getEnv()->setUserEventReceiver(0);
+    menuInput = false;
+    TheGame::getInstance()->getCamera()->setInputReceiverEnabled(true);
 }

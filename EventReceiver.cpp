@@ -65,6 +65,8 @@ EventReceiver::EventReceiver()
     keyMap[OPEN_EDITOR] = kp;
     keyNameMap["reset_vehicle"] = RESET_VEHICLE;
     keyMap[RESET_VEHICLE] = kp;
+    keyNameMap["switch_input"] = SWITCH_INPUT;
+    keyMap[SWITCH_INPUT] = kp;
 
     loadKeyMapping();
     //saveKeyMapping();
@@ -355,8 +357,12 @@ void EventReceiver::checkEvents()
     */
 #else // 0 or 1
     
-    if (MenuManager::getInstance()->isInMenu())
+    if (MenuManager::getInstance()->getMenuInput())
     {
+        if (IS_PRESSED(SWITCH_INPUT))
+        {
+            MenuManager::getInstance()->clearEventReceiver();
+        }
     }
     else
     {
@@ -449,6 +455,10 @@ void EventReceiver::checkEvents()
             }
         }
 
+        if (IS_PRESSED(SWITCH_INPUT))
+        {
+            MenuManager::getInstance()->refreshEventReceiver();
+        }
     }
 #endif // 0 or 1
 }

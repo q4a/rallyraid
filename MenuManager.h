@@ -33,7 +33,10 @@ private:
     MenuManager();
     ~MenuManager();
 
+public:
     void refreshEventReceiver();
+    void clearEventReceiver();
+    bool getMenuInput();    // inline
 
 public:
     
@@ -41,18 +44,23 @@ public:
     void close();
     void closeAll();
 
-    bool isInMenu(); // inline
+    bool isInMenu();        // inline
 
 private:
     MenuPageBase*   currentMenuPage;
-    
     MenuPageBase*   menuPages[NUMBER_OF_MENUPAGES];
+    bool            menuInput;
 };
 
 
 inline bool MenuManager::isInMenu()
 {
     return (currentMenuPage != 0);
+}
+
+inline bool MenuManager::getMenuInput()
+{
+    return menuInput;
 }
 
 #endif // MENUMANAGER_H
