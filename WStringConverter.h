@@ -2,7 +2,7 @@
 #define WSTRINGCONVERTER_H
 
 #include <string>
-//#include <sstream>
+#include <sstream>
 #include <irrlicht.h>
 
 class WStringConverter
@@ -26,6 +26,19 @@ public:
         //ret.resize(origsize);
     }
 
+    static void WStringConverter::toInt(const irr::core::stringw& wstr, int& ret)
+    {
+        const wchar_t* orig = wstr.c_str();
+        toInt(orig, ret);
+    }
+
+    static void WStringConverter::toInt(const wchar_t* orig, int& ret)
+    {
+        std::string val;
+        toString(orig, val);
+        std::istringstream str(val);
+        str >> ret;
+    }
 };
 
 #endif // WSTRINGCONVERTER_H

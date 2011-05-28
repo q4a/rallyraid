@@ -6,6 +6,7 @@
 #define MAX_MENU_ITEMS 100
 
 class MenuPageBase;
+class EmptyEventReceiver;
 
 class MenuManager
 {
@@ -50,6 +51,7 @@ private:
     MenuPageBase*   currentMenuPage;
     MenuPageBase*   menuPages[NUMBER_OF_MENUPAGES];
     bool            menuInput;
+    EmptyEventReceiver* eer;
 };
 
 

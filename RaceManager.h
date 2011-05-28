@@ -65,6 +65,7 @@ public:
     Day* getCurrentDay(); // inline
     Stage* getCurrentStage(); // inline
 
+    void activateStage(Stage* stage);
 
     static void readShortDescription(const std::string& fileName, std::string& shortDescription);
     static bool writeShortDescription(const std::string& fileName, const std::string& shortDescription);

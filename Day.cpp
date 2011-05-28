@@ -7,8 +7,9 @@
 #include "stdafx.h"
 
 
-Day::Day(const std::string& raceName, const std::string& dayName, bool& ret)
-    : raceName(raceName),
+Day::Day(Race* parent, const std::string& raceName, const std::string& dayName, bool& ret)
+    : parent(parent),
+      raceName(raceName),
       dayName(dayName),
       dayLongName(),
       shortDescription(),
@@ -104,7 +105,7 @@ bool Day::readStages()
          it++)
     {
         std::string stageName = it->c_str();
-        Stage* stage = new Stage(raceName, dayName, stageName, ret);
+        Stage* stage = new Stage(this, raceName, dayName, stageName, ret);
         if (!ret)
         {
             delete stage;

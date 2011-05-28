@@ -13,6 +13,7 @@ public:
         MI_WINDOW = MAX_MENU_ITEMS * MenuManager::MP_EDITOR,
         MI_BUTTONREFRESH,
         MI_BUTTONCREATEROAD,
+        MI_BUTTONACTIVATE,
         MI_TABCONTROL,
 
         MI_TABSELECTED,
@@ -25,12 +26,12 @@ public:
         MI_TABROADS,
 
         MI_TABLESELECTED,
+        MI_TABLEACTION,
         MI_TABLETILES,
         MI_TABLEOBJECTWIRE,
         MI_TABLEOBJECTWIRETILES,
         MI_TABLEOBJECTPOOL,
         MI_TABLERACEMANAGER,
-        MI_TABLEROADMANAGERG,
         MI_TABLEROADMANAGERS,
         MI_TABLEROADMANAGERV,
         MI_TABLEROADTYPES,
@@ -43,6 +44,15 @@ public:
         NUMBER_OF_MENUITEMS
     };
 
+    enum Action
+    {
+        A_None = 0,
+        A_AddObjectGlobal,
+        A_AddObjectRace,
+        A_AddObjectDay,
+        A_AddObjectStage,
+        A_AddRoadPoint
+    };
 
     MenuPageEditor();
     virtual ~MenuPageEditor();
@@ -69,12 +79,12 @@ private:
 private:
     irr::gui::IGUIWindow*   window;
     irr::gui::IGUITable*    tableSelected;
+    irr::gui::IGUITable*    tableAction;
     irr::gui::IGUITable*    tableTiles;
     irr::gui::IGUITable*    tableObjectWire;
     irr::gui::IGUITable*    tableObjectWireTiles;
     irr::gui::IGUITable*    tableObjectPool;
     irr::gui::IGUITable*    tableRaceManager;
-    irr::gui::IGUITable*    tableRoadManagerG;
     irr::gui::IGUITable*    tableRoadManagerS;
     irr::gui::IGUITable*    tableRoadManagerV;
     irr::gui::IGUITable*    tableRoadTypes;
@@ -82,6 +92,8 @@ private:
     irr::gui::IGUIEditBox*  editBoxNewRoadFilename;
     irr::gui::IGUIEditBox*  editBoxNewRoadName;
     irr::gui::IGUIEditBox*  editBoxNewRoadDataFilename;
+
+    Action                  action;
 };
 
 #endif // MENUPAGEEDITOR_H

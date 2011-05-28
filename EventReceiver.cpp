@@ -312,7 +312,6 @@ void EventReceiver::checkEvents()
 {
     //Need to capture/update each device
     keyboard->capture();
-    //mouse->capture();
     joystick->capture();
 
     const OIS::JoyStickState joystickState = joystick->getJoyStickState();
@@ -368,6 +367,28 @@ void EventReceiver::checkEvents()
     {
     
         // the real event check
+
+        // mouse
+        /*
+        mouse->capture();
+        const OIS::MouseState mouseState = mouse->getMouseState();
+        if (mouseState.buttonDown(OIS::MB_Left))
+        {
+            printf("mouse button left down\n");
+        }
+
+        if (mouseState.buttonDown(OIS::MB_Right))
+        {
+            printf("mouse button right down\n");
+        }
+
+        if (mouseState.buttonDown(OIS::MB_Middle))
+        {
+            printf("mouse button middle down\n");
+        }
+        */
+
+        // other
 
         if (IS_PRESSED(ACCELERATE))
         {

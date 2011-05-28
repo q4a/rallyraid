@@ -12,7 +12,7 @@
 class Stage
 {
 public:
-    Stage(const std::string& raceName, const std::string& dayName, const std::string& stageName, bool& ret);
+    Stage(Day* parent, const std::string& raceName, const std::string& dayName, const std::string& stageName, bool& ret);
     ~Stage();
     
 private:
@@ -36,6 +36,7 @@ public:
     void deactivate();
 
 private:
+    Day*                            parent;
     std::string                     raceName;
     std::string                     dayName;
     std::string                     stageName;

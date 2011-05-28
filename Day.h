@@ -14,7 +14,7 @@ class Stage;
 class Day
 {
 public:
-    Day(const std::string& raceName, const std::string& dayName, bool& ret);
+    Day(Race* parent, const std::string& raceName, const std::string& dayName, bool& ret);
     ~Day();
     
     typedef std::map<std::string, Stage*> stageMap_t;
@@ -43,6 +43,7 @@ public:
     void deactivate();
 
 private:
+    Race*                           parent;
     std::string                     raceName;
     std::string                     dayName;
     std::string                     dayLongName;

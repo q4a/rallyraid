@@ -88,6 +88,7 @@ MenuPageEditorStage::MenuPageEditorStage()
 
     tableGlobalObjects->addColumn(L"#");
     tableGlobalObjects->addColumn(L"object");
+    tableGlobalObjects->setColumnWidth(1, 80);
     tableGlobalObjects->addColumn(L"X");
     tableGlobalObjects->addColumn(L"Y");
     tableGlobalObjects->addColumn(L"visible");
@@ -124,11 +125,14 @@ MenuPageEditorStage::MenuPageEditorStage()
 
     tableRoads->addColumn(L"#");
     tableRoads->addColumn(L"name");
+    tableRoads->setColumnWidth(1, 60);
     tableRoads->addColumn(L"type");
+    tableRoads->setColumnWidth(2, 60);
+    tableRoads->addColumn(L"size");
     tableRoads->addColumn(L"loaded");
+    tableRoads->setColumnWidth(4, 30);
     tableRoads->addColumn(L"filename");
     tableRoads->addColumn(L"data");
-    tableRoads->addColumn(L"size");
 
     window->setVisible(false);
 }
@@ -240,6 +244,7 @@ bool MenuPageEditorStage::OnEvent(const irr::SEvent &event)
                 {
                     case MI_EBNEWROADNAME:
                         refreshRoadEditBoxes(editBoxNewRoadName->getText());
+                        break;
                 }
             }
         };
@@ -359,23 +364,23 @@ void MenuPageEditorStage::refreshRoads()
         str += rit->second->roadType->getName().c_str();
         tableRoads->setCellText(i, 2, str.c_str());
 
+        str = L"";
+        str += rit->second->roadPointVector.size();
+        tableRoads->setCellText(i, 3, str.c_str());
+
         str = L"false";
         if (rit->second->isLoaded())
         {
             str = L"true";
         }
-        tableRoads->setCellText(i, 3, str.c_str());
-
-        str = L"";
-        str += rit->second->roadFilename.c_str();
         tableRoads->setCellText(i, 4, str.c_str());
 
         str = L"";
-        str += rit->second->roadDataFilename.c_str();
+        str += rit->second->roadFilename.c_str();
         tableRoads->setCellText(i, 5, str.c_str());
 
         str = L"";
-        str += rit->second->roadPointVector.size();
+        str += rit->second->roadDataFilename.c_str();
         tableRoads->setCellText(i, 6, str.c_str());
     }
 

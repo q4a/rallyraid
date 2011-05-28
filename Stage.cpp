@@ -6,8 +6,9 @@
 #include "stdafx.h"
 
 
-Stage::Stage(const std::string& raceName, const std::string& dayName, const std::string& stageName, bool& ret)
-    : raceName(raceName),
+Stage::Stage(Day* parent, const std::string& raceName, const std::string& dayName, const std::string& stageName, bool& ret)
+    : parent(parent),
+      raceName(raceName),
       dayName(dayName),
       stageName(stageName),
       stageLongName(),

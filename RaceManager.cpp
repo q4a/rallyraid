@@ -1,6 +1,8 @@
 
 #include "RaceManager.h"
 #include "Race.h"
+#include "Day.h"
+#include "Stage.h"
 #include "stdafx.h"
 #include "ConfigDirectory.h"
 #include "ConfigFile.h"
@@ -9,6 +11,7 @@
 #include "ObjectPoolManager.h"
 #include "ObjectWire.h"
 #include "StringConverter.h"
+#include "RoadManager.h"
 
 
 RaceManager* RaceManager::raceManager = 0;
@@ -86,6 +89,39 @@ void RaceManager::read()
             raceMap[raceName] = race;
         }
     }
+}
+
+void RaceManager::activateStage(Stage* stage)
+{
+    if (currentStage == stage) return;
+
+    RoadManager::getInstance()->clearStageRoads();
+
+    Day* newDay = stage->parent;
+    Race* newRace = stage->parent->parent;
+
+    if (currentStage && stage != currentStage)
+    {
+        currentStage->deactivate();
+        currentStage = stage;
+        currentStageName = currentStage->getName();
+    }
+    if (currentDay && currentDay != newDay)
+    {
+        currentDay->deactivate();
+        currentDay = newDay;
+        currentDayName = currentDay->getName();
+    }
+    if (currentRace && currentRace != newRace)
+    {
+        currentRace->deactivate();
+        currentRace = newRace;
+        currentRaceName = currentRace->getName();
+    }
+
+    currentRace->activate();
+    currentDay->activate();
+    currentStage->activate();
 }
 
 /* static */ void RaceManager::readShortDescription(const std::string& fileName, std::string& shortDescription)

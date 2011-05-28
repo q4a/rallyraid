@@ -32,7 +32,9 @@ RoadManager::RoadManager()
     : roadMap(),
       stageRoadChunkListMap(),
       visibleRoadChunkSet(),
-      editorRoad(0)
+      editorRoad(0),
+      editorRadius(0),
+      editorColor(0)
 {
     read();
 }
@@ -90,12 +92,12 @@ void RoadManager::addStageRoad(Road* road)
     currentChunk.road = road;
     currentChunk.roadChunk = roadChunk_t(0, 0);
     unsigned int currentTile = TheEarth::getInstance()->calculateTileNum(
-        (unsigned int)abs((int)road->roadPointVector[0].X), (unsigned int)abs((int)road->roadPointVector[0].Z));
+        (unsigned int)abs((int)road->roadPointVector[0].p.X), (unsigned int)abs((int)road->roadPointVector[0].p.Z));
 
     for (unsigned int i = 1; i < ps; i++)
     {
         unsigned int newTile = TheEarth::getInstance()->calculateTileNum(
-            (unsigned int)abs((int)road->roadPointVector[i].X), (unsigned int)abs((int)road->roadPointVector[i].Z));
+            (unsigned int)abs((int)road->roadPointVector[i].p.X), (unsigned int)abs((int)road->roadPointVector[i].p.Z));
         if (newTile != currentTile)
         {
             currentChunk.roadChunk.second = i - 1;

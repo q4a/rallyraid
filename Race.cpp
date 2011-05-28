@@ -116,7 +116,7 @@ bool Race::readDays()
          it++)
     {
         std::string dayName = it->c_str();
-        Day* day = new Day(raceName, dayName, ret);
+        Day* day = new Day(this, raceName, dayName, ret);
         if (!ret)
         {
             delete day;

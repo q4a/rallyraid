@@ -72,8 +72,11 @@ private:
     roadRoadChunkSet_t      visibleRoadChunkSet;
 
     Road*                   editorRoad;
+    int                     editorRadius;
+    irr::video::SColor      editorColor;
 
 
+    friend class Road;
     friend class MenuPageEditor;
     friend class MenuPageEditorRoad;
     friend class MenuPageEditorRace;
