@@ -938,7 +938,10 @@ void MenuPageEditor::actionP()
 {
     irr::core::vector3df pos = TheGame::getInstance()->getCamera()->getPosition();
     pos.Y = TheEarth::getInstance()->getHeight(pos);
+    printf("action at (%f, %f, %f)\n", pos.X, pos.Y, pos.Z);
     irr::core::vector3df apos = pos + OffsetManager::getInstance()->getOffset();
+
+    //TheGame::getInstance()->getDriver()->setTransform(irr::video::ETS_WORLD, irr::core::IdentityMatrix);
 
     switch (currentAction)
     {

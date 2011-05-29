@@ -5,6 +5,7 @@
 #include "OffsetManager.h"
 #include "TheEarth.h"
 #include "TheGame.h"
+#include <assert.h>
 
 ObjectWireGlobalObject::ObjectWireGlobalObject(ObjectPool* objectPool,
     const irr::core::vector3df& apos,
@@ -63,6 +64,12 @@ void ObjectWireGlobalObject::editorRender(bool last)
     irr::video::IVideoDriver* driver = TheGame::getInstance()->getDriver();
     irr::core::vector3df renderPos = apos - OffsetManager::getInstance()->getOffset();
 
+    //printf("apos (%f, %f, %f), offset: (%f, %f, %f), renderpos (%f, %f, %f)\n",
+    //    apos.X, apos.Y, apos.Z,
+    //    OffsetManager::getInstance()->getOffset().X, OffsetManager::getInstance()->getOffset().Y, OffsetManager::getInstance()->getOffset().Z,
+    //    renderPos.X, renderPos.Y, renderPos.Z);
+    //assert(0);
+
     irr::core::vector3df min = renderPos;
     irr::core::vector3df max = renderPos;
     irr::video::SColor color(255, 255, 255, 0);
@@ -71,8 +78,11 @@ void ObjectWireGlobalObject::editorRender(bool last)
     max.X += 2.f;
     max.Y += 20.f;
     max.Z += 2.f;
+    //printf("min: (%f, %f, %f), max: (%f, %f, %f)\n", min.X, min.Y, min.Z, max.X, max.Y, max.Z);
 
     if (last) color.setGreen(0);
 
+    TheGame::getInstance()->getDriver()->setTransform(irr::video::ETS_WORLD, irr::core::IdentityMatrix);
     driver->draw3DBox(irr::core::aabbox3df(min, max), color);
+    //driver->draw3DLine(min, max, color);
 }

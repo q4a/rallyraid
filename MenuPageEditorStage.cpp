@@ -192,8 +192,8 @@ bool MenuPageEditorStage::OnEvent(const irr::SEvent &event)
                         WStringConverter::toString(editBoxNewRoadFilename->getText(), roadFilename);
                         WStringConverter::toString(editBoxNewRoadName->getText(), roadName);
                         WStringConverter::toString(editBoxNewRoadDataFilename->getText(), roadDataFilename);
-                        RoadManager::roadMap_t::const_iterator rit = RaceManager::getInstance()->editorRace->roadMap.find(roadName);
-                        if (rit == RaceManager::getInstance()->editorRace->roadMap.end() &&
+                        RoadManager::roadMap_t::const_iterator rit = RaceManager::getInstance()->editorStage->roadMap.find(roadName);
+                        if (rit == RaceManager::getInstance()->editorStage->roadMap.end() &&
                             !roadName.empty() &&
                             RoadTypeManager::getInstance()->editorRoadType)
                         {
@@ -202,7 +202,7 @@ bool MenuPageEditorStage::OnEvent(const irr::SEvent &event)
                                 ConfigDirectory::mkdir(STAGE_ROADS_DATA(RaceManager::getInstance()->editorRace->getName(),RaceManager::getInstance()->editorDay->getName(),RaceManager::getInstance()->editorStage->getName()));
                             if (ret)
                             {
-                                RaceManager::getInstance()->editorRace->roadMap[roadName] =
+                                RaceManager::getInstance()->editorStage->roadMap[roadName] =
                                     new Road(roadFilename, roadName, roadDataFilename, RoadTypeManager::getInstance()->editorRoadType, false);
                                 refreshRoads();
                             }
@@ -285,7 +285,7 @@ void MenuPageEditorStage::refreshGlobalObjects()
     tableGlobalObjects->addColumn(L"Y");
     tableGlobalObjects->addColumn(L"visible");
     */
-    const RaceManager::globalObjectList_t& globalObjectList = RaceManager::getInstance()->editorRace->globalObjectList;
+    const RaceManager::globalObjectList_t& globalObjectList = RaceManager::getInstance()->editorStage->globalObjectList;
     unsigned int i = 0;
     for (RaceManager::globalObjectList_t::const_iterator goit = globalObjectList.begin();
          goit != globalObjectList.end();
@@ -342,7 +342,7 @@ void MenuPageEditorStage::refreshRoads()
     tableRoads->addColumn(L"filename");
     tableRoads->addColumn(L"data");
     */
-    const RoadManager::roadMap_t& roadMap = RaceManager::getInstance()->editorRace->getRoadMap();
+    const RoadManager::roadMap_t& roadMap = RaceManager::getInstance()->editorStage->getRoadMap();
     unsigned int i = 0;
     for (RoadManager::roadMap_t::const_iterator rit = roadMap.begin();
          rit != roadMap.end();
@@ -394,12 +394,16 @@ void MenuPageEditorStage::refreshRoadEditBoxes(const wchar_t* newRoadName)
     editBoxNewRoadName->setText(str.c_str());
 
     str = L"";
-    str += (RACE_ROADS(RaceManager::getInstance()->editorRace->getName())+std::string("/")).c_str();
+    str += (STAGE_ROADS(RaceManager::getInstance()->editorRace->getName(),
+        RaceManager::getInstance()->editorDay->getName(),
+        RaceManager::getInstance()->editorStage->getName())+std::string("/")).c_str();
     str += newRoadName;
     editBoxNewRoadFilename->setText(str.c_str());
 
     str = L"";
-    str += (RACE_ROADS_DATA(RaceManager::getInstance()->editorRace->getName())+std::string("/")).c_str();
+    str += (STAGE_ROADS_DATA(RaceManager::getInstance()->editorRace->getName(),
+        RaceManager::getInstance()->editorDay->getName(),
+        RaceManager::getInstance()->editorStage->getName())+std::string("/")).c_str();
     str += newRoadName;
     editBoxNewRoadDataFilename->setText(str.c_str());
 
