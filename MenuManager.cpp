@@ -27,13 +27,13 @@ private:
     {
         if (event.EventType == irr::EET_GUI_EVENT && (int)event.GUIEvent.EventType == 0)
         {
-            if (firstAction)
+            //if (firstAction)
+            //{
+            //    firstAction = false;
+            //}
+            //else
             {
-                firstAction = false;
-            }
-            else
-            {
-                printf("ee gui action\n");
+                //printf("ee gui action\n");
                 MenuPageEditor::action();
             }
         }

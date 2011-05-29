@@ -270,6 +270,7 @@ bool MenuPageEditorDay::OnEvent(const irr::SEvent &event)
                 {
                     case MI_TABLESTAGES:
                         RaceManager::getInstance()->editorStage = (Stage*)tableStages->getCellData(tableStages->getSelected(), 0);
+                        MenuPageEditor::menuPageEditor->refreshSelected();
                         return true;
                         break;
                     case MI_TABLEROADS:

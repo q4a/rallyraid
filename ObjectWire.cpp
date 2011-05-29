@@ -248,6 +248,8 @@ bool ObjectWire::update(const irr::core::vector3df& newPos, bool force)
                     // check globals
                     globalObjectWire_t::const_iterator it = globalObjectWire.find((lastWireCenter.X-(int)(objectWireNum/2)+(int)x) +
                                            (TheEarth::getInstance()->getSizeX() * (lastWireCenter.Y+(int)(objectWireNum/2)-(int)y)));
+                    printf("check global in %d\n", (lastWireCenter.X-(int)(objectWireNum/2)+(int)x) +
+                                           (TheEarth::getInstance()->getSizeX() * (lastWireCenter.Y+(int)(objectWireNum/2)-(int)y)));
                     if (it != globalObjectWire.end())
                     {
                         for (globalObjectSet_t::const_iterator oit = it->second.begin();
@@ -255,6 +257,7 @@ bool ObjectWire::update(const irr::core::vector3df& newPos, bool force)
                              oit++)
                         {
                             (*oit)->setVisible(true);
+                            printf("set visible global object: %p\n", *oit);
                         }
                     }
                 }
@@ -297,7 +300,7 @@ ObjectWireGlobalObject* ObjectWire::addGlobalObject(ObjectWireGlobalObject* glob
     int y = (int)globalObject->getPos().Z / (int)objectWireSize;
     
     globalObjectWire[x + (TheEarth::getInstance()->getSizeX() * y)].insert(globalObject);
-
+    printf("add global object: %d - %p\n", x + (TheEarth::getInstance()->getSizeX() * y), globalObject);
     return globalObject;
 }
 

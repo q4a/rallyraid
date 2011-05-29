@@ -82,7 +82,6 @@ void ObjectWireGlobalObject::editorRender(bool last)
 
     if (last) color.setGreen(0);
 
-    TheGame::getInstance()->getDriver()->setTransform(irr::video::ETS_WORLD, irr::core::IdentityMatrix);
     driver->draw3DBox(irr::core::aabbox3df(min, max), color);
     //driver->draw3DLine(min, max, color);
 }

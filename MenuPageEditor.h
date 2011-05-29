@@ -41,6 +41,8 @@ public:
         MI_EBNEWROADNAME,
         MI_EBNEWROADDATAFILENAME,
 
+        MI_CBRENDER,
+
         NUMBER_OF_MENUITEMS
     };
 
@@ -107,8 +109,11 @@ private:
     irr::gui::IGUIEditBox*  editBoxNewRoadFilename;
     irr::gui::IGUIEditBox*  editBoxNewRoadName;
     irr::gui::IGUIEditBox*  editBoxNewRoadDataFilename;
+    irr::gui::IGUICheckBox* checkBoxRender;
 
     Action                  currentAction;
+    irr::video::SMaterial   material;
+    unsigned int            lastTick;
 };
 
 #endif // MENUPAGEEDITOR_H

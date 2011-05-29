@@ -103,21 +103,23 @@ void RaceManager::activateStage(Stage* stage)
     if (currentStage && stage != currentStage)
     {
         currentStage->deactivate();
-        currentStage = stage;
-        currentStageName = currentStage->getName();
     }
+    currentStage = stage;
+    currentStageName = currentStage->getName();
+
     if (currentDay && currentDay != newDay)
     {
         currentDay->deactivate();
-        currentDay = newDay;
-        currentDayName = currentDay->getName();
     }
+    currentDay = newDay;
+    currentDayName = currentDay->getName();
+
     if (currentRace && currentRace != newRace)
     {
         currentRace->deactivate();
-        currentRace = newRace;
-        currentRaceName = currentRace->getName();
     }
+    currentRace = newRace;
+    currentRaceName = currentRace->getName();
 
     currentRace->activate();
     currentDay->activate();

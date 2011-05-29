@@ -39,9 +39,15 @@ MenuPageEditor::MenuPageEditor()
       editBoxNewRoadFilename(0),
       editBoxNewRoadName(0),
       editBoxNewRoadDataFilename(0),
-      currentAction(A_None)
+      checkBoxRender(0),
+      currentAction(A_None),
+      material(),
+      lastTick(0)
 {
     menuPageEditor = this;
+    material.MaterialType = irr::video::EMT_SOLID;
+    material.setFlag(irr::video::EMF_LIGHTING, false);
+    material.Thickness = 2.0f;
 
     window = TheGame::getInstance()->getEnv()->addWindow(
         irr::core::recti(TheGame::getInstance()->getScreenSize().Width-350, 50, TheGame::getInstance()->getScreenSize().Width-10, TheGame::getInstance()->getScreenSize().Height-150),
@@ -80,8 +86,14 @@ MenuPageEditor::MenuPageEditor()
     // ----------------------------
     irr::gui::IGUITab* tabSelected = tc->addTab(L"S", MI_TABSELECTED);
 
+    checkBoxRender = TheGame::getInstance()->getEnv()->addCheckBox(true,
+        irr::core::recti(irr::core::position2di(0, 0), irr::core::dimension2di(tabSelected->getRelativePosition().getSize().Width, 20)),
+        tabSelected,
+        MI_CBRENDER,
+        L"render helpers");
+
     tableSelected = TheGame::getInstance()->getEnv()->addTable(
-        irr::core::recti(irr::core::position2di(0, 0), irr::core::dimension2di(tabSelected->getRelativePosition().getSize().Width, tabSelected->getRelativePosition().getSize().Height/2-1)),
+        irr::core::recti(irr::core::position2di(0, 44), irr::core::dimension2di(tabSelected->getRelativePosition().getSize().Width, (tabSelected->getRelativePosition().getSize().Height-44)/2-1)),
         tabSelected,
         MI_TABLESELECTED,
         true);
@@ -92,7 +104,7 @@ MenuPageEditor::MenuPageEditor()
     tableSelected->setColumnWidth(1, 150);
 
     tableAction = TheGame::getInstance()->getEnv()->addTable(
-        irr::core::recti(irr::core::position2di(0, tabSelected->getRelativePosition().getSize().Height/2+1), irr::core::dimension2di(tabSelected->getRelativePosition().getSize().Width, tabSelected->getRelativePosition().getSize().Height/2-1)),
+        irr::core::recti(irr::core::position2di(0, 44+(tabSelected->getRelativePosition().getSize().Height-44)/2+1), irr::core::dimension2di(tabSelected->getRelativePosition().getSize().Width, (tabSelected->getRelativePosition().getSize().Height-44)/2-1)),
         tabSelected,
         MI_TABLEACTION,
         true);
@@ -936,12 +948,16 @@ void MenuPageEditor::refreshRoadEditBoxes(const wchar_t* newRoadName)
 
 void MenuPageEditor::actionP()
 {
+    unsigned int tick = TheGame::getInstance()->getTick();
+
+    if (tick - lastTick < 500) return;
+
+    lastTick = tick;
+
     irr::core::vector3df pos = TheGame::getInstance()->getCamera()->getPosition();
     pos.Y = TheEarth::getInstance()->getHeight(pos);
     printf("action at (%f, %f, %f)\n", pos.X, pos.Y, pos.Z);
     irr::core::vector3df apos = pos + OffsetManager::getInstance()->getOffset();
-
-    //TheGame::getInstance()->getDriver()->setTransform(irr::video::ETS_WORLD, irr::core::IdentityMatrix);
 
     switch (currentAction)
     {
@@ -963,12 +979,34 @@ void MenuPageEditor::actionP()
         }
     case A_AddObjectDay:
         {
-            dprintf(MY_DEBUG_NOTE, "MenuPageEditor::action(): add object day\n");
+            dprintf(MY_DEBUG_NOTE, "MenuPageEditor::action(): add object day editorDay: %p, editorPool: %p\n",
+                RaceManager::getInstance()->editorDay, ObjectPoolManager::getInstance()->editorPool);
+            if (RaceManager::getInstance()->editorDay && ObjectPoolManager::getInstance()->editorPool)
+            {
+                ObjectWireGlobalObject* go = new ObjectWireGlobalObject(ObjectPoolManager::getInstance()->editorPool, apos);
+                RaceManager::getInstance()->editorDay->globalObjectList.push_back(go);
+                if (RaceManager::getInstance()->editorDay->active)
+                {
+                    ObjectWire::getInstance()->addGlobalObject(go);
+                    //go->setVisible(true);
+                }
+            }
             break;
         }
     case A_AddObjectStage:
         {
-            dprintf(MY_DEBUG_NOTE, "MenuPageEditor::action(): add object stage\n");
+            dprintf(MY_DEBUG_NOTE, "MenuPageEditor::action(): add object stage editorStage: %p, editorPool: %p\n",
+                RaceManager::getInstance()->editorStage, ObjectPoolManager::getInstance()->editorPool);
+            if (RaceManager::getInstance()->editorStage && ObjectPoolManager::getInstance()->editorPool)
+            {
+                ObjectWireGlobalObject* go = new ObjectWireGlobalObject(ObjectPoolManager::getInstance()->editorPool, apos);
+                RaceManager::getInstance()->editorStage->globalObjectList.push_back(go);
+                if (RaceManager::getInstance()->editorStage->active)
+                {
+                    ObjectWire::getInstance()->addGlobalObject(go);
+                    //go->setVisible(true);
+                }
+            }
             break;
         }
     case A_AddRoadPoint:
@@ -994,7 +1032,7 @@ void MenuPageEditor::actionP()
         {
             dprintf(MY_DEBUG_NOTE, "MenuPageEditor::action(): remove object race editorRace: %p\n",
                 RaceManager::getInstance()->editorRace);
-            if (RaceManager::getInstance()->editorRace)
+            if (RaceManager::getInstance()->editorRace && !RaceManager::getInstance()->editorRace->globalObjectList.empty())
             {
                 ObjectWireGlobalObject* go = RaceManager::getInstance()->editorRace->globalObjectList.back();
                 RaceManager::getInstance()->editorRace->globalObjectList.pop_back();
@@ -1008,12 +1046,34 @@ void MenuPageEditor::actionP()
         }
     case A_RemoveObjectDay:
         {
-            dprintf(MY_DEBUG_NOTE, "MenuPageEditor::action(): remove object day\n");
+            dprintf(MY_DEBUG_NOTE, "MenuPageEditor::action(): remove object day editorDay: %p\n",
+                RaceManager::getInstance()->editorDay);
+            if (RaceManager::getInstance()->editorDay && !RaceManager::getInstance()->editorDay->globalObjectList.empty())
+            {
+                ObjectWireGlobalObject* go = RaceManager::getInstance()->editorDay->globalObjectList.back();
+                RaceManager::getInstance()->editorDay->globalObjectList.pop_back();
+                if (RaceManager::getInstance()->editorDay->active)
+                {
+                    ObjectWire::getInstance()->removeGlobalObject(go, false);
+                }
+                delete go;
+            }
             break;
         }
     case A_RemoveObjectStage:
         {
-            dprintf(MY_DEBUG_NOTE, "MenuPageEditor::action(): remove object stage\n");
+            dprintf(MY_DEBUG_NOTE, "MenuPageEditor::action(): remove object stage editorStage: %p\n",
+                RaceManager::getInstance()->editorStage);
+            if (RaceManager::getInstance()->editorStage && !RaceManager::getInstance()->editorStage->globalObjectList.empty())
+            {
+                ObjectWireGlobalObject* go = RaceManager::getInstance()->editorStage->globalObjectList.back();
+                RaceManager::getInstance()->editorStage->globalObjectList.pop_back();
+                if (RaceManager::getInstance()->editorStage->active)
+                {
+                    ObjectWire::getInstance()->removeGlobalObject(go, false);
+                }
+                delete go;
+            }
             break;
         }
     case A_RemoveRoadPoint:
@@ -1041,6 +1101,11 @@ void MenuPageEditor::actionP()
 
 void MenuPageEditor::renderP()
 {
+    if (!checkBoxRender->isChecked()) return;
+
+    TheGame::getInstance()->getDriver()->setMaterial(material);
+    TheGame::getInstance()->getDriver()->setTransform(irr::video::ETS_WORLD, irr::core::IdentityMatrix);
+
     if (RaceManager::getInstance()->editorRace)
     {
         RaceManager::editorRenderObjects(RaceManager::getInstance()->editorRace->globalObjectList);

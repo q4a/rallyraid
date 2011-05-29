@@ -423,9 +423,9 @@ void TheGame::loop()
             //printf("2\n");
             smgr->drawAll();
             //printf("3\n");
+            MenuPageEditor::render();
             env->drawAll();
             //printf("4\n");
-            MenuPageEditor::render();
             //testQuad.render();
             hud->render();
 
