@@ -230,3 +230,16 @@ void RoadManager::clearRoadMap(RoadManager::roadMap_t& roadMap)
     }
     roadMap.clear();
 }
+
+/* static */ void RoadManager::editorRenderRoads(const RoadManager::roadMap_t& roadMap)
+{
+    for (roadMap_t::const_iterator rit = roadMap.begin();
+         rit != roadMap.end();
+         rit++)
+    {
+        if (rit->second != RoadManager::getInstance()->editorRoad)
+        {
+            rit->second->editorRender();
+        }
+    }
+}

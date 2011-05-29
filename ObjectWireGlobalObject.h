@@ -25,6 +25,8 @@ public:
     const irr::core::vector3df& getPos() {return apos;}
     const irr::core::vector3df& getRot() {return rot;}
     const irr::core::vector3df& getScale() {return scale;}
+
+    void editorRender(bool last);
     
 protected:
     virtual void updateVisible() {} 

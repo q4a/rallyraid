@@ -289,3 +289,13 @@ void RaceManager::activateStage(Stage* stage)
         ObjectWire::getInstance()->removeGlobalObject(*it, false);
     }
 }
+
+/* static */ void RaceManager::editorRenderObjects(const RaceManager::globalObjectList_t& globalObjectList)
+{
+    for (globalObjectList_t::const_iterator it = globalObjectList.begin();
+         it != globalObjectList.end();
+         it++)
+    {
+        (*it)->editorRender(*it == globalObjectList.back());
+    }
+}

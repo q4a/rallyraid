@@ -7,6 +7,7 @@
 
 #include "OffsetManager.h"
 #include "TheEarth.h"
+#include "TheGame.h"
 
 #include "stdafx.h"
 #include <assert.h>
@@ -288,4 +289,25 @@ void Road::addRoadPointBegin(const irr::core::vector3df& pos)
     roadPoint.radius = RoadManager::getInstance()->editorRadius;
 
     roadPointVector.insert(roadPointVector.begin(), roadPoint);
+}
+
+void Road::editorRender(bool editorRoad)
+{
+    irr::video::IVideoDriver* driver = TheGame::getInstance()->getDriver();
+
+    for (roadPointVector_t::iterator it = roadPointVector.begin();
+         it != roadPointVector.end();
+         it++)
+    {
+        irr::core::vector3df renderPos = it->p - OffsetManager::getInstance()->getOffset();
+
+        irr::core::vector3df min = renderPos;
+        irr::core::vector3df max = renderPos;
+        irr::video::SColor color(255, 0, 0, 255);
+        max.Y += 8.f;
+
+        if (editorRoad) color.setRed(255);
+
+        driver->draw3DLine(min, max, color);
+    }
 }

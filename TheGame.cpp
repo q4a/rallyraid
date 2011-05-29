@@ -16,6 +16,7 @@
 #include "Player.h"
 #include "RaceManager.h"
 #include "MenuManager.h"
+#include "MenuPageEditor.h"
 #include "Hud.h"
 #include "RoadManager.h"
 #include "RoadTypeManager.h"
@@ -424,6 +425,7 @@ void TheGame::loop()
             //printf("3\n");
             env->drawAll();
             //printf("4\n");
+            MenuPageEditor::render();
             //testQuad.render();
             hud->render();
 

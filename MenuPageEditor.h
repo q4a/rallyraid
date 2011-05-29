@@ -51,12 +51,24 @@ public:
         A_AddObjectRace,
         A_AddObjectDay,
         A_AddObjectStage,
-        A_AddRoadPoint
+        A_AddRoadPoint,
+        A_AddRoadPointBegin,
+        A_RemoveObjectGlobal,
+        A_RemoveObjectRace,
+        A_RemoveObjectDay,
+        A_RemoveObjectStage,
+        A_RemoveRoadPoint,
+        A_RemoveRoadPointBegin,
     };
 
     MenuPageEditor();
     virtual ~MenuPageEditor();
     void refreshSelected();
+
+    // mouse button hit
+    static void action();
+    // render editor stuff
+    static void render();
 
     static MenuPageEditor* menuPageEditor;
 
@@ -76,6 +88,9 @@ private:
     void refreshRoads();
     void refreshRoadEditBoxes(const wchar_t* newRoadName = L"");
 
+    void actionP();
+    void renderP();
+
 private:
     irr::gui::IGUIWindow*   window;
     irr::gui::IGUITable*    tableSelected;
@@ -93,7 +108,7 @@ private:
     irr::gui::IGUIEditBox*  editBoxNewRoadName;
     irr::gui::IGUIEditBox*  editBoxNewRoadDataFilename;
 
-    Action                  action;
+    Action                  currentAction;
 };
 
 #endif // MENUPAGEEDITOR_H

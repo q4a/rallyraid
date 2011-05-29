@@ -9,6 +9,7 @@
 #include "ObjectWire.h"
 #include "ObjectPool.h"
 #include "ObjectPoolManager.h"
+#include "ObjectWireGlobalObject.h"
 #include "RaceManager.h"
 #include "Race.h"
 #include "Settings.h"
@@ -38,7 +39,7 @@ MenuPageEditor::MenuPageEditor()
       editBoxNewRoadFilename(0),
       editBoxNewRoadName(0),
       editBoxNewRoadDataFilename(0),
-      action(A_None)
+      currentAction(A_None)
 {
     menuPageEditor = this;
 
@@ -97,19 +98,33 @@ MenuPageEditor::MenuPageEditor()
         true);
 
     tableAction->addColumn(L"Action");
-    tableAction->setColumnWidth(0, 100);
+    tableAction->setColumnWidth(0, 200);
     tableAction->addRow(A_None);
     tableAction->addRow(A_AddObjectGlobal);
     tableAction->addRow(A_AddObjectRace);
     tableAction->addRow(A_AddObjectDay);
     tableAction->addRow(A_AddObjectStage);
     tableAction->addRow(A_AddRoadPoint);
+    tableAction->addRow(A_AddRoadPointBegin);
+    tableAction->addRow(A_RemoveObjectGlobal);
+    tableAction->addRow(A_RemoveObjectRace);
+    tableAction->addRow(A_RemoveObjectDay);
+    tableAction->addRow(A_RemoveObjectStage);
+    tableAction->addRow(A_RemoveRoadPoint);
+    tableAction->addRow(A_RemoveRoadPointBegin);
     tableAction->setCellText(A_None, 0, L"none");
-    tableAction->setCellText(A_AddObjectGlobal, 0, L"add object global");
+    tableAction->setCellText(A_AddObjectGlobal, 0, L"not used"/*L"add object global"*/);
     tableAction->setCellText(A_AddObjectRace, 0, L"add object race");
     tableAction->setCellText(A_AddObjectDay, 0, L"add object day");
     tableAction->setCellText(A_AddObjectStage, 0, L"add object stage");
     tableAction->setCellText(A_AddRoadPoint, 0, L"add road point");
+    tableAction->setCellText(A_AddRoadPointBegin, 0, L"add road point begin");
+    tableAction->setCellText(A_RemoveObjectGlobal, 0, L"not used"/*L"remove object global"*/);
+    tableAction->setCellText(A_RemoveObjectRace, 0, L"remove object race");
+    tableAction->setCellText(A_RemoveObjectDay, 0, L"remove object day");
+    tableAction->setCellText(A_RemoveObjectStage, 0, L"remove object stage");
+    tableAction->setCellText(A_RemoveRoadPoint, 0, L"remove road point");
+    tableAction->setCellText(A_RemoveRoadPointBegin, 0, L"remove road point begin");
 
     // ----------------------------
     // Tiles tab
@@ -233,6 +248,7 @@ MenuPageEditor::MenuPageEditor()
     tableRoadTypes->addColumn(L"type");
     tableRoadTypes->setColumnWidth(1, 100);
 
+    /*
     // ----------------------------
     // Roads tab
     // ----------------------------
@@ -273,6 +289,7 @@ MenuPageEditor::MenuPageEditor()
     tableRoads->setColumnWidth(4, 30);
     tableRoads->addColumn(L"filename");
     tableRoads->addColumn(L"data");
+    */
 
     window->setVisible(false);
 }
@@ -353,6 +370,10 @@ bool MenuPageEditor::OnEvent(const irr::SEvent &event)
             {
                 switch (id)
                 {
+                    case MI_TABLEACTION:
+                        currentAction = (Action)tableAction->getSelected();
+                        return true;
+                        break;
                     case MI_TABLEOBJECTPOOL:
                         ObjectPoolManager::getInstance()->editorPool = (ObjectPool*)tableObjectPool->getCellData(tableObjectPool->getSelected(), 0);
                         refreshSelected();
@@ -403,10 +424,6 @@ bool MenuPageEditor::OnEvent(const irr::SEvent &event)
                                 //if (RoadTypeManager::getInstance()->editorRoadType) MenuManager::getInstance()->open(MenuManager::MP_EDITORROADTYPE);
                                 break;
                         }
-                        return true;
-                        break;
-                    case MI_TABLEACTION:
-                        action = (Action)tableAction->getSelected();
                         return true;
                         break;
                     case MI_TABLEROADS:
@@ -835,17 +852,11 @@ void MenuPageEditor::refreshRoadManager()
 
 void MenuPageEditor::refreshRoads()
 {
+    /*
     refreshRoadEditBoxes(editBoxNewRoadName->getText());
 
     tableRoads->clearRows();
-    /*
-    tableRoads->addColumn(L"#");
-    tableRoads->addColumn(L"name");
-    tableRoads->addColumn(L"type");
-    tableRoads->addColumn(L"loaded");
-    tableRoads->addColumn(L"filename");
-    tableRoads->addColumn(L"data");
-    */
+
     const RoadManager::roadMap_t& roadMap = RoadManager::getInstance()->getRoadMap();
     unsigned int i = 0;
     for (RoadManager::roadMap_t::const_iterator rit = roadMap.begin();
@@ -887,7 +898,7 @@ void MenuPageEditor::refreshRoads()
         str += rit->second->roadDataFilename.c_str();
         tableRoads->setCellText(i, 6, str.c_str());
     }
-
+    */
 }
 
 void MenuPageEditor::refreshRoadEditBoxes(const wchar_t* newRoadName)
@@ -905,4 +916,145 @@ void MenuPageEditor::refreshRoadEditBoxes(const wchar_t* newRoadName)
     str += newRoadName;
     editBoxNewRoadDataFilename->setText(str.c_str());
 
+}
+
+/* static */ void MenuPageEditor::action()
+{
+    if (menuPageEditor)
+    {
+        menuPageEditor->actionP();
+    }
+}
+
+/* static */ void MenuPageEditor::render()
+{
+    if (menuPageEditor)
+    {
+        menuPageEditor->renderP();
+    }
+}
+
+void MenuPageEditor::actionP()
+{
+    irr::core::vector3df pos = TheGame::getInstance()->getCamera()->getPosition();
+    pos.Y = TheEarth::getInstance()->getHeight(pos);
+    irr::core::vector3df apos = pos + OffsetManager::getInstance()->getOffset();
+
+    switch (currentAction)
+    {
+    case A_AddObjectRace:
+        {
+            dprintf(MY_DEBUG_NOTE, "MenuPageEditor::action(): add object race editorRace: %p, editorPool: %p\n",
+                RaceManager::getInstance()->editorRace, ObjectPoolManager::getInstance()->editorPool);
+            if (RaceManager::getInstance()->editorRace && ObjectPoolManager::getInstance()->editorPool)
+            {
+                ObjectWireGlobalObject* go = new ObjectWireGlobalObject(ObjectPoolManager::getInstance()->editorPool, apos);
+                RaceManager::getInstance()->editorRace->globalObjectList.push_back(go);
+                if (RaceManager::getInstance()->editorRace->active)
+                {
+                    ObjectWire::getInstance()->addGlobalObject(go);
+                    //go->setVisible(true);
+                }
+            }
+            break;
+        }
+    case A_AddObjectDay:
+        {
+            dprintf(MY_DEBUG_NOTE, "MenuPageEditor::action(): add object day\n");
+            break;
+        }
+    case A_AddObjectStage:
+        {
+            dprintf(MY_DEBUG_NOTE, "MenuPageEditor::action(): add object stage\n");
+            break;
+        }
+    case A_AddRoadPoint:
+        {
+            dprintf(MY_DEBUG_NOTE, "MenuPageEditor::action(): add road point, editorRoad: %p\n", RoadManager::getInstance()->editorRoad);
+            if (RoadManager::getInstance()->editorRoad)
+            {
+                RoadManager::getInstance()->editorRoad->addRoadFarPoint(pos);
+            }
+            break;
+        }
+    case A_AddRoadPointBegin:
+        {
+            dprintf(MY_DEBUG_NOTE, "MenuPageEditor::action(): add road point begin, editorRoad: %p\n",
+                RoadManager::getInstance()->editorRoad);
+            if (RoadManager::getInstance()->editorRoad)
+            {
+                RoadManager::getInstance()->editorRoad->addRoadFarPointBegin(pos);
+            }
+            break;
+        }
+    case A_RemoveObjectRace:
+        {
+            dprintf(MY_DEBUG_NOTE, "MenuPageEditor::action(): remove object race editorRace: %p\n",
+                RaceManager::getInstance()->editorRace);
+            if (RaceManager::getInstance()->editorRace)
+            {
+                ObjectWireGlobalObject* go = RaceManager::getInstance()->editorRace->globalObjectList.back();
+                RaceManager::getInstance()->editorRace->globalObjectList.pop_back();
+                if (RaceManager::getInstance()->editorRace->active)
+                {
+                    ObjectWire::getInstance()->removeGlobalObject(go, false);
+                }
+                delete go;
+            }
+            break;
+        }
+    case A_RemoveObjectDay:
+        {
+            dprintf(MY_DEBUG_NOTE, "MenuPageEditor::action(): remove object day\n");
+            break;
+        }
+    case A_RemoveObjectStage:
+        {
+            dprintf(MY_DEBUG_NOTE, "MenuPageEditor::action(): remove object stage\n");
+            break;
+        }
+    case A_RemoveRoadPoint:
+        {
+            dprintf(MY_DEBUG_NOTE, "MenuPageEditor::action(): remove road point, editorRoad: %p\n", RoadManager::getInstance()->editorRoad);
+            if (RoadManager::getInstance()->editorRoad)
+            {
+                RoadManager::getInstance()->editorRoad->removeRoadPoint();
+            }
+            break;
+        }
+    case A_RemoveRoadPointBegin:
+        {
+            dprintf(MY_DEBUG_NOTE, "MenuPageEditor::action(): remove road point begin, editorRoad: %p\n", RoadManager::getInstance()->editorRoad);
+            if (RoadManager::getInstance()->editorRoad)
+            {
+                RoadManager::getInstance()->editorRoad->removeRoadPointBegin();
+            }
+            break;
+        }
+    default:
+        dprintf(MY_DEBUG_ERROR, "MenuPageEditor::action(): no current action: %d\n", (int)currentAction);
+    }
+}
+
+void MenuPageEditor::renderP()
+{
+    if (RaceManager::getInstance()->editorRace)
+    {
+        RaceManager::editorRenderObjects(RaceManager::getInstance()->editorRace->globalObjectList);
+        RoadManager::editorRenderRoads(RaceManager::getInstance()->editorRace->roadMap);
+    }
+    if (RaceManager::getInstance()->editorDay)
+    {
+        RaceManager::editorRenderObjects(RaceManager::getInstance()->editorDay->globalObjectList);
+        RoadManager::editorRenderRoads(RaceManager::getInstance()->editorDay->roadMap);
+    }
+    if (RaceManager::getInstance()->editorStage)
+    {
+        RaceManager::editorRenderObjects(RaceManager::getInstance()->editorStage->globalObjectList);
+        RoadManager::editorRenderRoads(RaceManager::getInstance()->editorStage->roadMap);
+    }
+    if (RoadManager::getInstance()->editorRoad)
+    {
+        RoadManager::getInstance()->editorRoad->editorRender(true);
+    }
 }

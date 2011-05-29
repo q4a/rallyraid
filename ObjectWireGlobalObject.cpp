@@ -4,6 +4,7 @@
 #include "OffsetObject.h"
 #include "OffsetManager.h"
 #include "TheEarth.h"
+#include "TheGame.h"
 
 ObjectWireGlobalObject::ObjectWireGlobalObject(ObjectPool* objectPool,
     const irr::core::vector3df& apos,
@@ -55,4 +56,23 @@ void ObjectWireGlobalObject::setVisible(bool p_visible)
     }
     
     updateVisible();
+}
+
+void ObjectWireGlobalObject::editorRender(bool last)
+{
+    irr::video::IVideoDriver* driver = TheGame::getInstance()->getDriver();
+    irr::core::vector3df renderPos = apos - OffsetManager::getInstance()->getOffset();
+
+    irr::core::vector3df min = renderPos;
+    irr::core::vector3df max = renderPos;
+    irr::video::SColor color(255, 255, 255, 0);
+    min.X -= 2.f;
+    min.Z -= 2.f;
+    max.X += 2.f;
+    max.Y += 20.f;
+    max.Z += 2.f;
+
+    if (last) color.setGreen(0);
+
+    driver->draw3DBox(irr::core::aabbox3df(min, max), color);
 }

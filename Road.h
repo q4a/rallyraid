@@ -32,13 +32,15 @@ public:
     bool isLoaded(); // inline
     const std::string& getName(); // inline
 
+    void editorRender(bool editorRoad = false);
+
 private:
     bool readHeader();
     bool writeHeader();
     bool readData();
     bool writeData();
 
-    // only called by the editor
+    // only called by the editor: pos is the current camera pos, so not the absolute position
     void addRoadFarPoint(const irr::core::vector3df& pos);
     void addRoadFarPointBegin(const irr::core::vector3df& pos);
     void removeRoadPoint();

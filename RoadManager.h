@@ -67,6 +67,9 @@ public:
     //static bool writeGlobalObjects(const std::string& fileName, const globalObjectList_t& globalObjectList);
 
 private:
+    static void editorRenderRoads(const RoadManager::roadMap_t& roadMap);
+
+private:
     roadMap_t               roadMap;
     stageRoadChunkListMap_t stageRoadChunkListMap;
     roadRoadChunkSet_t      visibleRoadChunkSet;

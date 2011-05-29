@@ -78,6 +78,9 @@ public:
     static void removeGlobalObjectsFromObjectWire(const globalObjectList_t& globalObjectList);
 
 private:
+    static void editorRenderObjects(const globalObjectList_t& globalObjectList);
+
+private:
     raceMap_t   raceMap;
 
     std::string currentRaceName;

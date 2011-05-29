@@ -27,7 +27,8 @@ private:
     {
         if (event.EventType == irr::EET_GUI_EVENT && (int)event.GUIEvent.EventType == 0)
         {
-            printf("ee gui action\n");
+            //printf("ee gui action\n");
+            MenuPageEditor::action();
         }
         return true;
     }
