@@ -24,6 +24,7 @@ public:
         MI_TABRACEMANAGER,
         MI_TABROADMANAGER,
         MI_TABROADS,
+        MI_TABITINER,
 
         MI_TABLESELECTED,
         MI_TABLEACTION,
@@ -36,10 +37,14 @@ public:
         MI_TABLEROADMANAGERV,
         MI_TABLEROADTYPES,
         MI_TABLEROADS,
+        MI_TABLEITINER,
 
         MI_EBNEWROADFILENAME,
         MI_EBNEWROADNAME,
         MI_EBNEWROADDATAFILENAME,
+        MI_EBITINERGD,
+        MI_EBITINERLD,
+        MI_EBITINERDESCRIPTION,
 
         MI_CBRENDER,
 
@@ -55,12 +60,14 @@ public:
         A_AddObjectStage,
         A_AddRoadPoint,
         A_AddRoadPointBegin,
+        A_AddItinerPoint,
         A_RemoveObjectGlobal,
         A_RemoveObjectRace,
         A_RemoveObjectDay,
         A_RemoveObjectStage,
         A_RemoveRoadPoint,
         A_RemoveRoadPointBegin,
+        A_RemoveItinerPoint,
     };
 
     MenuPageEditor();
@@ -89,6 +96,7 @@ private:
     void refreshRoadManager();
     void refreshRoads();
     void refreshRoadEditBoxes(const wchar_t* newRoadName = L"");
+    void refreshItiner();
 
     void actionP();
     void renderP();
@@ -106,9 +114,13 @@ private:
     irr::gui::IGUITable*    tableRoadManagerV;
     irr::gui::IGUITable*    tableRoadTypes;
     irr::gui::IGUITable*    tableRoads;
+    irr::gui::IGUITable*    tableItiner;
     irr::gui::IGUIEditBox*  editBoxNewRoadFilename;
     irr::gui::IGUIEditBox*  editBoxNewRoadName;
     irr::gui::IGUIEditBox*  editBoxNewRoadDataFilename;
+    irr::gui::IGUIEditBox*  editBoxItinerGD;
+    irr::gui::IGUIEditBox*  editBoxItinerLD;
+    irr::gui::IGUIEditBox*  editBoxItinerDescription;
     irr::gui::IGUICheckBox* checkBoxRender;
 
     Action                  currentAction;

@@ -29,6 +29,7 @@
 #define DESCRIPTION_TXT             (std::string("description.txt"))
 #define COMPETITORS_CFG             (std::string("competitors.cfg"))
 #define OBJECTS_CFG                 (std::string("objects.cfg"))
+#define ITINER_CFG                  (std::string("itiner.cfg"))
 
 class Race;
 class Day;

@@ -20,6 +20,8 @@
 #include "Stage.h"
 #include "RoadType.h"
 #include "RoadTypeManager.h"
+#include "ItinerManager.h"
+#include "ItinerPoint.h"
 
 MenuPageEditor* MenuPageEditor::menuPageEditor = 0;
 
@@ -36,6 +38,7 @@ MenuPageEditor::MenuPageEditor()
       tableRoadManagerV(0),
       tableRoadTypes(0),
       tableRoads(0),
+      tableItiner(0),
       editBoxNewRoadFilename(0),
       editBoxNewRoadName(0),
       editBoxNewRoadDataFilename(0),
@@ -93,7 +96,7 @@ MenuPageEditor::MenuPageEditor()
         L"render helpers");
 
     tableSelected = TheGame::getInstance()->getEnv()->addTable(
-        irr::core::recti(irr::core::position2di(0, 44), irr::core::dimension2di(tabSelected->getRelativePosition().getSize().Width, (tabSelected->getRelativePosition().getSize().Height-44)/2-1)),
+        irr::core::recti(irr::core::position2di(0, 44), irr::core::dimension2di(tabSelected->getRelativePosition().getSize().Width, (tabSelected->getRelativePosition().getSize().Height-44)/3-1)),
         tabSelected,
         MI_TABLESELECTED,
         true);
@@ -104,7 +107,7 @@ MenuPageEditor::MenuPageEditor()
     tableSelected->setColumnWidth(1, 150);
 
     tableAction = TheGame::getInstance()->getEnv()->addTable(
-        irr::core::recti(irr::core::position2di(0, 44+(tabSelected->getRelativePosition().getSize().Height-44)/2+1), irr::core::dimension2di(tabSelected->getRelativePosition().getSize().Width, (tabSelected->getRelativePosition().getSize().Height-44)/2-1)),
+        irr::core::recti(irr::core::position2di(0, 44+(tabSelected->getRelativePosition().getSize().Height-44)/3+1), irr::core::dimension2di(tabSelected->getRelativePosition().getSize().Width, ((tabSelected->getRelativePosition().getSize().Height-44)*2)/3-1)),
         tabSelected,
         MI_TABLEACTION,
         true);
@@ -118,12 +121,14 @@ MenuPageEditor::MenuPageEditor()
     tableAction->addRow(A_AddObjectStage);
     tableAction->addRow(A_AddRoadPoint);
     tableAction->addRow(A_AddRoadPointBegin);
+    tableAction->addRow(A_AddItinerPoint);
     tableAction->addRow(A_RemoveObjectGlobal);
     tableAction->addRow(A_RemoveObjectRace);
     tableAction->addRow(A_RemoveObjectDay);
     tableAction->addRow(A_RemoveObjectStage);
     tableAction->addRow(A_RemoveRoadPoint);
     tableAction->addRow(A_RemoveRoadPointBegin);
+    tableAction->addRow(A_RemoveItinerPoint);
     tableAction->setCellText(A_None, 0, L"none");
     tableAction->setCellText(A_AddObjectGlobal, 0, L"not used"/*L"add object global"*/);
     tableAction->setCellText(A_AddObjectRace, 0, L"add object race");
@@ -131,12 +136,14 @@ MenuPageEditor::MenuPageEditor()
     tableAction->setCellText(A_AddObjectStage, 0, L"add object stage");
     tableAction->setCellText(A_AddRoadPoint, 0, L"add road point");
     tableAction->setCellText(A_AddRoadPointBegin, 0, L"add road point begin");
+    tableAction->setCellText(A_AddItinerPoint, 0, L"add itiner point");
     tableAction->setCellText(A_RemoveObjectGlobal, 0, L"not used"/*L"remove object global"*/);
     tableAction->setCellText(A_RemoveObjectRace, 0, L"remove object race");
     tableAction->setCellText(A_RemoveObjectDay, 0, L"remove object day");
     tableAction->setCellText(A_RemoveObjectStage, 0, L"remove object stage");
     tableAction->setCellText(A_RemoveRoadPoint, 0, L"remove road point");
     tableAction->setCellText(A_RemoveRoadPointBegin, 0, L"remove road point begin");
+    tableAction->setCellText(A_RemoveItinerPoint, 0, L"remove itiner point");
 
     // ----------------------------
     // Tiles tab
@@ -303,6 +310,39 @@ MenuPageEditor::MenuPageEditor()
     tableRoads->addColumn(L"data");
     */
 
+    // ----------------------------
+    // Itiner tab
+    // ----------------------------
+    irr::gui::IGUITab* tabItiner = tc->addTab(L"Iti", MI_TABITINER);
+
+    editBoxItinerGD = TheGame::getInstance()->getEnv()->addEditBox(L"global distance",
+        irr::core::recti(irr::core::position2di(0, 0), irr::core::dimension2di(tabItiner->getRelativePosition().getSize().Width, 20)),
+        true,
+        tabItiner,
+        MI_EBITINERGD);
+
+    editBoxItinerLD = TheGame::getInstance()->getEnv()->addEditBox(L"local distance",
+        irr::core::recti(irr::core::position2di(0, 22), irr::core::dimension2di(tabItiner->getRelativePosition().getSize().Width, 20)),
+        true,
+        tabItiner,
+        MI_EBITINERLD);
+
+    editBoxItinerDescription = TheGame::getInstance()->getEnv()->addEditBox(L"description",
+        irr::core::recti(irr::core::position2di(0, 2*22), irr::core::dimension2di(tabItiner->getRelativePosition().getSize().Width, 20)),
+        true,
+        tabItiner,
+        MI_EBITINERDESCRIPTION);
+
+    tableItiner = TheGame::getInstance()->getEnv()->addTable(
+        irr::core::recti(irr::core::position2di(0, 3*22), irr::core::dimension2di(tabItiner->getRelativePosition().getSize().Width, tabItiner->getRelativePosition().getSize().Height-(3*22))),
+        //irr::core::recti(irr::core::position2di(0, 0), tabRoads->getRelativePosition().getSize()),
+        tabItiner,
+        MI_TABLEITINER,
+        true);
+
+    tableItiner->addColumn(L"itiner image");
+    tableItiner->setColumnWidth(0, 200);
+
     window->setVisible(false);
 }
 
@@ -406,6 +446,13 @@ bool MenuPageEditor::OnEvent(const irr::SEvent &event)
                         MenuPageEditor::menuPageEditor->refreshSelected();
                         return true;
                         break;
+                    case MI_TABLEITINER:
+                    {
+                        WStringConverter::toString(tableItiner->getCellText(tableItiner->getSelected(), 0), ItinerManager::getInstance()->editorItinerImageName);
+                        MenuPageEditor::menuPageEditor->refreshSelected();
+                        return true;
+                        break;
+                    }
                 };
                 break;
             }
@@ -456,6 +503,21 @@ bool MenuPageEditor::OnEvent(const irr::SEvent &event)
                         break;
                 }
             }
+            case irr::gui::EGET_EDITBOX_ENTER:
+            {
+                switch (id)
+                {
+                    case MI_EBITINERGD:
+                        WStringConverter::toFloat(editBoxItinerGD->getText(), ItinerManager::getInstance()->editorGlobalDistance);
+                        break;
+                    case MI_EBITINERLD:
+                        WStringConverter::toFloat(editBoxItinerLD->getText(), ItinerManager::getInstance()->editorLocalDistance);
+                        break;
+                    case MI_EBITINERDESCRIPTION:
+                        WStringConverter::toString(editBoxItinerDescription->getText(), ItinerManager::getInstance()->editorDescription);
+                        break;
+                }
+            }
         };
     }
     return false;
@@ -484,6 +546,7 @@ void MenuPageEditor::refresh()
     refreshRaceManager();
     refreshRoadManager();
     refreshRoads();
+    refreshItiner();
 }
 
 void MenuPageEditor::refreshSelected()
@@ -590,6 +653,21 @@ void MenuPageEditor::refreshSelected()
     }
     tableSelected->setCellText(i, 1, str.c_str());
     tableSelected->setCellData(i, 1, (void*)RoadTypeManager::getInstance()->editorRoadType);
+
+    i = 6;
+    tableSelected->addRow(i);
+    str = L"itiner image";
+    tableSelected->setCellText(i, 0, str.c_str());
+    str = L"";
+    if (!ItinerManager::getInstance()->editorItinerImageName.empty())
+    {
+        str += ItinerManager::getInstance()->editorItinerImageName.c_str();
+    }
+    else
+    {
+        str = L"none";
+    }
+    tableSelected->setCellText(i, 1, str.c_str());
 }
 
 void MenuPageEditor::refreshTiles()
@@ -930,6 +1008,26 @@ void MenuPageEditor::refreshRoadEditBoxes(const wchar_t* newRoadName)
 
 }
 
+void MenuPageEditor::refreshItiner()
+{
+    tableItiner->clearRows();
+
+    const ItinerManager::itinerImageMap_t& itinerImageMap = ItinerManager::getInstance()->getItinerImageMap();
+    unsigned int i = 0;
+    for (ItinerManager::itinerImageMap_t::const_iterator it = itinerImageMap.begin();
+         it != itinerImageMap.end();
+         it++, i++)
+    {
+        irr::core::stringw str;
+        
+        tableItiner->addRow(i);
+
+        str = L"";
+        str += it->first.c_str();
+        tableItiner->setCellText(i, 0, str.c_str());
+    }
+}
+
 /* static */ void MenuPageEditor::action()
 {
     if (menuPageEditor)
@@ -1028,6 +1126,21 @@ void MenuPageEditor::actionP()
             }
             break;
         }
+    case A_AddItinerPoint:
+        {
+            dprintf(MY_DEBUG_NOTE, "MenuPageEditor::action(): add itiner point editorStage: %p\n",
+                RaceManager::getInstance()->editorStage);
+            if (RaceManager::getInstance()->editorStage)
+            {
+                ItinerPoint* ip = new ItinerPoint(apos,
+                    ItinerManager::getInstance()->editorGlobalDistance,
+                    ItinerManager::getInstance()->editorLocalDistance,
+                    ItinerManager::getInstance()->editorItinerImageName,
+                    ItinerManager::getInstance()->editorDescription);
+                RaceManager::getInstance()->editorStage->itinerPointList.push_back(ip);
+            }
+            break;
+        }
     case A_RemoveObjectRace:
         {
             dprintf(MY_DEBUG_NOTE, "MenuPageEditor::action(): remove object race editorRace: %p\n",
@@ -1091,6 +1204,18 @@ void MenuPageEditor::actionP()
             if (RoadManager::getInstance()->editorRoad)
             {
                 RoadManager::getInstance()->editorRoad->removeRoadPointBegin();
+            }
+            break;
+        }
+    case A_RemoveItinerPoint:
+        {
+            dprintf(MY_DEBUG_NOTE, "MenuPageEditor::action(): remove itiner point editorStage: %p\n",
+                RaceManager::getInstance()->editorStage);
+            if (RaceManager::getInstance()->editorStage && !RaceManager::getInstance()->editorStage->itinerPointList.empty())
+            {
+                ItinerPoint* ip = RaceManager::getInstance()->editorStage->itinerPointList.back();
+                RaceManager::getInstance()->editorStage->itinerPointList.pop_back();
+                delete ip;
             }
             break;
         }

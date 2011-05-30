@@ -39,6 +39,20 @@ public:
         std::istringstream str(val);
         str >> ret;
     }
+
+    static void WStringConverter::toFloat(const irr::core::stringw& wstr, float& ret)
+    {
+        const wchar_t* orig = wstr.c_str();
+        toFloat(orig, ret);
+    }
+
+    static void WStringConverter::toFloat(const wchar_t* orig, float& ret)
+    {
+        std::string val;
+        toString(orig, val);
+        std::istringstream str(val);
+        str >> ret;
+    }
 };
 
 #endif // WSTRINGCONVERTER_H

@@ -20,11 +20,15 @@
 #include "RoadType.h"
 #include "ObjectWireGlobalObject.h"
 #include "Competitor.h"
+#include "ItinerManager.h"
+#include "ItinerPoint.h"
+
 
 MenuPageEditorStage::MenuPageEditorStage()
     : window(0),
       tableGlobalObjects(0),
       tableRoads(0),
+      tableItiner(0),
       editBoxLongName(0),
       editBoxShortDescription(0),
       editBoxNewRoadFilename(0),
@@ -133,6 +137,29 @@ MenuPageEditorStage::MenuPageEditorStage()
     tableRoads->setColumnWidth(4, 30);
     tableRoads->addColumn(L"filename");
     tableRoads->addColumn(L"data");
+
+    // ----------------------------
+    // Itiner tab
+    // ----------------------------
+    irr::gui::IGUITab* tabItiner = tc->addTab(L"Iti", MI_TABITINER);
+
+    tableItiner = TheGame::getInstance()->getEnv()->addTable(
+        irr::core::recti(irr::core::position2di(0, 0), tabItiner->getRelativePosition().getSize()),
+        tabItiner,
+        MI_TABLEITINER,
+        true);
+
+    tableItiner->addColumn(L"#");
+    tableItiner->addColumn(L"image");
+    tableItiner->setColumnWidth(1, 100);
+    tableItiner->addColumn(L"X");
+    tableItiner->addColumn(L"Y");
+    tableItiner->addColumn(L"GD");
+    tableItiner->setColumnWidth(4, 60);
+    tableItiner->addColumn(L"LD");
+    tableItiner->setColumnWidth(5, 60);
+    tableItiner->addColumn(L"description");
+    tableItiner->setColumnWidth(6, 100);
 
     window->setVisible(false);
 }
@@ -270,6 +297,7 @@ void MenuPageEditorStage::refresh()
     refreshGlobalObjects();
     refreshEditBoxes();
     refreshRoads();
+    refreshItiner();
 }
 
 void MenuPageEditorStage::refreshGlobalObjects()
@@ -408,3 +436,50 @@ void MenuPageEditorStage::refreshRoadEditBoxes(const wchar_t* newRoadName)
     editBoxNewRoadDataFilename->setText(str.c_str());
 
 }
+
+void MenuPageEditorStage::refreshItiner()
+{
+    // ----------------------------
+    // Itiner
+    // ----------------------------
+    tableItiner->clearRows();
+
+    const ItinerManager::itinerPointList_t& itinerPointList = RaceManager::getInstance()->editorStage->itinerPointList;
+    unsigned int i = 0;
+    for (ItinerManager::itinerPointList_t::const_iterator ipit = itinerPointList.begin();
+         ipit != itinerPointList.end();
+         ipit++, i++)
+    {
+        irr::core::stringw str;
+        
+        tableItiner->addRow(i);
+
+        str += i;
+        tableItiner->setCellText(i, 0, str.c_str());
+
+        str = L"";
+        str += (*ipit)->getItinerImageName().c_str();
+        tableItiner->setCellText(i, 1, str.c_str());
+
+        str = L"";
+        str += (*ipit)->getPos().X;
+        tableItiner->setCellText(i, 2, str.c_str());
+
+        str = L"";
+        str += (*ipit)->getPos().Z;
+        tableItiner->setCellText(i, 3, str.c_str());
+
+        str = L"";
+        str += (*ipit)->getGlobalDistance();
+        tableItiner->setCellText(i, 4, str.c_str());
+
+        str = L"";
+        str += (*ipit)->getLocalDistance();
+        tableItiner->setCellText(i, 5, str.c_str());
+
+        str = L"";
+        str += (*ipit)->getDescription().c_str();
+        tableItiner->setCellText(i, 6, str.c_str());
+    }
+}
+

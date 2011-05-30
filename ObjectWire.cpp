@@ -299,7 +299,7 @@ ObjectWireGlobalObject* ObjectWire::addGlobalObject(ObjectWireGlobalObject* glob
     
     globalObjectWire[x + (TheEarth::getInstance()->getSizeX() * y)].insert(globalObject);
     //printf("add global object: %d - %p\n", x + (TheEarth::getInstance()->getSizeX() * y), globalObject);
-    if (abs(x-lastWireCenter.X) < objectWireNum2 && abs(y-lastWireCenter.Y) < objectWireNum2)
+    if ((unsigned int)abs(x-lastWireCenter.X) < objectWireNum2 && (unsigned int)abs(y-lastWireCenter.Y) < objectWireNum2)
     {
         globalObject->setVisible(true);
     }

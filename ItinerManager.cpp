@@ -47,7 +47,7 @@ ItinerManager::~ItinerManager()
     itinerImageMap.clear();
 }
 
-bool ItinerManager::update(const irr::core::vector3df& newPos, bool force = false)
+bool ItinerManager::update(const irr::core::vector3df& newPos, bool force)
 {
 // activeItinerPointSet
     return false;

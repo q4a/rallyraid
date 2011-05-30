@@ -7,6 +7,7 @@
 #include <irrlicht.h>
 #include "RaceManager.h"
 #include "RoadManager.h"
+#include "ItinerManager.h"
 
 
 class Stage
@@ -20,11 +21,13 @@ private:
     bool readCfg();
     void readShortDescription();
     void readGlobalObjects();
+    void readItinerPointList();
 
     bool write();
     bool writeCfg();
     bool writeShortDescription();
     bool writeGlobalObjects();
+    bool writeItinerPointList();
 
 public:
     const std::string& getName(); // inline
@@ -43,6 +46,7 @@ private:
     std::string                     stageLongName;
     std::string                     shortDescription;
     RaceManager::globalObjectList_t globalObjectList;
+    ItinerManager::itinerPointList_t itinerPointList;
     bool                            active;
     RoadManager::roadMap_t          roadMap;
     

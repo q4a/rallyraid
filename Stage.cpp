@@ -14,6 +14,7 @@ Stage::Stage(Day* parent, const std::string& raceName, const std::string& dayNam
       stageLongName(),
       shortDescription(),
       globalObjectList(),
+      itinerPointList(),
       active(false),
       roadMap()
 {
@@ -34,6 +35,7 @@ bool Stage::read()
     {
         readShortDescription();
         readGlobalObjects();
+        readItinerPointList();
         RoadManager::readRoads(STAGE_ROADS(raceName, dayName, stageName), roadMap, false, true);
     }
     return ret;
@@ -83,11 +85,17 @@ void Stage::readGlobalObjects()
     RaceManager::readGlobalObjects(STAGE_DIR(raceName, dayName, stageName) + "/" + OBJECTS_CFG, globalObjectList);
 }
 
+void Stage::readItinerPointList()
+{
+    ItinerManager::readItinerPointList(STAGE_DIR(raceName, dayName, stageName) + "/" + ITINER_CFG, itinerPointList);
+}
+
 bool Stage::write()
 {
     bool ret = writeCfg();
     ret &= writeShortDescription();
     ret &= writeGlobalObjects();
+    ret &= writeItinerPointList();
     return ret;
 }
 
@@ -119,6 +127,11 @@ bool Stage::writeGlobalObjects()
     return RaceManager::writeGlobalObjects(STAGE_DIR(raceName, dayName, stageName) + "/" + OBJECTS_CFG, globalObjectList);
 }
 
+bool Stage::writeItinerPointList()
+{
+    return ItinerManager::writeItinerPointList(STAGE_DIR(raceName, dayName, stageName) + "/" + ITINER_CFG, itinerPointList);
+}
+
 void Stage::activate()
 {
     RoadManager::getInstance()->addStageRoad(roadMap);
@@ -126,6 +139,7 @@ void Stage::activate()
     if (active) return;
 
     RaceManager::addGlobalObjectsToObjectWire(globalObjectList);
+    ItinerManager::addItinerPointListToObjectWire(itinerPointList);
     active = true;
 }
 
@@ -134,5 +148,6 @@ void Stage::deactivate()
     if (!active) return;
 
     RaceManager::removeGlobalObjectsFromObjectWire(globalObjectList);
+    ItinerManager::removeItinerPointListFromObjectWire(itinerPointList);
     active = false;
 }
