@@ -35,14 +35,27 @@ public:
     const itinerImageMap_t& getItinerImageMap();            // inline
     irr::video::ITexture* getItinerImage(const std::string& itinerImageName); // inline
 
+    static void readItinerPointList(const std::string& itinerListFilename, itinerPointList_t& itinerPointList);
+    static bool writeItinerPointList(const std::string& itinerListFilename, const itinerPointList_t& itinerPointList);
+    static void clearItinerPointList(itinerPointList_t& itinerPointList);
+
+    static void addItinerPointListToObjectWire(const itinerPointList_t& itinerPointList);
+    static void removeItinerPointListFromObjectWire(const itinerPointList_t& itinerPointList);
+
 private:
     bool readItinerImages();
+    static void editorRenderObjects(const itinerPointList_t& itinerPointList);
     
 private:
     typedef std::set<ItinerPoint*> itinerPointSet_t;
 
     itinerPointSet_t    activeItinerPointSet;
     itinerImageMap_t    itinerImageMap;
+
+    float               editorGlobalDistance;
+    float               editorLocalDistance;
+    std::string         editorItinerImageName;
+    std::string         editorDescription;
 
 
     friend class MenuPageEditor;

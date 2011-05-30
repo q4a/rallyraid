@@ -6,9 +6,19 @@
 #include <irrlicht.h>
 
 
-ItinerPoint::ItinerPoint(const irr::core::vector3df& apos)
-    : ObjectWireGlobalObject(0, apos)
+ItinerPoint::ItinerPoint(const irr::core::vector3df& apos,
+        float globalDistance,
+        float localDistance,
+        const std::string& itinerImageName,
+        const std::string& description)
+    : ObjectWireGlobalObject(0, apos),
+      globalDistance(globalDistance),
+      localDistance(localDistance),
+      itinerImageName(itinerImageName),
+      itinerImage(0),
+      description(description)
 {
+    itinerImage = ItinerManager::getInstance()->getItinerImage(itinerImageName);
 }
 
 ItinerPoint::~ItinerPoint()
@@ -47,7 +57,7 @@ void ItinerPoint::editorRender(bool last)
     //driver->draw3DLine(min, max, color);
 }
     
-ItinerPoint::updateVisible()
+void ItinerPoint::updateVisible()
 {
     if (getVisible())
     {

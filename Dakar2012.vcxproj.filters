@@ -195,6 +195,12 @@
     <ClInclude Include="MenuPageEditorRoad.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ItinerManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ItinerPoint.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -348,6 +354,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="MenuPageEditorRoad.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ItinerManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ItinerPoint.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

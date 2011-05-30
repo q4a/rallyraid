@@ -97,6 +97,8 @@
     <ClInclude Include="IrrCgMaterial.h" />
     <ClInclude Include="IrrCgSceneNode.h" />
     <ClInclude Include="IteratorWrapper.h" />
+    <ClInclude Include="ItinerManager.h" />
+    <ClInclude Include="ItinerPoint.h" />
     <ClInclude Include="KeyConfig.h" />
     <ClInclude Include="MenuManager.h" />
     <ClInclude Include="MenuPageBase.h" />
@@ -157,6 +159,8 @@
     <ClCompile Include="IrrCg.cpp" />
     <ClCompile Include="IrrCgMaterial.cpp" />
     <ClCompile Include="IrrCgSceneNode.cpp" />
+    <ClCompile Include="ItinerManager.cpp" />
+    <ClCompile Include="ItinerPoint.cpp" />
     <ClCompile Include="KeyConfig.cpp" />
     <ClCompile Include="MenuManager.cpp" />
     <ClCompile Include="MenuPageBase.cpp" />
