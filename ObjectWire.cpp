@@ -248,8 +248,8 @@ bool ObjectWire::update(const irr::core::vector3df& newPos, bool force)
                     // check globals
                     globalObjectWire_t::const_iterator it = globalObjectWire.find((lastWireCenter.X-(int)(objectWireNum/2)+(int)x) +
                                            (TheEarth::getInstance()->getSizeX() * (lastWireCenter.Y+(int)(objectWireNum/2)-(int)y)));
-                    printf("check global in %d\n", (lastWireCenter.X-(int)(objectWireNum/2)+(int)x) +
-                                           (TheEarth::getInstance()->getSizeX() * (lastWireCenter.Y+(int)(objectWireNum/2)-(int)y)));
+                    //printf("check global in %d\n", (lastWireCenter.X-(int)(objectWireNum/2)+(int)x) +
+                    //                       (TheEarth::getInstance()->getSizeX() * (lastWireCenter.Y+(int)(objectWireNum/2)-(int)y)));
                     if (it != globalObjectWire.end())
                     {
                         for (globalObjectSet_t::const_iterator oit = it->second.begin();
@@ -257,7 +257,7 @@ bool ObjectWire::update(const irr::core::vector3df& newPos, bool force)
                              oit++)
                         {
                             (*oit)->setVisible(true);
-                            printf("set visible global object: %p\n", *oit);
+                            //printf("set visible global object: %p\n", *oit);
                         }
                     }
                 }
@@ -273,10 +273,6 @@ ObjectWireGlobalObject* ObjectWire::addGlobalObject(const std::string& objectPoo
     const irr::core::vector3df& rot,
     const irr::core::vector3df& scale)
 {
-    const unsigned int objectWireSize = Settings::getInstance()->objectWireSize;
-    int x = (int)apos.X / (int)objectWireSize;
-    int y = (int)apos.Z / (int)objectWireSize;
-    
     ObjectPool* objectPool = 0;
     ObjectPoolManager::objectPoolMap_t::const_iterator poolIt = ObjectPoolManager::getInstance()->getObjectPoolMap().find(objectPoolName);
     if (poolIt != ObjectPoolManager::getInstance()->getObjectPoolMap().end())
@@ -289,18 +285,24 @@ ObjectWireGlobalObject* ObjectWire::addGlobalObject(const std::string& objectPoo
     }
     //assert(objectPool);
     ObjectWireGlobalObject* globalObject = new ObjectWireGlobalObject(objectPool, apos, rot, scale);
-    globalObjectWire[x + (TheEarth::getInstance()->getSizeX() * y)].insert(globalObject);
-    return globalObject;
+    //globalObjectWire[x + (TheEarth::getInstance()->getSizeX() * y)].insert(globalObject);
+    //return globalObject;
+    return addGlobalObject(globalObject);
 }
     
 ObjectWireGlobalObject* ObjectWire::addGlobalObject(ObjectWireGlobalObject* globalObject)
 {
+    const unsigned int objectWireNum2 = Settings::getInstance()->objectWireNum/2;
     const unsigned int objectWireSize = Settings::getInstance()->objectWireSize;
     int x = (int)globalObject->getPos().X / (int)objectWireSize;
     int y = (int)globalObject->getPos().Z / (int)objectWireSize;
     
     globalObjectWire[x + (TheEarth::getInstance()->getSizeX() * y)].insert(globalObject);
-    printf("add global object: %d - %p\n", x + (TheEarth::getInstance()->getSizeX() * y), globalObject);
+    //printf("add global object: %d - %p\n", x + (TheEarth::getInstance()->getSizeX() * y), globalObject);
+    if (abs(x-lastWireCenter.X) < objectWireNum2 && abs(y-lastWireCenter.Y) < objectWireNum2)
+    {
+        globalObject->setVisible(true);
+    }
     return globalObject;
 }
 
@@ -308,6 +310,7 @@ void ObjectWire::removeGlobalObject(ObjectWireGlobalObject* globalObject, bool d
 {
     if (globalObject)
     {
+        const unsigned int objectWireNum = Settings::getInstance()->objectWireNum;
         const unsigned int objectWireSize = Settings::getInstance()->objectWireSize;
         int x = (int)globalObject->apos.X / (int)objectWireSize;
         int y = (int)globalObject->apos.Z / (int)objectWireSize;
@@ -326,6 +329,10 @@ void ObjectWire::removeGlobalObject(ObjectWireGlobalObject* globalObject, bool d
         if (deleteObject)
         {
             delete globalObject;
+        }
+        else
+        {
+            globalObject->setVisible(false);
         }
     }
 }

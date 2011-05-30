@@ -107,7 +107,9 @@ Vehicle::Vehicle(const std::string& vehicleTypeName, const irr::core::vector3df&
       tyres(),
       hkVehicle(0),
       engineSound(0),
-      linearVelocity()
+      linearVelocity(),
+      distance(0.0f),
+      lastPos()
 {
     dprintf(MY_DEBUG_NOTE, "Vehicle::Vehicle(): %p, [%s]\n", this, vehicleTypeName.c_str());
     vehicleType = VehicleTypeManager::getInstance()->getVehicleType(vehicleTypeName);
@@ -439,7 +441,10 @@ void Vehicle::handleUpdatePos(bool phys)
         hkQuaternion hkQuat = /*hkVehicle->getChassis()*/hkBody->getRotation();
         irr::core::quaternion(hkQuat.m_vec(0), hkQuat.m_vec(1), hkQuat.m_vec(2), hkQuat.m_vec(3)).getMatrix(matrix,
             irr::core::vector3df(hkPos(0), hkPos(1), hkPos(2)));
-        node->setPosition(matrix.getTranslation());
+        const irr::core::vector3df newPos = matrix.getTranslation();
+        distance += newPos.getDistanceFrom(lastPos);
+        lastPos = newPos;
+        node->setPosition(newPos);
         node->setRotation(matrix.getRotationDegrees());
         
         linearVelocity.X = hkLV(0);
@@ -492,6 +497,7 @@ void Vehicle::handleUpdatePos(bool phys)
     else
     {
         const irr::core::vector3df soundPos = node->getPosition(); //(matrix*soundMatrix).getTranslation();
+        lastPos = soundPos;
         if (engineSound)
         {
             engineSound->setPosition(soundPos);
@@ -561,12 +567,13 @@ const irr::core::matrix4& Vehicle::getViewDest(unsigned int num) const
 
 void Vehicle::updateToMatrix()
 {
-    irr::core::vector3df pos = matrix.getTranslation();
+    const irr::core::vector3df pos = matrix.getTranslation();
     irr::core::quaternion quat(matrix);
     hkBody->setPositionAndRotation(hkVector4(pos.X, pos.Y, pos.Z), hkQuaternion(quat.X, quat.Y, quat.Z, quat.W));
 
     node->setPosition(pos);
     node->setRotation((matrix).getRotationDegrees());
+    lastPos = pos;
 }
 
 void Vehicle::setSteer(float value)

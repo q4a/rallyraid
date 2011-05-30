@@ -16,7 +16,7 @@ public:
         const irr::core::vector3df& apos,
         const irr::core::vector3df& rot = irr::core::vector3df(0.0f, 0.0f, 0.0f),
         const irr::core::vector3df& scale = irr::core::vector3df(1.0f, 1.0f, 1.0f));
-    ~ObjectWireGlobalObject();
+    virtual ~ObjectWireGlobalObject();
 
     void setVisible(bool p_visible);
     bool getVisible() {return visible;}
@@ -26,7 +26,7 @@ public:
     const irr::core::vector3df& getRot() {return rot;}
     const irr::core::vector3df& getScale() {return scale;}
 
-    void editorRender(bool last);
+    virtual void editorRender(bool last);
     
 protected:
     virtual void updateVisible() {} 

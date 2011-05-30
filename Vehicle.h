@@ -94,6 +94,9 @@ private:
     hkpVehicleInstance*         hkVehicle;
     MySound*                    engineSound;
     irr::core::vector3df        linearVelocity;
+    float                       distance;
+    irr::core::vector3df        lastPos;
+    
 
     friend class FrictionMapVehicleRaycastWheelCollide;
     friend class VehicleTyre;
