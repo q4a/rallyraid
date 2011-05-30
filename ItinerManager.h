@@ -44,7 +44,7 @@ public:
 
 private:
     bool readItinerImages();
-    static void editorRenderObjects(const itinerPointList_t& itinerPointList);
+    static void editorRenderItinerPointList(const itinerPointList_t& itinerPointList);
     
 private:
     typedef std::set<ItinerPoint*> itinerPointSet_t;

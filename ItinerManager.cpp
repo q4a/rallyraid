@@ -123,9 +123,13 @@ bool ItinerManager::readItinerImages()
             }
         }
 
-        ItinerPoint* itinerPoint = new ItinerPoint(apos, globalDistance, localDistance, itinerImageName, description);
-        itinerPointList.push_back(itinerPoint);
+        if (!secName.empty())
+        {
+            ItinerPoint* itinerPoint = new ItinerPoint(apos, globalDistance, localDistance, itinerImageName, description);
+            itinerPointList.push_back(itinerPoint);
+        }
     }
+    //assert(0);
 }
 
 /* static */ bool ItinerManager::writeItinerPointList(const std::string& itinerListFilename, const ItinerManager::itinerPointList_t& itinerPointList)
@@ -194,7 +198,7 @@ bool ItinerManager::readItinerImages()
     }
 }
 
-/* static */ void ItinerManager::editorRenderObjects(const ItinerManager::itinerPointList_t& itinerPointList)
+/* static */ void ItinerManager::editorRenderItinerPointList(const ItinerManager::itinerPointList_t& itinerPointList)
 {
     for (itinerPointList_t::const_iterator it = itinerPointList.begin();
          it != itinerPointList.end();

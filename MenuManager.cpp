@@ -105,6 +105,7 @@ void MenuManager::close()
     if (currentMenuPage)
     {
         currentMenuPage = currentMenuPage->closeMenu();
+        TheGame::getInstance()->getEnv()->setFocus(0);
         refreshEventReceiver();
     }
 }
@@ -122,6 +123,7 @@ void MenuManager::refreshEventReceiver()
     TheGame::getInstance()->getEnv()->setUserEventReceiver(currentMenuPage);
     menuInput = (currentMenuPage != 0);
     TheGame::getInstance()->getCamera()->setInputReceiverEnabled(!menuInput);
+    //printf("set event receiver: %p, menuInput %d\n", currentMenuPage, menuInput);
 }
 
 void MenuManager::clearEventReceiver()

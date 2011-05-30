@@ -40,7 +40,7 @@ void ItinerPoint::editorRender(bool last)
     irr::core::vector3df max = renderPos;
     irr::video::SColor color(255, 255, 255, 255);
     min.X -= 2.f;
-    max.Y += 5.f;
+    min.Y += 7.f;
     min.Z -= 2.f;
     max.X += 2.f;
     max.Y += 15.f;

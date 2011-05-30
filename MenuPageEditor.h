@@ -61,6 +61,7 @@ public:
         A_AddRoadPoint,
         A_AddRoadPointBegin,
         A_AddItinerPoint,
+        A_AddAIPoint,
         A_RemoveObjectGlobal,
         A_RemoveObjectRace,
         A_RemoveObjectDay,
@@ -68,6 +69,7 @@ public:
         A_RemoveRoadPoint,
         A_RemoveRoadPointBegin,
         A_RemoveItinerPoint,
+        A_RemoveAIPoint,
     };
 
     MenuPageEditor();
@@ -126,6 +128,7 @@ private:
     Action                  currentAction;
     irr::video::SMaterial   material;
     unsigned int            lastTick;
+    bool                    doRender;
 };
 
 #endif // MENUPAGEEDITOR_H

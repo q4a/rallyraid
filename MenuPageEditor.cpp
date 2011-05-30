@@ -45,7 +45,8 @@ MenuPageEditor::MenuPageEditor()
       checkBoxRender(0),
       currentAction(A_None),
       material(),
-      lastTick(0)
+      lastTick(0),
+      doRender(true)
 {
     menuPageEditor = this;
     material.MaterialType = irr::video::EMT_SOLID;
@@ -89,7 +90,7 @@ MenuPageEditor::MenuPageEditor()
     // ----------------------------
     irr::gui::IGUITab* tabSelected = tc->addTab(L"S", MI_TABSELECTED);
 
-    checkBoxRender = TheGame::getInstance()->getEnv()->addCheckBox(true,
+    checkBoxRender = TheGame::getInstance()->getEnv()->addCheckBox(doRender,
         irr::core::recti(irr::core::position2di(0, 0), irr::core::dimension2di(tabSelected->getRelativePosition().getSize().Width, 20)),
         tabSelected,
         MI_CBRENDER,
@@ -137,6 +138,7 @@ MenuPageEditor::MenuPageEditor()
     tableAction->setCellText(A_AddRoadPoint, 0, L"add road point");
     tableAction->setCellText(A_AddRoadPointBegin, 0, L"add road point begin");
     tableAction->setCellText(A_AddItinerPoint, 0, L"add itiner point");
+    tableAction->setCellText(A_AddAIPoint, 0, L"add AI point");
     tableAction->setCellText(A_RemoveObjectGlobal, 0, L"not used"/*L"remove object global"*/);
     tableAction->setCellText(A_RemoveObjectRace, 0, L"remove object race");
     tableAction->setCellText(A_RemoveObjectDay, 0, L"remove object day");
@@ -144,6 +146,7 @@ MenuPageEditor::MenuPageEditor()
     tableAction->setCellText(A_RemoveRoadPoint, 0, L"remove road point");
     tableAction->setCellText(A_RemoveRoadPointBegin, 0, L"remove road point begin");
     tableAction->setCellText(A_RemoveItinerPoint, 0, L"remove itiner point");
+    tableAction->setCellText(A_RemoveAIPoint, 0, L"remove AI point");
 
     // ----------------------------
     // Tiles tab
@@ -509,15 +512,26 @@ bool MenuPageEditor::OnEvent(const irr::SEvent &event)
                 {
                     case MI_EBITINERGD:
                         WStringConverter::toFloat(editBoxItinerGD->getText(), ItinerManager::getInstance()->editorGlobalDistance);
+                        dprintf(MY_DEBUG_INFO, "set itiner global distance: %f\n", ItinerManager::getInstance()->editorGlobalDistance);
                         break;
                     case MI_EBITINERLD:
                         WStringConverter::toFloat(editBoxItinerLD->getText(), ItinerManager::getInstance()->editorLocalDistance);
+                        dprintf(MY_DEBUG_INFO, "set itiner local distance: %f\n", ItinerManager::getInstance()->editorLocalDistance);
                         break;
                     case MI_EBITINERDESCRIPTION:
                         WStringConverter::toString(editBoxItinerDescription->getText(), ItinerManager::getInstance()->editorDescription);
+                        dprintf(MY_DEBUG_INFO, "set itiner description: [%s]\n", ItinerManager::getInstance()->editorDescription.c_str());
                         break;
                 }
             }
+            case irr::gui::EGET_CHECKBOX_CHANGED:
+                switch (id)
+                {
+                    case MI_CBRENDER:
+                        doRender = checkBoxRender->isChecked();
+                        dprintf(MY_DEBUG_INFO, "set render to: %u\n", doRender);
+                        break;
+                }
         };
     }
     return false;
@@ -1014,12 +1028,19 @@ void MenuPageEditor::refreshItiner()
 
     const ItinerManager::itinerImageMap_t& itinerImageMap = ItinerManager::getInstance()->getItinerImageMap();
     unsigned int i = 0;
+
+    irr::core::stringw str;
+
+    tableItiner->addRow(i);
+    str = L"none";
+    tableItiner->setCellText(i, 0, str.c_str());
+
+    i++;
+
     for (ItinerManager::itinerImageMap_t::const_iterator it = itinerImageMap.begin();
          it != itinerImageMap.end();
          it++, i++)
     {
-        irr::core::stringw str;
-        
         tableItiner->addRow(i);
 
         str = L"";
@@ -1128,8 +1149,12 @@ void MenuPageEditor::actionP()
         }
     case A_AddItinerPoint:
         {
-            dprintf(MY_DEBUG_NOTE, "MenuPageEditor::action(): add itiner point editorStage: %p\n",
-                RaceManager::getInstance()->editorStage);
+            dprintf(MY_DEBUG_NOTE, "MenuPageEditor::action(): add itiner point editorStage: %p, GD: %f, LD: %f, iti: [%s], desc: [%s]\n",
+                RaceManager::getInstance()->editorStage,
+                ItinerManager::getInstance()->editorGlobalDistance,
+                ItinerManager::getInstance()->editorLocalDistance,
+                ItinerManager::getInstance()->editorItinerImageName.c_str(),
+                ItinerManager::getInstance()->editorDescription.c_str());
             if (RaceManager::getInstance()->editorStage)
             {
                 ItinerPoint* ip = new ItinerPoint(apos,
@@ -1226,7 +1251,7 @@ void MenuPageEditor::actionP()
 
 void MenuPageEditor::renderP()
 {
-    if (!checkBoxRender->isChecked()) return;
+    if (/*!checkBoxRender->isChecked()*/!doRender) return;
 
     TheGame::getInstance()->getDriver()->setMaterial(material);
     TheGame::getInstance()->getDriver()->setTransform(irr::video::ETS_WORLD, irr::core::IdentityMatrix);
@@ -1244,6 +1269,7 @@ void MenuPageEditor::renderP()
     if (RaceManager::getInstance()->editorStage)
     {
         RaceManager::editorRenderObjects(RaceManager::getInstance()->editorStage->globalObjectList);
+        ItinerManager::editorRenderItinerPointList(RaceManager::getInstance()->editorStage->itinerPointList);
         RoadManager::editorRenderRoads(RaceManager::getInstance()->editorStage->roadMap);
     }
     if (RoadManager::getInstance()->editorRoad)
