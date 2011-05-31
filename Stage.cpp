@@ -15,6 +15,7 @@ Stage::Stage(Day* parent, const std::string& raceName, const std::string& dayNam
       shortDescription(),
       globalObjectList(),
       itinerPointList(),
+      AIPointList(),
       active(false),
       roadMap()
 {
@@ -27,6 +28,7 @@ Stage::~Stage()
     RaceManager::clearGlobalObjects(globalObjectList);
     RoadManager::clearRoadMap(roadMap);
     ItinerManager::clearItinerPointList(itinerPointList);
+    AIPoint::clearAIPointList(AIPointList);
 }
 
 bool Stage::read()
@@ -37,6 +39,7 @@ bool Stage::read()
         readShortDescription();
         readGlobalObjects();
         readItinerPointList();
+        readAIPointList();
         RoadManager::readRoads(STAGE_ROADS(raceName, dayName, stageName), roadMap, false, true);
     }
     return ret;
@@ -91,12 +94,18 @@ void Stage::readItinerPointList()
     ItinerManager::readItinerPointList(STAGE_DIR(raceName, dayName, stageName) + "/" + ITINER_CFG, itinerPointList);
 }
 
+void Stage::readAIPointList()
+{
+    AIPoint::readAIPointList(STAGE_DIR(raceName, dayName, stageName) + "/" + AIPOINT_CFG, AIPointList);
+}
+
 bool Stage::write()
 {
     bool ret = writeCfg();
     ret &= writeShortDescription();
     ret &= writeGlobalObjects();
     ret &= writeItinerPointList();
+    ret &= writeAIPointList();
     return ret;
 }
 
@@ -131,6 +140,11 @@ bool Stage::writeGlobalObjects()
 bool Stage::writeItinerPointList()
 {
     return ItinerManager::writeItinerPointList(STAGE_DIR(raceName, dayName, stageName) + "/" + ITINER_CFG, itinerPointList);
+}
+
+bool Stage::writeAIPointList()
+{
+    return AIPoint::writeAIPointList(STAGE_DIR(raceName, dayName, stageName) + "/" + AIPOINT_CFG, AIPointList);
 }
 
 void Stage::activate()

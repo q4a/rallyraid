@@ -8,6 +8,7 @@
 #include "RaceManager.h"
 #include "RoadManager.h"
 #include "ItinerManager.h"
+#include "AIPoint.h"
 
 
 class Stage
@@ -22,12 +23,14 @@ private:
     void readShortDescription();
     void readGlobalObjects();
     void readItinerPointList();
+    void readAIPointList();
 
     bool write();
     bool writeCfg();
     bool writeShortDescription();
     bool writeGlobalObjects();
     bool writeItinerPointList();
+    bool writeAIPointList();
 
 public:
     const std::string& getName(); // inline
@@ -47,6 +50,7 @@ private:
     std::string                     shortDescription;
     RaceManager::globalObjectList_t globalObjectList;
     ItinerManager::itinerPointList_t itinerPointList;
+    AIPoint::AIPointList_t          AIPointList;
     bool                            active;
     RoadManager::roadMap_t          roadMap;
     
