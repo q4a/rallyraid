@@ -47,6 +47,8 @@ public:
         MI_EBITINERDESCRIPTION,
 
         MI_CBRENDER,
+        
+        MI_STITINERGD,
 
         NUMBER_OF_MENUITEMS
     };
@@ -75,6 +77,7 @@ public:
     MenuPageEditor();
     virtual ~MenuPageEditor();
     void refreshSelected();
+    void refreshItinerGD();
 
     // mouse button hit
     static void action();
@@ -124,6 +127,7 @@ private:
     irr::gui::IGUIEditBox*  editBoxItinerLD;
     irr::gui::IGUIEditBox*  editBoxItinerDescription;
     irr::gui::IGUICheckBox* checkBoxRender;
+    irr::gui::IGUIStaticText* staticTextItinerGD;
 
     Action                  currentAction;
     irr::video::SMaterial   material;

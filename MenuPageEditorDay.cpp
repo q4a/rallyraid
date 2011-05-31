@@ -20,6 +20,8 @@
 #include "RoadType.h"
 #include "ObjectWireGlobalObject.h"
 #include "Competitor.h"
+#include "ItinerManager.h"
+#include "AIPoint.h"
 
 MenuPageEditorDay::MenuPageEditorDay()
     : window(0),
@@ -270,7 +272,13 @@ bool MenuPageEditorDay::OnEvent(const irr::SEvent &event)
                 {
                     case MI_TABLESTAGES:
                         RaceManager::getInstance()->editorStage = (Stage*)tableStages->getCellData(tableStages->getSelected(), 0);
+                        ItinerManager::getInstance()->editorGlobalDistance = 0.f;
+                        if (!RaceManager::getInstance()->editorStage->itinerPointList.empty())
+                        {
+                            ItinerManager::getInstance()->editorGlobalDistance = RaceManager::getInstance()->editorStage->itinerPointList.back()->getGlobalDistance();
+                        }
                         MenuPageEditor::menuPageEditor->refreshSelected();
+                        MenuPageEditor::menuPageEditor->refreshItinerGD();
                         return true;
                         break;
                     case MI_TABLEROADS:

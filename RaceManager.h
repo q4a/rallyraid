@@ -30,6 +30,7 @@
 #define COMPETITORS_CFG             (std::string("competitors.cfg"))
 #define OBJECTS_CFG                 (std::string("objects.cfg"))
 #define ITINER_CFG                  (std::string("itiner.cfg"))
+#define AIPOINTS_CFG                (std::string("aipoints.cfg"))
 
 class Race;
 class Day;

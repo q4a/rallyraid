@@ -26,6 +26,7 @@ Stage::~Stage()
     deactivate();
     RaceManager::clearGlobalObjects(globalObjectList);
     RoadManager::clearRoadMap(roadMap);
+    ItinerManager::clearItinerPointList(itinerPointList);
 }
 
 bool Stage::read()

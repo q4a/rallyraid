@@ -42,7 +42,11 @@ MenuPageEditor::MenuPageEditor()
       editBoxNewRoadFilename(0),
       editBoxNewRoadName(0),
       editBoxNewRoadDataFilename(0),
+      editBoxItinerGD(0),
+      editBoxItinerLD(0),
+      editBoxItinerDescription(0),
       checkBoxRender(0),
+      staticTextItinerGD(0),
       currentAction(A_None),
       material(),
       lastTick(0),
@@ -318,11 +322,17 @@ MenuPageEditor::MenuPageEditor()
     // ----------------------------
     irr::gui::IGUITab* tabItiner = tc->addTab(L"Iti", MI_TABITINER);
 
-    editBoxItinerGD = TheGame::getInstance()->getEnv()->addEditBox(L"global distance",
+    /*editBoxItinerGD = TheGame::getInstance()->getEnv()->addEditBox(L"global distance",
         irr::core::recti(irr::core::position2di(0, 0), irr::core::dimension2di(tabItiner->getRelativePosition().getSize().Width, 20)),
         true,
         tabItiner,
-        MI_EBITINERGD);
+        MI_EBITINERGD);*/
+    
+    staticTextItinerGD = TheGame::getInstance()->getEnv()->addStaticText(L"0",
+        irr::core::recti(irr::core::position2di(0, 0), irr::core::dimension2di(tabItiner->getRelativePosition().getSize().Width, 20)),
+        true,
+        tabItiner,
+        MI_STITINERGD);
 
     editBoxItinerLD = TheGame::getInstance()->getEnv()->addEditBox(L"local distance",
         irr::core::recti(irr::core::position2di(0, 22), irr::core::dimension2di(tabItiner->getRelativePosition().getSize().Width, 20)),
@@ -1049,6 +1059,14 @@ void MenuPageEditor::refreshItiner()
     }
 }
 
+void MenuPageEditor::refreshItinerGD()
+{
+    irr::core::stringw str;
+
+    str += ItinerManager::getInstance()->editorGlobalDistance;
+    staticTextItinerGD->setText(str.c_str());
+}
+
 /* static */ void MenuPageEditor::action()
 {
     if (menuPageEditor)
@@ -1157,6 +1175,8 @@ void MenuPageEditor::actionP()
                 ItinerManager::getInstance()->editorDescription.c_str());
             if (RaceManager::getInstance()->editorStage)
             {
+                ItinerManager::getInstance()->editorGlobalDistance += ItinerManager::getInstance()->editorLocalDistance;
+                refreshItinerGD();
                 ItinerPoint* ip = new ItinerPoint(apos,
                     ItinerManager::getInstance()->editorGlobalDistance,
                     ItinerManager::getInstance()->editorLocalDistance,
@@ -1239,6 +1259,9 @@ void MenuPageEditor::actionP()
             if (RaceManager::getInstance()->editorStage && !RaceManager::getInstance()->editorStage->itinerPointList.empty())
             {
                 ItinerPoint* ip = RaceManager::getInstance()->editorStage->itinerPointList.back();
+                ItinerManager::getInstance()->editorGlobalDistance -+= ip->getLocalDistance();
+                if (ItinerManager::getInstance()->editorGlobalDistance < 0.f) ItinerManager::getInstance()->editorGlobalDistance = 0.f;
+                refreshItinerGD();
                 RaceManager::getInstance()->editorStage->itinerPointList.pop_back();
                 delete ip;
             }

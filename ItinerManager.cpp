@@ -86,11 +86,11 @@ bool ItinerManager::readItinerImages()
     // Go through all sections & settings in the file
     ConfigFile::SectionIterator seci = cf.getSectionIterator();
 
+    float globalDistance = 0.f;
     std::string secName, keyName, valName;
     while (seci.hasMoreElements())
     {
         irr::core::vector3df apos;
-        float globalDistance = 0.f;
         float localDistance = 0.f;
         std::string itinerImageName;
         std::string description;
@@ -108,9 +108,9 @@ bool ItinerManager::readItinerImages()
             if (keyName == "pos")
             {
                 StringConverter::parseFloat3(valName, apos.X, apos.Y, apos.Z);
-            } else if (keyName == "gd")
-            {
-                globalDistance = StringConverter::parseFloat(valName, 0.f);
+            //} else if (keyName == "gd")
+            //{
+            //    globalDistance = StringConverter::parseFloat(valName, 0.f);
             } else if (keyName == "ld")
             {
                 localDistance = StringConverter::parseFloat(valName, 0.f);
@@ -125,6 +125,7 @@ bool ItinerManager::readItinerImages()
 
         if (!secName.empty())
         {
+            globalDistance += localDistance;
             ItinerPoint* itinerPoint = new ItinerPoint(apos, globalDistance, localDistance, itinerImageName, description);
             itinerPointList.push_back(itinerPoint);
         }
@@ -155,7 +156,7 @@ bool ItinerManager::readItinerImages()
         fprintf_s(f, "[%u]\n", id);
 
         fprintf_s(f, "pos=%f %f %f\n", (*it)->getPos().X, (*it)->getPos().Y, (*it)->getPos().Z);
-        fprintf_s(f, "gd=%f\n", (*it)->getGlobalDistance());
+        //fprintf_s(f, "gd=%f\n", (*it)->getGlobalDistance());
         fprintf_s(f, "ld=%f\n", (*it)->getLocalDistance());
         fprintf_s(f, "image=%s\n", (*it)->getItinerImageName().c_str());
         fprintf_s(f, "description=%s\n", (*it)->getDescription().c_str());
