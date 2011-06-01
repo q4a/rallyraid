@@ -85,6 +85,7 @@
     <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AIPoint.h" />
     <ClInclude Include="Competitor.h" />
     <ClInclude Include="ConfigDirectory.h" />
     <ClInclude Include="ConfigFile.h" />
@@ -148,6 +149,7 @@
     <ClInclude Include="WStringConverter.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AIPoint.cpp" />
     <ClCompile Include="Competitor.cpp" />
     <ClCompile Include="ConfigDirectory.cpp" />
     <ClCompile Include="ConfigFile.cpp" />

@@ -156,6 +156,17 @@ ObjectWire::~ObjectWire()
 {
     if (tiles)
     {
+        for (unsigned int x = 0; x < objectWireNum; x++)
+        {
+            for (unsigned int y = 0; y < objectWireNum; y++)
+            {
+                if (tiles[x + objectWireNum*y])
+                {
+                    delete tiles[x + objectWireNum*y];
+                    tiles[x + objectWireNum*y] = 0;
+                }
+            }
+        }
         delete tiles;
         tiles = 0;
     }
@@ -173,6 +184,38 @@ ObjectWire::~ObjectWire()
          it->second.clear();
      }
      globalObjectWire.clear();
+}
+
+void ObjectWire::reset()
+{
+    dprintf(MY_DEBUG_NOTE, "ObjectWire::reset()\n");
+    
+    for (unsigned int x = 0; x < objectWireNum; x++)
+    {
+        for (unsigned int y = 0; y < objectWireNum; y++)
+        {
+            if (tiles[x + objectWireNum*y])
+            {
+                delete tiles[x + objectWireNum*y];
+                tiles[x + objectWireNum*y] = 0;
+            }
+        }
+    }
+
+     for (globalObjectWire_t::iterator it = globalObjectWire.begin();
+          it != globalObjectWire.end();
+          it++)
+     {
+         for (globalObjectSet_t::const_iterator oit = it->second.begin();
+              oit != it->second.end();
+              oit++)
+         {
+             (*oit)->setVisible(false);
+         }
+         it->second.clear();
+     }
+     
+     lastWireCenter = irr::core::vector3df();
 }
 
 bool ObjectWire::update(const irr::core::vector3df& newPos, bool force)

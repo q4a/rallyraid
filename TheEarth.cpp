@@ -1002,13 +1002,13 @@ bool TheEarth::writeEarthTextureToPNG(irr::IrrlichtDevice* device, irr::video::I
     return ret;
 }
 
-void TheEarth::createFirst(const irr::core::vector3df& pos, const irr::core::vector3df& dir)
+void TheEarth::createFirst(const irr::core::vector3df& apos, const irr::core::vector3df& dir)
 {
-    lastCenterPosi = irr::core::vector3di(((int)(pos.X/TILE_SCALE_F))*TILE_SCALE, 0, ((int)(pos.Z/TILE_SCALE_F))*TILE_SCALE);
+    lastCenterPosi = irr::core::vector3di(((int)(apos.X/TILE_SCALE_F))*TILE_SCALE, 0, ((int)(apos.Z/TILE_SCALE_F))*TILE_SCALE);
     lastCenterPos = irr::core::vector3df((float)lastCenterPosi.X, (float)lastCenterPosi.Y, (float)lastCenterPosi.Z);
     lastPosBox = irr::core::aabbox3df(lastCenterPos.X-VISUAL_BOX_HSIZE_F, -1000.0f, lastCenterPos.Z-VISUAL_BOX_HSIZE_F,
         lastCenterPos.X+VISUAL_BOX_HSIZE_F, 10000.0f, lastCenterPos.Z+VISUAL_BOX_HSIZE_F);
-    lastLargeCenterPosi = irr::core::vector3di(((int)(pos.X/TILE_LARGE_SCALE_F))*TILE_LARGE_SCALE, 0, ((int)(pos.Z/TILE_LARGE_SCALE_F))*TILE_LARGE_SCALE);
+    lastLargeCenterPosi = irr::core::vector3di(((int)(apos.X/TILE_LARGE_SCALE_F))*TILE_LARGE_SCALE, 0, ((int)(apos.Z/TILE_LARGE_SCALE_F))*TILE_LARGE_SCALE);
 
     if (visualPart)
     {
@@ -1021,6 +1021,7 @@ void TheEarth::createFirst(const irr::core::vector3df& pos, const irr::core::vec
         newReadyVisualPart = 0;
     }
     newVisualPart = 0;
+    clearSetInUseFlagsForTiles();
 
     visualPart = new VisualMembers();
     printf("create members ... ");
@@ -1032,15 +1033,17 @@ void TheEarth::createFirst(const irr::core::vector3df& pos, const irr::core::vec
     printf("done\nrefresh minimap ... ");
     refreshMiniMap();
     printf("done\n");
+
+    // removeNotInUseTiles();
 }
 
-void TheEarth::update(const irr::core::vector3df& pos, const irr::core::vector3df& dir)
+void TheEarth::update(const irr::core::vector3df& apos, const irr::core::vector3df& dir)
 {
     //return;
 #if 0
-    if (!lastPosBox.isPointInside(irr::core::vector3df(pos.X, 0.0f, pos.Z)))
+    if (!lastPosBox.isPointInside(irr::core::vector3df(apos.X, 0.0f, apos.Z)))
     {
-        createFirst(pos, dir);
+        createFirst(apos, dir);
     }
 #else // 0
     if (newVisualPart)
@@ -1060,19 +1063,19 @@ void TheEarth::update(const irr::core::vector3df& pos, const irr::core::vector3d
         return;
     }
 
-    if (!lastPosBox.isPointInside(irr::core::vector3df(pos.X, 0.0f, pos.Z)))
+    if (!lastPosBox.isPointInside(irr::core::vector3df(apos.X, 0.0f, apos.Z)))
     {
         printf("start create new ...\n");
-        //irr::core::vector3df compPos = pos;
-        irr::core::vector3df compPos = pos + (dir * 200.0f);
+        //irr::core::vector3df compPos = apos;
+        irr::core::vector3df compPos = apos + (dir * 200.0f);
         newVisualPart = new VisualMembers();
         lastCenterPosi = irr::core::vector3di(((int)(compPos.X/TILE_SCALE_F))*TILE_SCALE, 0, ((int)(compPos.Z/TILE_SCALE_F))*TILE_SCALE);
-        //lastCenterPosi = irr::core::vector3di((int)pos.X, 0, (int)pos.Z);
+        //lastCenterPosi = irr::core::vector3di((int)apos.X, 0, (int)apos.Z);
         lastCenterPos = irr::core::vector3df((float)lastCenterPosi.X, (float)lastCenterPosi.Y, (float)lastCenterPosi.Z);
         lastPosBox = irr::core::aabbox3df(lastCenterPos.X-VISUAL_BOX_HSIZE_F, -100.0f, lastCenterPos.Z-VISUAL_BOX_HSIZE_F,
             lastCenterPos.X+VISUAL_BOX_HSIZE_F, 9000.0f, lastCenterPos.Z+VISUAL_BOX_HSIZE_F);
 #if 0
-        irr::core::vector3di newLargeCenterPosi = irr::core::vector3di(((int)(pos.X/TILE_LARGE_SCALE_F))*TILE_LARGE_SCALE, 0, ((int)(pos.Z/TILE_LARGE_SCALE_F))*TILE_LARGE_SCALE);
+        irr::core::vector3di newLargeCenterPosi = irr::core::vector3di(((int)(apos.X/TILE_LARGE_SCALE_F))*TILE_LARGE_SCALE, 0, ((int)(apos.Z/TILE_LARGE_SCALE_F))*TILE_LARGE_SCALE);
         if (lastLargeCenterPosi == newLargeCenterPosi)
         {
             newVisualPart->createMembers(lastCenterPosi, lastLargeCenterPosi, this, visualPart->terrainLarge);

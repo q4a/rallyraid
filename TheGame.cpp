@@ -21,6 +21,7 @@
 #include "RoadManager.h"
 #include "RoadTypeManager.h"
 #include "ItinerManager.h"
+#include "GamePlay.h"
 
 // static stuff
 TheGame* TheGame::theGame = 0;
@@ -65,6 +66,7 @@ TheGame::TheGame()
       roadManager(0),
       roadTypeManager(0),
       itinerManager(0),
+      gamePlay(0),
       terminate(true),
       windowId(0),
       lastScreenSize(),
@@ -166,6 +168,9 @@ TheGame::TheGame()
         dprintf(MY_DEBUG_NOTE, "Initialize menu manager\n");
         MenuManager::initialize();
         menuManager = MenuManager::getInstance();
+        dprintf(MY_DEBUG_NOTE, "Initialize game play\n");
+        GamePlay::initialize();
+        gamePlay = gamePlay::getInstance();
         dprintf(MY_DEBUG_NOTE, "Initialize hud\n");
         Hud::initialize();
         hud = Hud::getInstance();
@@ -206,10 +211,13 @@ TheGame::~TheGame()
     roadManager = 0;
     roadTypeManager = 0;
     menuManager = 0;
+    gamePlay = 0;
     hud = 0;
 
     dprintf(MY_DEBUG_NOTE, "Finalize hud\n");
     Hud::finalize();
+    dprintf(MY_DEBUG_NOTE, "Finalize game play\n");
+    GamePlay::finalize();
     dprintf(MY_DEBUG_NOTE, "Finalize menu manager\n");
     MenuManager::finalize();
     dprintf(MY_DEBUG_NOTE, "Finalize race manager\n");
@@ -271,22 +279,6 @@ void TheGame::loop()
         return;
     }
 
-    /* test */
-    //irr::core::vector3df initialPos(4190208.f, 1000.f, -6414336.f);
-    //irr::core::vector3df initialPos(4190225.f, 95.f, -6411350.f);
-    irr::core::vector3df initialPos(4190225.f, 215.f, -6401350.f);
-    irr::core::vector3df initialDir(20.f, -20.f, 20.f);
-    camera->setPosition(initialPos);
-    camera->setTarget(camera->getPosition()+initialDir);
-    //earth->createFirst(initialPos, irr::core::vector3df(1.f, 2.f, 1.f));
-
-    cameraOffsetObject = new OffsetObject(camera, true);
-    cameraOffsetObject->addToManager();
-    offsetManager->update(camera->getPosition());
-    cameraOffsetObject->setUpdateCB(this);
-    earth->createFirst(initialPos, irr::core::vector3df(1.f, 2.f, 1.f));
-
-
     smgr->setAmbientLight(irr::video::SColorf(0.3f, 0.3f, 0.3f));
     smgr->setShadowColor(irr::video::SColor(255, 50, 50, 50));
 
@@ -317,7 +309,7 @@ void TheGame::loop()
     //printf("car off: %f, %f (%f, %f)\n", offsetManager->getOffset().X, offsetManager->getOffset().Z,
     //    car->getNode()->getPosition().X, car->getNode()->getPosition().Z);
     //Vehicle* car = new Vehicle("vw3", initialPos+initialDir, irr::core::vector3df());
-    player->initializeVehicle(initialPos+initialDir, irr::core::vector3df());
+    gamePlay->startGame(0);
 
     while (device->run() && !terminate)
     {
@@ -425,15 +417,15 @@ void TheGame::loop()
             failed_render = 0;
 
             driver->setRenderTarget(0, true, true, irr::video::SColor(0, 0, 0, 255));
-            //printf("1\n");
+            //printf("prerender\n");
             earth->registerVisual();
             hud->preRender(cameraAngle);
-            //printf("2\n");
+            //printf("scene mgr drawAll\n");
             smgr->drawAll();
-            //printf("3\n");
+            //printf("menu and env render\n");
             MenuPageEditor::render();
             env->drawAll();
-            //printf("4\n");
+            //printf("hud render\n");
             //testQuad.render();
             hud->render();
 
@@ -454,6 +446,20 @@ void TheGame::loop()
     dprintf(MY_DEBUG_INFO, "TheGame::loop() end\n");
 }
 
+void TheGame::reset(const irr::core::vector3df& apos, const irr::core::vector3df& dir)
+{
+    cameraOffsetObject = 0;
+    if (camera == fps_camera) switchCamera();
+    camera->setPosition(apos);
+    camera->setTarget(camera->getPosition()+dir);
+
+    // cameraOffsetObject is deleted by the OffsetManager::reset()
+    cameraOffsetObject = new OffsetObject(camera, true);
+    cameraOffsetObject->addToManager();
+    offsetManager->update(camera->getPosition());
+    cameraOffsetObject->setUpdateCB(this);
+}
+
 void TheGame::switchCamera()
 {
     irr::core::vector3df pos = camera->getPosition();
@@ -462,7 +468,7 @@ void TheGame::switchCamera()
     smgr->setActiveCamera(camera);
     camera->setPosition(pos);
     camera->setTarget(tar);
-    cameraOffsetObject->setNode(camera);
+    if (cameraOffsetObject) cameraOffsetObject->setNode(camera);
 }
 
 void TheGame::handleUpdatePos(bool phys)

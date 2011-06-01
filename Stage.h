@@ -37,6 +37,8 @@ public:
     const std::string& getLongName(); // inline
     const std::string& getShortDescription(); // inline
     const RoadManager::roadMap_t& getRoadMap(); // inline
+    const ItinerManager::itinerPointList_t& getIteratorPointList(); // inline
+    const AIPoint::AIPointList_t& getAIPointList(); // inline
 
     void activate();
     void deactivate();
@@ -80,6 +82,16 @@ inline const std::string& Stage::getShortDescription()
 inline const RoadManager::roadMap_t& Stage::getRoadMap()
 {
     return roadMap;
+}
+
+inline const ItinerManager::itinerPointList_t& getIteratorPointList()
+{
+    return itinerPointList;
+}
+
+inline const AIPoint::AIPointList_t& getAIPointList()
+{
+    return AIPointList;
 }
 
 #endif // STAGE_H

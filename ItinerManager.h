@@ -25,9 +25,11 @@ public:
 private:
     static ItinerManager* itinerManager;
 
-public:
+private:
     ItinerManager();
     ~ItinerManager();
+    
+public:
     bool update(const irr::core::vector3df& newPos, bool force = false);
     
     void addActiveItinerPoint(ItinerPoint* itinerPoint);    // inline

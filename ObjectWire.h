@@ -39,7 +39,12 @@ private:
 public:
     ObjectWire();
     ~ObjectWire();
+    
+    // called by TheGame::loop()
     bool update(const irr::core::vector3df& newPos, bool force = false);
+    
+    // called by GamePlay::startGame()
+    void reset();
 
     ObjectWireGlobalObject* addGlobalObject(const std::string& objectPoolName,
         const irr::core::vector3df& apos,

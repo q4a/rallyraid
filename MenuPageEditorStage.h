@@ -19,10 +19,12 @@ public:
         MI_TABGLOBALOBJECTS,
         MI_TABROADS,
         MI_TABITINER,
+        MI_TABAI,
 
         MI_TABLEGLOBALOBJECTS,
         MI_TABLEROADS,
         MI_TABLEITINER,
+        MI_TABLEAI,
 
         MI_EBLONGNAME,
         MI_EBSHORTDESCRIPTION,
@@ -49,12 +51,14 @@ private:
     void refreshRoads();
     void refreshRoadEditBoxes(const wchar_t* newRoadName = L"");
     void refreshItiner();
+    void refreshAI();
 
 private:
     irr::gui::IGUIWindow*   window;
     irr::gui::IGUITable*    tableGlobalObjects;
     irr::gui::IGUITable*    tableRoads;
     irr::gui::IGUITable*    tableItiner;
+    irr::gui::IGUITable*    tableAI;
     irr::gui::IGUIEditBox*  editBoxLongName;
     irr::gui::IGUIEditBox*  editBoxShortDescription;
     irr::gui::IGUIEditBox*  editBoxNewRoadFilename;

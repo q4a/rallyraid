@@ -53,6 +53,7 @@ void ObjectWireGlobalObject::setVisible(bool p_visible)
         if (objectPool && offsetObject)
         {
             objectPool->putObject(offsetObject);
+            offsetObject = 0;
         }
     }
     

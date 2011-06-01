@@ -114,8 +114,13 @@ public:
     bool writeDensityToPNG(irr::IrrlichtDevice* device, irr::video::IVideoDriver* driver) const;
     bool writeEarthTextureToPNG(irr::IrrlichtDevice* device, irr::video::IVideoDriver* driver) const;
 
-    void createFirst(const irr::core::vector3df& pos, const irr::core::vector3df& dir);
-    void update(const irr::core::vector3df& pos, const irr::core::vector3df& dir);
+    // called by GamePlay::startGame()
+    void createFirst(const irr::core::vector3df& apos, const irr::core::vector3df& dir);
+    
+    // called by TheGame::loop() if small time elapsed
+    void update(const irr::core::vector3df& apos, const irr::core::vector3df& dir);
+    
+    // called by the TheGame::loop()
     void registerVisual();
 
     irr::video::ITexture* getMiniMapTexture() {return miniMapTexture;}

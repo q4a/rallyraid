@@ -22,6 +22,7 @@
 #include "Competitor.h"
 #include "ItinerManager.h"
 #include "ItinerPoint.h"
+#include "AIPoint.h"
 
 
 MenuPageEditorStage::MenuPageEditorStage()
@@ -29,6 +30,7 @@ MenuPageEditorStage::MenuPageEditorStage()
       tableGlobalObjects(0),
       tableRoads(0),
       tableItiner(0),
+      tableAI(0),
       editBoxLongName(0),
       editBoxShortDescription(0),
       editBoxNewRoadFilename(0),
@@ -160,6 +162,25 @@ MenuPageEditorStage::MenuPageEditorStage()
     tableItiner->setColumnWidth(5, 60);
     tableItiner->addColumn(L"description");
     tableItiner->setColumnWidth(6, 100);
+
+    // ----------------------------
+    // AI tab
+    // ----------------------------
+    irr::gui::IGUITab* tabAI = tc->addTab(L"AI", MI_TABAI);
+
+    tableAI = TheGame::getInstance()->getEnv()->addTable(
+        irr::core::recti(irr::core::position2di(0, 0), tabAI->getRelativePosition().getSize()),
+        tabAI,
+        MI_TABLEAI,
+        true);
+
+    tableAI->addColumn(L"#");
+    tableAI->addColumn(L"X");
+    tableAI->addColumn(L"Y");
+    tableAI->addColumn(L"GD");
+    tableAI->setColumnWidth(3, 60);
+    tableAI->addColumn(L"LD");
+    tableAI->setColumnWidth(4, 60);
 
     window->setVisible(false);
 }
@@ -298,6 +319,7 @@ void MenuPageEditorStage::refresh()
     refreshEditBoxes();
     refreshRoads();
     refreshItiner();
+    refreshAI();
 }
 
 void MenuPageEditorStage::refreshGlobalObjects()
@@ -480,6 +502,44 @@ void MenuPageEditorStage::refreshItiner()
         str = L"";
         str += (*ipit)->getDescription().c_str();
         tableItiner->setCellText(i, 6, str.c_str());
+    }
+}
+
+void MenuPageEditorStage::refreshAI()
+{
+    // ----------------------------
+    // AI
+    // ----------------------------
+    tableAI->clearRows();
+
+    const AIPoint::AIPointList_t& AIPointList = RaceManager::getInstance()->editorStage->AIPointList;
+    unsigned int i = 0;
+    for (AIPoint::AIPointList_t::const_iterator aiit = AIPointList.begin();
+         aiit != AIPointList.end();
+         aiit++, i++)
+    {
+        irr::core::stringw str;
+        
+        tableAI->addRow(i);
+
+        str += i;
+        tableAI->setCellText(i, 0, str.c_str());
+
+        str = L"";
+        str += (*aiit)->getPos().X;
+        tableAI->setCellText(i, 1, str.c_str());
+
+        str = L"";
+        str += (*aiit)->getPos().Z;
+        tableAI->setCellText(i, 2, str.c_str());
+
+        str = L"";
+        str += (*aiit)->getGlobalDistance();
+        tableAI->setCellText(i, 3, str.c_str());
+
+        str = L"";
+        str += (*aiit)->getLocalDistance();
+        tableAI->setCellText(i, 4, str.c_str());
     }
 }
 

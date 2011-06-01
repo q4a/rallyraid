@@ -19,6 +19,7 @@ class Hud;
 class RoadManager;
 class RoadTypeManager;
 class ItinerManager;
+class GamePlay;
 
 class TheGame : public OffsetObjectUpdateCB
 {
@@ -29,6 +30,9 @@ public:
 
 public:
     void loop();
+
+    // called by GamePlay::startGame()
+    void reset(const irr::core::vector3df& apos, const irr::core::vector3df& dir);
 
     irr::IrrlichtDevice*            getDevice();
     irr::video::IVideoDriver*       getDriver();
@@ -82,6 +86,7 @@ private:
     RoadManager*                    roadManager;
     RoadTypeManager*                roadTypeManager;
     ItinerManager*                  itinerManager;
+    GamePlay*                       gamePlay;
 
     bool                            terminate;
     size_t                          windowId;
