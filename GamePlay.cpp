@@ -8,6 +8,7 @@
 #include "TheGame.h"
 #include "TheEarth.h"
 #include "ObjectWire.h"
+#include "Player.h"
 
 
 GamePlay* GamePlay::gamePlay = 0;
@@ -79,4 +80,6 @@ void GamePlay::startGame(Stage* stage)
     {
         RaceManager::getInstance()->activateStage(stage);
     }
+
+    TheGame::getInstance()->resetTick();
 }

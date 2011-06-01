@@ -154,6 +154,7 @@ ObjectWire::ObjectWire()
 
 ObjectWire::~ObjectWire()
 {
+    const unsigned int objectWireNum = Settings::getInstance()->objectWireNum;
     if (tiles)
     {
         for (unsigned int x = 0; x < objectWireNum; x++)
@@ -188,6 +189,7 @@ ObjectWire::~ObjectWire()
 
 void ObjectWire::reset()
 {
+    const unsigned int objectWireNum = Settings::getInstance()->objectWireNum;
     dprintf(MY_DEBUG_NOTE, "ObjectWire::reset()\n");
     
     for (unsigned int x = 0; x < objectWireNum; x++)
@@ -215,7 +217,7 @@ void ObjectWire::reset()
          it->second.clear();
      }
      
-     lastWireCenter = irr::core::vector3df();
+     lastWireCenter = irr::core::vector2di();
 }
 
 bool ObjectWire::update(const irr::core::vector3df& newPos, bool force)

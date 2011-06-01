@@ -91,6 +91,7 @@
     <ClInclude Include="ConfigFile.h" />
     <ClInclude Include="Day.h" />
     <ClInclude Include="EventReceiver.h" />
+    <ClInclude Include="GamePlay.h" />
     <ClInclude Include="hk.h" />
     <ClInclude Include="Hud.h" />
     <ClInclude Include="IrrCg.h" />
@@ -141,6 +142,7 @@
     <ClInclude Include="Terrain_defs.h" />
     <ClInclude Include="TheEarth.h" />
     <ClInclude Include="TheGame.h" />
+    <ClInclude Include="Tick.h" />
     <ClInclude Include="Tile.h" />
     <ClInclude Include="Vehicle.h" />
     <ClInclude Include="VehicleManager.h" />
@@ -156,6 +158,7 @@
     <ClCompile Include="Dakar2012.cpp" />
     <ClCompile Include="Day.cpp" />
     <ClCompile Include="EventReceiver.cpp" />
+    <ClCompile Include="GamePlay.cpp" />
     <ClCompile Include="hk.cpp" />
     <ClCompile Include="Hud.cpp" />
     <ClCompile Include="IrrCg.cpp" />

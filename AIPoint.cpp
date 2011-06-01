@@ -3,6 +3,8 @@
 #include "TheGame.h"
 #include "OffsetManager.h"
 #include <irrlicht.h>
+#include "ConfigFile.h"
+#include "StringConverter.h"
 
 
 AIPoint::AIPoint(const irr::core::vector3df& apos,
@@ -108,8 +110,8 @@ void AIPoint::updateVisible()
             }
             globalDistance += localDistance;
             lastPos = apos;
-            AIPoint* AIPoint = new AIPoint(apos, globalDistance, localDistance);
-            AIPointList.push_back(AIPoint);
+            AIPoint* aiPoint = new AIPoint(apos, globalDistance, localDistance);
+            AIPointList.push_back(aiPoint);
         }
     }
     //assert(0);

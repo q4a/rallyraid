@@ -62,6 +62,7 @@ private:
 
     friend class MenuPageEditor;
     friend class MenuPageEditorItiner;
+    friend class MenuPageEditorDay;
 };
 
 

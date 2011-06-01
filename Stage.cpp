@@ -96,7 +96,7 @@ void Stage::readItinerPointList()
 
 void Stage::readAIPointList()
 {
-    AIPoint::readAIPointList(STAGE_DIR(raceName, dayName, stageName) + "/" + AIPOINT_CFG, AIPointList);
+    AIPoint::readAIPointList(STAGE_DIR(raceName, dayName, stageName) + "/" + AIPOINTS_CFG, AIPointList);
 }
 
 bool Stage::write()
@@ -144,7 +144,7 @@ bool Stage::writeItinerPointList()
 
 bool Stage::writeAIPointList()
 {
-    return AIPoint::writeAIPointList(STAGE_DIR(raceName, dayName, stageName) + "/" + AIPOINT_CFG, AIPointList);
+    return AIPoint::writeAIPointList(STAGE_DIR(raceName, dayName, stageName) + "/" + AIPOINTS_CFG, AIPointList);
 }
 
 void Stage::activate()

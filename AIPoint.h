@@ -7,8 +7,11 @@
 #include <list>
 
 
+
 class AIPoint : public ObjectWireGlobalObject
 {
+public:
+    typedef std::list<AIPoint*> AIPointList_t;
 
 public:
     AIPoint(const irr::core::vector3df& apos,
@@ -32,7 +35,6 @@ private:
     float                   globalDistance;
     float                   localDistance;
 };
-typedef std::list<AIPoint*> AIPointList_t;
 
 
 inline float AIPoint::getGlobalDistance() const

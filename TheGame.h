@@ -33,6 +33,7 @@ public:
 
     // called by GamePlay::startGame()
     void reset(const irr::core::vector3df& apos, const irr::core::vector3df& dir);
+    void resetTick();
 
     irr::IrrlichtDevice*            getDevice();
     irr::video::IVideoDriver*       getDriver();

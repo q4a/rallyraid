@@ -21,6 +21,7 @@
 #include "ObjectWireGlobalObject.h"
 #include "Competitor.h"
 #include "ItinerManager.h"
+#include "ItinerPoint.h"
 #include "AIPoint.h"
 
 MenuPageEditorDay::MenuPageEditorDay()

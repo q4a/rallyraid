@@ -22,6 +22,7 @@
 #include "RoadTypeManager.h"
 #include "ItinerManager.h"
 #include "GamePlay.h"
+#include "Tick.h"
 
 // static stuff
 TheGame* TheGame::theGame = 0;
@@ -170,7 +171,7 @@ TheGame::TheGame()
         menuManager = MenuManager::getInstance();
         dprintf(MY_DEBUG_NOTE, "Initialize game play\n");
         GamePlay::initialize();
-        gamePlay = gamePlay::getInstance();
+        gamePlay = GamePlay::getInstance();
         dprintf(MY_DEBUG_NOTE, "Initialize hud\n");
         Hud::initialize();
         hud = Hud::getInstance();
@@ -289,9 +290,6 @@ void TheGame::loop()
     dLight->setSpecularColour(Ogre::ColourValue(0.4f, 0.4f, 0.4f));
     dLight->setDirection(0, -1, 1);
     */
-    device->run();
-    lastPhysTick = lastSlowTick = tick = device->getTimer()->getTime();
-    lastPhysTick--;
     const unsigned int step_ms = 1000 / Settings::getInstance()->targetFps;
     const unsigned int slowStep_ms = 100;
     const float step_sec = 1.f / (float)Settings::getInstance()->targetFps;
@@ -349,15 +347,19 @@ void TheGame::loop()
             //car->setSteer(-0.4f);
             bool physUpdateDone = false;
             physUpdate = (tick - lastPhysTick) / step_ms;
-            if (physUpdate > 10) physUpdate = 10;
-            while (lastPhysTick < tick && physUpdate)
+            if (physUpdate > 10)
+            {
+                physUpdate = 10;
+                lastPhysTick = tick - (10*step_ms);
+            }
+            while (/*lastPhysTick < tick && */physUpdate)
             {
                 if (physicsOngoing)
                 {
                     hk::step(step_sec);
                     physUpdateDone = true;
                 }
-                lastPhysTick += 16;
+                lastPhysTick += step_ms;
                 physUpdate--;
             }
             /*
@@ -369,9 +371,10 @@ void TheGame::loop()
                 handleUpdatePos(true); // update the camera to the player position
             }
 
-            if (lastSlowTick < tick || tick < slowStep_ms)
+            if (tick - lastSlowTick > slowStep_ms /*Tick::less(lastSlowTick, tick) lastSlowTick < tick || tick < slowStep_ms*/)
             {
-                lastSlowTick += slowStep_ms;
+                //lastSlowTick += slowStep_ms;
+                lastSlowTick = tick;// + slowStep_ms;
                 irr::core::stringw str = L"Speed: ";
                 str += (int)player->getVehicleSpeed();
                 str += L" km/h (";
@@ -458,6 +461,13 @@ void TheGame::reset(const irr::core::vector3df& apos, const irr::core::vector3df
     cameraOffsetObject->addToManager();
     offsetManager->update(camera->getPosition());
     cameraOffsetObject->setUpdateCB(this);
+}
+
+void TheGame::resetTick()
+{
+    device->run();
+    lastPhysTick = lastSlowTick = tick = device->getTimer()->getTime();
+    lastPhysTick--;
 }
 
 void TheGame::switchCamera()

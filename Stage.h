@@ -84,12 +84,12 @@ inline const RoadManager::roadMap_t& Stage::getRoadMap()
     return roadMap;
 }
 
-inline const ItinerManager::itinerPointList_t& getIteratorPointList()
+inline const ItinerManager::itinerPointList_t& Stage::getIteratorPointList()
 {
     return itinerPointList;
 }
 
-inline const AIPoint::AIPointList_t& getAIPointList()
+inline const AIPoint::AIPointList_t& Stage::getAIPointList()
 {
     return AIPointList;
 }

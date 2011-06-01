@@ -331,6 +331,7 @@ MenuPageEditor::MenuPageEditor()
     staticTextItinerGD = TheGame::getInstance()->getEnv()->addStaticText(L"0",
         irr::core::recti(irr::core::position2di(0, 0), irr::core::dimension2di(tabItiner->getRelativePosition().getSize().Width, 20)),
         true,
+        false,
         tabItiner,
         MI_STITINERGD);
 
@@ -1259,7 +1260,7 @@ void MenuPageEditor::actionP()
             if (RaceManager::getInstance()->editorStage && !RaceManager::getInstance()->editorStage->itinerPointList.empty())
             {
                 ItinerPoint* ip = RaceManager::getInstance()->editorStage->itinerPointList.back();
-                ItinerManager::getInstance()->editorGlobalDistance -+= ip->getLocalDistance();
+                ItinerManager::getInstance()->editorGlobalDistance -= ip->getLocalDistance();
                 if (ItinerManager::getInstance()->editorGlobalDistance < 0.f) ItinerManager::getInstance()->editorGlobalDistance = 0.f;
                 refreshItinerGD();
                 RaceManager::getInstance()->editorStage->itinerPointList.pop_back();
