@@ -5,24 +5,9 @@
 #include "Settings.h"
 #include "Shaders.h"
 #include "stdafx.h"
+#include "CTreeSceneNode.h"
+#include "CTreeGenerator.h"
 
-/*
-    enum ObjectType
-    {
-        Standard = 0,
-        Vehicle
-    };
-
-    enum Category
-    {
-        All = 0,
-        Normal = 1,
-        HalfDesert = 2,
-        Desert = 4
-    };
-
-    typedef std::list<OffsetObject*> objectList_t;
-*/
 
 ObjectPool::ObjectPool(const std::string& name, 
                        const std::string& meshFilename, const std::string& textureFilename,
@@ -34,6 +19,7 @@ ObjectPool::ObjectPool(const std::string& name,
     : name(name),
       objectList(),
       objectMesh(0),
+      treeGenerator(0),
       hkShape(0),
       category(category),
       texture(0),
@@ -47,23 +33,6 @@ ObjectPool::ObjectPool(const std::string& name,
       num(num),
       inUse(0)
 {
-    if (meshFilename == "" && objectType == Grass)
-    {
-        objectMesh = generateGrassMesh();
-    } else if (meshFilename.rfind(".mso") != std::string::npos)
-    {
-        objectMesh = readMySimpleObject(meshFilename);
-    }
-    else
-    {
-        objectMesh = TheGame::getInstance()->getSmgr()->getMesh(meshFilename.c_str());
-    }
-
-    if (physics)
-    {
-        hkShape = calculateCollisionMesh(objectMesh);
-    }
-
     if (textureFilename != "")
     {
         texture = TheGame::getInstance()->getDriver()->getTexture(textureFilename.c_str());
@@ -80,6 +49,37 @@ ObjectPool::ObjectPool(const std::string& name,
     {
         material2 = Shaders::getInstance()->materialMap[material2Name];
     }
+
+    switch (objectType)
+    {
+        case Grass:
+            objectMesh = generateGrassMesh();
+            break;
+        case Tree:
+        {
+            treeGenerator = new irr::scene::CTreeGenerator(TheGame::getInstance()->getSmgr());
+            irr::io::IXMLReader* xml = TheGame::getInstance()->getDevice()->getFileSystem()->createXMLReader(meshFilename.c_str());
+            treeGenerator->loadFromXML(xml);
+            xml->drop();
+            break;
+        }
+        default:
+            if (meshFilename.rfind(".mso") != std::string::npos)
+            {
+                objectMesh = readMySimpleObject(meshFilename, (objectType==MyTree)?mass:1.0f);
+            }
+            else
+            {
+                objectMesh = TheGame::getInstance()->getSmgr()->getMesh(meshFilename.c_str());
+            }
+            break;
+    }
+
+    if (physics)
+    {
+        hkShape = calculateCollisionMesh(objectMesh, objectType);
+    }
+
 
     if (Settings::getInstance()->preloadObjects)
     {
@@ -225,30 +225,71 @@ void ObjectPool::putObject(OffsetObject* object)
 
 OffsetObject* ObjectPool::createNewInstance()
 {
-    /*
-        switch (objectType)
+    //irr::scene::IAnimatedMeshSceneNode* objectNode = 0;
+    irr::scene::ISceneNode* objectNode = 0;
+    switch (objectType)
+    {
+        case Tree:
         {
-            case Standard:
-            case Grass:
-            case Vehicle:
-            case Tree:
+            irr::scene::CTreeSceneNode* treeNode = new irr::scene::CTreeSceneNode(TheGame::getInstance()->getSmgr()->getRootSceneNode(),
+                TheGame::getInstance()->getSmgr());
+            treeNode->setup(treeGenerator, rand()%0xffff, 0);
+            
+            if (treeNode->getLeafNode())
             {
-                break;
-            }
+            	treeNode->getLeafNode()->getMaterial(0).TextureLayer[0].AnisotropicFilter = true;
+                treeNode->getLeafNode()->getMaterial(0).TextureLayer[0].BilinearFilter = false;
+                //treeNode->getLeafNode()->getMaterial(0).MaterialTypeParam = 0.5f;
+                
+                treeNode->getLeafNode()->setMaterialTexture(0, texture2);
+                treeNode->getLeafNode()->setMaterialType(material2);
+            }        	
+
+            treeNode->setMaterialTexture(0, texture);
+            treeNode->setMaterialType(material);
+
+            //if (globalLight)
+            //{
+            //    treeNode->setMaterialFlag(irr::video::EMF_NORMALIZE_NORMALS, true);
+            //}
+            objectNode = treeNode;
+            break;
         }
-    */
-    irr::scene::IAnimatedMeshSceneNode* objectNode = TheGame::getInstance()->getSmgr()->addAnimatedMeshSceneNode(objectMesh);
+        case MyTree:
+        {
+            objectNode = TheGame::getInstance()->getSmgr()->addAnimatedMeshSceneNode(objectMesh);
+            
+            irr::scene::IBillboardSceneNode* leaf = TheGame::getInstance()->getSmgr()->addBillboardSceneNode(objectNode, irr::core::dimension2df(2.5f*mass, 2.5f*mass), irr::core::vector3df(0.f, 3.f*mass, 0.f));
+            objectNode->setMaterialFlag(irr::video::EMF_LIGHTING, false);
+            leaf->setMaterialFlag(irr::video::EMF_LIGHTING, false);
+            leaf->setMaterialFlag(irr::video::EMF_TEXTURE_WRAP, true);
+
+            objectNode->setMaterialTexture(0, texture);
+            objectNode->setMaterialType(material);
+
+            leaf->setMaterialTexture(0, texture2);
+            leaf->setMaterialType(material2);
+            leaf->getMaterial(0).MaterialTypeParam = 0.1f;
+            break;
+        }
+        default:
+            objectNode = TheGame::getInstance()->getSmgr()->addAnimatedMeshSceneNode(objectMesh);
+            objectNode->setMaterialTexture(0, texture);
+            objectNode->setMaterialTexture(1, texture2);
+            objectNode->setMaterialType(material);
+            break;
+    }
+    
+    assert(objectNode);
+    
     objectNode->setVisible(false);
-    objectNode->setMaterialTexture(0, texture);
-    objectNode->setMaterialTexture(1, texture2);
-    objectNode->setMaterialType(material);
     // TODO
     OffsetObject* offsetObject = new OffsetObject(objectNode, objectType == Vehicle);
 
     return offsetObject;
 }
 
-irr::scene::SAnimatedMesh* ObjectPool::readMySimpleObject(const std::string& meshFilename)
+irr::scene::SAnimatedMesh* ObjectPool::readMySimpleObject(const std::string& meshFilename, float scale)
 {
     FILE* f;
     unsigned int numOfVertices, numOfPols;
@@ -305,9 +346,9 @@ irr::scene::SAnimatedMesh* ObjectPool::readMySimpleObject(const std::string& mes
 #ifdef MSO_DEBUG
     printf("vertex read done\n");
 #endif    
-        vtx.Pos.X = x;            
-        vtx.Pos.Z = z;
-        vtx.Pos.Y = y; 
+        vtx.Pos.X = x*scale;
+        vtx.Pos.Z = z*scale;
+        vtx.Pos.Y = y*scale;
         vtx.TCoords.X = tu;
         vtx.TCoords.Y = tv;
         vtx.Color.set(255,r,g,b);
@@ -386,9 +427,18 @@ irr::scene::SAnimatedMesh* ObjectPool::readMySimpleObject(const std::string& mes
     return animatedMesh;
 }
 
-hkpShape* ObjectPool::calculateCollisionMesh(irr::scene::IAnimatedMesh* objectMesh, bool /*box*/)
+hkpShape* ObjectPool::calculateCollisionMesh(irr::scene::IAnimatedMesh* objectMesh, ObjectType objectType, bool /*box*/)
 {
     hkpShape* hkShape = 0;
+    
+    if (objectType == Tree || objectType == MyTree)
+    {
+        hk::lock();
+        hkShape = new hkpBoxShape(hkVector4(1.0f, 20.0f, 1.0f), 0);
+        hk::unlock();
+        return hkShape;
+    }
+    
     if (objectMesh == 0) return hkShape;
     
     int sizeOfBuffers = 0;

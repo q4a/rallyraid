@@ -8,6 +8,13 @@
 #include "hk.h"
 
 class OffsetObject;
+namespace irr
+{
+    namespace scene
+    {
+        class CTreeGenerator;
+    }
+}
 
 class ObjectPool
 {
@@ -17,7 +24,8 @@ public:
         Standard = 0,
         Vehicle,
         Grass,
-        Tree
+        Tree,
+        MyTree
     };
 
     enum Category
@@ -49,8 +57,8 @@ public:
     unsigned int getNum() {return num;}
     const std::string& getName() {return name;}
     
-    static irr::scene::SAnimatedMesh* readMySimpleObject(const std::string& meshFilename);
-    static hkpShape* calculateCollisionMesh(irr::scene::IAnimatedMesh* objectMesh, bool box = false);
+    static irr::scene::SAnimatedMesh* readMySimpleObject(const std::string& meshFilename, float scale = 1.0f);
+    static hkpShape* calculateCollisionMesh(irr::scene::IAnimatedMesh* objectMesh, ObjectType objectType, bool box = false);
     static irr::scene::SAnimatedMesh* generateGrassMesh();
 
 private:
@@ -58,6 +66,7 @@ private:
     objectList_t                objectList;
 
     irr::scene::IAnimatedMesh*  objectMesh;
+    irr::scene::CTreeGenerator* treeGenerator;
     hkpShape*                   hkShape;
     int                         category;
 

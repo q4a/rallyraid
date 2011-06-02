@@ -86,9 +86,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AIPoint.h" />
+    <ClInclude Include="CBillboardGroupSceneNode.h" />
     <ClInclude Include="Competitor.h" />
     <ClInclude Include="ConfigDirectory.h" />
     <ClInclude Include="ConfigFile.h" />
+    <ClInclude Include="CTreeGenerator.h" />
+    <ClInclude Include="CTreeSceneNode.h" />
     <ClInclude Include="Day.h" />
     <ClInclude Include="EventReceiver.h" />
     <ClInclude Include="GamePlay.h" />
@@ -132,6 +135,7 @@
     <ClInclude Include="ShadersSM20.h" />
     <ClInclude Include="Stage.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="STreeMesh.h" />
     <ClInclude Include="StringConverter.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="Terrain.h" />
@@ -152,9 +156,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AIPoint.cpp" />
+    <ClCompile Include="CBillboardGroupSceneNode.cpp" />
     <ClCompile Include="Competitor.cpp" />
     <ClCompile Include="ConfigDirectory.cpp" />
     <ClCompile Include="ConfigFile.cpp" />
+    <ClCompile Include="CTreeGenerator.cpp" />
+    <ClCompile Include="CTreeSceneNode.cpp" />
     <ClCompile Include="Dakar2012.cpp" />
     <ClCompile Include="Day.cpp" />
     <ClCompile Include="EventReceiver.cpp" />

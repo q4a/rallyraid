@@ -107,6 +107,9 @@ void ObjectPoolManager::read()
                 } else if (valName == "tree")
                 {
                     objectType = ObjectPool::Tree;
+                } else if (valName == "my_tree")
+                {
+                    objectType = ObjectPool::MyTree;
                 }
             } else if (keyName == "category")
             {
