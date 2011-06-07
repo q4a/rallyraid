@@ -30,10 +30,14 @@ public:
     
 private:
     //virtual void updateVisible();
+    static void editorRenderAIPointList(const AIPointList_t& AIPointList);
 
 private:
     float                   globalDistance;
     float                   localDistance;
+
+
+    friend class MenuPageEditor;
 };
 
 

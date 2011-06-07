@@ -23,6 +23,8 @@
 #include "ItinerManager.h"
 #include "ItinerPoint.h"
 #include "AIPoint.h"
+#include "WayPointManager.h"
+#include "WayPoint.h"
 
 
 MenuPageEditorStage::MenuPageEditorStage()
@@ -31,6 +33,7 @@ MenuPageEditorStage::MenuPageEditorStage()
       tableRoads(0),
       tableItiner(0),
       tableAI(0),
+      tableWP(0),
       editBoxLongName(0),
       editBoxShortDescription(0),
       editBoxNewRoadFilename(0),
@@ -182,6 +185,21 @@ MenuPageEditorStage::MenuPageEditorStage()
     tableAI->addColumn(L"LD");
     tableAI->setColumnWidth(4, 60);
 
+    // ----------------------------
+    // WP tab
+    // ----------------------------
+    irr::gui::IGUITab* tabWP = tc->addTab(L"WP", MI_TABWP);
+
+    tableWP = TheGame::getInstance()->getEnv()->addTable(
+        irr::core::recti(irr::core::position2di(0, 0), tabWP->getRelativePosition().getSize()),
+        tabWP,
+        MI_TABLEWP,
+        true);
+
+    tableWP->addColumn(L"#");
+    tableWP->addColumn(L"X");
+    tableWP->addColumn(L"Y");
+
     window->setVisible(false);
 }
 
@@ -303,6 +321,7 @@ bool MenuPageEditorStage::OnEvent(const irr::SEvent &event)
 void MenuPageEditorStage::open()
 {
     dprintf(MY_DEBUG_NOTE, "MenuPageEditorStage::open()\n");
+    refresh();
     window->setVisible(true);
     TheGame::getInstance()->getEnv()->setFocus(window);
 }
@@ -320,6 +339,7 @@ void MenuPageEditorStage::refresh()
     refreshRoads();
     refreshItiner();
     refreshAI();
+    refreshWP();
 }
 
 void MenuPageEditorStage::refreshGlobalObjects()
@@ -540,6 +560,36 @@ void MenuPageEditorStage::refreshAI()
         str = L"";
         str += (*aiit)->getLocalDistance();
         tableAI->setCellText(i, 4, str.c_str());
+    }
+}
+
+void MenuPageEditorStage::refreshWP()
+{
+    // ----------------------------
+    // WP
+    // ----------------------------
+    tableWP->clearRows();
+
+    const WayPointManager::wayPointList_t& wayPointList = RaceManager::getInstance()->editorStage->wayPointList;
+    unsigned int i = 0;
+    for (WayPointManager::wayPointList_t::const_iterator wpit = wayPointList.begin();
+         wpit != wayPointList.end();
+         wpit++, i++)
+    {
+        irr::core::stringw str;
+        
+        tableWP->addRow(i);
+
+        str += i;
+        tableWP->setCellText(i, 0, str.c_str());
+
+        str = L"";
+        str += (*wpit)->getPos().X;
+        tableWP->setCellText(i, 1, str.c_str());
+
+        str = L"";
+        str += (*wpit)->getPos().Z;
+        tableWP->setCellText(i, 2, str.c_str());
     }
 }
 

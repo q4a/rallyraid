@@ -218,6 +218,7 @@ bool MenuPageEditorRoad::OnEvent(const irr::SEvent &event)
 void MenuPageEditorRoad::open()
 {
     dprintf(MY_DEBUG_NOTE, "MenuPageEditorRoad::open()\n");
+    refresh();
     window->setVisible(true);
     TheGame::getInstance()->getEnv()->setFocus(window);
 }

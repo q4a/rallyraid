@@ -337,6 +337,10 @@ bool MenuPageEditorRace::OnEvent(const irr::SEvent &event)
 void MenuPageEditorRace::open()
 {
     dprintf(MY_DEBUG_NOTE, "MenuPageEditorRace::open()\n");
+    refreshDays();
+    refreshGlobalObjects();
+    refreshEditBoxes();
+    refreshRoads();
     window->setVisible(true);
     TheGame::getInstance()->getEnv()->setFocus(window);
 }

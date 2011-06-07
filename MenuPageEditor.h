@@ -64,6 +64,7 @@ public:
         A_AddRoadPointBegin,
         A_AddItinerPoint,
         A_AddAIPoint,
+        A_AddWayPoint,
         A_RemoveObjectGlobal,
         A_RemoveObjectRace,
         A_RemoveObjectDay,
@@ -72,6 +73,7 @@ public:
         A_RemoveRoadPointBegin,
         A_RemoveItinerPoint,
         A_RemoveAIPoint,
+        A_RemoveWayPoint,
     };
 
     MenuPageEditor();

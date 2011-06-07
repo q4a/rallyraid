@@ -325,6 +325,7 @@ bool MenuPageEditorDay::OnEvent(const irr::SEvent &event)
 void MenuPageEditorDay::open()
 {
     dprintf(MY_DEBUG_NOTE, "MenuPageEditorDay::open()\n");
+    refresh();
     window->setVisible(true);
     TheGame::getInstance()->getEnv()->setFocus(window);
 }

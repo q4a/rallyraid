@@ -22,6 +22,9 @@
 #include "RoadTypeManager.h"
 #include "ItinerManager.h"
 #include "ItinerPoint.h"
+#include "AIPoint.h"
+#include "WayPointManager.h"
+#include "WayPoint.h"
 
 MenuPageEditor* MenuPageEditor::menuPageEditor = 0;
 
@@ -127,6 +130,8 @@ MenuPageEditor::MenuPageEditor()
     tableAction->addRow(A_AddRoadPoint);
     tableAction->addRow(A_AddRoadPointBegin);
     tableAction->addRow(A_AddItinerPoint);
+    tableAction->addRow(A_AddAIPoint);
+    tableAction->addRow(A_AddWayPoint);
     tableAction->addRow(A_RemoveObjectGlobal);
     tableAction->addRow(A_RemoveObjectRace);
     tableAction->addRow(A_RemoveObjectDay);
@@ -134,6 +139,8 @@ MenuPageEditor::MenuPageEditor()
     tableAction->addRow(A_RemoveRoadPoint);
     tableAction->addRow(A_RemoveRoadPointBegin);
     tableAction->addRow(A_RemoveItinerPoint);
+    tableAction->addRow(A_RemoveAIPoint);
+    tableAction->addRow(A_RemoveWayPoint);
     tableAction->setCellText(A_None, 0, L"none");
     tableAction->setCellText(A_AddObjectGlobal, 0, L"not used"/*L"add object global"*/);
     tableAction->setCellText(A_AddObjectRace, 0, L"add object race");
@@ -143,6 +150,7 @@ MenuPageEditor::MenuPageEditor()
     tableAction->setCellText(A_AddRoadPointBegin, 0, L"add road point begin");
     tableAction->setCellText(A_AddItinerPoint, 0, L"add itiner point");
     tableAction->setCellText(A_AddAIPoint, 0, L"add AI point");
+    tableAction->setCellText(A_AddWayPoint, 0, L"add waypoint");
     tableAction->setCellText(A_RemoveObjectGlobal, 0, L"not used"/*L"remove object global"*/);
     tableAction->setCellText(A_RemoveObjectRace, 0, L"remove object race");
     tableAction->setCellText(A_RemoveObjectDay, 0, L"remove object day");
@@ -151,6 +159,7 @@ MenuPageEditor::MenuPageEditor()
     tableAction->setCellText(A_RemoveRoadPointBegin, 0, L"remove road point begin");
     tableAction->setCellText(A_RemoveItinerPoint, 0, L"remove itiner point");
     tableAction->setCellText(A_RemoveAIPoint, 0, L"remove AI point");
+    tableAction->setCellText(A_RemoveWayPoint, 0, L"remove waypoint");
 
     // ----------------------------
     // Tiles tab
@@ -326,7 +335,8 @@ MenuPageEditor::MenuPageEditor()
         irr::core::recti(irr::core::position2di(0, 0), irr::core::dimension2di(tabItiner->getRelativePosition().getSize().Width, 20)),
         true,
         tabItiner,
-        MI_EBITINERGD);*/
+        MI_EBITINERGD);
+*/
     
     staticTextItinerGD = TheGame::getInstance()->getEnv()->addStaticText(L"0",
         irr::core::recti(irr::core::position2di(0, 0), irr::core::dimension2di(tabItiner->getRelativePosition().getSize().Width, 20)),
@@ -551,6 +561,7 @@ bool MenuPageEditor::OnEvent(const irr::SEvent &event)
 void MenuPageEditor::open()
 {
     dprintf(MY_DEBUG_NOTE, "MenuPageEditor::open()\n");
+    refresh();
     window->setVisible(true);
     TheGame::getInstance()->getEnv()->setFocus(window);
 }
@@ -1187,6 +1198,37 @@ void MenuPageEditor::actionP()
             }
             break;
         }
+    case A_AddAIPoint:
+        {
+            dprintf(MY_DEBUG_NOTE, "MenuPageEditor::action(): add AI point editorStage: %p\n",
+                RaceManager::getInstance()->editorStage);
+            if (RaceManager::getInstance()->editorStage)
+            {
+                float gd = 0.f;
+                float ld = 0.f;
+                if (!RaceManager::getInstance()->editorStage->AIPointList.empty())
+                {
+                    irr::core::vector3df lastPos = RaceManager::getInstance()->editorStage->AIPointList.back()->getPos();
+                    ld = lastPos.getDistanceFrom(apos);
+                    gd = ld + RaceManager::getInstance()->editorStage->AIPointList.back()->getGlobalDistance();
+                }
+                AIPoint* aip = new AIPoint(apos, gd ,ld);
+                RaceManager::getInstance()->editorStage->AIPointList.push_back(aip);
+            }
+            break;
+        }
+    case A_AddWayPoint:
+        {
+            dprintf(MY_DEBUG_NOTE, "MenuPageEditor::action(): add waypoint editorStage: %p\n",
+                RaceManager::getInstance()->editorStage);
+            if (RaceManager::getInstance()->editorStage)
+            {
+                unsigned int num = RaceManager::getInstance()->editorStage->wayPointList.size() + 1;
+                WayPoint* wpip = new WayPoint(apos, num);
+                RaceManager::getInstance()->editorStage->wayPointList.push_back(wpip);
+            }
+            break;
+        }
     case A_RemoveObjectRace:
         {
             dprintf(MY_DEBUG_NOTE, "MenuPageEditor::action(): remove object race editorRace: %p\n",
@@ -1268,6 +1310,30 @@ void MenuPageEditor::actionP()
             }
             break;
         }
+    case A_RemoveAIPoint:
+        {
+            dprintf(MY_DEBUG_NOTE, "MenuPageEditor::action(): remove AI point editorStage: %p\n",
+                RaceManager::getInstance()->editorStage);
+            if (RaceManager::getInstance()->editorStage && !RaceManager::getInstance()->editorStage->AIPointList.empty())
+            {
+                AIPoint* aip = RaceManager::getInstance()->editorStage->AIPointList.back();
+                RaceManager::getInstance()->editorStage->AIPointList.pop_back();
+                delete aip;
+            }
+            break;
+        }
+    case A_RemoveWayPoint:
+        {
+            dprintf(MY_DEBUG_NOTE, "MenuPageEditor::action(): remove waypoint editorStage: %p\n",
+                RaceManager::getInstance()->editorStage);
+            if (RaceManager::getInstance()->editorStage && !RaceManager::getInstance()->editorStage->wayPointList.empty())
+            {
+                WayPoint* wpip = RaceManager::getInstance()->editorStage->wayPointList.back();
+                RaceManager::getInstance()->editorStage->wayPointList.pop_back();
+                delete wpip;
+            }
+            break;
+        }
     default:
         dprintf(MY_DEBUG_ERROR, "MenuPageEditor::action(): no current action: %d\n", (int)currentAction);
     }
@@ -1294,6 +1360,8 @@ void MenuPageEditor::renderP()
     {
         RaceManager::editorRenderObjects(RaceManager::getInstance()->editorStage->globalObjectList);
         ItinerManager::editorRenderItinerPointList(RaceManager::getInstance()->editorStage->itinerPointList);
+        AIPoint::editorRenderAIPointList(RaceManager::getInstance()->editorStage->AIPointList);
+        WayPointManager::editorRenderWayPointList(RaceManager::getInstance()->editorStage->wayPointList);
         RoadManager::editorRenderRoads(RaceManager::getInstance()->editorStage->roadMap);
     }
     if (RoadManager::getInstance()->editorRoad)

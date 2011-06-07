@@ -159,3 +159,12 @@ void AIPoint::updateVisible()
     AIPointList.clear();
 }
 
+/* static */ void AIPoint::editorRenderAIPointList(const AIPoint::AIPointList_t& AIPointList)
+{
+    for (AIPointList_t::const_iterator it = AIPointList.begin();
+         it != AIPointList.end();
+         it++)
+    {
+        (*it)->editorRender(*it == AIPointList.back());
+    }
+}
