@@ -26,7 +26,7 @@ void Player::finalize()
     
 Player::Player()
     : vehicle(0),
-      vehicleTypeName("vw3"),
+      vehicleTypeName("sil"),
       viewNum(VIEW_0),
       viewMask(VIEW_CENTER),
       recenterView(true)

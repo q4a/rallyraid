@@ -15,6 +15,7 @@ Stage::Stage(Day* parent, const std::string& raceName, const std::string& dayNam
       shortDescription(),
       globalObjectList(),
       itinerPointList(),
+      wayPointList(),
       AIPointList(),
       active(false),
       roadMap()
@@ -28,6 +29,7 @@ Stage::~Stage()
     RaceManager::clearGlobalObjects(globalObjectList);
     RoadManager::clearRoadMap(roadMap);
     ItinerManager::clearItinerPointList(itinerPointList);
+    WayPointManager::clearWayPointList(wayPointList);
     AIPoint::clearAIPointList(AIPointList);
 }
 
@@ -39,6 +41,7 @@ bool Stage::read()
         readShortDescription();
         readGlobalObjects();
         readItinerPointList();
+        readWayPointList();
         readAIPointList();
         RoadManager::readRoads(STAGE_ROADS(raceName, dayName, stageName), roadMap, false, true);
     }
@@ -94,6 +97,11 @@ void Stage::readItinerPointList()
     ItinerManager::readItinerPointList(STAGE_DIR(raceName, dayName, stageName) + "/" + ITINER_CFG, itinerPointList);
 }
 
+void Stage::readWayPointList()
+{
+    WayPointManager::readWayPointList(STAGE_DIR(raceName, dayName, stageName) + "/" + WAYPOINT_CFG, wayPointList);
+}
+
 void Stage::readAIPointList()
 {
     AIPoint::readAIPointList(STAGE_DIR(raceName, dayName, stageName) + "/" + AIPOINTS_CFG, AIPointList);
@@ -105,6 +113,7 @@ bool Stage::write()
     ret &= writeShortDescription();
     ret &= writeGlobalObjects();
     ret &= writeItinerPointList();
+    ret &= writeWayPointList();
     ret &= writeAIPointList();
     return ret;
 }
@@ -142,6 +151,11 @@ bool Stage::writeItinerPointList()
     return ItinerManager::writeItinerPointList(STAGE_DIR(raceName, dayName, stageName) + "/" + ITINER_CFG, itinerPointList);
 }
 
+bool Stage::writeWayPointList()
+{
+    return WayPointManager::writeWayPointList(STAGE_DIR(raceName, dayName, stageName) + "/" + WAYPOINT_CFG, wayPointList);
+}
+
 bool Stage::writeAIPointList()
 {
     return AIPoint::writeAIPointList(STAGE_DIR(raceName, dayName, stageName) + "/" + AIPOINTS_CFG, AIPointList);
@@ -155,6 +169,7 @@ void Stage::activate()
 
     RaceManager::addGlobalObjectsToObjectWire(globalObjectList);
     ItinerManager::addItinerPointListToObjectWire(itinerPointList);
+    WayPointManager::addWayPointListToObjectWire(wayPointList);
     active = true;
 }
 
@@ -164,5 +179,6 @@ void Stage::deactivate()
 
     RaceManager::removeGlobalObjectsFromObjectWire(globalObjectList);
     ItinerManager::removeItinerPointListFromObjectWire(itinerPointList);
+    WayPointManager::removeWayPointListFromObjectWire(wayPointList);
     active = false;
 }

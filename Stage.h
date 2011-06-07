@@ -9,6 +9,7 @@
 #include "RoadManager.h"
 #include "ItinerManager.h"
 #include "AIPoint.h"
+#include "WayPointManager.h"
 
 
 class Stage
@@ -23,6 +24,7 @@ private:
     void readShortDescription();
     void readGlobalObjects();
     void readItinerPointList();
+    void readWayPointList();
     void readAIPointList();
 
     bool write();
@@ -30,6 +32,7 @@ private:
     bool writeShortDescription();
     bool writeGlobalObjects();
     bool writeItinerPointList();
+    bool writeWayPointList();
     bool writeAIPointList();
 
 public:
@@ -37,7 +40,8 @@ public:
     const std::string& getLongName(); // inline
     const std::string& getShortDescription(); // inline
     const RoadManager::roadMap_t& getRoadMap(); // inline
-    const ItinerManager::itinerPointList_t& getIteratorPointList(); // inline
+    const ItinerManager::itinerPointList_t& getItinerPointList(); // inline
+    const WayPointManager::wayPointList_t& getWayPointList(); // inline
     const AIPoint::AIPointList_t& getAIPointList(); // inline
 
     void activate();
@@ -52,6 +56,7 @@ private:
     std::string                     shortDescription;
     RaceManager::globalObjectList_t globalObjectList;
     ItinerManager::itinerPointList_t itinerPointList;
+    WayPointManager::WayPointList_t wayPointList;
     AIPoint::AIPointList_t          AIPointList;
     bool                            active;
     RoadManager::roadMap_t          roadMap;
@@ -84,9 +89,14 @@ inline const RoadManager::roadMap_t& Stage::getRoadMap()
     return roadMap;
 }
 
-inline const ItinerManager::itinerPointList_t& Stage::getIteratorPointList()
+inline const ItinerManager::itinerPointList_t& Stage::getItinerPointList()
 {
     return itinerPointList;
+}
+
+inline const WayPointManager::wayPointList_t& Stage::getWayPointList()
+{
+    return wayPointList;
 }
 
 inline const AIPoint::AIPointList_t& Stage::getAIPointList()
