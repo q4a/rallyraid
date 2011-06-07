@@ -32,20 +32,20 @@ public:
     void addActiveWayPoint(WayPoint* WayPoint);    // inline
     void removeActiveWayPoint(WayPoint* WayPoint); // inline
 
-    static void readWayPointList(const std::string& WPListFilename, WayPointList_t& wayPointList);
-    static bool writeWayPointList(const std::string& WPListFilename, const WayPointList_t& wayPointList);
-    static void clearWayPointList(WayPointList_t& wayPointList);
+    static void readWayPointList(const std::string& WPListFilename, wayPointList_t& wayPointList);
+    static bool writeWayPointList(const std::string& WPListFilename, const wayPointList_t& wayPointList);
+    static void clearWayPointList(wayPointList_t& wayPointList);
 
-    static void addWayPointListToObjectWire(const WayPointList_t& wayPointList);
-    static void removeWayPointListFromObjectWire(const WayPointList_t& wayPointList);
+    static void addWayPointListToObjectWire(const wayPointList_t& wayPointList);
+    static void removeWayPointListFromObjectWire(const wayPointList_t& wayPointList);
 
 private:
-    static void editorRenderWayPointList(const WayPointList_t& wayPointList);
+    static void editorRenderWayPointList(const wayPointList_t& wayPointList);
     
 private:
     typedef std::set<WayPoint*> wayPointSet_t;
 
-    WayPointSet_t       activeWayPointSet;
+    wayPointSet_t       activeWayPointSet;
 
 
     friend class MenuPageEditor;

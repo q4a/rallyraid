@@ -56,7 +56,7 @@ private:
     std::string                     shortDescription;
     RaceManager::globalObjectList_t globalObjectList;
     ItinerManager::itinerPointList_t itinerPointList;
-    WayPointManager::WayPointList_t wayPointList;
+    WayPointManager::wayPointList_t wayPointList;
     AIPoint::AIPointList_t          AIPointList;
     bool                            active;
     RoadManager::roadMap_t          roadMap;

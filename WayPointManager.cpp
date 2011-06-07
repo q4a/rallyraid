@@ -1,6 +1,6 @@
 
 #include "WayPointManager.h"
-#include "WayPointPoint.h"
+#include "WayPoint.h"
 #include <irrlicht.h>
 #include <set>
 #include "ConfigFile.h"
@@ -30,22 +30,22 @@ WayPointManager* WayPointManager::wayPointManager = 0;
 }
 
 WayPointManager::WayPointManager()
-    : activeWayPointPointSet()
+    : activeWayPointSet()
 {
 }
 
 WayPointManager::~WayPointManager()
 {
-    activeWayPointPointSet.clear();
+    activeWayPointSet.clear();
 }
 
 bool WayPointManager::update(const irr::core::vector3df& newPos, bool force)
 {
-// activeWayPointPointSet
+// activeWayPointSet
     return false;
 }
 
-/* static */ void WayPointManager::readWayPointPointList(const std::string& wayPointListFilename, WayPointManager::wayPointPointList_t& wayPointPointList)
+/* static */ void WayPointManager::readWayPointList(const std::string& wayPointListFilename, WayPointManager::wayPointList_t& wayPointList)
 {
     ConfigFile cf;
     cf.load(wayPointListFilename);
@@ -79,15 +79,15 @@ bool WayPointManager::update(const irr::core::vector3df& newPos, bool force)
 
         if (!secName.empty())
         {
-            WayPointPoint* wayPointPoint = new WayPointPoint(apos, num);
-            wayPointPointList.push_back(wayPointPoint);
+            WayPoint* wayPoint = new WayPoint(apos, num);
+            wayPointList.push_back(wayPoint);
             num++;
         }
     }
     //assert(0);
 }
 
-/* static */ bool WayPointManager::writeWayPointPointList(const std::string& wayPointListFilename, const WayPointManager::wayPointPointList_t& wayPointPointList)
+/* static */ bool WayPointManager::writeWayPointList(const std::string& wayPointListFilename, const WayPointManager::wayPointList_t& wayPointList)
 {
     FILE* f;
     errno_t error = fopen_s(&f, wayPointListFilename.c_str(), "w");
@@ -99,8 +99,8 @@ bool WayPointManager::update(const irr::core::vector3df& newPos, bool force)
 
     unsigned int id = 1;
 
-    for (wayPointPointList_t::const_iterator it = wayPointPointList.begin();
-         it != wayPointPointList.end();
+    for (wayPointList_t::const_iterator it = wayPointList.begin();
+         it != wayPointList.end();
          it++)
     {
         if (id != 1)
@@ -118,43 +118,43 @@ bool WayPointManager::update(const irr::core::vector3df& newPos, bool force)
     return true;
 }
 
-/* static */ void WayPointManager::clearWayPointPointList(WayPointManager::wayPointPointList_t& wayPointPointList)
+/* static */ void WayPointManager::clearWayPointList(WayPointManager::wayPointList_t& wayPointList)
 {
-    for (wayPointPointList_t::iterator it = wayPointPointList.begin();
-         it != wayPointPointList.end();
+    for (wayPointList_t::iterator it = wayPointList.begin();
+         it != wayPointList.end();
          it++)
     {
         delete (*it);
     }
-    wayPointPointList.clear();
+    wayPointList.clear();
 }
 
-/* static */ void WayPointManager::addWayPointPointListToObjectWire(const WayPointManager::wayPointPointList_t& wayPointPointList)
+/* static */ void WayPointManager::addWayPointListToObjectWire(const WayPointManager::wayPointList_t& wayPointList)
 {
-    for (wayPointPointList_t::const_iterator it = wayPointPointList.begin();
-         it != wayPointPointList.end();
+    for (wayPointList_t::const_iterator it = wayPointList.begin();
+         it != wayPointList.end();
          it++)
     {
         ObjectWire::getInstance()->addGlobalObject(*it);
     }
 }
 
-/* static */ void WayPointManager::removeWayPointPointListFromObjectWire(const WayPointManager::wayPointPointList_t& wayPointPointList)
+/* static */ void WayPointManager::removeWayPointListFromObjectWire(const WayPointManager::wayPointList_t& wayPointList)
 {
-    for (wayPointPointList_t::const_iterator it = wayPointPointList.begin();
-         it != wayPointPointList.end();
+    for (wayPointList_t::const_iterator it = wayPointList.begin();
+         it != wayPointList.end();
          it++)
     {
         ObjectWire::getInstance()->removeGlobalObject(*it, false);
     }
 }
 
-/* static */ void WayPointManager::editorRenderWayPointPointList(const WayPointManager::wayPointPointList_t& wayPointPointList)
+/* static */ void WayPointManager::editorRenderWayPointList(const WayPointManager::wayPointList_t& wayPointList)
 {
-    for (wayPointPointList_t::const_iterator it = wayPointPointList.begin();
-         it != wayPointPointList.end();
+    for (wayPointList_t::const_iterator it = wayPointList.begin();
+         it != wayPointList.end();
          it++)
     {
-        (*it)->editorRender(*it == wayPointPointList.back());
+        (*it)->editorRender(*it == wayPointList.back());
     }
 }

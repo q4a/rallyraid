@@ -152,6 +152,8 @@
     <ClInclude Include="VehicleManager.h" />
     <ClInclude Include="VehicleType.h" />
     <ClInclude Include="VehicleTypeManager.h" />
+    <ClInclude Include="WayPoint.h" />
+    <ClInclude Include="WayPointManager.h" />
     <ClInclude Include="WStringConverter.h" />
   </ItemGroup>
   <ItemGroup>
@@ -213,6 +215,8 @@
     <ClCompile Include="VehicleManager.cpp" />
     <ClCompile Include="VehicleType.cpp" />
     <ClCompile Include="VehicleTypeManager.cpp" />
+    <ClCompile Include="WayPoint.cpp" />
+    <ClCompile Include="WayPointManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Dakar2012.rc" />

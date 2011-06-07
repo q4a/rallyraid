@@ -40,7 +40,7 @@ Hud::Hud()
         irr::core::position2di(10, TheGame::getInstance()->getDriver()->getScreenSize().Height - MINIMAP_SIZE - 10),
         irr::core::dimension2du(MINIMAP_SIZE, MINIMAP_SIZE), false);
     compassQuad->getMaterial().MaterialType = Shaders::getInstance()->materialMap["quad2d_t"];
-    compassQuad->getMaterial().MaterialTypeParam = 0.2f;
+    //compassQuad->getMaterial().MaterialTypeParam = 0.2f;
     //compassQuad->getMaterial().MaterialTypeParam2 = 0.8f;
     compassQuad->getMaterial().setTexture(0, TheGame::getInstance()->getDriver()->getTexture("data/hud/compass.png"));
 }
