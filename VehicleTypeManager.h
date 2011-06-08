@@ -29,6 +29,7 @@ private:
 
 public:
     VehicleType* getVehicleType(const std::string& vehicleTypeName) {return vehicleTypeMap[vehicleTypeName];}
+    const vehicleTypeMap_t& getVehicleTypeMap() {return vehicleTypeMap;}
 
 private:
     vehicleTypeMap_t vehicleTypeMap;

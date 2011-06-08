@@ -551,6 +551,7 @@ bool MenuPageEditor::OnEvent(const irr::SEvent &event)
                         refreshRoadEditBoxes(editBoxNewRoadName->getText());
                         break;
                 }
+                break;
             }
             case irr::gui::EGET_EDITBOX_ENTER:
             {
@@ -569,8 +570,10 @@ bool MenuPageEditor::OnEvent(const irr::SEvent &event)
                         dprintf(MY_DEBUG_INFO, "set itiner description: [%s]\n", ItinerManager::getInstance()->editorDescription.c_str());
                         break;
                 }
+                break;
             }
             case irr::gui::EGET_CHECKBOX_CHANGED:
+            {
                 switch (id)
                 {
                     case MI_CBRENDER:
@@ -578,6 +581,8 @@ bool MenuPageEditor::OnEvent(const irr::SEvent &event)
                         dprintf(MY_DEBUG_INFO, "set render to: %u\n", doRender);
                         break;
                 }
+                break;
+            }
         };
     }
     return false;
@@ -1113,7 +1118,7 @@ void MenuPageEditor::refreshItiner()
     tableItiner2->clearRows();
 
     const ItinerManager::itinerImageMap_t& itinerImageMap2 = ItinerManager::getInstance()->getItinerImageMap2();
-    unsigned int i = 0;
+    i = 0;
 
     tableItiner2->addRow(i);
     str = L"none";

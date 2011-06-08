@@ -23,6 +23,7 @@
 #include "ItinerManager.h"
 #include "GamePlay.h"
 #include "Tick.h"
+#include "WayPointManager.h"
 
 // static stuff
 TheGame* TheGame::theGame = 0;
@@ -68,6 +69,7 @@ TheGame::TheGame()
       roadTypeManager(0),
       itinerManager(0),
       gamePlay(0),
+      wayPointManager(0),
       terminate(true),
       windowId(0),
       lastScreenSize(),
@@ -78,6 +80,8 @@ TheGame::TheGame()
       dynCamDist(2.f),
       cameraDirection(),
       cameraAngle(0.0f),
+      inGame(true),
+      editorMode(true),
       testText(0)
 {
     dprintf(MY_DEBUG_INFO, "TheGame::TheGame(): this: %p\n", this);
@@ -163,6 +167,9 @@ TheGame::TheGame()
         dprintf(MY_DEBUG_NOTE, "Initialize itiner manager\n");
         ItinerManager::initialize();
         itinerManager = ItinerManager::getInstance();
+        dprintf(MY_DEBUG_NOTE, "Initialize waypoint manager\n");
+        WayPointManager::initialize();
+        wayPointManager = WayPointManager::getInstance();
         dprintf(MY_DEBUG_NOTE, "Initialize race manager\n");
         RaceManager::initialize();
         raceManager = RaceManager::getInstance();
@@ -209,6 +216,7 @@ TheGame::~TheGame()
     player = 0;
     raceManager = 0;
     itinerManager = 0;
+    wayPointManager = 0;
     roadManager = 0;
     roadTypeManager = 0;
     menuManager = 0;
@@ -223,6 +231,8 @@ TheGame::~TheGame()
     MenuManager::finalize();
     dprintf(MY_DEBUG_NOTE, "Finalize race manager\n");
     RaceManager::finalize();
+    dprintf(MY_DEBUG_NOTE, "Finalize waypoint manager\n");
+    WayPointManager::finalize();
     dprintf(MY_DEBUG_NOTE, "Finalize itiner manager\n");
     ItinerManager::finalize();
     dprintf(MY_DEBUG_NOTE, "Finalize road manager\n");
@@ -307,7 +317,9 @@ void TheGame::loop()
     //printf("car off: %f, %f (%f, %f)\n", offsetManager->getOffset().X, offsetManager->getOffset().Z,
     //    car->getNode()->getPosition().X, car->getNode()->getPosition().Z);
     //Vehicle* car = new Vehicle("vw3", initialPos+initialDir, irr::core::vector3df());
-    gamePlay->startGame(0);
+
+    MenuManager::getInstance()->open(MenuManager::MP_MAIN);
+    //gamePlay->startGame(0);
 
     while (device->run() && !terminate)
     {
@@ -315,93 +327,100 @@ void TheGame::loop()
         {
             tick = device->getTimer()->getTime();
 
-            // -------------------------------
-            //         update events
-            // -------------------------------
-            if (eventReceiver)
+            if (inGame)
             {
-                eventReceiver->checkEvents();
-            }
-            /*
-            if (eventReceiver)
-            {
-                eventReceiver->updateWindow(width, height);
-            }
-            */
-
-            // -------------------------------
-            //         update physics
-            // -------------------------------
-            //camera->setTarget(camera->getPosition()+initialDir);
-            //printf("off: %f, %f (%f, %f)\n", offsetManager->getOffset().X, offsetManager->getOffset().Z,
-            //    camera->getPosition().X, camera->getPosition().Z);
-            offsetManager->update(offsetManager->getOffset()+camera->getPosition());
-            objectWire->update(offsetManager->getOffset()+camera->getPosition());
-            //printf("off: %f, %f (%f, %f)\n", offsetManager->getOffset().X, offsetManager->getOffset().Z,
-            //    camera->getPosition().X, camera->getPosition().Z);
-            //assert(0);
-            //car->getBody()->activate();
-
-            //car->setHandbrake(0.0f);
-            //car->setTorque(-0.2f);
-            //car->setSteer(-0.4f);
-            bool physUpdateDone = false;
-            physUpdate = (tick - lastPhysTick) / step_ms;
-            if (physUpdate > 10)
-            {
-                physUpdate = 10;
-                lastPhysTick = tick - (10*step_ms);
-            }
-            while (/*lastPhysTick < tick && */physUpdate)
-            {
-                if (physicsOngoing)
+                // -------------------------------
+                //         update events
+                // -------------------------------
+                if (eventReceiver)
                 {
-                    hk::step(step_sec);
-                    physUpdateDone = true;
+                    eventReceiver->checkEvents();
                 }
-                lastPhysTick += step_ms;
-                physUpdate--;
-            }
-            /*
-            update dynamic object position
-            */
-            if (physUpdateDone)
-            {
-                OffsetObject::updateDynamicToPhys();
-                handleUpdatePos(true); // update the camera to the player position
-            }
-
-            if (tick - lastSlowTick > slowStep_ms /*Tick::less(lastSlowTick, tick) lastSlowTick < tick || tick < slowStep_ms*/)
-            {
-                //lastSlowTick += slowStep_ms;
-                lastSlowTick = tick;// + slowStep_ms;
-                irr::core::stringw str = L"Speed: ";
-                str += (int)player->getVehicleSpeed();
-                str += L" km/h (";
-                str += player->getVehicleGear();
-                str += L"),     Pos: ";
-                str += (int)camera->getPosition().X;
-                str += L", ";
-                str += (int)camera->getPosition().Y;
-                str += L", ";
-                str += (int)camera->getPosition().Z;
-                str += L" - Offset: ";
-                str += (int)offsetManager->getOffset().X;
-                str += L", ";
-                str += (int)offsetManager->getOffset().Z;
-                str += ",     Tile pos: ";
-                str += ((int)offsetManager->getOffset().X+(int)camera->getPosition().X)/TILE_SIZE;
-                str += L", ";
-                str += abs((int)offsetManager->getOffset().Z+(int)camera->getPosition().Z)/TILE_SIZE;
-                if (TheEarth::getInstance()->threadIsRunning())
+                /*
+                if (eventReceiver)
                 {
-                    str += L"       thread is running";
+                    eventReceiver->updateWindow(width, height);
                 }
-                testText->setText(str.c_str());
+                */
 
-                earth->update(offsetManager->getOffset()+camera->getPosition(), cameraDirection);
+                // -------------------------------
+                //         update physics
+                // -------------------------------
+                //camera->setTarget(camera->getPosition()+initialDir);
+                //printf("off: %f, %f (%f, %f)\n", offsetManager->getOffset().X, offsetManager->getOffset().Z,
+                //    camera->getPosition().X, camera->getPosition().Z);
+                offsetManager->update(offsetManager->getOffset()+camera->getPosition());
+                objectWire->update(offsetManager->getOffset()+camera->getPosition());
+                //printf("off: %f, %f (%f, %f)\n", offsetManager->getOffset().X, offsetManager->getOffset().Z,
+                //    camera->getPosition().X, camera->getPosition().Z);
+                //assert(0);
+                //car->getBody()->activate();
+
+                //car->setHandbrake(0.0f);
+                //car->setTorque(-0.2f);
+                //car->setSteer(-0.4f);
+                bool physUpdateDone = false;
+                physUpdate = (tick - lastPhysTick) / step_ms;
+                if (physUpdate > 10)
+                {
+                    physUpdate = 10;
+                    lastPhysTick = tick - (10*step_ms);
+                }
+                while (/*lastPhysTick < tick && */physUpdate)
+                {
+                    if (physicsOngoing)
+                    {
+                        hk::step(step_sec);
+                        physUpdateDone = true;
+                    }
+                    lastPhysTick += step_ms;
+                    physUpdate--;
+                }
+                /*
+                update dynamic object position
+                */
+                if (physUpdateDone)
+                {
+                    OffsetObject::updateDynamicToPhys();
+                    handleUpdatePos(true); // update the camera to the player position
+                }
+
+                if (tick - lastSlowTick > slowStep_ms /*Tick::less(lastSlowTick, tick) lastSlowTick < tick || tick < slowStep_ms*/)
+                {
+                    //lastSlowTick += slowStep_ms;
+                    lastSlowTick = tick;// + slowStep_ms;
+                    irr::core::stringw str = L"Speed: ";
+                    str += (int)player->getVehicleSpeed();
+                    str += L" km/h (";
+                    str += player->getVehicleGear();
+                    str += L"),     Pos: ";
+                    str += (int)camera->getPosition().X;
+                    str += L", ";
+                    str += (int)camera->getPosition().Y;
+                    str += L", ";
+                    str += (int)camera->getPosition().Z;
+                    str += L" - Offset: ";
+                    str += (int)offsetManager->getOffset().X;
+                    str += L", ";
+                    str += (int)offsetManager->getOffset().Z;
+                    str += ",     Tile pos: ";
+                    str += ((int)offsetManager->getOffset().X+(int)camera->getPosition().X)/TILE_SIZE;
+                    str += L", ";
+                    str += abs((int)offsetManager->getOffset().Z+(int)camera->getPosition().Z)/TILE_SIZE;
+                    if (TheEarth::getInstance()->threadIsRunning())
+                    {
+                        str += L"       thread is running";
+                    }
+                    testText->setText(str.c_str());
+
+  
+                    earth->update(offsetManager->getOffset()+camera->getPosition(), cameraDirection);
+                }
             }
-
+            else
+            {
+                lastPhysTick = lastSlowTick = tick;
+            }
             // -------------------------------
             //         update graphics
             // -------------------------------
@@ -426,16 +445,22 @@ void TheGame::loop()
             //printf("scene mgr drawAll\n");
             smgr->drawAll();
             //printf("menu and env render\n");
-            MenuPageEditor::render();
+            if (editorMode)
+            {
+                MenuPageEditor::render();
+            }
             env->drawAll();
             //printf("hud render\n");
             //testQuad.render();
-            hud->render();
+            if (inGame)
+            {
+                hud->render();
+            }
 
             driver->endScene();
             //printf("5\n");
 
-            int fps = driver->getFPS();
+            //int fps = driver->getFPS();
 
             //last_tick = tick;
         } // if (window->active)

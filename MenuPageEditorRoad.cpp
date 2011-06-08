@@ -209,6 +209,7 @@ bool MenuPageEditorRoad::OnEvent(const irr::SEvent &event)
                         break;
                     }
                 }
+                break;
             }
         };
     }

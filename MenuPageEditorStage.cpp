@@ -312,6 +312,7 @@ bool MenuPageEditorStage::OnEvent(const irr::SEvent &event)
                         refreshRoadEditBoxes(editBoxNewRoadName->getText());
                         break;
                 }
+                break;
             }
         };
     }

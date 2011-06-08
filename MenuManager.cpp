@@ -8,6 +8,7 @@
 #include "MenuPageEditorDay.h"
 #include "MenuPageEditorStage.h"
 #include "MenuPageEditorRoad.h"
+#include "MenuPageMain.h"
 
 #include <string.h>
 
@@ -73,6 +74,7 @@ MenuManager::MenuManager()
     menuPages[MP_EDITORDAY] = new MenuPageEditorDay();
     menuPages[MP_EDITORSTAGE] = new MenuPageEditorStage();
     menuPages[MP_EDITORROAD] = new MenuPageEditorRoad();
+    menuPages[MP_MAIN] = new MenuPageMain();
 }
 
 MenuManager::~MenuManager()

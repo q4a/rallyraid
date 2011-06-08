@@ -1022,6 +1022,7 @@ void TheEarth::createFirst(const irr::core::vector3df& apos, const irr::core::ve
     }
     newVisualPart = 0;
     clearSetInUseFlagsForTiles();
+    removeNotInUseTiles();
 
     visualPart = new VisualMembers();
     printf("create members ... ");
@@ -1034,7 +1035,6 @@ void TheEarth::createFirst(const irr::core::vector3df& apos, const irr::core::ve
     refreshMiniMap();
     printf("done\n");
 
-    // removeNotInUseTiles();
 }
 
 void TheEarth::update(const irr::core::vector3df& apos, const irr::core::vector3df& dir)
@@ -1105,8 +1105,7 @@ void TheEarth::run()
     printf("loading visual part ... done\n");
     newReadyVisualPart = newVisualPart;
     newVisualPart = 0;
-    
-    // removeNotInUseTiles();
+    removeNotInUseTiles();
 }
 
 void TheEarth::registerVisual()

@@ -112,6 +112,7 @@
     <ClInclude Include="MenuPageEditorRace.h" />
     <ClInclude Include="MenuPageEditorRoad.h" />
     <ClInclude Include="MenuPageEditorStage.h" />
+    <ClInclude Include="MenuPageMain.h" />
     <ClInclude Include="MyLock.h" />
     <ClInclude Include="MySound.h" />
     <ClInclude Include="MyThread.h" />
@@ -183,6 +184,7 @@
     <ClCompile Include="MenuPageEditorRace.cpp" />
     <ClCompile Include="MenuPageEditorRoad.cpp" />
     <ClCompile Include="MenuPageEditorStage.cpp" />
+    <ClCompile Include="MenuPageMain.cpp" />
     <ClCompile Include="MySound.cpp" />
     <ClCompile Include="MyThread.cpp" />
     <ClCompile Include="ObjectPool.cpp" />

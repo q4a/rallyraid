@@ -27,6 +27,7 @@ public:
         MP_EDITORDAY,
         MP_EDITORSTAGE,
         MP_EDITORROAD,
+        MP_MAIN,
         NUMBER_OF_MENUPAGES
     };
 

@@ -20,6 +20,7 @@ class RoadManager;
 class RoadTypeManager;
 class ItinerManager;
 class GamePlay;
+class WayPointManager;
 
 class TheGame : public OffsetObjectUpdateCB
 {
@@ -49,6 +50,12 @@ public:
 
     bool                            getPhysicsOngoing() {return physicsOngoing;}
     void                            setPhysicsOngoing(bool newValue) {physicsOngoing = newValue;}
+    
+    bool                            getInGame(); // inline
+    void                            setInGame(bool val); // inline
+
+    bool                            getEditorMode(); // inline
+    void                            setEditorMode(bool val); // inline
 
 private:
     TheGame();
@@ -88,6 +95,7 @@ private:
     RoadTypeManager*                roadTypeManager;
     ItinerManager*                  itinerManager;
     GamePlay*                       gamePlay;
+    WayPointManager*                wayPointManager;
 
     bool                            terminate;
     size_t                          windowId;
@@ -101,6 +109,8 @@ private:
     float                           dynCamDist;
     irr::core::vector3df            cameraDirection;
     float                           cameraAngle;
+    bool                            inGame;
+    bool                            editorMode;
 
     irr::gui::IGUIStaticText*       testText;
 };
@@ -154,5 +164,25 @@ inline bool TheGame::isFpsCamera()
 //{
 //    return shaders;
 //}
+
+inline bool TheGame::getInGame()
+{
+    return inGame;
+}
+
+inline void TheGame::setInGame(bool val)
+{
+    inGame = val;
+}
+
+inline bool TheGame::getEditorMode()
+{
+    return editorMode;
+}
+
+inline void TheGame::setEditorMode(bool val)
+{
+    editorMode = val;
+}
 
 #endif // THEGAME_H

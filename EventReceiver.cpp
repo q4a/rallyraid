@@ -462,7 +462,10 @@ void EventReceiver::checkEvents()
 
         if (IS_PRESSED(OPEN_EDITOR))
         {
-            MenuManager::getInstance()->open(MenuManager::MP_EDITOR);
+            if (TheGame::getInstance()->getEditorMode())
+            {
+                MenuManager::getInstance()->open(MenuManager::MP_EDITOR);
+            }
         }
 
         if (IS_PRESSED(RESET_VEHICLE))

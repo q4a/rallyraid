@@ -61,6 +61,7 @@ private:
     irr::core::matrix4      viewDest[VIEW_SIZE];
 
     friend class Vehicle;
+    friend class MenuPageMain;
 };
 
 inline const std::string& VehicleType::getLongName()
