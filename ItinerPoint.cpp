@@ -10,15 +10,19 @@ ItinerPoint::ItinerPoint(const irr::core::vector3df& apos,
         float globalDistance,
         float localDistance,
         const std::string& itinerImageName,
+        const std::string& itinerImageName2,
         const std::string& description)
     : ObjectWireGlobalObject(0, apos),
       globalDistance(globalDistance),
       localDistance(localDistance),
       itinerImageName(itinerImageName),
       itinerImage(0),
+      itinerImageName2(itinerImageName2),
+      itinerImage2(0),
       description(description)
 {
     itinerImage = ItinerManager::getInstance()->getItinerImage(itinerImageName);
+    itinerImage2 = ItinerManager::getInstance()->getItinerImage2(itinerImageName2);
 }
 
 ItinerPoint::~ItinerPoint()

@@ -38,6 +38,7 @@ public:
         MI_TABLEROADTYPES,
         MI_TABLEROADS,
         MI_TABLEITINER,
+        MI_TABLEITINER2,
 
         MI_EBNEWROADFILENAME,
         MI_EBNEWROADNAME,
@@ -122,6 +123,7 @@ private:
     irr::gui::IGUITable*    tableRoadTypes;
     irr::gui::IGUITable*    tableRoads;
     irr::gui::IGUITable*    tableItiner;
+    irr::gui::IGUITable*    tableItiner2;
     irr::gui::IGUIEditBox*  editBoxNewRoadFilename;
     irr::gui::IGUIEditBox*  editBoxNewRoadName;
     irr::gui::IGUIEditBox*  editBoxNewRoadDataFilename;

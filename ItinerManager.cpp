@@ -33,9 +33,11 @@ ItinerManager* ItinerManager::itinerManager = 0;
 ItinerManager::ItinerManager()
     : activeItinerPointSet(),
       itinerImageMap(),
+      itinerImageMap2(),
       editorGlobalDistance(0.f),
       editorLocalDistance(0.f),
       editorItinerImageName(),
+      editorItinerImageName2(),
       editorDescription()
 {
     readItinerImages();
@@ -45,6 +47,7 @@ ItinerManager::~ItinerManager()
 {
     activeItinerPointSet.clear();
     itinerImageMap.clear();
+    itinerImageMap2.clear();
 }
 
 bool ItinerManager::update(const irr::core::vector3df& newPos, bool force)
@@ -77,6 +80,30 @@ bool ItinerManager::readItinerImages()
     return true;
 }
 
+bool ItinerManager::readItinerImages2()
+{
+    ConfigDirectory::fileList_t fileList;
+    
+    dprintf(MY_DEBUG_NOTE, "Read itiner images 2 directory:\n");
+
+    bool ret = ConfigDirectory::load(ITINERIMAGES2_DIR.c_str(), fileList);
+    
+    if (!ret)
+    {
+        dprintf(MY_DEBUG_WARNING, "unable to read itiner images 2 directory\n");
+        return false;
+    }
+    
+    for (ConfigDirectory::fileList_t::const_iterator it = fileList.begin();
+         it != fileList.end();
+         it++)
+    {
+        std::string itinerImage = it->c_str();
+        itinerImageMap2[itinerImage] = TheGame::getInstance()->getDriver()->getTexture((ITINERIMAGES2_DIR+"/"+itinerImage).c_str());
+    }
+    return true;
+}
+
 /* static */ void ItinerManager::readItinerPointList(const std::string& itinerListFilename, ItinerManager::itinerPointList_t& itinerPointList)
 {
     ConfigFile cf;
@@ -93,6 +120,7 @@ bool ItinerManager::readItinerImages()
         irr::core::vector3df apos;
         float localDistance = 0.f;
         std::string itinerImageName;
+        std::string itinerImageName2;
         std::string description;
 
         secName = seci.peekNextKey();
@@ -117,6 +145,9 @@ bool ItinerManager::readItinerImages()
             } else if (keyName == "image")
             {
                 itinerImageName = valName;
+            } else if (keyName == "image2")
+            {
+                itinerImageName2 = valName;
             } else if (keyName == "description")
             {
                 description = valName;
@@ -126,7 +157,7 @@ bool ItinerManager::readItinerImages()
         if (!secName.empty())
         {
             globalDistance += localDistance;
-            ItinerPoint* itinerPoint = new ItinerPoint(apos, globalDistance, localDistance, itinerImageName, description);
+            ItinerPoint* itinerPoint = new ItinerPoint(apos, globalDistance, localDistance, itinerImageName, itinerImageName2, description);
             itinerPointList.push_back(itinerPoint);
         }
     }
@@ -159,6 +190,7 @@ bool ItinerManager::readItinerImages()
         //fprintf_s(f, "gd=%f\n", (*it)->getGlobalDistance());
         fprintf_s(f, "ld=%f\n", (*it)->getLocalDistance());
         fprintf_s(f, "image=%s\n", (*it)->getItinerImageName().c_str());
+        fprintf_s(f, "image2=%s\n", (*it)->getItinerImageName2().c_str());
         fprintf_s(f, "description=%s\n", (*it)->getDescription().c_str());
 
         id++;

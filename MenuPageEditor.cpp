@@ -42,6 +42,7 @@ MenuPageEditor::MenuPageEditor()
       tableRoadTypes(0),
       tableRoads(0),
       tableItiner(0),
+      tableItiner2(0),
       editBoxNewRoadFilename(0),
       editBoxNewRoadName(0),
       editBoxNewRoadDataFilename(0),
@@ -364,8 +365,25 @@ MenuPageEditor::MenuPageEditor()
         MI_TABLEITINER,
         true);
 
+    tableItiner = TheGame::getInstance()->getEnv()->addTable(
+        irr::core::recti(irr::core::position2di(0, 3*22), irr::core::dimension2di(tabItiner->getRelativePosition().getSize().Width, (tabItiner->getRelativePosition().getSize().Height-(3*22))/2 - 1)),
+        //irr::core::recti(irr::core::position2di(0, 0), tabRoads->getRelativePosition().getSize()),
+        tabItiner,
+        MI_TABLEITINER,
+        true);
+
     tableItiner->addColumn(L"itiner image");
     tableItiner->setColumnWidth(0, 200);
+
+    tableItiner2 = TheGame::getInstance()->getEnv()->addTable(
+        irr::core::recti(irr::core::position2di(0, 3*22 + (tabItiner->getRelativePosition().getSize().Height-(3*22))/2 + 1), irr::core::dimension2di(tabItiner->getRelativePosition().getSize().Width, (tabItiner->getRelativePosition().getSize().Height-(3*22))/2-1)),
+        //irr::core::recti(irr::core::position2di(0, 0), tabRoads->getRelativePosition().getSize()),
+        tabItiner,
+        MI_TABLEITINER2,
+        true);
+
+    tableItiner2->addColumn(L"itiner image 2");
+    tableItiner2->setColumnWidth(0, 200);
 
     window->setVisible(false);
 }
@@ -473,6 +491,13 @@ bool MenuPageEditor::OnEvent(const irr::SEvent &event)
                     case MI_TABLEITINER:
                     {
                         WStringConverter::toString(tableItiner->getCellText(tableItiner->getSelected(), 0), ItinerManager::getInstance()->editorItinerImageName);
+                        MenuPageEditor::menuPageEditor->refreshSelected();
+                        return true;
+                        break;
+                    }
+                    case MI_TABLEITINER2:
+                    {
+                        WStringConverter::toString(tableItiner2->getCellText(tableItiner2->getSelected(), 0), ItinerManager::getInstance()->editorItinerImageName2);
                         MenuPageEditor::menuPageEditor->refreshSelected();
                         return true;
                         break;
@@ -698,6 +723,21 @@ void MenuPageEditor::refreshSelected()
     if (!ItinerManager::getInstance()->editorItinerImageName.empty())
     {
         str += ItinerManager::getInstance()->editorItinerImageName.c_str();
+    }
+    else
+    {
+        str = L"none";
+    }
+    tableSelected->setCellText(i, 1, str.c_str());
+
+    i = 7;
+    tableSelected->addRow(i);
+    str = L"itiner image 2";
+    tableSelected->setCellText(i, 0, str.c_str());
+    str = L"";
+    if (!ItinerManager::getInstance()->editorItinerImageName2.empty())
+    {
+        str += ItinerManager::getInstance()->editorItinerImageName2.c_str();
     }
     else
     {
@@ -1069,6 +1109,28 @@ void MenuPageEditor::refreshItiner()
         str += it->first.c_str();
         tableItiner->setCellText(i, 0, str.c_str());
     }
+
+    tableItiner2->clearRows();
+
+    const ItinerManager::itinerImageMap_t& itinerImageMap2 = ItinerManager::getInstance()->getItinerImageMap2();
+    unsigned int i = 0;
+
+    tableItiner2->addRow(i);
+    str = L"none";
+    tableItiner2->setCellText(i, 0, str.c_str());
+
+    i++;
+
+    for (ItinerManager::itinerImageMap_t::const_iterator it = itinerImageMap2.begin();
+         it != itinerImageMap2.end();
+         it++, i++)
+    {
+        tableItiner2->addRow(i);
+
+        str = L"";
+        str += it->first.c_str();
+        tableItiner2->setCellText(i, 0, str.c_str());
+    }
 }
 
 void MenuPageEditor::refreshItinerGD()
@@ -1179,11 +1241,12 @@ void MenuPageEditor::actionP()
         }
     case A_AddItinerPoint:
         {
-            dprintf(MY_DEBUG_NOTE, "MenuPageEditor::action(): add itiner point editorStage: %p, GD: %f, LD: %f, iti: [%s], desc: [%s]\n",
+            dprintf(MY_DEBUG_NOTE, "MenuPageEditor::action(): add itiner point editorStage: %p, GD: %f, LD: %f, iti: [%s] / [%s], desc: [%s]\n",
                 RaceManager::getInstance()->editorStage,
                 ItinerManager::getInstance()->editorGlobalDistance,
                 ItinerManager::getInstance()->editorLocalDistance,
                 ItinerManager::getInstance()->editorItinerImageName.c_str(),
+                ItinerManager::getInstance()->editorItinerImageName2.c_str(),
                 ItinerManager::getInstance()->editorDescription.c_str());
             if (RaceManager::getInstance()->editorStage)
             {
@@ -1193,6 +1256,7 @@ void MenuPageEditor::actionP()
                     ItinerManager::getInstance()->editorGlobalDistance,
                     ItinerManager::getInstance()->editorLocalDistance,
                     ItinerManager::getInstance()->editorItinerImageName,
+                    ItinerManager::getInstance()->editorItinerImageName2,
                     ItinerManager::getInstance()->editorDescription);
                 RaceManager::getInstance()->editorStage->itinerPointList.push_back(ip);
             }
@@ -1223,9 +1287,23 @@ void MenuPageEditor::actionP()
                 RaceManager::getInstance()->editorStage);
             if (RaceManager::getInstance()->editorStage)
             {
-                unsigned int num = RaceManager::getInstance()->editorStage->wayPointList.size() + 1;
-                WayPoint* wpip = new WayPoint(apos, num);
-                RaceManager::getInstance()->editorStage->wayPointList.push_back(wpip);
+                float ld = 10000.f;
+                if (!RaceManager::getInstance()->editorStage->wayPointList.empty())
+                {
+                    irr::core::vector3df lastPos = RaceManager::getInstance()->editorStage->wayPointList.back()->getPos();
+                    ld = lastPos.getDistanceFrom(apos);
+                }
+                
+                if (ld > 1500.f)
+                {
+                    unsigned int num = RaceManager::getInstance()->editorStage->wayPointList.size() + 1;
+                    WayPoint* wpip = new WayPoint(apos, num);
+                    RaceManager::getInstance()->editorStage->wayPointList.push_back(wpip);
+                }
+                else
+                {
+                    dprintf(MY_DEBUG_INFO, "MenuPageEditor::action(): add waypoint not possible, because last WP is to close: %f\n", ld);
+                }
             }
             break;
         }
