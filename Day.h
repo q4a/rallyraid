@@ -32,12 +32,13 @@ private:
     bool writeGlobalObjects();
 
 public:
-    Stage* getStage(const std::string& stageName); // inline
-    const stageMap_t& getStageMap(); // inline
-    const std::string& getName(); // inline
-    const std::string& getLongName(); // inline
-    const std::string& getShortDescription(); // inline
-    const RoadManager::roadMap_t& getRoadMap(); // inline
+    Stage* getStage(const std::string& stageName) const; // inline
+    const stageMap_t& getStageMap() const; // inline
+    const std::string& getName() const; // inline
+    const std::string& getLongName() const; // inline
+    const std::string& getShortDescription() const; // inline
+    const RoadManager::roadMap_t& getRoadMap() const; // inline
+    Race* getParent() const; // inline
 
     void activate();
     void deactivate();
@@ -62,7 +63,7 @@ private:
 };
 
 
-inline Stage* Day::getStage(const std::string& stageName)
+inline Stage* Day::getStage(const std::string& stageName) const
 {
     stageMap_t::const_iterator sit = stageMap.find(stageName);
     if (sit == stageMap.end())
@@ -72,29 +73,34 @@ inline Stage* Day::getStage(const std::string& stageName)
     return sit->second;
 }
 
-inline const Day::stageMap_t& Day::getStageMap()
+inline const Day::stageMap_t& Day::getStageMap() const
 {
     return stageMap;
 }
 
-inline const std::string& Day::getName()
+inline const std::string& Day::getName() const
 {
     return dayName;
 }
 
-inline const std::string& Day::getLongName()
+inline const std::string& Day::getLongName() const
 {
     return dayLongName;
 }
 
-inline const std::string& Day::getShortDescription()
+inline const std::string& Day::getShortDescription() const
 {
     return shortDescription;
 }
 
-inline const RoadManager::roadMap_t& Day::getRoadMap()
+inline const RoadManager::roadMap_t& Day::getRoadMap() const
 {
     return roadMap;
+}
+
+inline Race* Day::getParent() const
+{
+    return parent;
 }
 
 #endif // DAY_H

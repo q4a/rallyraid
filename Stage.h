@@ -36,13 +36,14 @@ private:
     bool writeAIPointList();
 
 public:
-    const std::string& getName(); // inline
-    const std::string& getLongName(); // inline
-    const std::string& getShortDescription(); // inline
-    const RoadManager::roadMap_t& getRoadMap(); // inline
-    const ItinerManager::itinerPointList_t& getItinerPointList(); // inline
-    const WayPointManager::wayPointList_t& getWayPointList(); // inline
-    const AIPoint::AIPointList_t& getAIPointList(); // inline
+    const std::string& getName() const; // inline
+    const std::string& getLongName() const; // inline
+    const std::string& getShortDescription() const; // inline
+    const RoadManager::roadMap_t& getRoadMap() const; // inline
+    const ItinerManager::itinerPointList_t& getItinerPointList() const; // inline
+    const WayPointManager::wayPointList_t& getWayPointList() const; // inline
+    const AIPoint::AIPointList_t& getAIPointList() const; // inline
+    Day* getParent() const; // inline
 
     void activate();
     void deactivate();
@@ -69,39 +70,44 @@ private:
     friend class MenuPageEditorStage;
 };
 
-inline const std::string& Stage::getName()
+inline const std::string& Stage::getName() const
 {
     return stageName;
 }
 
-inline const std::string& Stage::getLongName()
+inline const std::string& Stage::getLongName() const
 {
     return stageLongName;
 }
 
-inline const std::string& Stage::getShortDescription()
+inline const std::string& Stage::getShortDescription() const
 {
     return shortDescription;
 }
 
-inline const RoadManager::roadMap_t& Stage::getRoadMap()
+inline const RoadManager::roadMap_t& Stage::getRoadMap() const
 {
     return roadMap;
 }
 
-inline const ItinerManager::itinerPointList_t& Stage::getItinerPointList()
+inline const ItinerManager::itinerPointList_t& Stage::getItinerPointList() const
 {
     return itinerPointList;
 }
 
-inline const WayPointManager::wayPointList_t& Stage::getWayPointList()
+inline const WayPointManager::wayPointList_t& Stage::getWayPointList() const
 {
     return wayPointList;
 }
 
-inline const AIPoint::AIPointList_t& Stage::getAIPointList()
+inline const AIPoint::AIPointList_t& Stage::getAIPointList() const
 {
     return AIPointList;
+}
+
+inline Day* Stage::getParent() const
+{
+    return parent;
 }
 
 #endif // STAGE_H
