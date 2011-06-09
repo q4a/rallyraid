@@ -327,7 +327,7 @@ unsigned short TheEarth::getTileHeight(unsigned int x, unsigned int y)
         {
             if (getHasDetail(tileNum))
             {
-                tile = new Tile(tileX, tileY,
+                tile = new Tile(tileX, tileY, tileNum,
                     getEarthTexture(tileX, tileY),
                     getEarthTexture(tileX+1, tileY),
                     getEarthTexture(tileX, tileY+1),
@@ -369,7 +369,7 @@ const irr::video::SColor& TheEarth::getTileTexture(unsigned int x, unsigned int 
         {
             if (getHasDetail(tileNum))
             {
-                tile = new Tile(tileX, tileY,
+                tile = new Tile(tileX, tileY, tileNum,
                     getEarthTexture(tileX, tileY),
                     getEarthTexture(tileX+1, tileY),
                     getEarthTexture(tileX, tileY+1),
@@ -413,7 +413,7 @@ void TheEarth::getTileHeightAndTexture(unsigned int x, unsigned int y,
         {
             if (getHasDetail(tileNum))
             {
-                tile = new Tile(tileX, tileY,
+                tile = new Tile(tileX, tileY, tileNum,
                     getEarthTexture(tileX, tileY),
                     getEarthTexture(tileX+1, tileY),
                     getEarthTexture(tileX, tileY+1),
@@ -460,7 +460,7 @@ const irr::video::SColor& TheEarth::getTileFineTexture(unsigned int x, unsigned 
         {
             if (getHasDetail(tileNum))
             {
-                tile = new Tile(tileX, tileY,
+                tile = new Tile(tileX, tileY, tileNum,
                     getEarthTexture(tileX, tileY),
                     getEarthTexture(tileX+1, tileY),
                     getEarthTexture(tileX, tileY+1),
@@ -1201,6 +1201,7 @@ void TheEarth::removeNotInUseTiles()
     {
         if (!it->second->isInUse())
         {
+            setIsLoaded(it->second->getTileNum(), false);
             delete it->second;
 
             tileMap_t::iterator tmpIt = it;
@@ -1210,6 +1211,6 @@ void TheEarth::removeNotInUseTiles()
         else
         {
             it++;
-        }        
+        }
     }
 }

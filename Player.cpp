@@ -39,9 +39,10 @@ Player::~Player()
 }
 
 
-void Player::initializeVehicle(const irr::core::vector3df& apos, const irr::core::vector3df& rotation)
+void Player::initializeVehicle(const std::string& vehicleTypeName, const irr::core::vector3df& apos, const irr::core::vector3df& rotation)
 {
     assert(vehicle == 0);
+    this->vehicleTypeName = vehicleTypeName;
     vehicle = new Vehicle(vehicleTypeName, apos, rotation);
     recenterView = true;
 }

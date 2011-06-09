@@ -8,7 +8,7 @@
 #include "Vehicle.h"
 //#include <assert.h>
 
-//class Vehicle;
+//class VehicleType;
 
 class Player
 {
@@ -26,7 +26,7 @@ private:
     ~Player();
 
 public:
-    void initializeVehicle(const irr::core::vector3df& apos, const irr::core::vector3df& rotation);
+    void initializeVehicle(const std::string& vehicleTypeName, const irr::core::vector3df& apos, const irr::core::vector3df& rotation);
     void finalizeVehicle();
 
     Vehicle* getVehicle(); // inline

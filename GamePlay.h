@@ -4,6 +4,7 @@
 
 
 class Stage;
+class VehicleType;
 
 class GamePlay
 {
@@ -21,7 +22,7 @@ private:
     ~GamePlay();
 
 public:
-    void startGame(Stage* stage);
+    void startGame(Stage* stage, VehicleType* vehicleType);
 
 private:
 

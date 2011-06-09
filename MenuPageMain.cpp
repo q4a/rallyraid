@@ -20,6 +20,7 @@
 #include "Competitor.h"
 #include "VehicleTypeManager.h"
 #include "VehicleType.h"
+#include "GamePlay.h"
 
 
 MenuPageMain* MenuPageMain::menuPageMain = 0;
@@ -30,7 +31,9 @@ MenuPageMain::MenuPageMain()
       tableVehicles(0),
       checkBoxEditor(0),
       staticTextRaceData(0),
-      staticTextVehicleData(0)
+      staticTextVehicleData(0),
+      selectedRace(0),
+      selectedVehicleType(0)
 {
     menuPageMain = this;
     window = TheGame::getInstance()->getEnv()->addImage(
@@ -132,7 +135,25 @@ bool MenuPageMain::OnEvent(const irr::SEvent &event)
                 switch (id)
                 {
                     case MI_BUTTONSTART:
-                        dprintf(MY_DEBUG_NOTE, "mainmenu::startbutton::clicked\n");
+                        dprintf(MY_DEBUG_NOTE, "mainmenu::startbutton::clicked: selected race: %s, vehicle: %s\n",
+                            selectedRace?selectedRace->getName().c_str():"-", selectedVehicleType?selectedVehicleType->getName():"-");
+                        if (selectedRace && selectedVehicleType)
+                        {
+                            Stage* stage = 0;
+                            Day* day = 0;
+                            
+                            if (!selectedRace->getDayMap().empty())
+                            {
+                                day = selectedRace->getDayMap().begin()->second;
+                            }
+                            if (day && !day->getStageMap().empty())
+                            {
+                                stage = day->getStageMap().begin()->second;
+                            }
+
+                            MenuManager::getInstance()->close();                            
+                            GamePlay::getInstance()->startGame(stage, selectedVehicleType);
+                        }
                         return true;
                         break;
                 };
@@ -221,6 +242,11 @@ void MenuPageMain::refresh()
         str += rit->second->getLongName().c_str();
         tableRaces->setCellText(i, 0, str.c_str());
         tableRaces->setCellData(i, 0, (void*)rit->second);
+        
+        if (i==0)
+        {
+            selectedRace = rit->second;
+        }
     }
 
     // ----------------------------
@@ -242,6 +268,11 @@ void MenuPageMain::refresh()
         str += vit->second->getLongName().c_str();
         tableVehicles->setCellText(i, 0, str.c_str());
         tableVehicles->setCellData(i, 0, (void*)vit->second);
+        
+        if (i==0)
+        {
+            selectedVehicleType = vit->second;
+        }
     }
 }
 
@@ -254,6 +285,7 @@ void MenuPageMain::refreshRaceData(Race* race)
     str += race->getShortDescription().c_str();
 
     staticTextRaceData->setText(str.c_str());
+    selectedRace = race;
 }
 
 void MenuPageMain::refreshVehicleData(VehicleType* vehicleType)
@@ -289,4 +321,5 @@ void MenuPageMain::refreshVehicleData(VehicleType* vehicleType)
     str += L" / 10\n";
 
     staticTextVehicleData->setText(str.c_str());
+    selectedVehicleType = vehicleType;
 }

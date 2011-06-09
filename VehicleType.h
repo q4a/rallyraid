@@ -36,6 +36,7 @@ public:
     VehicleType(const std::string& vehicleTypeName, const std::string& vehicleTypeFilename, bool& ret);
     ~VehicleType();
 
+    const std::string& getName(); // inline
     const std::string& getLongName(); // inline
 
 private:
@@ -63,6 +64,11 @@ private:
     friend class Vehicle;
     friend class MenuPageMain;
 };
+
+inline const std::string& VehicleType::getName()
+{
+    return vehicleTypeName;
+}
 
 inline const std::string& VehicleType::getLongName()
 {

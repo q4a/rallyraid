@@ -51,7 +51,9 @@ private:
     irr::gui::IGUICheckBox* checkBoxEditor;
     irr::gui::IGUIStaticText* staticTextRaceData;
     irr::gui::IGUIStaticText* staticTextVehicleData;
-
+    
+    Race*                   selectedRace;
+    VehicleType*            selectedVehicleType;
 };
 
 #endif // MENUPAGEMAIN_H

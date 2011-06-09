@@ -8,7 +8,7 @@
 class Tile
 {
 public:
-    Tile(unsigned int posx, unsigned int posy,
+    Tile(unsigned int posx, unsigned int posy, unsigned int tileNum,
         const irr::video::SColor& color00,
         const irr::video::SColor& color10,
         const irr::video::SColor& color01,
@@ -81,13 +81,14 @@ public:
         }
     }
     
-    bool getInUse() {return inUse;}
-    bool isInUse() {return inUse;}
+    bool getInUse() const {return inUse;}
+    bool isInUse() const {return inUse;}
     void setInUse() {inUse = true;}
     void clearInUse() {inUse = false;}
 
-    unsigned int getPosX() {return posx;}
-    unsigned int getPosY() {return posy;}
+    unsigned int getPosX() const {return posx;}
+    unsigned int getPosY() const {return posy;}
+    unsigned int getTileNum() const {return tileNum;}
 
 private:
     bool setHeight(unsigned int x, unsigned int y, unsigned short val);
@@ -99,6 +100,7 @@ private:
     unsigned int caty;
     unsigned int posx;
     unsigned int posy;
+    unsigned int tileNum;
 
     unsigned short* height;
     bool inUse;

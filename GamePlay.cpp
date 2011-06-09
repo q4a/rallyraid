@@ -9,6 +9,8 @@
 #include "TheEarth.h"
 #include "ObjectWire.h"
 #include "Player.h"
+#include "VehicleType.h"
+#include <assert.h>
 
 
 GamePlay* GamePlay::gamePlay = 0;
@@ -39,13 +41,14 @@ GamePlay::~GamePlay()
 {
 }
 
-void GamePlay::startGame(Stage* stage)
+void GamePlay::startGame(Stage* stage, VehicleType* vehicleType)
 {
     irr::core::vector3df initialPos(4190225.f, 215.f, -6401350.f);
     irr::core::vector3df initialDir(1.f, 0.f, 0.f);
     float deg = 0.f;
     
-    dprintf(MY_DEBUG_INFO, "GamePlay::startGame(): stage: %p\n", stage);
+    dprintf(MY_DEBUG_INFO, "GamePlay::startGame(): stage: %p, vehicleType: %p\n", stage, vehicleType);
+    assert(vehicleType);
 
     if (stage)
     {
@@ -74,7 +77,7 @@ void GamePlay::startGame(Stage* stage)
     TheGame::getInstance()->reset(initialPos, initialDir);
     TheEarth::getInstance()->createFirst(initialPos, initialDir);
     Player::getInstance()->finalizeVehicle();
-    Player::getInstance()->initializeVehicle(initialPos+initialDir, irr::core::vector3df(0.f, deg, 0.f));
+    Player::getInstance()->initializeVehicle(vehicleType->getName(), initialPos+initialDir, irr::core::vector3df(0.f, deg, 0.f));
     
     if (stage)
     {
