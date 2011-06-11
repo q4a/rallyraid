@@ -4,6 +4,7 @@
 #include "Stage.h"
 #include "ConfigFile.h"
 #include "stdafx.h"
+#include "StringConverter.h"
 
 
 Stage::Stage(Day* parent, const std::string& raceName, const std::string& dayName, const std::string& stageName, bool& ret)
@@ -18,7 +19,8 @@ Stage::Stage(Day* parent, const std::string& raceName, const std::string& dayNam
       wayPointList(),
       AIPointList(),
       active(false),
-      roadMap()
+      roadMap(),
+      stageTime(1000)
 {
     ret = read();
 }
@@ -73,10 +75,10 @@ bool Stage::readCfg()
             if (keyName == "long_name")
             {
                 stageLongName = valName;
-            }/* else if (keyName == "cache_objects")
+            } else if (keyName == "stage_time")
             {
-                cacheObjects = StringConverter::parseBool(valName, true);
-            }*/
+                stageTime = StringConverter::parseUnsignedInt(valName, 1000);
+            }
         }
     }
     return true;
@@ -131,6 +133,7 @@ bool Stage::writeCfg()
     }
 
     ret = fprintf(f, "long_name=%s\n", stageLongName.c_str());
+    ret = fprintf(f, "stage_time=%u\n", stageTime);
 
     fclose(f);
     return true;

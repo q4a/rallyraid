@@ -235,6 +235,8 @@ void GamePlay::startGame(Stage* stage, VehicleType* vehicleType)
     unsigned int num = 0;
     unsigned int stageTime = 0;
     unsigned int globalTime = 0;
+    unsigned int stagePenalityTime = 0;
+    unsigned int globalPenalityTime = 0;
 
     ret = fscanf_s(f, "%lu\n", &numOfComps);
     if (ret < 1)
@@ -246,8 +248,8 @@ void GamePlay::startGame(Stage* stage, VehicleType* vehicleType)
 
     for (unsigned int i = 0; i < numOfComps; i++)
     {
-        ret = fscanf_s(f, "%u %u %u\n", &num, &stageTime, &globalTime);
-        if (ret < 3)
+        ret = fscanf_s(f, "%u %u %u %u %u\n", &num, &stageTime, &globalTime, &stagePenalityTime, &globalPenalityTime);
+        if (ret < 5)
         {
             printf("stage state unable to read competitor list\n");
             fclose(f);
@@ -259,13 +261,17 @@ void GamePlay::startGame(Stage* stage, VehicleType* vehicleType)
         {
             competitor = cit->second;
         }
+        else if (Player::getInstance()->getCompetitor()->getNum() == num)
+        {
+            competitor = Player::getInstance()->getCompetitor();
+        }
         else
         {
             printf("stage state unable to find competitor: %u (%s)\n", num, race->getName());
             fclose(f);
             return false;
         }
-        CompetitorResult* competitorResult = new CompetitorResult(competitor, stageTime, globalTime);
+        CompetitorResult* competitorResult = new CompetitorResult(competitor, stageTime, stagePenalityTime, globalTime, globalPenalityTime);
 
         competitorResultList.push_back(competitorResult);
     }
@@ -281,7 +287,32 @@ void GamePlay::startGame(Stage* stage, VehicleType* vehicleType)
          it != competitorResultList.end();
          it++)
     {
-        ret = fprintf(f, "%u %u %u\n", (*it)->competitor->getNum(), (*it)->stageTime, (*it)->globalTime);
+        ret = fprintf(f, "%u %u %u %u %u\n", (*it)->competitor->getNum(), (*it)->stageTime, (*it)->globalTime,
+            (*it)->stagePenalityTime, (*it)->globalPenalityTime);
     }
     return true;
+}
+
+/* static */ void GamePlay::clearStageStateList(stageStateList_t& stageStateList)
+{
+    for (stageStateList_t::const_iterator it = stageStateList.begin(); 
+         it != stageStateList.end();
+         it++)
+    {
+        clearCompetitorResultList((*it)->competitorResultListStage);
+        clearCompetitorResultList((*it)->competitorResultListOverall);
+        delete (*it);
+    }
+    stageStateList.clear();
+}
+
+/* static */ void GamePlay::clearCompetitorResultList(competitorResultList_t& competitorResultList)
+{
+    for (competitorResultList_t::const_iterator it = competitorResultList.begin(); 
+         it != competitorResultList.end();
+         it++)
+    {
+        delete (*it);
+    }
+    competitorResultList.clear();
 }

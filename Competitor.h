@@ -22,6 +22,8 @@ public:
     const std::string& getVehicleTypeName(); // inline
     unsigned int getStrength(); // inline
     bool getAi(); // inline
+    
+    void setVehicleTypeName(const std::string& vehicleTypeName); // inline
 
 private:
     unsigned int num;
@@ -66,6 +68,11 @@ inline unsigned int Competitor::getStrength()
 inline bool Competitor::getAi()
 {
     return ai;
+}
+
+inline void Competitor::setVehicleTypeName(const std::string& vehicleTypeName)
+{
+    this->vehicleTypeName = vehicleTypeName;
 }
 
 #endif // COMPETITORS_H

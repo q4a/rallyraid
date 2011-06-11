@@ -2,7 +2,9 @@
 
 #include "Player.h"
 #include "Vehicle.h"
+#include "Competitor.h"
 #include <assert.h>
+
 
 Player* Player::player = 0;
 
@@ -26,7 +28,7 @@ void Player::finalize()
     
 Player::Player()
     : vehicle(0),
-      vehicleTypeName("sil"),
+      competitor(new Competitor(499, "Player", "-", "Player's Team", "vw3", 0, false)),
       viewNum(VIEW_0),
       viewMask(VIEW_CENTER),
       recenterView(true)
@@ -36,13 +38,14 @@ Player::Player()
 Player::~Player()
 {
     finalizeVehicle();
+    delete competitor;
 }
 
 
 void Player::initializeVehicle(const std::string& vehicleTypeName, const irr::core::vector3df& apos, const irr::core::vector3df& rotation)
 {
     assert(vehicle == 0);
-    this->vehicleTypeName = vehicleTypeName;
+    competitor->setVehicleTypeName(vehicleTypeName);
     vehicle = new Vehicle(vehicleTypeName, apos, rotation);
     recenterView = true;
 }

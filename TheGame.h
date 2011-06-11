@@ -21,6 +21,8 @@ class RoadTypeManager;
 class ItinerManager;
 class GamePlay;
 class WayPointManager;
+class FontManager;
+class MessageManager;
 
 class TheGame : public OffsetObjectUpdateCB
 {
@@ -96,6 +98,8 @@ private:
     ItinerManager*                  itinerManager;
     GamePlay*                       gamePlay;
     WayPointManager*                wayPointManager;
+    FontManager*                    fontManager;
+    MessageManager*                 messageManager;
 
     bool                            terminate;
     size_t                          windowId;

@@ -44,6 +44,7 @@ public:
     const WayPointManager::wayPointList_t& getWayPointList() const; // inline
     const AIPoint::AIPointList_t& getAIPointList() const; // inline
     Day* getParent() const; // inline
+    unsigned int getStageTime(); // inline
 
     void activate();
     void deactivate();
@@ -61,6 +62,7 @@ private:
     AIPoint::AIPointList_t          AIPointList;
     bool                            active;
     RoadManager::roadMap_t          roadMap;
+    unsigned int                    stageTime;
     
 
     friend class RaceManager;
@@ -108,6 +110,11 @@ inline const AIPoint::AIPointList_t& Stage::getAIPointList() const
 inline Day* Stage::getParent() const
 {
     return parent;
+}
+
+inline unsigned int Stage::getStageTime()
+{
+    return stageTime;
 }
 
 #endif // STAGE_H

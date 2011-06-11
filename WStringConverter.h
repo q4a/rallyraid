@@ -40,6 +40,20 @@ public:
         str >> ret;
     }
 
+    static void WStringConverter::toUnsignedInt(const irr::core::stringw& wstr, unsigned int& ret)
+    {
+        const wchar_t* orig = wstr.c_str();
+        toUnsignedInt(orig, ret);
+    }
+
+    static void WStringConverter::toUnsignedInt(const wchar_t* orig, unsigned int& ret)
+    {
+        std::string val;
+        toString(orig, val);
+        std::istringstream str(val);
+        str >> ret;
+    }
+
     static void WStringConverter::toFloat(const irr::core::stringw& wstr, float& ret)
     {
         const wchar_t* orig = wstr.c_str();
@@ -52,6 +66,36 @@ public:
         toString(orig, val);
         std::istringstream str(val);
         str >> ret;
+    }
+
+    static void addTimeToStr(irr::core::stringw& str, unsigned int diffTime)
+    {
+        if (diffTime/3600 > 0)
+        {
+            str += diffTime/3600; // hours
+            str += ":";
+        }
+        if ((diffTime/60)%60==0)
+        {
+            str += "00";
+        }
+        else
+            {
+                if ((diffTime/60)%60<10)
+                    str += "0";
+                str += (diffTime/60)%60; // minutes
+            }
+        str += ":";
+        if (diffTime%60==0)
+        {
+            str += "00";
+        }
+        else
+            {
+                if (diffTime%60<10)
+                    str += "0";
+                str += diffTime%60;  // sec
+            }
     }
 };
 

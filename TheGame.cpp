@@ -24,6 +24,9 @@
 #include "GamePlay.h"
 #include "Tick.h"
 #include "WayPointManager.h"
+#include "FontManager.h"
+#include "MessageManager.h"
+
 
 // static stuff
 TheGame* TheGame::theGame = 0;
@@ -70,6 +73,8 @@ TheGame::TheGame()
       itinerManager(0),
       gamePlay(0),
       wayPointManager(0),
+      fontManager(0),
+      messageManager(0),
       terminate(true),
       windowId(0),
       lastScreenSize(),
@@ -135,6 +140,12 @@ TheGame::TheGame()
         shaders = Shaders::getInstance();
         dprintf(MY_DEBUG_NOTE, "Initialize Havok\n");
         hk::initialize();
+        dprintf(MY_DEBUG_NOTE, "Initialize font manager\n");
+        FontManager::initialize();
+        fontManager = FontManager::getInstance();
+        dprintf(MY_DEBUG_NOTE, "Initialize message manager\n");
+        MessageManager::initialize();
+        messageManager = MessageManager::getInstance();
         dprintf(MY_DEBUG_NOTE, "Initialize offset manager\n");
         OffsetManager::initialize();
         offsetManager = OffsetManager::getInstance();
@@ -207,6 +218,8 @@ TheGame::~TheGame()
         delete cameraOffsetObject;
         cameraOffsetObject = 0;
     }
+    messageManager = 0;
+    fontManager = 0;
     offsetManager = 0;
     earth = 0;
     vehicleManager = 0;
@@ -255,6 +268,10 @@ TheGame::~TheGame()
     OffsetManager::finalize();
     dprintf(MY_DEBUG_NOTE, "Finalize objectPoolManager\n");
     ObjectPoolManager::finalize();
+    dprintf(MY_DEBUG_NOTE, "Finalize message manager\n");
+    MessageManager::finalize();
+    dprintf(MY_DEBUG_NOTE, "Finalize font manager\n");
+    FontManager::finalize();
     dprintf(MY_DEBUG_NOTE, "Finalize shaders\n");
     Shaders::finalize();
     dprintf(MY_DEBUG_NOTE, "Finalize settings\n");
@@ -445,6 +462,7 @@ void TheGame::loop()
             //printf("scene mgr drawAll\n");
             smgr->drawAll();
             //printf("menu and env render\n");
+            messageManager->updateText(tick);
             if (editorMode)
             {
                 MenuPageEditor::render();

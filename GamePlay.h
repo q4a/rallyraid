@@ -16,22 +16,31 @@ struct CompetitorResult
     CompetitorResult(Competitor* competitor)
         : competitor(competitor),
           stageTime(0),
-          globalTime(0)
+          stagePenalityTime(0),
+          globalTime(0),
+          globalPenalityTime(0)
     {
     }
 
-    CompetitorResult(Competitor* competitor, unsigned int stageTime, unsigned int globalTime)
+    CompetitorResult(Competitor* competitor, unsigned int stageTime, unsigned int stagePenalityTime,
+        unsigned int globalTime, unsigned int globalPenalityTime)
         : competitor(competitor),
           stageTime(stageTime),
-          globalTime(globalTime)
+          stagePenalityTime(stagePenalityTime),
+          globalTime(globalTime),
+          globalPenalityTime(globalPenalityTime)
     {
     }
 
     Competitor*     competitor;
     unsigned int    stageTime;
+    unsigned int    stagePenalityTime;
     unsigned int    globalTime;
+    unsigned int    globalPenalityTime;
 };
 typedef std::list<CompetitorResult*> competitorResultList_t;
+
+// -----------------------------------------------------------------
 
 struct StageState
 {
@@ -40,6 +49,8 @@ struct StageState
     competitorResultList_t  competitorResultListOverall;
 };
 typedef std::list<StageState*> stageStateList_t;
+
+// -----------------------------------------------------------------
 
 class GamePlay
 {
@@ -64,6 +75,9 @@ private:
     static bool writeStageStateList(const std::string& filename, const stageStateList_t& stageStateList);
     static bool readCompetitorResultList(FILE* f, Race* race, competitorResultList_t& competitorResultList);
     static bool writeCompetitorResultList(FILE* f, const competitorResultList_t& competitorResultList);
+
+    static void clearStageStateList(stageStateList_t& stageStateList);
+    static void clearCompetitorResultList(competitorResultList_t& competitorResultList);
 
 private:
 

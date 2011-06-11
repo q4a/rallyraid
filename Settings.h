@@ -32,6 +32,8 @@ public:
     unsigned int            objectWireNum;
     unsigned int            objectDensity;
     bool                    useTerrainDetail;
+    bool                    showNames;
+    unsigned int            difficulty;
 };
 
 #endif // SETTINGS_H

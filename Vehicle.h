@@ -67,7 +67,7 @@ public:
     int getGear() const {return hkVehicle->m_currentGear+1;}
     float getSpeed() const {return hkVehicle->calcKMPH();}
     const irr::core::vector3df& getLinearVelocity() {return linearVelocity;}
-    //VehicleType* getVehicleType() {return vehicleType;}
+    VehicleType* getVehicleType() {return vehicleType;}
     const irr::core::matrix4& getViewPos(unsigned int num) const;
     const irr::core::matrix4& getViewDest(unsigned int num) const;
     const irr::core::matrix4& getMatrix() const {return matrix;}

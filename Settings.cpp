@@ -32,7 +32,9 @@ Settings::Settings()
       objectWireSize(200),
       objectWireNum(11),
       objectDensity(10),
-      useTerrainDetail(true)
+      useTerrainDetail(true),
+      showNames(true),
+      difficulty(2);
 {
 }
 
@@ -86,6 +88,12 @@ void Settings::read()
             } else if (keyName == "use_terrain_detail")
             {
                 useTerrainDetail = StringConverter::parseBool(valName, true);
+            } else if (keyName == "show_names")
+            {
+                showNames = StringConverter::parseBool(valName, true);
+            } else if (keyName == "difficulty")
+            {
+                difficulty = StringConverter::parseUnsignedInt(valName, 2);
             }
         }
     }
@@ -113,6 +121,8 @@ void Settings::write()
     ret = fprintf(f, "object_wire_num=%u\n", objectWireNum);
     ret = fprintf(f, "object_density=%u\n", objectDensity);
     ret = fprintf(f, "use_terrain_detail=%s\n", useTerrainDetail?"yes":"no");
+    ret = fprintf(f, "show_names=%s\n", showNames?"yes":"no");
+    ret = fprintf(f, "difficulty=%u\n", difficulty);
 
     fclose(f);
 }

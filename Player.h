@@ -9,6 +9,7 @@
 //#include <assert.h>
 
 //class VehicleType;
+class Competitor;
 
 class Player
 {
@@ -30,6 +31,7 @@ public:
     void finalizeVehicle();
 
     Vehicle* getVehicle(); // inline
+    Competitor* getCompetitor(); // inline
 
     const irr::core::matrix4& getViewPos() const; // inline
     const irr::core::matrix4& getViewDest() const; // inline
@@ -48,6 +50,7 @@ public:
 
 private:
     Vehicle*        vehicle;
+    Competitor*     competitor;
     std::string     vehicleTypeName;
     unsigned int    viewNum;
     unsigned int    viewMask;
@@ -57,6 +60,11 @@ private:
 inline Vehicle* Player::getVehicle()
 {
     return vehicle;
+}
+
+inline Competitor* Player::getCompetitor()
+{
+    return competitor;
 }
 
 inline const irr::core::matrix4& Player::getViewPos() const

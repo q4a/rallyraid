@@ -38,7 +38,8 @@ MenuPageEditorStage::MenuPageEditorStage()
       editBoxShortDescription(0),
       editBoxNewRoadFilename(0),
       editBoxNewRoadName(0),
-      editBoxNewRoadDataFilename(0)
+      editBoxNewRoadDataFilename(0),
+      editBoxStageTime(0)
 {
     window = TheGame::getInstance()->getEnv()->addWindow(
         irr::core::recti(TheGame::getInstance()->getScreenSize().Width-350, 50, TheGame::getInstance()->getScreenSize().Width-10, TheGame::getInstance()->getScreenSize().Height-150),
@@ -77,8 +78,14 @@ MenuPageEditorStage::MenuPageEditorStage()
         window,
         MI_EBSHORTDESCRIPTION);
 
+    editBoxStageTime = TheGame::getInstance()->getEnv()->addEditBox(L"1000",
+        irr::core::recti(irr::core::position2di(2, 88), irr::core::dimension2di(window->getRelativePosition().getSize().Width - 4, 20)),
+        true,
+        window,
+        MI_EBSTAGETIME);
+
     irr::gui::IGUITabControl* tc = TheGame::getInstance()->getEnv()->addTabControl(
-        irr::core::recti(irr::core::position2di(2, 88), irr::core::dimension2di(window->getRelativePosition().getSize().Width - 4, window->getRelativePosition().getSize().Height - 90)),
+        irr::core::recti(irr::core::position2di(2, 110), irr::core::dimension2di(window->getRelativePosition().getSize().Width - 4, window->getRelativePosition().getSize().Height - 112)),
         window,
         true,
         true,
@@ -246,6 +253,7 @@ bool MenuPageEditorStage::OnEvent(const irr::SEvent &event)
                         dprintf(MY_DEBUG_NOTE, "editor::stage::save\n");
                         WStringConverter::toString(editBoxLongName->getText(), RaceManager::getInstance()->editorStage->stageLongName);
                         WStringConverter::toString(editBoxShortDescription->getText(), RaceManager::getInstance()->editorStage->shortDescription);
+                        WStringConverter::toUnsignedInt(editBoxStageTime->getText(), RaceManager::getInstance()->editorStage->stageTime);
                         RaceManager::getInstance()->editorStage->write();
                         return true;
                         break;
@@ -398,6 +406,10 @@ void MenuPageEditorStage::refreshEditBoxes()
     str = L"";
     str += RaceManager::getInstance()->editorStage->getShortDescription().c_str();
     editBoxShortDescription->setText(str.c_str());
+
+    str = L"";
+    str += RaceManager::getInstance()->editorStage->getStageTime();
+    editBoxStageTime->setText(str.c_str());
 }
 
 void MenuPageEditorStage::refreshRoads()

@@ -35,13 +35,14 @@ private:
     bool writeGlobalObjects();
 
 public:
-    Day* getDay(const std::string& dayName); // inline
-    const dayMap_t& getDayMap(); // inline
-    const std::string& getName(); // inline
-    const std::string& getLongName(); // inline
-    const std::string& getShortDescription(); // inline
-    const competitorMap_t& getCompetitorMap(); // inline
-    const RoadManager::roadMap_t& getRoadMap(); // inline
+    Day* getDay(const std::string& dayName) const; // inline
+    const dayMap_t& getDayMap() const; // inline
+    const std::string& getName() const; // inline
+    const std::string& getLongName() const; // inline
+    const std::string& getShortDescription() const; // inline
+    const competitorMap_t& getCompetitorMap() const; // inline
+    Competitor* getCompetitor(unsigned int compNum) const; // inline
+    const RoadManager::roadMap_t& getRoadMap() const; // inline
 
     void activate();
     void deactivate();
@@ -65,7 +66,7 @@ private:
 };
 
 
-inline Day* Race::getDay(const std::string& dayName)
+inline Day* Race::getDay(const std::string& dayName) const
 {
     dayMap_t::const_iterator dit = dayMap.find(dayName);
     if (dit == dayMap.end())
@@ -75,32 +76,42 @@ inline Day* Race::getDay(const std::string& dayName)
     return dit->second;
 }
 
-inline const Race::dayMap_t& Race::getDayMap()
+inline const Race::dayMap_t& Race::getDayMap() const
 {
     return dayMap;
 }
 
-inline const std::string& Race::getName()
+inline const std::string& Race::getName() const
 {
     return raceName;
 }
 
-inline const std::string& Race::getLongName()
+inline const std::string& Race::getLongName() const
 {
     return raceLongName;
 }
 
-inline const std::string& Race::getShortDescription()
+inline const std::string& Race::getShortDescription() const
 {
     return shortDescription;
 }
 
-inline const Race::competitorMap_t& Race::getCompetitorMap()
+inline const Race::competitorMap_t& Race::getCompetitorMap() const
 {
     return competitorMap;
 }
 
-inline const RoadManager::roadMap_t& Race::getRoadMap()
+inline Competitor* Race::getCompetitor(unsigned int compNum) const
+{
+    competitorMap_t::const_iterator it = competitorMap.find(compNum);
+    if (it == competitorMap.end())
+    {
+        return 0;
+    }
+    return it->second;
+}
+
+inline const RoadManager::roadMap_t& Race::getRoadMap() const
 {
     return roadMap;
 }
