@@ -23,6 +23,8 @@ public:
     unsigned int getStrength(); // inline
     bool getAi(); // inline
     
+    void setName(const std::string& name); // inline
+    void setTeamName(const std::string& teamName); // inline
     void setVehicleTypeName(const std::string& vehicleTypeName); // inline
 
 private:
@@ -68,6 +70,16 @@ inline unsigned int Competitor::getStrength()
 inline bool Competitor::getAi()
 {
     return ai;
+}
+
+inline void Competitor::setName(const std::string& name)
+{
+    this->name = name;
+}
+
+inline void Competitor::setTeamName(const std::string& teamName)
+{
+    this->teamName = teamName;
 }
 
 inline void Competitor::setVehicleTypeName(const std::string& vehicleTypeName)

@@ -94,7 +94,9 @@
     <ClInclude Include="CTreeSceneNode.h" />
     <ClInclude Include="Day.h" />
     <ClInclude Include="EventReceiver.h" />
+    <ClInclude Include="FontManager.h" />
     <ClInclude Include="GamePlay.h" />
+    <ClInclude Include="GamePlay_defs.h" />
     <ClInclude Include="hk.h" />
     <ClInclude Include="Hud.h" />
     <ClInclude Include="IrrCg.h" />
@@ -113,6 +115,7 @@
     <ClInclude Include="MenuPageEditorRoad.h" />
     <ClInclude Include="MenuPageEditorStage.h" />
     <ClInclude Include="MenuPageMain.h" />
+    <ClInclude Include="MessageManager.h" />
     <ClInclude Include="MyLock.h" />
     <ClInclude Include="MySound.h" />
     <ClInclude Include="MyThread.h" />
@@ -125,6 +128,7 @@
     <ClInclude Include="Player.h" />
     <ClInclude Include="Player_defs.h" />
     <ClInclude Include="Race.h" />
+    <ClInclude Include="RaceEngine.h" />
     <ClInclude Include="RaceManager.h" />
     <ClInclude Include="Road.h" />
     <ClInclude Include="RoadManager.h" />
@@ -168,6 +172,7 @@
     <ClCompile Include="Dakar2012.cpp" />
     <ClCompile Include="Day.cpp" />
     <ClCompile Include="EventReceiver.cpp" />
+    <ClCompile Include="FontManager.cpp" />
     <ClCompile Include="GamePlay.cpp" />
     <ClCompile Include="hk.cpp" />
     <ClCompile Include="Hud.cpp" />
@@ -185,6 +190,7 @@
     <ClCompile Include="MenuPageEditorRoad.cpp" />
     <ClCompile Include="MenuPageEditorStage.cpp" />
     <ClCompile Include="MenuPageMain.cpp" />
+    <ClCompile Include="MessageManager.cpp" />
     <ClCompile Include="MySound.cpp" />
     <ClCompile Include="MyThread.cpp" />
     <ClCompile Include="ObjectPool.cpp" />
@@ -195,6 +201,7 @@
     <ClCompile Include="OffsetObject.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Race.cpp" />
+    <ClCompile Include="RaceEngine.cpp" />
     <ClCompile Include="RaceManager.cpp" />
     <ClCompile Include="Road.cpp" />
     <ClCompile Include="RoadManager.cpp" />

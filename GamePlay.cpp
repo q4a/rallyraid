@@ -10,7 +10,11 @@
 #include "ObjectWire.h"
 #include "Player.h"
 #include "VehicleType.h"
+#include "VehicleTypeManager.h"
 #include "Competitor.h"
+#include "RaceEngine.h"
+#include "stdafx.h"
+#include "ConfigDirectory.h"
 #include <assert.h>
 
 
@@ -35,14 +39,168 @@ void GamePlay::finalize()
 
 
 GamePlay::GamePlay()
+    : currentRace(0),
+      currentStage(0),
+      raceState(),
+      raceEngine(0)
 {
 }
 
 GamePlay::~GamePlay()
 {
+    if (raceEngine)
+    {
+        delete raceEngine;
+        raceEngine = 0;
+    }
+    clearStageStateList(raceState);
 }
 
-void GamePlay::startGame(Stage* stage, VehicleType* vehicleType)
+void GamePlay::startNewGame(Race* race, VehicleType* vehicleType)
+{
+    if (vehicleType)
+    {
+        Stage* stage = 0;
+        if (race)
+        {
+            Day* day = 0;
+
+            if (!race->getDayMap().empty())
+            {
+                day = race->getDayMap().begin()->second;
+            }
+            if (day && !day->getStageMap().empty())
+            {
+                stage = day->getStageMap().begin()->second;
+            }
+        }
+
+        // release old resources
+        if (raceEngine)
+        {
+            delete raceEngine;
+            raceEngine = 0;
+        }
+
+        if (currentRace)
+        {
+            clearStageStateList(raceState);
+            currentRace = 0;
+        }
+        currentRace = race;
+
+        // reinitalize new resources
+        StageState* stageState = new StageState;
+
+        stageState->stage = stage;
+        const Race::competitorMap_t& competitorMap = currentRace->getCompetitorMap();
+        for (Race::competitorMap_t::const_iterator it = competitorMap.begin();
+             it != competitorMap.end();
+             it++)
+        {
+            CompetitorResult* competitorResult = new CompetitorResult(it->second, 0, 0, 0, 0);
+            stageState->competitorResultListStage.push_back(competitorResult);
+        }
+        {
+            CompetitorResult* competitorResult = new CompetitorResult(Player::getInstance()->getCompetitor(), 0, 0, 0, 0);
+            stageState->competitorResultListStage.push_back(competitorResult);
+        }
+
+        raceState.push_back(stageState);
+
+        if (TheGame::getInstance()->getEditorMode()==false)
+        {
+            raceEngine = new RaceEngine(stageState, raceState.size());
+            clearCompetitorResultList(stageState->competitorResultListStage);
+            while (raceEngine && raceEngine->update(0, irr::core::vector3df(), RaceEngine::AtStart));
+        }
+        else
+        {
+            clearCompetitorResultList(stageState->competitorResultListStage);
+        }
+        startStage(stage, vehicleType);
+    }
+}
+
+bool GamePlay::loadGame(const std::string& saveName)
+{
+    assert(TheGame::getInstance()->getEditorMode()==false);
+
+    dprintf(MY_DEBUG_NOTE, "GamePlay::loadGame(): load save game: %s\n", saveName.c_str());
+
+    bool ret = true;
+    Stage* stage = 0;
+
+    // release old resources
+    if (raceEngine)
+    {
+        delete raceEngine;
+        raceEngine = 0;
+    }
+
+    if (currentRace)
+    {
+        clearStageStateList(raceState);
+        currentRace = 0;
+    }
+
+    ret = readStageStateList(SAVE_STATE(saveName), raceState);
+    if (ret)
+    {
+        assert(!raceState.empty());
+        stage = raceState.back()->stage;
+        currentRace = stage->getParent()->getParent();
+
+        raceEngine = new RaceEngine(stage);
+        ret = raceEngine->load(SAVE_ENGINE(saveName), currentRace);
+        if (ret)
+        {
+            ret = Player::getInstance()->load(SAVE_PLAYER(saveName));
+        }
+    }
+
+    if (ret)
+    {
+        VehicleType* vehicleType = VehicleTypeManager::getInstance()->getVehicleType(Player::getInstance()->getCompetitor()->getVehicleTypeName());
+        startStage(stage, vehicleType);
+    }
+    else
+    {
+        dprintf(MY_DEBUG_ERROR, "GamePlay::loadGame(): unable to load save game: %s\n", saveName.c_str());
+    }
+
+    return ret;
+}
+
+bool GamePlay::saveGame(const std::string& saveName)
+{
+    assert(TheGame::getInstance()->getEditorMode()==false);
+
+    dprintf(MY_DEBUG_NOTE, "GamePlay::saveGame(): save game: %s\n", saveName.c_str());
+
+    bool ret = ((raceEngine != 0) && (currentRace != 0) && (!raceState.empty()));
+
+
+    if (ret)
+    {
+        ret = writeStageStateList(SAVE_STATE(saveName), raceState);
+        if (ret)
+        {
+            ret = raceEngine->save(SAVE_ENGINE(saveName));
+            if (ret)
+            {
+                ret = Player::getInstance()->save(SAVE_PLAYER(saveName));
+            }
+        }
+    }
+    if (!ret)
+    {
+        dprintf(MY_DEBUG_ERROR, "GamePlay::saveGame(): unable to write save game: %s\n", saveName.c_str());
+    }
+    return ret;
+}
+
+void GamePlay::startStage(Stage* stage, VehicleType* vehicleType)
 {
     irr::core::vector3df initialPos(4190225.f, 215.f, -6401350.f);
     irr::core::vector3df initialDir(1.f, 0.f, 0.f);
@@ -84,8 +242,81 @@ void GamePlay::startGame(Stage* stage, VehicleType* vehicleType)
     {
         RaceManager::getInstance()->activateStage(stage);
     }
+    currentStage = stage;
 
     TheGame::getInstance()->resetTick();
+}
+
+void GamePlay::update(unsigned int tick, const irr::core::vector3df& apos)
+{
+    if (raceEngine)
+    {
+        assert(Player::getInstance()->getStarter()!=0);
+        if (Player::getInstance()->getStarter()->startTime==0 ||
+            (Player::getInstance()->getStarter()->startTime!=0 && Player::getInstance()->getFirstPressed()))
+        raceEngine->update(tick, apos, RaceEngine::InTheMiddle);
+    }
+}
+
+unsigned int GamePlay::competitorFinished(CompetitorResult* competitorResult)
+{
+    unsigned int insertPos = 1;
+
+    assert(!raceState.empty());
+
+    StageState* stageState = raceState.back();
+
+    // update stage list
+    if (stageState->competitorResultListStage.empty())
+    {
+        stageState->competitorResultListStage.push_back(competitorResult);
+    }
+    else
+    {
+        bool inserted = false;
+        for (competitorResultList_t::const_iterator it = stageState->competitorResultListStage.begin();
+             it != stageState->competitorResultListStage.end();
+             it++, insertPos++)
+        {
+            if (((*it)->stageTime+(*it)->stagePenalityTime) > (competitorResult->stageTime+competitorResult->stagePenalityTime))
+            {
+                stageState->competitorResultListStage.insert(it, competitorResult);
+                inserted = true;
+                break;
+            }
+            if (!inserted)
+            {
+                stageState->competitorResultListStage.push_back(competitorResult);
+            }
+        }
+    }
+
+    // update overall state
+    if (stageState->competitorResultListOverall.empty())
+    {
+        stageState->competitorResultListOverall.push_back(competitorResult);
+    }
+    else
+    {
+        bool inserted = false;
+        for (competitorResultList_t::const_iterator it = stageState->competitorResultListOverall.begin();
+             it != stageState->competitorResultListOverall.end();
+             it++)
+        {
+            if (((*it)->globalTime+(*it)->globalPenalityTime) > (competitorResult->globalTime+competitorResult->globalPenalityTime))
+            {
+                stageState->competitorResultListOverall.insert(it, competitorResult);
+                inserted = true;
+                break;
+            }
+            if (!inserted)
+            {
+                stageState->competitorResultListOverall.push_back(competitorResult);
+            }
+        }
+    }
+
+    return insertPos;
 }
 
 /* static */ bool GamePlay::readStageStateList(const std::string& filename, stageStateList_t& stageStateList)

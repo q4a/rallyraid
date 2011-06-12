@@ -74,22 +74,23 @@ public:
     };
     
     RaceEngine(StageState* stageState, int stageNum);
+    RaceEngine(Stage* stage);
     ~RaceEngine();
     bool update(unsigned int tick, const irr::core::vector3df& apos, UpdateWhen when = InTheMiddle);
     void updateShowNames();
-    void addUpdater(Starter* starter);
-    void removeUpdater(Starter* starter);
-    int insertIntoFinishedState(Starter* starter);
     bool save(const std::string& filename);
     bool load(const std::string& filename, Race* race);
+    bool isRaceFinished() {return raceFinished;}
+
+    // functions called by the Starter
+    void addUpdater(Starter* starter);
+    void removeUpdater(Starter* starter);
+    unsigned int insertIntoFinishedState(Starter* starter);
+
     //core::array<Competitor*> &getFinishedState() {return finishedState;}
     //core::array<Starter*> &getStarters() {return starters;}
     //int insertIntoFinishedState(Competitor* competitor);
-    
     //void refreshBigTerrain(BigTerrain* p_bigTerrain);
-    
-    bool isRaceFinished() {return raceFinished;}
-    
     //static void clearStates();
     //static void refreshStates(RaceEngine* re);
     //static core::array<Competitor*> &getRaceState() {return raceState;}

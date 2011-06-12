@@ -10,6 +10,7 @@
 
 //class VehicleType;
 class Competitor;
+class Starter;
 
 class Player
 {
@@ -30,8 +31,16 @@ public:
     void initializeVehicle(const std::string& vehicleTypeName, const irr::core::vector3df& apos, const irr::core::vector3df& rotation);
     void finalizeVehicle();
 
+    bool save(const std::string& filename);
+    bool load(const std::string& filename);
+
     Vehicle* getVehicle(); // inline
     Competitor* getCompetitor(); // inline
+    Starter* getStarter(); // inline
+    void setStarter(Starter* starter); // inline
+    bool getFirstPressed() const; // inline
+    bool isFirstPressed() const; // inline
+    void setFirstPressed(); // inline
 
     const irr::core::matrix4& getViewPos() const; // inline
     const irr::core::matrix4& getViewDest() const; // inline
@@ -51,10 +60,11 @@ public:
 private:
     Vehicle*        vehicle;
     Competitor*     competitor;
-    std::string     vehicleTypeName;
+    Starter*        starter;
     unsigned int    viewNum;
     unsigned int    viewMask;
     bool            recenterView;
+    bool            firstPressed;
 };
 
 inline Vehicle* Player::getVehicle()
@@ -65,6 +75,31 @@ inline Vehicle* Player::getVehicle()
 inline Competitor* Player::getCompetitor()
 {
     return competitor;
+}
+
+inline Starter* Player::getStarter()
+{
+    return starter;
+}
+
+inline void Player::setStarter(Starter* starter)
+{
+    this->starter = starter;
+}
+
+inline bool Player::getFirstPressed() const
+{
+    return firstPressed;
+}
+
+inline bool Player::isFirstPressed() const
+{
+    return firstPressed;
+}
+
+inline void Player::setFirstPressed()
+{
+    firstPressed = true;
 }
 
 inline const irr::core::matrix4& Player::getViewPos() const

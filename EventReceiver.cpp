@@ -393,12 +393,14 @@ void EventReceiver::checkEvents()
         if (IS_PRESSED(ACCELERATE))
         {
             //dprintf(MY_DEBUG_NOTE, "accelerate pressed\n");
+            Player::getInstance()->setFirstPressed();
             Player::getInstance()->getVehicle()->setTorque(-1);
         }
         else
         if (IS_PRESSED(BRAKE))
         {
             //dprintf(MY_DEBUG_NOTE, "brake pressed\n");
+            Player::getInstance()->setFirstPressed();
             Player::getInstance()->getVehicle()->setTorque(1);
         }
         else

@@ -34,7 +34,7 @@ Settings::Settings()
       objectDensity(10),
       useTerrainDetail(true),
       showNames(true),
-      difficulty(2);
+      difficulty(2)
 {
 }
 

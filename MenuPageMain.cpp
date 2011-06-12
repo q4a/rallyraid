@@ -139,20 +139,8 @@ bool MenuPageMain::OnEvent(const irr::SEvent &event)
                             selectedRace?selectedRace->getName().c_str():"-", selectedVehicleType?selectedVehicleType->getName():"-");
                         if (selectedRace && selectedVehicleType)
                         {
-                            Stage* stage = 0;
-                            Day* day = 0;
-                            
-                            if (!selectedRace->getDayMap().empty())
-                            {
-                                day = selectedRace->getDayMap().begin()->second;
-                            }
-                            if (day && !day->getStageMap().empty())
-                            {
-                                stage = day->getStageMap().begin()->second;
-                            }
-
-                            MenuManager::getInstance()->close();                            
-                            GamePlay::getInstance()->startGame(stage, selectedVehicleType);
+                            MenuManager::getInstance()->close();
+                            GamePlay::getInstance()->startNewGame(selectedRace, selectedVehicleType);
                         }
                         return true;
                         break;

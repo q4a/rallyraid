@@ -5,14 +5,22 @@
 #include <map>
 #include <list>
 #include <string>
+#include <irrlicht.h>
+
+#define SAVE_DIR                (std::string("savegames"))
+#define SAVE_STATE(saveName)    (SAVE_DIR + "/" + saveName + "/" + std::string("racestate"))
+#define SAVE_ENGINE(saveName)   (SAVE_DIR + "/" + saveName + "/" + std::string("stagestate"))
+#define SAVE_PLAYER(saveName)   (SAVE_DIR + "/" + saveName + "/" + std::string("player"))
 
 class Stage;
 class Race;
 class VehicleType;
 class Competitor;
+class RaceEngine;
 
-struct CompetitorResult
+class CompetitorResult
 {
+public:
     CompetitorResult(Competitor* competitor)
         : competitor(competitor),
           stageTime(0),
@@ -42,8 +50,9 @@ typedef std::list<CompetitorResult*> competitorResultList_t;
 
 // -----------------------------------------------------------------
 
-struct StageState
+class StageState
 {
+public:
     Stage*                  stage;
     competitorResultList_t  competitorResultListStage;
     competitorResultList_t  competitorResultListOverall;
@@ -68,7 +77,17 @@ private:
     ~GamePlay();
 
 public:
-    void startGame(Stage* stage, VehicleType* vehicleType);
+    void startNewGame(Race* race, VehicleType* vehicleType);
+    bool loadGame(const std::string& saveName);
+    bool saveGame(const std::string& saveName);
+
+    // called by the TheGame::loop()
+    void update(unsigned int tick, const irr::core::vector3df& apos);
+
+    unsigned int competitorFinished(CompetitorResult* competitorResult);
+
+private:
+    void startStage(Stage* stage, VehicleType* vehicleType);
 
 private:
     static bool readStageStateList(const std::string& filename, stageStateList_t& stageStateList);
@@ -80,6 +99,10 @@ private:
     static void clearCompetitorResultList(competitorResultList_t& competitorResultList);
 
 private:
+    Race*               currentRace;
+    Stage*              currentStage;
+    stageStateList_t    raceState;
+    RaceEngine*         raceEngine;
 
 
     friend class MenuPageEditor;
