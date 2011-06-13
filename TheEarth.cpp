@@ -1034,6 +1034,7 @@ void TheEarth::createFirst(const irr::core::vector3df& apos, const irr::core::ve
     printf("done\ngenerate road stuff ... ");
     newVisualPart = visualPart;
     RoadManager::getInstance()->generateNewVisual();
+    RoadManager::getInstance()->switchToNewVisual();
     newVisualPart = 0;
     printf("done\nset visible members ... ");
     visualPart->setVisible(true);

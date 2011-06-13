@@ -165,7 +165,8 @@ void VisualRoad::generateRoadNode()
                 else
 #endif // 0
                 {
-                    float hc =TheEarth::getInstance()->getNewHeight(ppos-offsetManager->getOffset());
+                    float hc =TheEarth::getInstance()->getNewHeight(ppos/*-offsetManager->getOffset()*/);
+                    //printf("%f x %f - %f\n", ppos.X-offsetManager->getOffset().X, ppos.Z-offsetManager->getOffset().Z, hc);
                     if (hc > 0.01f)
                         vtx.Pos.Y = roadType->slicePoints[j].Y+hc;
                 }
