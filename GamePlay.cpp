@@ -234,15 +234,16 @@ void GamePlay::startStage(Stage* stage, VehicleType* vehicleType)
 
     ObjectWire::getInstance()->reset();
     TheGame::getInstance()->reset(initialPos, initialDir);
-    TheEarth::getInstance()->createFirst(initialPos, initialDir);
-    Player::getInstance()->finalizeVehicle();
-    Player::getInstance()->initializeVehicle(vehicleType->getName(), initialPos+initialDir, irr::core::vector3df(0.f, deg, 0.f));
-    
+
     if (stage)
     {
         RaceManager::getInstance()->activateStage(stage);
     }
     currentStage = stage;
+
+    TheEarth::getInstance()->createFirst(initialPos, initialDir);
+    Player::getInstance()->finalizeVehicle();
+    Player::getInstance()->initializeVehicle(vehicleType->getName(), initialPos+initialDir, irr::core::vector3df(0.f, deg, 0.f));
 
     TheGame::getInstance()->resetTick();
 }

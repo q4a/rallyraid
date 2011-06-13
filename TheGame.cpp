@@ -87,7 +87,8 @@ TheGame::TheGame()
       cameraAngle(0.0f),
       inGame(true),
       editorMode(true),
-      testText(0)
+      testText(0),
+      skydome(0)
 {
     dprintf(MY_DEBUG_INFO, "TheGame::TheGame(): this: %p\n", this);
     theGame = this;
@@ -151,6 +152,12 @@ TheGame::TheGame()
         offsetManager = OffsetManager::getInstance();
         dprintf(MY_DEBUG_NOTE, "Initialize object pool manager\n");
         ObjectPoolManager::initialize();
+        dprintf(MY_DEBUG_NOTE, "Initialize road type manager\n");
+        RoadTypeManager::initialize();
+        roadTypeManager = RoadTypeManager::getInstance();
+        dprintf(MY_DEBUG_NOTE, "Initialize road manager\n");
+        RoadManager::initialize();
+        roadManager = RoadManager::getInstance();
         dprintf(MY_DEBUG_NOTE, "Initialize earth\n");
         TheEarth::initialize();
         earth = TheEarth::getInstance();
@@ -169,12 +176,6 @@ TheGame::TheGame()
         dprintf(MY_DEBUG_NOTE, "Initialize player\n");
         Player::initialize();
         player = Player::getInstance();
-        dprintf(MY_DEBUG_NOTE, "Initialize road type manager\n");
-        RoadTypeManager::initialize();
-        roadTypeManager = RoadTypeManager::getInstance();
-        dprintf(MY_DEBUG_NOTE, "Initialize road manager\n");
-        RoadManager::initialize();
-        roadManager = RoadManager::getInstance();
         dprintf(MY_DEBUG_NOTE, "Initialize itiner manager\n");
         ItinerManager::initialize();
         itinerManager = ItinerManager::getInstance();
@@ -195,6 +196,13 @@ TheGame::TheGame()
         hud = Hud::getInstance();
 
         testText = env->addStaticText(L"", irr::core::recti(10, 10, 790, 30), false, true, 0, -1, true);
+        skydome = smgr->addSkyDomeSceneNode(driver->getTexture("data/skys/fairday.jpg"),16,8,0.95f,2.0f);
+        /*if (useShaders && useCgShaders)
+        {
+            skydome->setMaterialType((video::E_MATERIAL_TYPE)myMaterialType_sky);
+            skydome->setMaterialTexture(1, driver->getTexture("data/skys/skystars.jpg"));
+        }*/
+        skydome->setMaterialFlag(irr::video::EMF_LIGHTING, false);
     }
 }
 
@@ -248,10 +256,6 @@ TheGame::~TheGame()
     WayPointManager::finalize();
     dprintf(MY_DEBUG_NOTE, "Finalize itiner manager\n");
     ItinerManager::finalize();
-    dprintf(MY_DEBUG_NOTE, "Finalize road manager\n");
-    RoadManager::finalize();
-    dprintf(MY_DEBUG_NOTE, "Finalize road type manager\n");
-    RoadTypeManager::finalize();
     dprintf(MY_DEBUG_NOTE, "Finalize player\n");
     Player::finalize();
     dprintf(MY_DEBUG_NOTE, "Finalize object wire\n");
@@ -264,6 +268,10 @@ TheGame::~TheGame()
     VehicleTypeManager::finalize();
     dprintf(MY_DEBUG_NOTE, "Finalize earth\n");
     TheEarth::finalize();
+    dprintf(MY_DEBUG_NOTE, "Finalize road manager\n");
+    RoadManager::finalize();
+    dprintf(MY_DEBUG_NOTE, "Finalize road type manager\n");
+    RoadTypeManager::finalize();
     dprintf(MY_DEBUG_NOTE, "Finalize offsetManager\n");
     OffsetManager::finalize();
     dprintf(MY_DEBUG_NOTE, "Finalize objectPoolManager\n");

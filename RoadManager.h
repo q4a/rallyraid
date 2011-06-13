@@ -10,6 +10,8 @@
 #include <irrlicht.h>
 
 class Road;
+class VisualRoad;
+class Tile;
 
 typedef std::pair<unsigned int, unsigned int> roadChunk_t;
 
@@ -37,6 +39,7 @@ public:
 
     typedef std::map<std::string, Road*>                roadMap_t;
     typedef std::map<unsigned int, roadRoadChunkList_t> stageRoadChunkListMap_t;
+    typedef std::list<VisualRoad*>                      visualRoadList_t;
 
 private:
     static RoadManager* roadManager;
@@ -55,11 +58,30 @@ public:
     void addStageRoad(const roadMap_t& p_roadMap);  // call when start a new stage: add race, day and stage roads
     void clearStageRoads();         // call when a stage is ended
 
+    // -------------------------------------------------------------------
     // these stuffs are called from the earth visible part builder thread!
-    void clearVisible();                                                        // call when start to build the new visible stuff
-    void addChunkListToVisible(const roadRoadChunkList_t& roadRoadChunkList);   // call when a tile become visible
-    void setVisibleStageRoad(unsigned int tileNum);                             // call from the tile which become visible
+    // -------------------------------------------------------------------
+    
+    // call when start to a brand new earth stuff, called from earth
+    void clearVisible();
 
+    // call when a tile become visible, called from setVisibleStageRoad and from tiles constructor, called from thread
+    void addChunkListToVisible(const roadRoadChunkList_t& roadRoadChunkList, Tile* tile);
+    // call from the tile which become visible, called from thread
+    void setVisibleStageRoad(unsigned int tileNum, Tile* tile);
+
+    // call when a tile become invisible, called from setInvisibleStageRoad and from tiles destructor, called from thread
+    void removeChunkListToVisible(const roadRoadChunkList_t& roadRoadChunkList, Tile* tile);
+    // call from the tile which become invisible, called from thread
+    void setInvisibleStageRoad(unsigned int tileNum, Tile* tile);
+
+    // called from the thread
+    void generateNewVisual();
+
+    // call from the earth stuff, the non-threaded part at the end
+    void switchToNewVisual();
+
+    // general static finctions
     static void readRoads(const std::string& dirName, roadMap_t& roadMap, bool global, bool doRead = false);
     static bool readRoadRoadChunk(const std::string& fileName, roadRoadChunkList_t& roadRoadChunkList, const RoadManager::roadMap_t& roadMap);
     static bool writeRoadRoadChunk(const std::string& fileName, const roadRoadChunkList_t& roadRoadChunkList);
@@ -73,6 +95,8 @@ private:
     roadMap_t               roadMap;
     stageRoadChunkListMap_t stageRoadChunkListMap;
     roadRoadChunkSet_t      visibleRoadChunkSet;
+    visualRoadList_t        visualRoadList;
+    visualRoadList_t        visualRoadListNew;
 
     Road*                   editorRoad;
     int                     editorRadius;

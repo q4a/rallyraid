@@ -117,6 +117,7 @@ private:
     bool                            editorMode;
 
     irr::gui::IGUIStaticText*       testText;
+    irr::scene::ISceneNode*         skydome;
 };
 
 inline irr::IrrlichtDevice* TheGame::getDevice()

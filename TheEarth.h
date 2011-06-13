@@ -51,14 +51,9 @@ private:
     void removeNotInUseTiles();
     
 public:
-    unsigned short getTileHeight(unsigned int x, unsigned int y);
-                 // x and y devide by TILE_SCALE
-    const irr::video::SColor& getTileTexture(unsigned int x, unsigned int y);
-     // x and y devide by TILE_SCALE
-    void getTileHeightAndTexture(unsigned int x, unsigned int y,
-                  // x and y devide by TILE_SCALE
-        unsigned short& height, irr::video::SColor& textureColor);
-                // x and y devide by TILE_SCALE
+    unsigned short getTileHeight(unsigned int x, unsigned int y); // x and y devide by TILE_SCALE
+    const irr::video::SColor& getTileTexture(unsigned int x, unsigned int y); // x and y devide by TILE_SCALE
+    void getTileHeightAndTexture(unsigned int x, unsigned int y, unsigned short& height, irr::video::SColor& textureColor); // x and y devide by TILE_SCALE
     const irr::video::SColor& getTileFineTexture(unsigned int x, unsigned int y);   // x and y are not devided by TILE_SCALE, but TILE_FINE_SCALE
     const irr::video::SColor& getTileFineDensity(unsigned int x, unsigned int y);   // x and y are not devided by TILE_SCALE, but TILE_FINE_SCALE
     void setTileFineTexture(unsigned int x, unsigned int y, const irr::video::SColor& val = irr::video::SColor()); // x and y are not devided by TILE_SCALE, but TILE_FINE_SCALE
@@ -128,6 +123,10 @@ public:
     float getHeight(float x, float z);
     float getHeight(const irr::core::vector3df& pos);
     float getHeight(const irr::core::vector2df& pos);
+    
+    float getNewHeight(float x, float z);
+    float getNewHeight(const irr::core::vector3df& pos);
+    float getNewHeight(const irr::core::vector2df& pos);
     
     unsigned int getSizeX() {return xsize;}
     unsigned int getSizeY() {return ysize;}

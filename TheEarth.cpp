@@ -15,6 +15,7 @@
 #include "TerrainCircle.h"
 #include "TerrainLarge.h"
 #include "Settings.h"
+#include "RoadManager.h"
 
 
 const irr::core::vector3di TheEarth::VisualMembers::terrainPos[3][3] =
@@ -1023,12 +1024,17 @@ void TheEarth::createFirst(const irr::core::vector3df& apos, const irr::core::ve
     newVisualPart = 0;
     clearSetInUseFlagsForTiles();
     removeNotInUseTiles();
+    RoadManager::getInstance()->clearVisible();
 
     visualPart = new VisualMembers();
     printf("create members ... ");
     visualPart->createMembers(lastCenterPosi, lastLargeCenterPosi, this);
     printf("done\nload members ... ");
     visualPart->loadMembers(this);
+    printf("done\ngenerate road stuff ... ");
+    newVisualPart = visualPart;
+    RoadManager::getInstance()->generateNewVisual();
+    newVisualPart = 0;
     printf("done\nset visible members ... ");
     visualPart->setVisible(true);
     printf("done\nrefresh minimap ... ");
@@ -1058,6 +1064,7 @@ void TheEarth::update(const irr::core::vector3df& apos, const irr::core::vector3
         visualPart = newReadyVisualPart;
         newReadyVisualPart = 0;
         visualPart->setVisible(true);
+        RoadManager::getInstance()->switchToNewVisual();
         printf("switch to new, set visible true ... done\n");
         
         return;
@@ -1100,9 +1107,13 @@ void TheEarth::update(const irr::core::vector3df& apos, const irr::core::vector3
 void TheEarth::run()
 {
     clearSetInUseFlagsForTiles();
+    //RoadManager::getInstance()->clearVisible();
     printf("loading visual part ...\n");
     newVisualPart->loadMembers(this);
     printf("loading visual part ... done\n");
+    printf("generate road stuff ... \n");
+    RoadManager::getInstance()->generateNewVisual();
+    printf("generate road stuff ... done\n");
     newReadyVisualPart = newVisualPart;
     newVisualPart = 0;
     removeNotInUseTiles();
@@ -1185,6 +1196,21 @@ float TheEarth::getHeight(const irr::core::vector3df& pos)
 float TheEarth::getHeight(const irr::core::vector2df& pos)
 {
     return getHeight(pos.X, pos.Y);
+}
+
+float TheEarth::getNewHeight(float x, float z)
+{
+    return newVisualPart->getHeight(x, z);
+}
+
+float TheEarth::getNewHeight(const irr::core::vector3df& pos)
+{
+    return getNewHeight(pos.X, pos.Z);
+}
+
+float TheEarth::getNewHeight(const irr::core::vector2df& pos)
+{
+    return getNewHeight(pos.X, pos.Y);
 }
 
 void TheEarth::clearSetInUseFlagsForTiles()

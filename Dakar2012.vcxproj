@@ -157,6 +157,7 @@
     <ClInclude Include="VehicleManager.h" />
     <ClInclude Include="VehicleType.h" />
     <ClInclude Include="VehicleTypeManager.h" />
+    <ClInclude Include="VisualRoad.h" />
     <ClInclude Include="WayPoint.h" />
     <ClInclude Include="WayPointManager.h" />
     <ClInclude Include="WStringConverter.h" />
@@ -224,6 +225,7 @@
     <ClCompile Include="VehicleManager.cpp" />
     <ClCompile Include="VehicleType.cpp" />
     <ClCompile Include="VehicleTypeManager.cpp" />
+    <ClCompile Include="VisualRoad.cpp" />
     <ClCompile Include="WayPoint.cpp" />
     <ClCompile Include="WayPointManager.cpp" />
   </ItemGroup>

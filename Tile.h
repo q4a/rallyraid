@@ -81,6 +81,30 @@ public:
         }
     }
     
+    void setFineColor(unsigned int x, unsigned int y, int radius = 0, const irr::video::SColor& val = irr::video::SColor())
+    {
+        if (fineColors && x < TILE_FINE_POINTS_NUM && y < TILE_FINE_POINTS_NUM)
+        {
+            fineColors[x + (TILE_FINE_POINTS_NUM*y)] = val;
+        }
+    }
+    
+    void setFineColorAndZeroDensity(unsigned int x, unsigned int y, unsigned int radius, const irr::video::SColor& val)
+    {
+        if (!fineColors || !fineDensity) return;
+        for (unsigned int yy = y - radius, fy = TILE_FINE_POINTS_NUM*(y-radius); yy < y + radius; yy++, fy += TILE_FINE_POINTS_NUM)
+        {
+            for (unsigned int xx = x - radius; xx < x + radius; xx++)
+            {
+                if (xx < TILE_FINE_POINTS_NUM && yy < TILE_FINE_POINTS_NUM)
+                {
+                    fineDensity[xx + fy] = irr::video::SColor();
+                    fineColors[xx + fy] = val;
+                }
+            }
+        }
+    }
+    
     bool getInUse() const {return inUse;}
     bool isInUse() const {return inUse;}
     void setInUse() {inUse = true;}

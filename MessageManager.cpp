@@ -32,6 +32,7 @@ MessageManager::MessageManager()
         true,  // wordwrap
         0, -1,
         true); // show bg
+    messageText->setVisible(false);
 }
 
 MessageManager::~MessageManager()

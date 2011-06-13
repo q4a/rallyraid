@@ -27,6 +27,7 @@ private:
     float                               tRate;
 
     friend class Road;
+    friend class VisualRoad;
 };
 
 

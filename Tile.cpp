@@ -220,10 +220,15 @@ Tile::Tile(unsigned int posx, unsigned int posy, unsigned int tileNum,
     printf("\n");
     */
     //assert(0);
+    //RoadManager::getInstance()->addChunkListToVisible(roadRoadChunkList, this);
+    RoadManager::getInstance()->setVisibleStageRoad(TheEarth::getInstance()->calculateTileNum(posx, posy), this);
 }
 
 Tile::~Tile()
 {
+    //RoadManager::getInstance()->removeChunkListToVisible(roadRoadChunkList, this);
+    RoadManager::getInstance()->setInvisibleStageRoad(TheEarth::getInstance()->calculateTileNum(posx, posy), this);
+
     if (height)
     {
         delete [] height;
@@ -287,10 +292,8 @@ bool Tile::read()
     file->seek(6);    
     rc = file->read(height, (TILE_POINTS_NUM*TILE_POINTS_NUM)*sizeof(unsigned short));
     file->drop();
-    
-    RoadManager::readRoadRoadChunk(filenameRRC, roadRoadChunkList, RoadManager::getInstance()->getRoadMap());
-    RoadManager::getInstance()->addChunkListToVisible(roadRoadChunkList);
-    RoadManager::getInstance()->setVisibleStageRoad(TheEarth::getInstance()->calculateTileNum(posx, posy));
+
+    //RoadManager::readRoadRoadChunk(filenameRRC, roadRoadChunkList, RoadManager::getInstance()->getRoadMap());
 
     return true;
 }

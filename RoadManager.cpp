@@ -7,6 +7,10 @@
 #include "StringConverter.h"
 #include "Terrain_defs.h"
 #include "TheEarth.h"
+#include "VisualRoad.h"
+#include "Tile.h"
+#include "Terrain_defs.h"
+
 
 RoadManager* RoadManager::roadManager = 0;
 
@@ -32,6 +36,8 @@ RoadManager::RoadManager()
     : roadMap(),
       stageRoadChunkListMap(),
       visibleRoadChunkSet(),
+      visualRoadList(),
+      visualRoadListNew(),
       editorRoad(0),
       editorRadius(0),
       editorColor(0)
@@ -86,18 +92,20 @@ void RoadManager::readRoads(const std::string& dirName, RoadManager::roadMap_t& 
 void RoadManager::addStageRoad(Road* road)
 {
     unsigned long ps = road->roadPointVector.size();
+    //printf("addStageRoad(): %lu\n", ps);
     if (ps == 0) return;
 
     RoadRoadChunk currentChunk;
     currentChunk.road = road;
     currentChunk.roadChunk = roadChunk_t(0, 0);
     unsigned int currentTile = TheEarth::getInstance()->calculateTileNum(
-        (unsigned int)abs((int)road->roadPointVector[0].p.X), (unsigned int)abs((int)road->roadPointVector[0].p.Z));
-
+        (unsigned int)abs((int)road->roadPointVector[0].p.X)/TILE_SIZE, (unsigned int)abs((int)road->roadPointVector[0].p.Z)/TILE_SIZE);
+    //printf("0. %u\n", currentTile);
     for (unsigned int i = 1; i < ps; i++)
     {
         unsigned int newTile = TheEarth::getInstance()->calculateTileNum(
-            (unsigned int)abs((int)road->roadPointVector[i].p.X), (unsigned int)abs((int)road->roadPointVector[i].p.Z));
+            (unsigned int)abs((int)road->roadPointVector[i].p.X)/TILE_SIZE, (unsigned int)abs((int)road->roadPointVector[i].p.Z)/TILE_SIZE);
+        //printf("%u. %u\n", i, newTile);
         if (newTile != currentTile)
         {
             currentChunk.roadChunk.second = i - 1;
@@ -109,6 +117,8 @@ void RoadManager::addStageRoad(Road* road)
     }
     currentChunk.roadChunk.second = ps - 1;
     stageRoadChunkListMap[currentTile].push_back(currentChunk);
+    //printf("addStageRoad(): %lu\n", stageRoadChunkListMap.size());
+    //assert(0);
 }
 
 void RoadManager::addStageRoad(const RoadManager::roadMap_t& p_roadMap)
@@ -129,25 +139,110 @@ void RoadManager::clearStageRoads()
 void RoadManager::clearVisible()
 {
     visibleRoadChunkSet.clear();
+    for (visualRoadList_t::const_iterator it = visualRoadList.begin();
+         it != visualRoadList.end();
+         it++)
+    {
+        delete (*it);
+    }
+    visualRoadList.clear();
 }
 
-void RoadManager::addChunkListToVisible(const roadRoadChunkList_t& roadRoadChunkList)
+void RoadManager::addChunkListToVisible(const roadRoadChunkList_t& roadRoadChunkList, Tile* tile)
 {
     for (roadRoadChunkList_t::const_iterator rcit = roadRoadChunkList.begin();
          rcit != roadRoadChunkList.end();
          rcit++)
     {
         visibleRoadChunkSet.insert(*rcit);
+        for (unsigned int i = rcit->roadChunk.first; i <= rcit->roadChunk.second; i++)
+        {
+            if (rcit->road->roadPointVector[i].radius > 0)
+            {
+                const unsigned int inX = (unsigned int)fabsf(rcit->road->roadPointVector[i].p.X) % TILE_FINE_POINTS_NUM;
+                const unsigned int inY = (unsigned int)fabsf(rcit->road->roadPointVector[i].p.Z) % TILE_FINE_POINTS_NUM;
+
+                tile->setFineColorAndZeroDensity(inX, inY, rcit->road->roadPointVector[i].radius, rcit->road->roadPointVector[i].color);
+            }
+        }
     }
 }
 
-void RoadManager::setVisibleStageRoad(unsigned int tileNum)
+void RoadManager::setVisibleStageRoad(unsigned int tileNum, Tile* tile)
 {
     stageRoadChunkListMap_t::const_iterator srit = stageRoadChunkListMap.find(tileNum);
     if (srit != stageRoadChunkListMap.end())
     {
-        addChunkListToVisible(srit->second);
+        addChunkListToVisible(srit->second, tile);
     }
+}
+
+void RoadManager::removeChunkListToVisible(const roadRoadChunkList_t& roadRoadChunkList, Tile* tile)
+{
+    for (roadRoadChunkList_t::const_iterator rcit = roadRoadChunkList.begin();
+         rcit != roadRoadChunkList.end();
+         rcit++)
+    {
+        visibleRoadChunkSet.erase(*rcit);
+    }
+}
+
+void RoadManager::setInvisibleStageRoad(unsigned int tileNum, Tile* tile)
+{
+    stageRoadChunkListMap_t::const_iterator srit = stageRoadChunkListMap.find(tileNum);
+    if (srit != stageRoadChunkListMap.end())
+    {
+        removeChunkListToVisible(srit->second, tile);
+    }
+}
+
+void RoadManager::generateNewVisual()
+{
+    //assert(0);
+    RoadRoadChunk roadRoadChunk;
+    roadRoadChunk.road = 0;
+    for (roadRoadChunkSet_t::const_iterator it = visibleRoadChunkSet.begin();
+         it != visibleRoadChunkSet.end();
+         it++)
+    {
+        if (roadRoadChunk.road != it->road ||
+            (roadRoadChunk.road && roadRoadChunk.roadChunk.second+1 != it->roadChunk.first))
+        { // it is not continous road, switch
+            if (roadRoadChunk.road)
+            { // road exist
+                visualRoadListNew.push_back(new VisualRoad(roadRoadChunk));
+            }
+            roadRoadChunk = *it;
+        }
+        else // continue from the previous
+        {
+            roadRoadChunk.roadChunk.second = it->roadChunk.second;
+        }
+    }
+    if (roadRoadChunk.road)
+    {
+        visualRoadListNew.push_back(new VisualRoad(roadRoadChunk));
+    }
+}
+
+void RoadManager::switchToNewVisual()
+{
+    for (visualRoadList_t::const_iterator it = visualRoadList.begin();
+         it != visualRoadList.end();
+         it++)
+    {
+        delete (*it);
+    }
+    visualRoadList.clear();
+
+    for (visualRoadList_t::const_iterator it = visualRoadListNew.begin();
+         it != visualRoadListNew.end();
+         it++)
+    {
+        (*it)->switchToVisible();
+        visualRoadList.push_back((*it));
+    }
+    visualRoadListNew.clear();
 }
 
 /* static */

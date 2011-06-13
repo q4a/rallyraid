@@ -33,6 +33,8 @@ public:
     const std::string& getName(); // inline
 
     void editorRender(bool editorRoad = false);
+    const roadPointVector_t& getRoadPointVector() const; // inline
+    RoadType* getRoadType(); // inline
 
 private:
     bool readHeader();
@@ -79,6 +81,16 @@ inline bool Road::isLoaded()
 inline const std::string& Road::getName()
 {
     return roadName;
+}
+
+inline const Road::roadPointVector_t& Road::getRoadPointVector() const
+{
+    return roadPointVector;
+}
+
+inline RoadType* Road::getRoadType()
+{
+    return roadType;
 }
 
 #endif // ROAD_H
