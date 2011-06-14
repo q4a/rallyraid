@@ -1,6 +1,8 @@
 #ifndef HUD_H
 #define HUD_H
 
+#include <irrlicht.h>
+
 class ScreenQuad;
 
 class Hud
@@ -21,13 +23,18 @@ public:
     void setVisible(bool newVisible);
     bool getVisible(); // inline
     
-    void preRender(float angle);
+    void preRender(float p_angle);
     void render();
 
 private:
     bool            visible;
     ScreenQuad*     miniMapQuad;
     ScreenQuad*     compassQuad;
+    ScreenQuad*     tripMasterQuad;
+
+    irr::gui::IGUIStaticText*   compassText;
+    irr::gui::IGUIStaticText*   tmPartText;
+    irr::gui::IGUIStaticText*   tmTotalText;
 };
 
 inline bool Hud::getVisible()

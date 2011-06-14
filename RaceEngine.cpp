@@ -37,14 +37,14 @@
 
 
 // normalize angle between 0 and 360
-float normalizeAngle(float &angle)
+static float normalizeAngle(float &angle)
 {
     while (angle > 360.f) angle -= 360.f;
     while (angle < 0.f) angle += 360.f;
     return angle;
 }
 
-float normalizeAngle180(float &angle)
+static float normalizeAngle180(float &angle)
 {
     while (angle > 180.f) angle -= 360.f;
     while (angle < -180.f) angle += 360.f;

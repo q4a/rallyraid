@@ -14,7 +14,7 @@ public:
         Material.Lighting = false;
         Material.ZWriteEnable = false;
         Material.BackfaceCulling = false;
-        Material.ZBuffer = irr::video::ECFN_ALWAYS/*ECFN_NEVER*/;
+        Material.ZBuffer = irr::video::ECFN_NEVER/*ECFN_NEVER ECFN_ALWAYS*/;
         Material.setFlag(irr::video::EMF_TEXTURE_WRAP, true);
         //Material.setFlag(EMF_BILINEAR_FILTER, false);
         bool flip_vert = true;

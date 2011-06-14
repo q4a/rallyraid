@@ -244,12 +244,12 @@ TheGame::~TheGame()
     gamePlay = 0;
     hud = 0;
 
-    dprintf(MY_DEBUG_NOTE, "Finalize hud\n");
-    Hud::finalize();
     dprintf(MY_DEBUG_NOTE, "Finalize game play\n");
     GamePlay::finalize();
     dprintf(MY_DEBUG_NOTE, "Finalize menu manager\n");
     MenuManager::finalize();
+    dprintf(MY_DEBUG_NOTE, "Finalize hud\n");
+    Hud::finalize();
     dprintf(MY_DEBUG_NOTE, "Finalize race manager\n");
     RaceManager::finalize();
     dprintf(MY_DEBUG_NOTE, "Finalize waypoint manager\n");
@@ -475,14 +475,13 @@ void TheGame::loop()
             {
                 MenuPageEditor::render();
             }
-            env->drawAll();
-            //printf("hud render\n");
-            //testQuad.render();
             if (inGame)
             {
                 hud->render();
             }
-
+            env->drawAll();
+            //printf("hud render\n");
+            //testQuad.render();
             driver->endScene();
             //printf("5\n");
 
@@ -578,6 +577,11 @@ void TheGame::handleUpdatePos(bool phys)
             if (dir.Y < 0.05f) dir.Y = 0.05f;
             camera->setPosition(centar + dir);
         }
+    }
+
+    if (phys)
+    {
+        player->update();
     }
     
     cameraDirection = camera->getTarget()-camera->getPosition();

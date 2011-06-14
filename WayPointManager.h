@@ -7,6 +7,7 @@
 #include <map>
 #include <string>
 #include <list>
+#include <assert.h>
 
 
 class WayPoint;
@@ -56,6 +57,7 @@ private:
 
 inline void WayPointManager::addActiveWayPoint(WayPoint* wayPoint)
 {
+    assert(activeWayPointSet.empty());
     activeWayPointSet.insert(wayPoint);
 }
 

@@ -57,6 +57,10 @@ public:
     void lookCenter(bool set); // inline
     void switchToNextView(); // inline
 
+    float getDistance() const; // inline
+    void resetDistance(); // inline
+    void update(); // inline
+
 private:
     Vehicle*        vehicle;
     Competitor*     competitor;
@@ -65,6 +69,9 @@ private:
     unsigned int    viewMask;
     bool            recenterView;
     bool            firstPressed;
+    float           distance;
+    float           lastVehicleDistance;
+    float           savedVehicleDistance;
 };
 
 inline Vehicle* Player::getVehicle()
@@ -187,6 +194,25 @@ inline void Player::switchToNextView()
 {
     SWITCH_TO_NEXT_VIEW(viewNum);
     recenterView = true;
+}
+
+inline float Player::getDistance() const
+{
+    return distance;
+}
+
+inline void Player::resetDistance()
+{
+    distance = 0.f;
+}
+
+inline void Player::update()
+{
+    if (vehicle==0) return;
+
+    float vehicleDistance = vehicle->getDistance();
+    distance += vehicleDistance - lastVehicleDistance;
+    lastVehicleDistance = vehicleDistance;
 }
 
 #endif // PLAYER_H

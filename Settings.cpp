@@ -29,8 +29,8 @@ Settings::Settings()
       cacheObjects(true),
       targetFps(60),
       nonshaderLight(false),
-      objectWireSize(200),
-      objectWireNum(11),
+      objectWireSize(250),
+      objectWireNum(7),
       objectDensity(10),
       useTerrainDetail(true),
       showNames(true),
@@ -76,12 +76,12 @@ void Settings::read()
             } else if (keyName == "nonshader_light")
             {
                 nonshaderLight = StringConverter::parseBool(valName, false);
-            } else if (keyName == "object_wire_size")
-            {
-                objectWireSize = StringConverter::parseUnsignedInt(valName, 200);
-            } else if (keyName == "object_wire_num")
-            {
-                objectWireNum = StringConverter::parseUnsignedInt(valName, 11);
+            //} else if (keyName == "object_wire_size")
+            //{
+            //    objectWireSize = StringConverter::parseUnsignedInt(valName, 250);
+            //} else if (keyName == "object_wire_num")
+            //{
+            //    objectWireNum = StringConverter::parseUnsignedInt(valName, 7);
             } else if (keyName == "object_density")
             {
                 objectDensity = StringConverter::parseUnsignedInt(valName, 10);

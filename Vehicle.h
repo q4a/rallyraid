@@ -71,10 +71,12 @@ public:
     const irr::core::matrix4& getViewPos(unsigned int num) const;
     const irr::core::matrix4& getViewDest(unsigned int num) const;
     const irr::core::matrix4& getMatrix() const {return matrix;}
+    float getDistance() const {return distance;}
 
     void setSteer(float value);
     void setTorque(float value);
     void setHandbrake(float value);
+    void setDistance(float distance) {this->distance = distance;}
     
     void pause();
     void resume();

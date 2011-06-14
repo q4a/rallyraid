@@ -1299,7 +1299,7 @@ void MenuPageEditor::actionP()
                     ld = lastPos.getDistanceFrom(apos);
                 }
                 
-                if (ld > 1500.f)
+                if (ld > 2500.f/*((float)(Settings::getInstance()->objectWireNum*Settings::getInstance()->objectWireSize)+200.f)*/)
                 {
                     unsigned int num = RaceManager::getInstance()->editorStage->wayPointList.size() + 1;
                     WayPoint* wpip = new WayPoint(apos, num);
@@ -1307,7 +1307,7 @@ void MenuPageEditor::actionP()
                 }
                 else
                 {
-                    dprintf(MY_DEBUG_INFO, "MenuPageEditor::action(): add waypoint not possible, because last WP is to close: %f\n", ld);
+                    dprintf(MY_DEBUG_INFO, "MenuPageEditor::action(): add waypoint not possible, because last WP is to close: %f < 2500.0\n", ld);
                 }
             }
             break;

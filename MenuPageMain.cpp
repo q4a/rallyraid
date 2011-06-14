@@ -21,6 +21,7 @@
 #include "VehicleTypeManager.h"
 #include "VehicleType.h"
 #include "GamePlay.h"
+#include "Hud.h"
 
 
 MenuPageMain* MenuPageMain::menuPageMain = 0;
@@ -66,7 +67,7 @@ MenuPageMain::MenuPageMain()
         true);
 
     tableRaces->addColumn(L"Race");
-    tableRaces->setColumnWidth(0, tableRaces->getRelativePosition().getSize().Width);
+    tableRaces->setColumnWidth(0, tableRaces->getRelativePosition().getSize().Width-16);
 
     staticTextRaceData = TheGame::getInstance()->getEnv()->addStaticText(L"-",
         irr::core::recti(irr::core::position2di(window->getRelativePosition().getSize().Width/4, (window->getRelativePosition().getSize().Height)/2), irr::core::dimension2di(window->getRelativePosition().getSize().Width/4-2,window->getRelativePosition().getSize().Height/6-4)),
@@ -86,7 +87,7 @@ MenuPageMain::MenuPageMain()
         true);
 
     tableVehicles->addColumn(L"Vehicle");
-    tableVehicles->setColumnWidth(0, tableVehicles->getRelativePosition().getSize().Width);
+    tableVehicles->setColumnWidth(0, tableVehicles->getRelativePosition().getSize().Width-16);
 
     staticTextVehicleData = TheGame::getInstance()->getEnv()->addStaticText(L"-",
         irr::core::recti(irr::core::position2di(window->getRelativePosition().getSize().Width/2+2, window->getRelativePosition().getSize().Height/2), irr::core::dimension2di(window->getRelativePosition().getSize().Width/4-2,window->getRelativePosition().getSize().Height/6-4)),
@@ -200,6 +201,7 @@ void MenuPageMain::open()
     window->setVisible(true);
     TheGame::getInstance()->getEnv()->setFocus(tableRaces);
     TheGame::getInstance()->setInGame(false);
+    Hud::getInstance()->setVisible(false);
 }
 
 void MenuPageMain::close()
@@ -207,6 +209,7 @@ void MenuPageMain::close()
     dprintf(MY_DEBUG_NOTE, "MenuPageMain::close()\n");
     window->setVisible(false);
     TheGame::getInstance()->setInGame(true);
+    Hud::getInstance()->setVisible(true);
 }
 
 void MenuPageMain::refresh()

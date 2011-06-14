@@ -34,7 +34,10 @@ Player::Player()
       viewNum(VIEW_0),
       viewMask(VIEW_CENTER),
       recenterView(true),
-      firstPressed(false)
+      firstPressed(false),
+      distance(0.f),
+      lastVehicleDistance(0.f),
+      savedVehicleDistance(0.f)
 {
 }
 
@@ -52,6 +55,10 @@ void Player::initializeVehicle(const std::string& vehicleTypeName, const irr::co
     vehicle = new Vehicle(vehicleTypeName, apos, rotation);
     recenterView = true;
     firstPressed = false;
+    distance = 0.f;
+    lastVehicleDistance = savedVehicleDistance;
+    vehicle->setDistance(savedVehicleDistance);
+    savedVehicleDistance = 0.f;
 }
 
 void Player::finalizeVehicle()
@@ -78,6 +85,8 @@ bool Player::save(const std::string& filename)
     ret = fprintf(f, "%s\n", competitor->getName().c_str());
     ret = fprintf(f, "%s\n", competitor->getTeamName().c_str());
     ret = fprintf(f, "%s\n", competitor->getVehicleTypeName().c_str());
+    ret = fprintf(f, "%f\n", lastVehicleDistance);
+    ret = fprintf(f, "%f\n", distance);
 
     fclose(f);
 
@@ -119,6 +128,14 @@ bool Player::load(const std::string& filename)
     if (ret < 1)
     {
         printf("player file unable to read vehicle type name: %s\n", filename.c_str());
+        fclose(f);
+        return false;
+    }
+
+    ret = fscanf_s(f, "%f\n%f\n", &savedVehicleDistance, &distance);
+    if (ret < 2)
+    {
+        printf("player file unable to read distances: %s\n", filename.c_str());
         fclose(f);
         return false;
     }
