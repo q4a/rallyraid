@@ -114,6 +114,7 @@ bool ItinerManager::readItinerImages2()
     ConfigFile::SectionIterator seci = cf.getSectionIterator();
 
     float globalDistance = 0.f;
+    unsigned int num = 1;
     std::string secName, keyName, valName;
     while (seci.hasMoreElements())
     {
@@ -157,8 +158,9 @@ bool ItinerManager::readItinerImages2()
         if (!secName.empty())
         {
             globalDistance += localDistance;
-            ItinerPoint* itinerPoint = new ItinerPoint(apos, globalDistance, localDistance, itinerImageName, itinerImageName2, description);
+            ItinerPoint* itinerPoint = new ItinerPoint(apos, num, globalDistance, localDistance, itinerImageName, itinerImageName2, description);
             itinerPointList.push_back(itinerPoint);
+            num++;
         }
     }
     //assert(0);

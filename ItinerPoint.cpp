@@ -7,12 +7,14 @@
 
 
 ItinerPoint::ItinerPoint(const irr::core::vector3df& apos,
+        unsigned int num,
         float globalDistance,
         float localDistance,
         const std::string& itinerImageName,
         const std::string& itinerImageName2,
         const std::string& description)
     : ObjectWireGlobalObject(0, apos),
+      num(num),
       globalDistance(globalDistance),
       localDistance(localDistance),
       itinerImageName(itinerImageName),

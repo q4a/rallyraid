@@ -9,6 +9,7 @@ class ItinerPoint : public ObjectWireGlobalObject
 {
 public:
     ItinerPoint(const irr::core::vector3df& apos,
+        unsigned int num,
         float globalDistance,
         float localDistance,
         const std::string& itinerImageName,
@@ -18,6 +19,7 @@ public:
 
     virtual void editorRender(bool last);
 
+    unsigned int getNum() const; // inline
     float getGlobalDistance() const; // inline
     float getLocalDistance() const; // inline
     const std::string& getItinerImageName() const; // inline
@@ -30,6 +32,7 @@ private:
     virtual void updateVisible();
 
 private:
+    unsigned int            num;
     float                   globalDistance;
     float                   localDistance;
     std::string             itinerImageName;
@@ -39,6 +42,11 @@ private:
     std::string             description;
 };
 
+
+inline unsigned int ItinerPoint::getNum() const
+{
+    return num;
+}
 
 inline float ItinerPoint::getGlobalDistance() const
 {

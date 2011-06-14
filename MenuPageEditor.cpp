@@ -1258,6 +1258,7 @@ void MenuPageEditor::actionP()
                 ItinerManager::getInstance()->editorGlobalDistance += ItinerManager::getInstance()->editorLocalDistance;
                 refreshItinerGD();
                 ItinerPoint* ip = new ItinerPoint(apos,
+                    RaceManager::getInstance()->editorStage->itinerPointList.size()+1,
                     ItinerManager::getInstance()->editorGlobalDistance,
                     ItinerManager::getInstance()->editorLocalDistance,
                     ItinerManager::getInstance()->editorItinerImageName,

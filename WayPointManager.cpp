@@ -54,12 +54,11 @@ bool WayPointManager::update(const irr::core::vector3df& newPos, bool force)
     // Go through all sections & settings in the file
     ConfigFile::SectionIterator seci = cf.getSectionIterator();
 
-    float globalDistance = 0.f;
+    unsigned int num = 1;
     std::string secName, keyName, valName;
     while (seci.hasMoreElements())
     {
         irr::core::vector3df apos;
-        unsigned int num = 1;
 
         secName = seci.peekNextKey();
         dprintf(MY_DEBUG_NOTE, "\tSection: %s\n", secName.c_str());
