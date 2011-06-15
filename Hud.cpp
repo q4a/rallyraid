@@ -24,7 +24,7 @@ static float normalizeAngle180(float &angle)
     return angle;
 }
 
-#define HUD_PADDING             10
+#define HUD_PADDING             5
 
 #define COMPASS_SIZE            192 // 128
 #define COMPASS_HSIZE           (COMPASS_SIZE / 2)
@@ -42,6 +42,10 @@ static float normalizeAngle180(float &angle)
 #define TM_TOTAL_TEXT_Y         (34)
 #define TM_TEXT_SIZE_X          (70)
 #define TM_TEXT_SIZE_Y          (22)
+
+#define ROADBOOKBG_SIZE_X       (512)
+#define ROADBOOKBG_HSIZE_X      (ROADBOOKBG_SIZE_X / 2)
+#define ROADBOOKBG_SIZE_Y       (128)
 
 Hud* Hud::hud = 0;
 
@@ -68,6 +72,7 @@ Hud::Hud()
       miniMapQuad(0),
       compassQuad(0),
       tripMasterQuad(0),
+      roadBookBGQuad(0),
       compassText(0),
       tmPartText(0),
       tmTotalText(0)
@@ -84,6 +89,10 @@ Hud::Hud()
     tripMasterQuad->getMaterial().MaterialType = Shaders::getInstance()->materialMap["quad2d_t"];
     //compassQuad->getMaterial().MaterialTypeParam = 0.2f;
     //compassQuad->getMaterial().MaterialTypeParam2 = 0.8f;
+    tripMasterQuad->getMaterial().setFlag(irr::video::EMF_ANTI_ALIASING, false);
+    tripMasterQuad->getMaterial().setFlag(irr::video::EMF_BILINEAR_FILTER, false);
+    tripMasterQuad->getMaterial().setFlag(irr::video::EMF_TRILINEAR_FILTER, false);
+    tripMasterQuad->getMaterial().UseMipMaps = false;
     tripMasterQuad->getMaterial().setTexture(0, TheGame::getInstance()->getDriver()->getTexture("data/hud/tripmaster.png"));
 
     compassQuad = new ScreenQuad(TheGame::getInstance()->getDriver(),
@@ -93,7 +102,22 @@ Hud::Hud()
     compassQuad->getMaterial().MaterialType = Shaders::getInstance()->materialMap["quad2d_t"];
     //compassQuad->getMaterial().MaterialTypeParam = 0.2f;
     //compassQuad->getMaterial().MaterialTypeParam2 = 0.8f;
+    compassQuad->getMaterial().setFlag(irr::video::EMF_ANTI_ALIASING, false);
+    compassQuad->getMaterial().setFlag(irr::video::EMF_BILINEAR_FILTER, false);
+    compassQuad->getMaterial().setFlag(irr::video::EMF_TRILINEAR_FILTER, false);
+    compassQuad->getMaterial().UseMipMaps = false;
     compassQuad->getMaterial().setTexture(0, TheGame::getInstance()->getDriver()->getTexture("data/hud/compass.png"));
+
+    roadBookBGQuad = new ScreenQuad(TheGame::getInstance()->getDriver(),
+        irr::core::position2di(TheGame::getInstance()->getDriver()->getScreenSize().Width/2 - ROADBOOKBG_HSIZE_X,
+        TheGame::getInstance()->getDriver()->getScreenSize().Height - ROADBOOKBG_SIZE_Y - HUD_PADDING),
+        irr::core::dimension2du(ROADBOOKBG_SIZE_X, ROADBOOKBG_SIZE_Y), false);
+    roadBookBGQuad->getMaterial().MaterialType = Shaders::getInstance()->materialMap["quad2d"];
+    roadBookBGQuad->getMaterial().setFlag(irr::video::EMF_ANTI_ALIASING, false);
+    roadBookBGQuad->getMaterial().setFlag(irr::video::EMF_BILINEAR_FILTER, false);
+    roadBookBGQuad->getMaterial().setFlag(irr::video::EMF_TRILINEAR_FILTER, false);
+    roadBookBGQuad->getMaterial().UseMipMaps = false;
+    roadBookBGQuad->getMaterial().setTexture(0, TheGame::getInstance()->getDriver()->getTexture("data/hud/roadbookbg.png"));
 
     compassText = TheGame::getInstance()->getEnv()->addStaticText(L"0",
         irr::core::recti(irr::core::position2di(TheGame::getInstance()->getDriver()->getScreenSize().Width - COMPASS_HSIZE - COMPASS_WP_ARROW_HDIFF - HUD_PADDING - COMPASS_TEXT_HSIZE_X,
@@ -136,6 +160,12 @@ Hud::~Hud()
         delete tripMasterQuad;
         tripMasterQuad = 0;
     }
+
+    if (roadBookBGQuad)
+    {
+        delete roadBookBGQuad;
+        roadBookBGQuad = 0;
+    }
 }
     
 void Hud::setVisible(bool newVisible)
@@ -147,6 +177,7 @@ void Hud::setVisible(bool newVisible)
     miniMapQuad->setVisible(visible);
     compassQuad->setVisible(visible);
     tripMasterQuad->setVisible(visible);
+    roadBookBGQuad->setVisible(visible);
 
     compassText->setVisible(visible);
     tmPartText->setVisible(visible);
@@ -226,4 +257,5 @@ void Hud::render()
     miniMapQuad->render();
     compassQuad->render();
     tripMasterQuad->render();
+    roadBookBGQuad->render();
 }

@@ -31,6 +31,7 @@ private:
     ScreenQuad*     miniMapQuad;
     ScreenQuad*     compassQuad;
     ScreenQuad*     tripMasterQuad;
+    ScreenQuad*     roadBookBGQuad;
 
     irr::gui::IGUIStaticText*   compassText;
     irr::gui::IGUIStaticText*   tmPartText;

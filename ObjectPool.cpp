@@ -237,13 +237,13 @@ OffsetObject* ObjectPool::createNewInstance()
             
             if (treeNode->getLeafNode())
             {
-            	treeNode->getLeafNode()->getMaterial(0).TextureLayer[0].AnisotropicFilter = true;
+                treeNode->getLeafNode()->getMaterial(0).TextureLayer[0].AnisotropicFilter = true;
                 treeNode->getLeafNode()->getMaterial(0).TextureLayer[0].BilinearFilter = false;
                 //treeNode->getLeafNode()->getMaterial(0).MaterialTypeParam = 0.5f;
                 
                 treeNode->getLeafNode()->setMaterialTexture(0, texture2);
                 treeNode->getLeafNode()->setMaterialType(material2);
-            }        	
+            }
 
             treeNode->setMaterialTexture(0, texture);
             treeNode->setMaterialType(material);
@@ -274,9 +274,14 @@ OffsetObject* ObjectPool::createNewInstance()
         }
         default:
             objectNode = TheGame::getInstance()->getSmgr()->addAnimatedMeshSceneNode(objectMesh);
+            objectNode->setMaterialType(material);
+            if (objectType == Grass)
+            {
+                objectNode->setMaterialFlag(irr::video::EMF_TEXTURE_WRAP, true);
+                objectNode->getMaterial(0).UseMipMaps = false;
+            }
             objectNode->setMaterialTexture(0, texture);
             objectNode->setMaterialTexture(1, texture2);
-            objectNode->setMaterialType(material);
             break;
     }
     
