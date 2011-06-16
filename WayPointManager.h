@@ -16,6 +16,7 @@ class WayPointManager
 {
 public:
     typedef std::list<WayPoint*> wayPointList_t;
+    typedef std::set<unsigned int> wayPointNumSet_t;
 
     static void initialize();
     static void finalize();

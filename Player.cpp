@@ -36,8 +36,15 @@ Player::Player()
       recenterView(true),
       firstPressed(false),
       distance(0.f),
+      savedDistance(0.f),
       lastVehicleDistance(0.f),
-      savedVehicleDistance(0.f)
+      savedVehicleDistance(0.f),
+      prevItinerIt(),
+      currItinerIt(),      
+      savedPrevItinerIt(),
+      savedCurrItinerIt(),
+      passedWayPoints(),
+      savedPassedWayPoints()
 {
 }
 
@@ -48,17 +55,53 @@ Player::~Player()
 }
 
 
-void Player::initializeVehicle(const std::string& vehicleTypeName, const irr::core::vector3df& apos, const irr::core::vector3df& rotation)
+void Player::initializeVehicle(const std::string& vehicleTypeName, const irr::core::vector3df& apos, const irr::core::vector3df& rotation, Stage* stage)
 {
     assert(vehicle == 0);
     competitor->setVehicleTypeName(vehicleTypeName);
     vehicle = new Vehicle(vehicleTypeName, apos, rotation);
     recenterView = true;
     firstPressed = false;
-    distance = 0.f;
+    distance = savedDistance;
     lastVehicleDistance = savedVehicleDistance;
     vehicle->setDistance(savedVehicleDistance);
+    if (savedPrevItinerIt!=ItinerManager::itinerList_t::const_iterator())
+    {
+        prevItinerIt = savedPrevItinerIt;
+    }
+    else
+    {
+        if (stage)
+        {
+            prevItinerIt = stage->getItinerPointList().end();
+        }
+        else
+        {
+            prevItinerIt = ItinerManager::itinerList_t::const_iterator();
+        }
+    }
+    
+    if (savedCurrItinerIt!=ItinerManager::itinerList_t::const_iterator())
+    {
+        currItinerIt = savedCurrItinerIt;
+    }
+    else
+    {
+        if (stage)
+        {
+            currItinerIt = stage->getItinerPointList().begin();
+        }
+        else
+        {
+            currItinerIt = ItinerManager::itinerList_t::const_iterator();
+        }
+    }
+    passedWayPoints = savedPassedWayPoints;
+    savedDistance = 0.f;
     savedVehicleDistance = 0.f;
+    savedPrevItinerIt = ItinerManager::itinerList_t::const_iterator();
+    savedCurrItinerIt = ItinerManager::itinerList_t::const_iterator();
+    savedPassedWayPoints.clear();
 }
 
 void Player::finalizeVehicle()
@@ -74,6 +117,7 @@ bool Player::save(const std::string& filename)
 {
     FILE* f;
     int ret = 0;
+    Stage* stage = RaceManager::getInstance()->getCurrentStage();
 
     errno_t error = fopen_s(&f, filename.c_str(), "w");
     if (error)
@@ -87,19 +131,36 @@ bool Player::save(const std::string& filename)
     ret = fprintf(f, "%s\n", competitor->getVehicleTypeName().c_str());
     ret = fprintf(f, "%f\n", lastVehicleDistance);
     ret = fprintf(f, "%f\n", distance);
+    
+    ret = fprintf(f, "%u\n", (stage && prevItinerIt!=stage->getIteratorPointList().end())?(*prevItinerIt)->getNum():0);
+    ret = fprintf(f, "%u\n", (stage && currItinerIt!=stage->getIteratorPointList().end())?(*currItinerIt)->getNum():0);
+    
+    ret = fprintf(f, "%lu\n", passedWayPoints.size());
+    for (WayPointManager::wayPointNumSet_t::const_iterator it = passedWayPoints.begin();
+         it != passedWayPoints.end() && ret;
+         it++)
+    {
+        ret = fprintf(f, "%u\n", *it);
+    }
+    
 
     fclose(f);
 
     return (ret > 0);
 }
 
-bool Player::load(const std::string& filename)
+bool Player::load(const std::string& filename, Stage* stage)
 {
     FILE* f;
     int ret = 0;
     char name[256];
     char teamName[256];
     char vehicleTypeName[256];
+    unsigned int prevItinerNum = 0;
+    unsigned int currItinerNum = 0;
+    unsigned int num = 0;
+    unsigned long numOfPWP = 0;
+    
 
     errno_t error = fopen_s(&f, filename.c_str(), "r");
     if (error)
@@ -132,12 +193,61 @@ bool Player::load(const std::string& filename)
         return false;
     }
 
-    ret = fscanf_s(f, "%f\n%f\n", &savedVehicleDistance, &distance);
+    ret = fscanf_s(f, "%f\n%f\n", &savedVehicleDistance, &savedDistance);
     if (ret < 2)
     {
         printf("player file unable to read distances: %s\n", filename.c_str());
         fclose(f);
         return false;
+    }
+
+    ret = fscanf_s(f, "%u\n%u\n", &prevItinerNum, &currItinerNum);
+    if (ret < 2)
+    {
+        printf("player file unable to read itiner points' num: %s\n", filename.c_str());
+        fclose(f);
+        return false;
+    }
+    
+    savedPrevItinerIt = ItinerManager::itinerList_t::const_iterator();
+    savedCurrItinerIt = ItinerManager::itinerList_t::const_iterator();
+    if (stage)
+    {
+        ItinerManager::itinerList_t::const_iterator it = stage->getItinerPointList().begin();
+        savedPrevItinerIt = stage->getItinerPointList().end();
+        savedCurrItinerIt = stage->getItinerPointList().end();
+        for (; it != stage->getItinerPointList().end(); it++)
+        {
+            if (prevItinerNum == (*it)->getNum())
+            {
+                savedPrevItinerIt = it;
+            }
+            if (currItinerNum == (*it)->getNum())
+            {
+                savedCurrItinerIt = it;
+            }
+        }
+    }
+
+    savedPassedWayPoints.clear();
+    ret = fscanf_s(f, "%lu\n", &numOfPWP);
+    if (ret < 1)
+    {
+        printf("player file unable to read number of WPs: %s\n", filename.c_str());
+        fclose(f);
+        return false;
+    }
+    
+    for (;numOfPWP > 0 && ret; numOfPWP--)
+    {
+        ret = fscanf_s(f, "%u\n", &num);
+        if (ret < 1)
+        {
+            printf("player file unable to read WP num: %s\n", filename.c_str());
+            fclose(f);
+            return false;
+        }
+        savedPassedWayPoints.insert(num);
     }
 
     fclose(f);

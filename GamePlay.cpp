@@ -155,7 +155,7 @@ bool GamePlay::loadGame(const std::string& saveName)
         ret = raceEngine->load(SAVE_ENGINE(saveName), currentRace);
         if (ret)
         {
-            ret = Player::getInstance()->load(SAVE_PLAYER(saveName));
+            ret = Player::getInstance()->load(SAVE_PLAYER(saveName), stage);
         }
     }
 
@@ -243,7 +243,7 @@ void GamePlay::startStage(Stage* stage, VehicleType* vehicleType)
 
     TheEarth::getInstance()->createFirst(initialPos, initialDir);
     Player::getInstance()->finalizeVehicle();
-    Player::getInstance()->initializeVehicle(vehicleType->getName(), initialPos+initialDir, irr::core::vector3df(0.f, deg, 0.f));
+    Player::getInstance()->initializeVehicle(vehicleType->getName(), initialPos+initialDir, irr::core::vector3df(0.f, deg, 0.f), currentStage);
 
     TheGame::getInstance()->resetTick();
 }

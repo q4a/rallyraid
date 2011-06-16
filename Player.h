@@ -6,11 +6,16 @@
 #include <string>
 #include "Player_defs.h"
 #include "Vehicle.h"
+#include "ItinerManager.h"
+#include "RaceManager.h"
+#include "Stage.h"
+#include "WayPointManager.h"
 //#include <assert.h>
 
 //class VehicleType;
 class Competitor;
 class Starter;
+//class Stage;
 
 class Player
 {
@@ -32,7 +37,7 @@ public:
     void finalizeVehicle();
 
     bool save(const std::string& filename);
-    bool load(const std::string& filename);
+    bool load(const std::string& filename, Stage* stage);
 
     Vehicle* getVehicle(); // inline
     Competitor* getCompetitor(); // inline
@@ -60,6 +65,8 @@ public:
     float getDistance() const; // inline
     void resetDistance(); // inline
     void update(); // inline
+    
+    void stepItiner(); // inline
 
 private:
     Vehicle*        vehicle;
@@ -70,8 +77,18 @@ private:
     bool            recenterView;
     bool            firstPressed;
     float           distance;
+    float           stavedDistance;
     float           lastVehicleDistance;
     float           savedVehicleDistance;
+
+    ItinerManager::itinerList_t::const_iterator prevItinerIt;
+    ItinerManager::itinerList_t::const_iterator currItinerIt;
+    ItinerManager::itinerList_t::const_iterator savedPrevItinerIt;
+    ItinerManager::itinerList_t::const_iterator savedCurrItinerIt;
+    //ItinerManager::itinerList_t::const_iterator nextItinerIt;
+
+    WayPointManager::wayPointNumSet_t passedWayPoints;
+    WayPointManager::wayPointNumSet_t savedPassedWayPoints;
 };
 
 inline Vehicle* Player::getVehicle()
@@ -213,6 +230,16 @@ inline void Player::update()
     float vehicleDistance = vehicle->getDistance();
     distance += vehicleDistance - lastVehicleDistance;
     lastVehicleDistance = vehicleDistance;
+}
+
+inline void Player::stepItiner()
+{
+    Stage* stage = RaceManager::getInstance()->getCurrentStage();
+    if (stage && currItinerIt != stage->getItinerPointList().end())
+    {
+        prevItinerIt = currItinerIt;
+        currItinerIt++;
+    }
 }
 
 #endif // PLAYER_H
