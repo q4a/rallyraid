@@ -180,6 +180,7 @@ bool MenuPageEditorRoad::OnEvent(const irr::SEvent &event)
                 break;
             }
             */
+            case irr::gui::EGET_EDITBOX_CHANGED:
             case irr::gui::EGET_EDITBOX_ENTER:
             {
                 switch (id)

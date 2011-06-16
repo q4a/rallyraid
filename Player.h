@@ -33,7 +33,7 @@ private:
     ~Player();
 
 public:
-    void initializeVehicle(const std::string& vehicleTypeName, const irr::core::vector3df& apos, const irr::core::vector3df& rotation);
+    void initializeVehicle(const std::string& vehicleTypeName, const irr::core::vector3df& apos, const irr::core::vector3df& rotation, Stage* stage);
     void finalizeVehicle();
 
     bool save(const std::string& filename);
@@ -77,14 +77,15 @@ private:
     bool            recenterView;
     bool            firstPressed;
     float           distance;
-    float           stavedDistance;
+    float           savedDistance;
     float           lastVehicleDistance;
     float           savedVehicleDistance;
 
-    ItinerManager::itinerList_t::const_iterator prevItinerIt;
-    ItinerManager::itinerList_t::const_iterator currItinerIt;
-    ItinerManager::itinerList_t::const_iterator savedPrevItinerIt;
-    ItinerManager::itinerList_t::const_iterator savedCurrItinerIt;
+    ItinerManager::itinerPointList_t::const_iterator prevItinerIt;
+    ItinerManager::itinerPointList_t::const_iterator currItinerIt;
+    ItinerManager::itinerPointList_t::const_iterator savedPrevItinerIt;
+    ItinerManager::itinerPointList_t::const_iterator savedCurrItinerIt;
+    static ItinerManager::itinerPointList_t helperItinerPointList;
     //ItinerManager::itinerList_t::const_iterator nextItinerIt;
 
     WayPointManager::wayPointNumSet_t passedWayPoints;

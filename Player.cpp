@@ -4,10 +4,13 @@
 #include "Vehicle.h"
 #include "Competitor.h"
 #include "RaceEngine.h"
+#include "ItinerPoint.h"
 #include <assert.h>
 
 
 Player* Player::player = 0;
+ItinerManager::itinerPointList_t Player::helperItinerPointList;
+
 
 void Player::initialize()
 {
@@ -39,10 +42,10 @@ Player::Player()
       savedDistance(0.f),
       lastVehicleDistance(0.f),
       savedVehicleDistance(0.f),
-      prevItinerIt(),
-      currItinerIt(),      
-      savedPrevItinerIt(),
-      savedCurrItinerIt(),
+      prevItinerIt(helperItinerPointList.end()),
+      currItinerIt(helperItinerPointList.end()),
+      savedPrevItinerIt(helperItinerPointList.end()),
+      savedCurrItinerIt(helperItinerPointList.end()),
       passedWayPoints(),
       savedPassedWayPoints()
 {
@@ -65,7 +68,7 @@ void Player::initializeVehicle(const std::string& vehicleTypeName, const irr::co
     distance = savedDistance;
     lastVehicleDistance = savedVehicleDistance;
     vehicle->setDistance(savedVehicleDistance);
-    if (savedPrevItinerIt!=ItinerManager::itinerList_t::const_iterator())
+    if (savedPrevItinerIt!=helperItinerPointList.end()/*ItinerManager::itinerPointList_t::const_iterator()*/)
     {
         prevItinerIt = savedPrevItinerIt;
     }
@@ -77,11 +80,11 @@ void Player::initializeVehicle(const std::string& vehicleTypeName, const irr::co
         }
         else
         {
-            prevItinerIt = ItinerManager::itinerList_t::const_iterator();
+            prevItinerIt = helperItinerPointList.end()/*ItinerManager::itinerPointList_t::const_iterator()*/;
         }
     }
     
-    if (savedCurrItinerIt!=ItinerManager::itinerList_t::const_iterator())
+    if (savedCurrItinerIt!=helperItinerPointList.end()/*ItinerManager::itinerPointList_t::const_iterator()*/)
     {
         currItinerIt = savedCurrItinerIt;
     }
@@ -93,14 +96,14 @@ void Player::initializeVehicle(const std::string& vehicleTypeName, const irr::co
         }
         else
         {
-            currItinerIt = ItinerManager::itinerList_t::const_iterator();
+            currItinerIt = helperItinerPointList.end()/*ItinerManager::itinerPointList_t::const_iterator()*/;
         }
     }
     passedWayPoints = savedPassedWayPoints;
     savedDistance = 0.f;
     savedVehicleDistance = 0.f;
-    savedPrevItinerIt = ItinerManager::itinerList_t::const_iterator();
-    savedCurrItinerIt = ItinerManager::itinerList_t::const_iterator();
+    savedPrevItinerIt = helperItinerPointList.end()/*ItinerManager::itinerPointList_t::const_iterator()*/;
+    savedCurrItinerIt = helperItinerPointList.end()/*ItinerManager::itinerPointList_t::const_iterator()*/;
     savedPassedWayPoints.clear();
 }
 
@@ -132,8 +135,8 @@ bool Player::save(const std::string& filename)
     ret = fprintf(f, "%f\n", lastVehicleDistance);
     ret = fprintf(f, "%f\n", distance);
     
-    ret = fprintf(f, "%u\n", (stage && prevItinerIt!=stage->getIteratorPointList().end())?(*prevItinerIt)->getNum():0);
-    ret = fprintf(f, "%u\n", (stage && currItinerIt!=stage->getIteratorPointList().end())?(*currItinerIt)->getNum():0);
+    ret = fprintf(f, "%u\n", (stage && prevItinerIt!=stage->getItinerPointList().end())?(*prevItinerIt)->getNum():0);
+    ret = fprintf(f, "%u\n", (stage && currItinerIt!=stage->getItinerPointList().end())?(*currItinerIt)->getNum():0);
     
     ret = fprintf(f, "%lu\n", passedWayPoints.size());
     for (WayPointManager::wayPointNumSet_t::const_iterator it = passedWayPoints.begin();
@@ -209,11 +212,11 @@ bool Player::load(const std::string& filename, Stage* stage)
         return false;
     }
     
-    savedPrevItinerIt = ItinerManager::itinerList_t::const_iterator();
-    savedCurrItinerIt = ItinerManager::itinerList_t::const_iterator();
+    savedPrevItinerIt = helperItinerPointList.end()/*ItinerManager::itinerPointList_t::const_iterator()*/;
+    savedCurrItinerIt = helperItinerPointList.end()/*ItinerManager::itinerPointList_t::const_iterator()*/;
     if (stage)
     {
-        ItinerManager::itinerList_t::const_iterator it = stage->getItinerPointList().begin();
+        ItinerManager::itinerPointList_t::const_iterator it = stage->getItinerPointList().begin();
         savedPrevItinerIt = stage->getItinerPointList().end();
         savedCurrItinerIt = stage->getItinerPointList().end();
         for (; it != stage->getItinerPointList().end(); it++)

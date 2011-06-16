@@ -264,6 +264,9 @@ bool MenuPageEditorRace::OnEvent(const irr::SEvent &event)
                         WStringConverter::toString(editBoxNewRoadName->getText(), roadName);
                         WStringConverter::toString(editBoxNewRoadDataFilename->getText(), roadDataFilename);
                         RoadManager::roadMap_t::const_iterator rit = RaceManager::getInstance()->editorRace->roadMap.find(roadName);
+                        dprintf(MY_DEBUG_NOTE, "\t%s\n\t%s\n\t%s\n\t%s\n",
+                            roadName.c_str(), roadFilename.c_str(), roadDataFilename.c_str(),
+                            RoadTypeManager::getInstance()->editorRoadType?RoadTypeManager::getInstance()->editorRoadType->getName().c_str():"ERROR - no road type selected");
                         if (rit == RaceManager::getInstance()->editorRace->roadMap.end() &&
                             !roadName.empty() &&
                             RoadTypeManager::getInstance()->editorRoadType)

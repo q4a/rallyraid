@@ -98,7 +98,7 @@ public:
             {
                 if (xx < TILE_FINE_POINTS_NUM && yy < TILE_FINE_POINTS_NUM)
                 {
-                    fineDensity[xx + fy] = irr::video::SColor();
+                    fineDensity[xx + fy] = irr::video::SColor(0);
                     fineColors[xx + fy] = val;
                 }
             }
