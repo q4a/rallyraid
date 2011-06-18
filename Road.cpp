@@ -113,7 +113,7 @@ bool Road::readData()
 {
     FILE* f;
     int ret = 0;
-    float f1, f2, f3;
+    double f1, f2, f3;
     int radius;
     unsigned int color;
     unsigned long pointNum = 0;
@@ -145,13 +145,14 @@ bool Road::readData()
     unsigned int i = 0;
     while (true)
     {
-        ret = fscanf_s(f, "%f %f %f %d %x\n", &f1, &f2, &f3, &radius, &color);
+        f1 = f2 = f3 = 0.0;
+        ret = fscanf_s(f, "%lf %lf %lf %d %x\n", &f1, &f2, &f3, &radius, &color);
         if (ret < 5 )
         {
             break;
         }
         assert(i < pointNum);
-        roadPointVector[i].p = irr::core::vector3df(f1, f2, f3);
+        roadPointVector[i].p = vector3dd(f1, f2, f3);
         roadPointVector[i].radius = radius;
         roadPointVector[i].color.color = color;
         i++;
@@ -174,7 +175,7 @@ bool Road::writeData()
     ret = fprintf(f, "%lu\n", roadPointVector.size());
     for (unsigned int i = 0; i < roadPointVector.size(); i++)
     {
-        ret = fprintf(f, "%f %f %f %d %x\n",
+        ret = fprintf(f, "%lf %lf %lf %d %x\n",
             roadPointVector[i].p.X, roadPointVector[i].p.Y, roadPointVector[i].p.Z, roadPointVector[i].radius, roadPointVector[i].color.color);
     }
 
@@ -184,7 +185,10 @@ bool Road::writeData()
 
 void Road::addRoadFarPoint(const irr::core::vector3df& pos)
 {
-    irr::core::vector3df apos = pos + OffsetManager::getInstance()->getOffset();
+    vector3dd apos;
+    apos.X = (double)pos.X + (double)OffsetManager::getInstance()->getOffset().X;
+    apos.Y = (double)pos.Y + (double)OffsetManager::getInstance()->getOffset().Y;
+    apos.Z = (double)pos.Z + (double)OffsetManager::getInstance()->getOffset().Z;
     if (!roadPointVector.empty())
     {
 #if 0
@@ -206,10 +210,10 @@ void Road::addRoadFarPoint(const irr::core::vector3df& pos)
         }
 #else // 0 v 1
         irr::core::vector2df pos2d = irr::core::vector2df(pos.X, pos.Z);
-        irr::core::vector2df bp = irr::core::vector2df(roadPointVector.back().p.X-OffsetManager::getInstance()->getOffset().X, roadPointVector.back().p.Z-OffsetManager::getInstance()->getOffset().Z);
+        irr::core::vector2df bp = irr::core::vector2df(roadPointVector.back().p.X-(double)OffsetManager::getInstance()->getOffset().X, roadPointVector.back().p.Z-(double)OffsetManager::getInstance()->getOffset().Z);
         irr::core::vector2df dir = pos2d - bp;
         irr::core::vector2df tmpp;
-        irr::core::vector3df tmpp3d;
+        vector3dd tmpp3d;
         float dist = dir.getLength();
         float cur = 0.f;
         while (cur + 6.f < dist)
@@ -217,9 +221,12 @@ void Road::addRoadFarPoint(const irr::core::vector3df& pos)
             cur += 4.f;
             tmpp = bp + dir*(cur/dist);
             
-            tmpp3d.X = tmpp.X+OffsetManager::getInstance()->getOffset().X;
-            tmpp3d.Z = tmpp.Y+OffsetManager::getInstance()->getOffset().Z;
+            tmpp3d.X = (double)tmpp.X+(double)OffsetManager::getInstance()->getOffset().X;
+            tmpp3d.Z = (double)tmpp.Y+(double)OffsetManager::getInstance()->getOffset().Z;
             tmpp3d.Y = TheEarth::getInstance()->getHeight(tmpp/*3d - OffsetManager::getInstance()->getOffset()*/);
+            printf("add rp 2: %f, %f (+ %f, %f) = %f, %f\n", tmpp.X, tmpp.Y,
+                OffsetManager::getInstance()->getOffset().X, OffsetManager::getInstance()->getOffset().Z,
+                tmpp3d.X, tmpp3d.Z);
             addRoadPoint(tmpp3d);
         }
 #endif // 0 v 1
@@ -229,7 +236,10 @@ void Road::addRoadFarPoint(const irr::core::vector3df& pos)
 
 void Road::addRoadFarPointBegin(const irr::core::vector3df& pos)
 {
-    irr::core::vector3df apos = pos + OffsetManager::getInstance()->getOffset();
+    vector3dd apos;
+    apos.X = (double)pos.X + (double)OffsetManager::getInstance()->getOffset().X;
+    apos.Y = (double)pos.Y + (double)OffsetManager::getInstance()->getOffset().Y;
+    apos.Z = (double)pos.Z + (double)OffsetManager::getInstance()->getOffset().Z;
     if (!roadPointVector.empty())
     {
 #if 0
@@ -251,10 +261,10 @@ void Road::addRoadFarPointBegin(const irr::core::vector3df& pos)
         }
 #else // 0 v 1
         irr::core::vector2df pos2d = irr::core::vector2df(pos.X, pos.Z);
-        irr::core::vector2df bp = irr::core::vector2df(roadPointVector.front().p.X-OffsetManager::getInstance()->getOffset().X, roadPointVector.front().p.Z-OffsetManager::getInstance()->getOffset().Z);
+        irr::core::vector2df bp = irr::core::vector2df(roadPointVector.front().p.X-(double)OffsetManager::getInstance()->getOffset().X, roadPointVector.front().p.Z-(double)OffsetManager::getInstance()->getOffset().Z);
         irr::core::vector2df dir = pos2d - bp;
         irr::core::vector2df tmpp;
-        irr::core::vector3df tmpp3d;
+        vector3dd tmpp3d;
         float dist = dir.getLength();
         float cur = 0.f;
         while (cur + 6.f < dist)
@@ -262,8 +272,8 @@ void Road::addRoadFarPointBegin(const irr::core::vector3df& pos)
             cur += 4.f;
             tmpp = bp + dir*(cur/dist);
             
-            tmpp3d.X = tmpp.X+OffsetManager::getInstance()->getOffset().X;
-            tmpp3d.Z = tmpp.Y+OffsetManager::getInstance()->getOffset().Z;
+            tmpp3d.X = (double)tmpp.X+(double)OffsetManager::getInstance()->getOffset().X;
+            tmpp3d.Z = (double)tmpp.Y+(double)OffsetManager::getInstance()->getOffset().Z;
             tmpp3d.Y = TheEarth::getInstance()->getHeight(tmpp/*3d - OffsetManager::getInstance()->getOffset()*/);
             addRoadPointBegin(tmpp3d);
         }
@@ -299,7 +309,7 @@ void Road::removeRoadPointBegin()
 }
 
 
-void Road::addRoadPoint(const irr::core::vector3df& pos)
+void Road::addRoadPoint(const vector3dd& pos)
 {
     if (!loaded)
     {
@@ -315,7 +325,7 @@ void Road::addRoadPoint(const irr::core::vector3df& pos)
     roadPointVector.push_back(roadPoint);
 }
 
-void Road::addRoadPointBegin(const irr::core::vector3df& pos)
+void Road::addRoadPointBegin(const vector3dd& pos)
 {
     if (!loaded)
     {
@@ -339,7 +349,10 @@ void Road::editorRender(bool editorRoad)
          it != roadPointVector.end();
          it++)
     {
-        irr::core::vector3df renderPos = it->p - OffsetManager::getInstance()->getOffset();
+        irr::core::vector3df renderPos = irr::core::vector3df(it->p.X - (double)OffsetManager::getInstance()->getOffset().X,
+            it->p.Y - (double)OffsetManager::getInstance()->getOffset().Y,
+            it->p.Z - (double)OffsetManager::getInstance()->getOffset().Z
+            );
 
         irr::core::vector3df min = renderPos;
         irr::core::vector3df max = renderPos;

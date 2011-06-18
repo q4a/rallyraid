@@ -100,7 +100,7 @@ void VisualRoad::generateRoadNode()
     int vertexCount = 0;
     const Road::roadPointVector_t& basePoints = roadRoadChunk.road->getRoadPointVector();
     RoadType* roadType = roadRoadChunk.road->getRoadType();
-    irr::core::vector3df basePoint(basePoints[roadRoadChunk.roadChunk.first].p.X, 0.f, basePoints[roadRoadChunk.roadChunk.first].p.Z);
+    vector3dd basePoint(basePoints[roadRoadChunk.roadChunk.first].p.X, 0.f, basePoints[roadRoadChunk.roadChunk.first].p.Z);
     for (unsigned int i = roadRoadChunk.roadChunk.first; i <= roadRoadChunk.roadChunk.second; i++)
     {
         irr::core::vector2df normal;
@@ -144,10 +144,12 @@ void VisualRoad::generateRoadNode()
             else
 #endif // 0
             {
-                irr::core::vector3df ppos((roadType->slicePoints[j].X*normal.X)+basePoints[i].p.X,
-                                    roadType->slicePoints[j].Y,
-                                    (roadType->slicePoints[j].X*normal.Y)+basePoints[i].p.Z);
-                vtx.Pos = ppos - basePoint;
+                vector3dd ppos((double)(roadType->slicePoints[j].X*normal.X)+basePoints[i].p.X,
+                    (double)roadType->slicePoints[j].Y,
+                    (double)(roadType->slicePoints[j].X*normal.Y)+basePoints[i].p.Z);
+                vtx.Pos.X = (float)(ppos.X - basePoint.X);
+                vtx.Pos.Y = (float)(ppos.Y - basePoint.Y);
+                vtx.Pos.Z = (float)(ppos.Z - basePoint.Z);
 #if 0
                 if (roadType->slicePoints.size() == 2)
                 {
@@ -165,7 +167,7 @@ void VisualRoad::generateRoadNode()
                 else
 #endif // 0
                 {
-                    float hc =TheEarth::getInstance()->getNewHeight(ppos/*-offsetManager->getOffset()*/);
+                    float hc = TheEarth::getInstance()->getNewHeight((float)ppos.X, (float)ppos.Z/*-offsetManager->getOffset()*/);
                     //printf("%f x %f - %f\n", ppos.X-offsetManager->getOffset().X, ppos.Z-offsetManager->getOffset().Z, hc);
                     if (hc > 0.01f)
                         vtx.Pos.Y = roadType->slicePoints[j].Y+hc;

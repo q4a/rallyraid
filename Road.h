@@ -9,9 +9,10 @@
 class RoadType;
 
 typedef irr::core::vector3d<double> vector3dd;
+typedef irr::core::vector2d<double> vector2dd;
 struct RoadPoint
 {
-    irr::core::vector3df    p;
+    vector3dd               p;
     int                     radius;
     irr::video::SColor      color;
 };
@@ -51,8 +52,8 @@ private:
     
 private:
     // only called by the addFarPoint
-    void addRoadPoint(const irr::core::vector3df& pos);
-    void addRoadPointBegin(const irr::core::vector3df& pos);
+    void addRoadPoint(const vector3dd& pos);
+    void addRoadPointBegin(const vector3dd& pos);
 
 private:
     std::string             roadFilename;
