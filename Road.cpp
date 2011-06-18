@@ -210,7 +210,8 @@ void Road::addRoadFarPoint(const irr::core::vector3df& pos)
         }
 #else // 0 v 1
         irr::core::vector2df pos2d = irr::core::vector2df(pos.X, pos.Z);
-        irr::core::vector2df bp = irr::core::vector2df(roadPointVector.back().p.X-(double)OffsetManager::getInstance()->getOffset().X, roadPointVector.back().p.Z-(double)OffsetManager::getInstance()->getOffset().Z);
+        irr::core::vector2df bp = irr::core::vector2df((float)(roadPointVector.back().p.X-(double)OffsetManager::getInstance()->getOffset().X),
+            (float)(roadPointVector.back().p.Z-(double)OffsetManager::getInstance()->getOffset().Z));
         irr::core::vector2df dir = pos2d - bp;
         irr::core::vector2df tmpp;
         vector3dd tmpp3d;
@@ -261,7 +262,8 @@ void Road::addRoadFarPointBegin(const irr::core::vector3df& pos)
         }
 #else // 0 v 1
         irr::core::vector2df pos2d = irr::core::vector2df(pos.X, pos.Z);
-        irr::core::vector2df bp = irr::core::vector2df(roadPointVector.front().p.X-(double)OffsetManager::getInstance()->getOffset().X, roadPointVector.front().p.Z-(double)OffsetManager::getInstance()->getOffset().Z);
+        irr::core::vector2df bp = irr::core::vector2df((float)(roadPointVector.front().p.X-(double)OffsetManager::getInstance()->getOffset().X),
+            (float)(roadPointVector.front().p.Z-(double)OffsetManager::getInstance()->getOffset().Z));
         irr::core::vector2df dir = pos2d - bp;
         irr::core::vector2df tmpp;
         vector3dd tmpp3d;
@@ -349,10 +351,9 @@ void Road::editorRender(bool editorRoad)
          it != roadPointVector.end();
          it++)
     {
-        irr::core::vector3df renderPos = irr::core::vector3df(it->p.X - (double)OffsetManager::getInstance()->getOffset().X,
-            it->p.Y - (double)OffsetManager::getInstance()->getOffset().Y,
-            it->p.Z - (double)OffsetManager::getInstance()->getOffset().Z
-            );
+        irr::core::vector3df renderPos = irr::core::vector3df((float)(it->p.X - (double)OffsetManager::getInstance()->getOffset().X),
+            (float)(it->p.Y - (double)OffsetManager::getInstance()->getOffset().Y),
+            (float)(it->p.Z - (double)OffsetManager::getInstance()->getOffset().Z));
 
         irr::core::vector3df min = renderPos;
         irr::core::vector3df max = renderPos;

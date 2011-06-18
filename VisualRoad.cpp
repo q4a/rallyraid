@@ -106,15 +106,15 @@ void VisualRoad::generateRoadNode()
         irr::core::vector2df normal;
         if (i == roadRoadChunk.roadChunk.first)
         {
-            normal = irr::core::vector2df(basePoints[i+1].p.X - basePoints[i].p.X, basePoints[i+1].p.Z - basePoints[i].p.Z);
+            normal = irr::core::vector2df((float)(basePoints[i+1].p.X - basePoints[i].p.X), (float)(basePoints[i+1].p.Z - basePoints[i].p.Z));
         }
         else if (i == roadRoadChunk.roadChunk.second)
         {
-            normal = irr::core::vector2df(basePoints[i].p.X - basePoints[i-1].p.X, basePoints[i].p.Z - basePoints[i-1].p.Z);
+            normal = irr::core::vector2df((float)(basePoints[i].p.X - basePoints[i-1].p.X), (float)(basePoints[i].p.Z - basePoints[i-1].p.Z));
         }
         else
         {
-            normal = irr::core::vector2df(basePoints[i+1].p.X - basePoints[i-1].p.X, basePoints[i+1].p.Z - basePoints[i-1].p.Z);
+            normal = irr::core::vector2df((float)(basePoints[i+1].p.X - basePoints[i-1].p.X), (float)(basePoints[i+1].p.Z - basePoints[i-1].p.Z));
         }
         normal.normalize();
         normal.rotateBy(-90.f);
@@ -181,7 +181,7 @@ void VisualRoad::generateRoadNode()
         }
         if (i < roadRoadChunk.roadChunk.second)
         {
-            ty += (basePoints[i+1].p - basePoints[i].p).getLength()/roadType->tRate;
+            ty += (float)(basePoints[i+1].p - basePoints[i].p).getLength()/roadType->tRate;
             for (unsigned int k = 0; k < roadType->sliceIndices.size(); k++)
             {
                 buffer->Indices.push_back(vertexCount+roadType->sliceIndices[k]);
@@ -223,7 +223,7 @@ void VisualRoad::switchToVisible()
     OffsetManager* offsetManager = OffsetManager::getInstance();
     RoadType* roadType = roadRoadChunk.road->getRoadType();
     const Road::roadPointVector_t& basePoints = roadRoadChunk.road->getRoadPointVector();
-    irr::core::vector3df basePoint(basePoints[roadRoadChunk.roadChunk.first].p.X, 0.f, basePoints[roadRoadChunk.roadChunk.first].p.Z);
+    irr::core::vector3df basePoint((float)basePoints[roadRoadChunk.roadChunk.first].p.X, 0.f, (float)basePoints[roadRoadChunk.roadChunk.first].p.Z);
 
     roadNode = TheGame::getInstance()->getSmgr()->addAnimatedMeshSceneNode(animatedMesh);
     if (Shaders::getInstance()->getSupportedSMVersion() < 2)
