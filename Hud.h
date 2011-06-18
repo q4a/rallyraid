@@ -8,6 +8,17 @@ class ScreenQuad;
 class Hud
 {
 public:
+    class RoadBookEntry
+    {
+    public:
+        irr::gui::IGUIStaticText*   numText;
+        irr::gui::IGUIStaticText*   globalDistanceText;
+        irr::gui::IGUIStaticText*   localDistanceText;
+        irr::gui::IGUIStaticText*   noteText;
+        ScreenQuad*                 itinerQuad;
+        ScreenQuad*                 itiner2Quad;
+    };
+public:
     static void initialize();
     static void finalize();
     
@@ -26,6 +37,8 @@ public:
     void preRender(float p_angle);
     void render();
 
+    void updateRoadBook();
+
 private:
     bool            visible;
     ScreenQuad*     miniMapQuad;
@@ -36,6 +49,8 @@ private:
     irr::gui::IGUIStaticText*   compassText;
     irr::gui::IGUIStaticText*   tmPartText;
     irr::gui::IGUIStaticText*   tmTotalText;
+
+    RoadBookEntry roadBookEntries[4];
 };
 
 inline bool Hud::getVisible()

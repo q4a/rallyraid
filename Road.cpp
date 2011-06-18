@@ -145,7 +145,7 @@ bool Road::readData()
     unsigned int i = 0;
     while (true)
     {
-        ret = fscanf_s(f, "%f %f %f %d %u\n", &f1, &f2, &f3, &radius, &color);
+        ret = fscanf_s(f, "%f %f %f %d %x\n", &f1, &f2, &f3, &radius, &color);
         if (ret < 5 )
         {
             break;
@@ -174,7 +174,7 @@ bool Road::writeData()
     ret = fprintf(f, "%lu\n", roadPointVector.size());
     for (unsigned int i = 0; i < roadPointVector.size(); i++)
     {
-        ret = fprintf(f, "%f %f %f %d %u\n",
+        ret = fprintf(f, "%f %f %f %d %x\n",
             roadPointVector[i].p.X, roadPointVector[i].p.Y, roadPointVector[i].p.Z, roadPointVector[i].radius, roadPointVector[i].color.color);
     }
 
@@ -187,6 +187,7 @@ void Road::addRoadFarPoint(const irr::core::vector3df& pos)
     irr::core::vector3df apos = pos + OffsetManager::getInstance()->getOffset();
     if (!roadPointVector.empty())
     {
+#if 0
         irr::core::vector3df bp = roadPointVector.back().p;
         irr::core::vector3df dir = apos - bp;
         irr::core::vector3df tmpp;
@@ -203,6 +204,25 @@ void Road::addRoadFarPoint(const irr::core::vector3df& pos)
             dir = apos - bp;
             dist = dir.getLength();
         }
+#else // 0 v 1
+        irr::core::vector2df pos2d = irr::core::vector2df(pos.X, pos.Z);
+        irr::core::vector2df bp = irr::core::vector2df(roadPointVector.back().p.X-OffsetManager::getInstance()->getOffset().X, roadPointVector.back().p.Z-OffsetManager::getInstance()->getOffset().Z);
+        irr::core::vector2df dir = pos2d - bp;
+        irr::core::vector2df tmpp;
+        irr::core::vector3df tmpp3d;
+        float dist = dir.getLength();
+        float cur = 0.f;
+        while (cur + 6.f < dist)
+        {
+            cur += 4.f;
+            tmpp = bp + dir*(cur/dist);
+            
+            tmpp3d.X = tmpp.X+OffsetManager::getInstance()->getOffset().X;
+            tmpp3d.Z = tmpp.Y+OffsetManager::getInstance()->getOffset().Z;
+            tmpp3d.Y = TheEarth::getInstance()->getHeight(tmpp/*3d - OffsetManager::getInstance()->getOffset()*/);
+            addRoadPoint(tmpp3d);
+        }
+#endif // 0 v 1
     }
     addRoadPoint(apos);
 }

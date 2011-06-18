@@ -67,6 +67,12 @@ public:
     void update(); // inline
     
     void stepItiner(); // inline
+    void stepBackItiner(); // inline
+    const ItinerManager::itinerPointList_t::const_iterator& getPrevItiner(); // inline
+    const ItinerManager::itinerPointList_t::const_iterator& getCurrItiner(); // inline
+    bool isPrevItinerValid(); //inline
+    bool isCurrItinerValid(); //inline
+    bool isItinerValid(const ItinerManager::itinerPointList_t::const_iterator& itinerIt); //inline
 
 private:
     Vehicle*        vehicle;
@@ -235,12 +241,48 @@ inline void Player::update()
 
 inline void Player::stepItiner()
 {
-    Stage* stage = RaceManager::getInstance()->getCurrentStage();
-    if (stage && currItinerIt != stage->getItinerPointList().end())
+    //Stage* stage = RaceManager::getInstance()->getCurrentStage();
+    if (isCurrItinerValid()/*stage && currItinerIt != stage->getItinerPointList().end()*/)
     {
         prevItinerIt = currItinerIt;
         currItinerIt++;
     }
+}
+
+inline void Player::stepBackItiner()
+{
+    //Stage* stage = RaceManager::getInstance()->getCurrentStage();
+    if (isPrevItinerValid()/*stage && currItinerIt != stage->getItinerPointList().end()*/)
+    {
+        currItinerIt = prevItinerIt;
+        prevItinerIt--;
+    }
+}
+
+inline const ItinerManager::itinerPointList_t::const_iterator& Player::getPrevItiner()
+{
+    return prevItinerIt;
+}
+
+inline const ItinerManager::itinerPointList_t::const_iterator& Player::getCurrItiner()
+{
+    return currItinerIt;
+}
+
+inline bool Player::isPrevItinerValid()
+{
+    return isItinerValid(prevItinerIt);
+}
+
+inline bool Player::isCurrItinerValid()
+{
+    return isItinerValid(currItinerIt);
+}
+
+inline bool Player::isItinerValid(const ItinerManager::itinerPointList_t::const_iterator& itinerIt)
+{
+    Stage* stage = RaceManager::getInstance()->getCurrentStage();
+    return (stage!=0 && itinerIt != stage->getItinerPointList().end());
 }
 
 #endif // PLAYER_H

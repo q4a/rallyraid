@@ -15,6 +15,7 @@
 #include "RaceEngine.h"
 #include "stdafx.h"
 #include "ConfigDirectory.h"
+#include "Hud.h"
 #include <assert.h>
 
 
@@ -244,6 +245,8 @@ void GamePlay::startStage(Stage* stage, VehicleType* vehicleType)
     TheEarth::getInstance()->createFirst(initialPos, initialDir);
     Player::getInstance()->finalizeVehicle();
     Player::getInstance()->initializeVehicle(vehicleType->getName(), initialPos+initialDir, irr::core::vector3df(0.f, deg, 0.f), currentStage);
+
+    Hud::getInstance()->updateRoadBook();
 
     TheGame::getInstance()->resetTick();
 }

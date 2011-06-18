@@ -7,6 +7,7 @@
 #include "FontManager.h"
 #include "Player.h"
 #include "Vehicle.h"
+#include "ItinerPoint.h"
 
 
 // normalize angle between 0 and 360
@@ -46,6 +47,30 @@ static float normalizeAngle180(float &angle)
 #define ROADBOOKBG_SIZE_X       (512)
 #define ROADBOOKBG_HSIZE_X      (ROADBOOKBG_SIZE_X / 2)
 #define ROADBOOKBG_SIZE_Y       (128)
+
+#define ROADBOOKENTRY_NUM_SIZE_X    (30) // 32
+#define ROADBOOKENTRY_NUM_SIZE_Y    (16)
+#define ROADBOOKENTRY_GD_SIZE_X     (92) // 96
+#define ROADBOOKENTRY_GD_SIZE_Y     (32)
+#define ROADBOOKENTRY_LD_SIZE_X     (92) // 96
+#define ROADBOOKENTRY_LD_SIZE_Y     (24)
+#define ROADBOOKENTRY_ITINER_SIZE   (58)
+#define ROADBOOKENTRY_ITINER2_SIZE  (28)
+#define ROADBOOKENTRY_NOTE_SIZE_X   (62)
+#define ROADBOOKENTRY_NOTE_SIZE_Y   (62)
+
+#define ROADBOOKENTRY_NUM_POS_X(num)    (num*128+0)
+#define ROADBOOKENTRY_NUM_POS_Y         (2)
+#define ROADBOOKENTRY_GD_POS_X(num)     (num*128+32)
+#define ROADBOOKENTRY_GD_POS_Y          (2)
+#define ROADBOOKENTRY_LD_POS_X(num)     (num*128+32)
+#define ROADBOOKENTRY_LD_POS_Y          (36)
+#define ROADBOOKENTRY_ITINER_POS_X(num) (num*128+3)
+#define ROADBOOKENTRY_ITINER_POS_Y      (67)
+#define ROADBOOKENTRY_ITINER2_POS_X(num) (num*128+67)
+#define ROADBOOKENTRY_ITINER2_POS_Y     (67)
+#define ROADBOOKENTRY_NOTE_POS_X(num)   (num*128+64)
+#define ROADBOOKENTRY_NOTE_POS_Y        (64)
 
 Hud* Hud::hud = 0;
 
@@ -108,17 +133,6 @@ Hud::Hud()
     compassQuad->getMaterial().UseMipMaps = false;
     compassQuad->getMaterial().setTexture(0, TheGame::getInstance()->getDriver()->getTexture("data/hud/compass.png"));
 
-    roadBookBGQuad = new ScreenQuad(TheGame::getInstance()->getDriver(),
-        irr::core::position2di(TheGame::getInstance()->getDriver()->getScreenSize().Width/2 - ROADBOOKBG_HSIZE_X,
-        TheGame::getInstance()->getDriver()->getScreenSize().Height - ROADBOOKBG_SIZE_Y - HUD_PADDING),
-        irr::core::dimension2du(ROADBOOKBG_SIZE_X, ROADBOOKBG_SIZE_Y), false);
-    roadBookBGQuad->getMaterial().MaterialType = Shaders::getInstance()->materialMap["quad2d"];
-    roadBookBGQuad->getMaterial().setFlag(irr::video::EMF_ANTI_ALIASING, false);
-    roadBookBGQuad->getMaterial().setFlag(irr::video::EMF_BILINEAR_FILTER, false);
-    roadBookBGQuad->getMaterial().setFlag(irr::video::EMF_TRILINEAR_FILTER, false);
-    roadBookBGQuad->getMaterial().UseMipMaps = false;
-    roadBookBGQuad->getMaterial().setTexture(0, TheGame::getInstance()->getDriver()->getTexture("data/hud/roadbookbg.png"));
-
     compassText = TheGame::getInstance()->getEnv()->addStaticText(L"0",
         irr::core::recti(irr::core::position2di(TheGame::getInstance()->getDriver()->getScreenSize().Width - COMPASS_HSIZE - COMPASS_WP_ARROW_HDIFF - HUD_PADDING - COMPASS_TEXT_HSIZE_X,
         TheGame::getInstance()->getDriver()->getScreenSize().Height - COMPASS_HSIZE - COMPASS_HSIZE - COMPASS_WP_ARROW_HDIFF - HUD_PADDING*2 - COMPASS_TEXT_HSIZE_Y),
@@ -139,6 +153,84 @@ Hud::Hud()
         irr::core::dimension2di(TM_TEXT_SIZE_X, TM_TEXT_SIZE_Y)),
         false, false, 0, -1, false);
     tmTotalText->setOverrideFont(FontManager::getInstance()->getFont(FontManager::FONT_LARGE));
+
+
+    roadBookBGQuad = new ScreenQuad(TheGame::getInstance()->getDriver(),
+        irr::core::position2di(TheGame::getInstance()->getDriver()->getScreenSize().Width/2 - ROADBOOKBG_HSIZE_X,
+        TheGame::getInstance()->getDriver()->getScreenSize().Height - ROADBOOKBG_SIZE_Y - HUD_PADDING),
+        irr::core::dimension2du(ROADBOOKBG_SIZE_X, ROADBOOKBG_SIZE_Y), false);
+    roadBookBGQuad->getMaterial().MaterialType = Shaders::getInstance()->materialMap["quad2d"];
+    roadBookBGQuad->getMaterial().setFlag(irr::video::EMF_ANTI_ALIASING, false);
+    roadBookBGQuad->getMaterial().setFlag(irr::video::EMF_BILINEAR_FILTER, false);
+    roadBookBGQuad->getMaterial().setFlag(irr::video::EMF_TRILINEAR_FILTER, false);
+    roadBookBGQuad->getMaterial().UseMipMaps = false;
+    roadBookBGQuad->getMaterial().setTexture(0, TheGame::getInstance()->getDriver()->getTexture("data/hud/roadbookbg.png"));
+
+    for (unsigned int i = 0; i < 4; i++)
+    {
+/*
+            irr::core::recti(irr::core::position2di(TheGame::getInstance()->getDriver()->getScreenSize().Width/2 - ROADBOOKBG_HSIZE_X,
+            TheGame::getInstance()->getDriver()->getScreenSize().Height - ROADBOOKBG_SIZE_Y - HUD_PADDING),
+            irr::core::dimension2di(ROADBOOKENTRY_GD_SIZE_X, ROADBOOKENTRY_GD_SIZE_Y)),
+*/
+        roadBookEntries[i].numText = TheGame::getInstance()->getEnv()->addStaticText(L"0",
+            irr::core::recti(irr::core::position2di(TheGame::getInstance()->getDriver()->getScreenSize().Width/2 - ROADBOOKBG_HSIZE_X + ROADBOOKENTRY_NUM_POS_X(i),
+            TheGame::getInstance()->getDriver()->getScreenSize().Height - ROADBOOKBG_SIZE_Y - HUD_PADDING + ROADBOOKENTRY_NUM_POS_Y),
+            irr::core::dimension2di(ROADBOOKENTRY_NUM_SIZE_X, ROADBOOKENTRY_NUM_SIZE_Y)),
+            false, false, 0, -1, false);
+        roadBookEntries[i].numText->setOverrideFont(FontManager::getInstance()->getFont(FontManager::FONT_SMALL));
+        roadBookEntries[i].numText->setTextAlignment(irr::gui::EGUIA_LOWERRIGHT, irr::gui::EGUIA_UPPERLEFT);
+        if (i!=1) roadBookEntries[i].numText->setOverrideColor(irr::video::SColor(255, 127, 127, 127));
+
+        roadBookEntries[i].globalDistanceText = TheGame::getInstance()->getEnv()->addStaticText(L"0,00",
+            irr::core::recti(irr::core::position2di(TheGame::getInstance()->getDriver()->getScreenSize().Width/2 - ROADBOOKBG_HSIZE_X + ROADBOOKENTRY_GD_POS_X(i),
+            TheGame::getInstance()->getDriver()->getScreenSize().Height - ROADBOOKBG_SIZE_Y - HUD_PADDING + ROADBOOKENTRY_GD_POS_Y),
+            irr::core::dimension2di(ROADBOOKENTRY_GD_SIZE_X, ROADBOOKENTRY_GD_SIZE_Y)),
+            false, false, 0, -1, false);
+        roadBookEntries[i].globalDistanceText->setOverrideFont(FontManager::getInstance()->getFont(FontManager::FONT_EXTRALARGE));
+        roadBookEntries[i].globalDistanceText->setTextAlignment(irr::gui::EGUIA_LOWERRIGHT, irr::gui::EGUIA_UPPERLEFT);
+        if (i!=1) roadBookEntries[i].globalDistanceText->setOverrideColor(irr::video::SColor(255, 127, 127, 127));
+
+        roadBookEntries[i].localDistanceText = TheGame::getInstance()->getEnv()->addStaticText(L"0,00",
+            irr::core::recti(irr::core::position2di(TheGame::getInstance()->getDriver()->getScreenSize().Width/2 - ROADBOOKBG_HSIZE_X + ROADBOOKENTRY_LD_POS_X(i),
+            TheGame::getInstance()->getDriver()->getScreenSize().Height - ROADBOOKBG_SIZE_Y - HUD_PADDING + ROADBOOKENTRY_LD_POS_Y),
+            irr::core::dimension2di(ROADBOOKENTRY_LD_SIZE_X, ROADBOOKENTRY_LD_SIZE_Y)),
+            false, false, 0, -1, false);
+        roadBookEntries[i].localDistanceText->setOverrideFont(FontManager::getInstance()->getFont(FontManager::FONT_NORMALBOLD));
+        roadBookEntries[i].localDistanceText->setTextAlignment(irr::gui::EGUIA_LOWERRIGHT, irr::gui::EGUIA_UPPERLEFT);
+        if (i!=1) roadBookEntries[i].localDistanceText->setOverrideColor(irr::video::SColor(255, 127, 127, 127));
+
+        roadBookEntries[i].noteText = TheGame::getInstance()->getEnv()->addStaticText(L"0,00",
+            irr::core::recti(irr::core::position2di(TheGame::getInstance()->getDriver()->getScreenSize().Width/2 - ROADBOOKBG_HSIZE_X + ROADBOOKENTRY_NOTE_POS_X(i),
+            TheGame::getInstance()->getDriver()->getScreenSize().Height - ROADBOOKBG_SIZE_Y - HUD_PADDING + ROADBOOKENTRY_NOTE_POS_Y),
+            irr::core::dimension2di(ROADBOOKENTRY_NOTE_SIZE_X, ROADBOOKENTRY_NOTE_SIZE_Y)),
+            false, true, 0, -1, false);
+        roadBookEntries[i].noteText->setOverrideFont(FontManager::getInstance()->getFont(FontManager::FONT_SMALLBOLD));
+        roadBookEntries[i].noteText->setTextAlignment(irr::gui::EGUIA_LOWERRIGHT, irr::gui::EGUIA_LOWERRIGHT);
+        if (i!=1) roadBookEntries[i].noteText->setOverrideColor(irr::video::SColor(255, 127, 127, 127));
+
+        roadBookEntries[i].itinerQuad = new ScreenQuad(TheGame::getInstance()->getDriver(),
+            irr::core::position2di(TheGame::getInstance()->getDriver()->getScreenSize().Width/2 - ROADBOOKBG_HSIZE_X + ROADBOOKENTRY_ITINER_POS_X(i),
+            TheGame::getInstance()->getDriver()->getScreenSize().Height - ROADBOOKBG_SIZE_Y - HUD_PADDING + ROADBOOKENTRY_ITINER_POS_Y),
+            irr::core::dimension2du(ROADBOOKENTRY_ITINER_SIZE, ROADBOOKENTRY_ITINER_SIZE), false);
+        roadBookEntries[i].itinerQuad->getMaterial().MaterialType = Shaders::getInstance()->materialMap["quad2d_t"];
+        roadBookEntries[i].itinerQuad->getMaterial().setFlag(irr::video::EMF_ANTI_ALIASING, false);
+        roadBookEntries[i].itinerQuad->getMaterial().setFlag(irr::video::EMF_BILINEAR_FILTER, false);
+        roadBookEntries[i].itinerQuad->getMaterial().setFlag(irr::video::EMF_TRILINEAR_FILTER, false);
+        roadBookEntries[i].itinerQuad->getMaterial().UseMipMaps = false;
+        roadBookEntries[i].itinerQuad->getMaterial().setTexture(0, 0);
+
+        roadBookEntries[i].itiner2Quad = new ScreenQuad(TheGame::getInstance()->getDriver(),
+            irr::core::position2di(TheGame::getInstance()->getDriver()->getScreenSize().Width/2 - ROADBOOKBG_HSIZE_X + ROADBOOKENTRY_ITINER2_POS_X(i),
+            TheGame::getInstance()->getDriver()->getScreenSize().Height - ROADBOOKBG_SIZE_Y - HUD_PADDING + ROADBOOKENTRY_ITINER2_POS_Y),
+            irr::core::dimension2du(ROADBOOKENTRY_ITINER2_SIZE, ROADBOOKENTRY_ITINER2_SIZE), false);
+        roadBookEntries[i].itiner2Quad->getMaterial().MaterialType = Shaders::getInstance()->materialMap["quad2d_t"];
+        roadBookEntries[i].itiner2Quad->getMaterial().setFlag(irr::video::EMF_ANTI_ALIASING, false);
+        roadBookEntries[i].itiner2Quad->getMaterial().setFlag(irr::video::EMF_BILINEAR_FILTER, false);
+        roadBookEntries[i].itiner2Quad->getMaterial().setFlag(irr::video::EMF_TRILINEAR_FILTER, false);
+        roadBookEntries[i].itiner2Quad->getMaterial().UseMipMaps = false;
+        roadBookEntries[i].itiner2Quad->getMaterial().setTexture(0, 0);
+    }
 }
 
 Hud::~Hud()
@@ -166,6 +258,20 @@ Hud::~Hud()
         delete roadBookBGQuad;
         roadBookBGQuad = 0;
     }
+
+    for (unsigned int i = 0; i < 4; i++)
+    {
+        if (roadBookEntries[i].itinerQuad)
+        {
+            delete roadBookEntries[i].itinerQuad;
+            roadBookEntries[i].itinerQuad = 0;
+        }
+        if (roadBookEntries[i].itiner2Quad)
+        {
+            delete roadBookEntries[i].itiner2Quad;
+            roadBookEntries[i].itiner2Quad = 0;
+        }
+    }
 }
     
 void Hud::setVisible(bool newVisible)
@@ -182,6 +288,8 @@ void Hud::setVisible(bool newVisible)
     compassText->setVisible(visible);
     tmPartText->setVisible(visible);
     tmTotalText->setVisible(visible);
+
+    updateRoadBook();
 }
 
 void Hud::preRender(float p_angle)
@@ -258,4 +366,107 @@ void Hud::render()
     compassQuad->render();
     tripMasterQuad->render();
     roadBookBGQuad->render();
+    for (unsigned int i = 0; i < 4; i++)
+    {
+        roadBookEntries[i].itinerQuad->render();
+        roadBookEntries[i].itiner2Quad->render();
+    }
+}
+
+void Hud::updateRoadBook()
+{
+    ItinerManager::itinerPointList_t::const_iterator it = Player::getInstance()->getCurrItiner();
+    ItinerPoint* itinerPoint = 0;
+    for (unsigned int i = 0; i < 4; i++)
+    {
+        itinerPoint = 0;
+        if (i == 0 && Player::getInstance()->isPrevItinerValid())
+        {
+            itinerPoint = *(Player::getInstance()->getPrevItiner());
+        }
+        else if (i == 1 && Player::getInstance()->isCurrItinerValid())
+        {
+            itinerPoint = *(Player::getInstance()->getCurrItiner());
+            it++;
+        }
+        else if (i!=0 && i!=1 && Player::getInstance()->isItinerValid(it))
+        {
+            itinerPoint = *it;
+            it++;
+        }
+
+        if (itinerPoint)
+        {
+            irr::core::stringw str;
+            int dist;
+            int distp;
+
+            str = L"";
+            str += itinerPoint->getNum();
+            roadBookEntries[i].numText->setText(str.c_str());
+            roadBookEntries[i].numText->setVisible(visible);
+
+            str = L"";
+            dist = (int)(itinerPoint->getGlobalDistance()/1000.f) % 1000;
+            distp = (int)(itinerPoint->getGlobalDistance()/10.f) % 100;
+            str += (int)dist;
+            str += L",";
+            if (distp < 10)
+            {
+                str += L"0";
+            }
+            str += distp;
+            roadBookEntries[i].globalDistanceText->setText(str.c_str());
+            roadBookEntries[i].globalDistanceText->setVisible(visible);
+
+            str = L"";
+            dist = (int)(itinerPoint->getLocalDistance()/1000.f) % 1000;
+            distp = (int)(itinerPoint->getLocalDistance()/10.f) % 100;
+            str += (int)dist;
+            str += L",";
+            if (distp < 10)
+            {
+                str += L"0";
+            }
+            str += distp;
+            roadBookEntries[i].localDistanceText->setText(str.c_str());
+            roadBookEntries[i].localDistanceText->setVisible(visible);
+
+            str = L"";
+            str += itinerPoint->getDescription().c_str();
+            roadBookEntries[i].noteText->setText(str.c_str());
+            roadBookEntries[i].noteText->setVisible(visible);
+
+            //printf("%u. itiner: %p, num: %u, image: %p, image2: %p\n", i, itinerPoint, itinerPoint->getNum(), itinerPoint->getItinerImage(), itinerPoint->getItinerImage2());
+
+            if (itinerPoint->getItinerImage())
+            {
+                roadBookEntries[i].itinerQuad->getMaterial().setTexture(0, itinerPoint->getItinerImage());
+                roadBookEntries[i].itinerQuad->setVisible(visible);
+            }
+            else
+            {
+                roadBookEntries[i].itinerQuad->setVisible(false);
+            }
+
+            if (itinerPoint->getItinerImage2())
+            {
+                roadBookEntries[i].itiner2Quad->getMaterial().setTexture(0, itinerPoint->getItinerImage2());
+                roadBookEntries[i].itiner2Quad->setVisible(visible);
+            }
+            else
+            {
+                roadBookEntries[i].itiner2Quad->setVisible(false);
+            }
+        }
+        else
+        {
+            roadBookEntries[i].numText->setVisible(false);
+            roadBookEntries[i].globalDistanceText->setVisible(false);
+            roadBookEntries[i].localDistanceText->setVisible(false);
+            roadBookEntries[i].noteText->setVisible(false);
+            roadBookEntries[i].itinerQuad->setVisible(false);
+            roadBookEntries[i].itiner2Quad->setVisible(false);
+        }
+    }
 }

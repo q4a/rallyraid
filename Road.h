@@ -8,6 +8,7 @@
 
 class RoadType;
 
+typedef irr::core::vector3d<double> vector3dd;
 struct RoadPoint
 {
     irr::core::vector3df    p;
