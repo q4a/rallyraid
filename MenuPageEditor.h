@@ -14,6 +14,7 @@ public:
         MI_BUTTONREFRESH,
         MI_BUTTONCREATEROAD,
         MI_BUTTONACTIVATE,
+        MI_BUTTONRESET,
         MI_TABCONTROL,
 
         MI_TABSELECTED,
@@ -46,6 +47,9 @@ public:
         MI_EBITINERGD,
         MI_EBITINERLD,
         MI_EBITINERDESCRIPTION,
+        MI_EBRESETX,
+        MI_EBRESETY,
+        MI_EBRESETZ,
 
         MI_CBRENDER,
         
@@ -130,6 +134,9 @@ private:
     irr::gui::IGUIEditBox*  editBoxItinerGD;
     irr::gui::IGUIEditBox*  editBoxItinerLD;
     irr::gui::IGUIEditBox*  editBoxItinerDescription;
+    irr::gui::IGUIEditBox*  editBoxResetX;
+    irr::gui::IGUIEditBox*  editBoxResetY;
+    irr::gui::IGUIEditBox*  editBoxResetZ;
     irr::gui::IGUICheckBox* checkBoxRender;
     irr::gui::IGUIStaticText* staticTextItinerGD;
 

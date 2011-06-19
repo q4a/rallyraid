@@ -234,6 +234,8 @@ void GamePlay::startStage(Stage* stage, VehicleType* vehicleType, const irr::cor
     }
 
     ObjectWire::getInstance()->reset();
+    Player::getInstance()->finalizeVehicle();
+    OffsetManager::getInstance()->reset();
     TheGame::getInstance()->reset(initialPos, initialDir);
 
     if (stage)
@@ -243,7 +245,6 @@ void GamePlay::startStage(Stage* stage, VehicleType* vehicleType, const irr::cor
     currentStage = stage;
 
     TheEarth::getInstance()->createFirst(initialPos, initialDir);
-    Player::getInstance()->finalizeVehicle();
     Player::getInstance()->initializeVehicle(vehicleType->getName(), initialPos+initialDir, irr::core::vector3df(0.f, deg, 0.f), currentStage);
 
     Hud::getInstance()->updateRoadBook();

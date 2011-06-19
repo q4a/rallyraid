@@ -502,7 +502,12 @@ void TheGame::loop()
 
 void TheGame::reset(const irr::core::vector3df& apos, const irr::core::vector3df& dir)
 {
-    cameraOffsetObject = 0;
+    if (cameraOffsetObject)
+    {
+        cameraOffsetObject->removeFromManager();
+        delete cameraOffsetObject;
+        cameraOffsetObject = 0;
+    }
     if (camera == fps_camera) switchCamera();
     camera->setPosition(apos);
     camera->setTarget(camera->getPosition()+dir);
@@ -591,6 +596,6 @@ void TheGame::handleUpdatePos(bool phys)
     cameraAngle = (float)(irr::core::vector2df(cameraDirection.X, cameraDirection.Z)).getAngle();
     
     irr::core::vector3df velocity;
-    if (camera != fps_camera) velocity = player->getVehicle()->getLinearVelocity();
+    if (camera != fps_camera && player->getVehicle() != 0) velocity = player->getVehicle()->getLinearVelocity();
     soundEngine->setListenerPosition(camera->getPosition(), cameraDirection, camera->getUpVector(), velocity);
 }

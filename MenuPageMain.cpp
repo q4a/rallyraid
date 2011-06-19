@@ -137,7 +137,7 @@ bool MenuPageMain::OnEvent(const irr::SEvent &event)
                 {
                     case MI_BUTTONSTART:
                         dprintf(MY_DEBUG_NOTE, "mainmenu::startbutton::clicked: selected race: %s, vehicle: %s\n",
-                            selectedRace?selectedRace->getName().c_str():"-", selectedVehicleType?selectedVehicleType->getName():"-");
+                            selectedRace?selectedRace->getName().c_str():"-", selectedVehicleType?selectedVehicleType->getName().c_str():"-");
                         if (selectedRace && selectedVehicleType)
                         {
                             MenuManager::getInstance()->close();

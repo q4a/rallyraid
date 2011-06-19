@@ -126,6 +126,7 @@ OffsetObject* ObjectPool::getObject(const irr::core::vector3df& apos, const irr:
         offsetObject = createNewInstance();
     }
 
+    offsetObject->setUpdateCB(0);
     //offsetObject->setPos(apos);
     offsetObject->getNode()->setPosition(apos);
     offsetObject->getNode()->setScale(scale);
@@ -210,6 +211,7 @@ void ObjectPool::putObject(OffsetObject* object)
         object->setPool(0);
     }
     object->removeFromManager();
+    object->setUpdateCB(0);
     if (Settings::getInstance()->cacheObjects)
     {
         objectList.push_back(object);

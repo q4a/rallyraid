@@ -4,6 +4,8 @@
 //#include "TerrainPool.h"
 //#include "gameplay.h"
 #include <stdio.h>
+#include <assert.h>
+#include "stdafx.h"
 
 OffsetManager* OffsetManager::offsetManager = 0;
 
@@ -94,12 +96,17 @@ bool OffsetManager::update(const irr::core::vector3df& newPos, bool force)
 void OffsetManager::reset()
 {
     unsigned int reseted = 0;
+    dprintf(MY_DEBUG_NOTE, "OffsetManager::reset(): %u objects in the list, 0 can be no problem\n", objects.size());
+    //return;
+    //assert(0);
+    /*
     for (offsetObjectList_t::Iterator it = objects.begin(); it != objects.end();)
     {
         delete (*it);
         it = objects.erase(it);
         reseted++;
     }
+    */
     last = irr::core::vector3di();
     offset = irr::core::vector3df();
 }

@@ -515,9 +515,10 @@ namespace scene
                 //earth->getTileHeightAndTexture((unsigned int)abs(offsetX+x), (unsigned int)abs(offsetY+z), height, vertex.Color);
                 earth->getEarthHeightAndTexture((unsigned int)abs(offsetX+x), (unsigned int)abs(offsetY+z), h, color);
                 float height = (float)h;
-                unsigned int dist = min(abs(x - centerX), abs(z - centerY));
+                unsigned int dist = max(abs(x - centerX), abs(z - centerY));
                 if (dist < 3)
                 {
+                    /*
                     height -= 50.f;
                     if (dist < 2)
                     {
@@ -527,6 +528,8 @@ namespace scene
                             height -= 75.f;
                         }
                     }
+                    */
+                    height = -5.f;
                 }
                 vertex.Color = irr::video::SColor(0/*255*/,127,127,127);
 				vertex.Pos.X = fx;

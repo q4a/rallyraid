@@ -25,6 +25,13 @@
 #include "AIPoint.h"
 #include "WayPointManager.h"
 #include "WayPoint.h"
+#include "GamePlay.h"
+#include "Player.h"
+#include "Competitor.h"
+#include "VehicleType.h"
+#include "VehicleTypeManager.h"
+#include "Terrain_defs.h"
+
 
 MenuPageEditor* MenuPageEditor::menuPageEditor = 0;
 
@@ -49,6 +56,9 @@ MenuPageEditor::MenuPageEditor()
       editBoxItinerGD(0),
       editBoxItinerLD(0),
       editBoxItinerDescription(0),
+      editBoxResetX(0),
+      editBoxResetY(0),
+      editBoxResetZ(0),
       checkBoxRender(0),
       staticTextItinerGD(0),
       currentAction(A_None),
@@ -86,6 +96,12 @@ MenuPageEditor::MenuPageEditor()
         MI_BUTTONACTIVATE,
         L"activate race");
 
+    TheGame::getInstance()->getEnv()->addButton(
+        irr::core::recti(148,22,188,42),
+        window,
+        MI_BUTTONRESET,
+        L"reset");
+
     irr::gui::IGUITabControl* tc = TheGame::getInstance()->getEnv()->addTabControl(
         irr::core::recti(irr::core::position2di(2, 44), irr::core::dimension2di(window->getRelativePosition().getSize().Width - 4, window->getRelativePosition().getSize().Height - 46)),
         window,
@@ -99,10 +115,28 @@ MenuPageEditor::MenuPageEditor()
     irr::gui::IGUITab* tabSelected = tc->addTab(L"S", MI_TABSELECTED);
 
     checkBoxRender = TheGame::getInstance()->getEnv()->addCheckBox(doRender,
-        irr::core::recti(irr::core::position2di(0, 0), irr::core::dimension2di(tabSelected->getRelativePosition().getSize().Width, 20)),
+        irr::core::recti(irr::core::position2di(0, 0), irr::core::dimension2di(100, 20)),
         tabSelected,
         MI_CBRENDER,
         L"render helpers");
+
+    editBoxResetX = TheGame::getInstance()->getEnv()->addEditBox(L"tileX",
+        irr::core::recti(irr::core::position2di(110, 0), irr::core::dimension2di(48, 20)),
+        true,
+        tabSelected,
+        MI_EBRESETX);
+
+    editBoxResetY = TheGame::getInstance()->getEnv()->addEditBox(L"30",
+        irr::core::recti(irr::core::position2di(160, 0), irr::core::dimension2di(48, 20)),
+        true,
+        tabSelected,
+        MI_EBRESETY);
+
+    editBoxResetZ = TheGame::getInstance()->getEnv()->addEditBox(L"tileY",
+        irr::core::recti(irr::core::position2di(210, 0), irr::core::dimension2di(48, 20)),
+        true,
+        tabSelected,
+        MI_EBRESETZ);
 
     tableSelected = TheGame::getInstance()->getEnv()->addTable(
         irr::core::recti(irr::core::position2di(0, 44), irr::core::dimension2di(tabSelected->getRelativePosition().getSize().Width, (tabSelected->getRelativePosition().getSize().Height-44)/3-1)),
@@ -457,6 +491,32 @@ bool MenuPageEditor::OnEvent(const irr::SEvent &event)
                         }
                         return true;
                         break;
+                    case MI_BUTTONRESET:
+                    {
+                        int resetX = 0;
+                        int resetY = 0;
+                        int resetZ = 0;
+                        WStringConverter::toInt(editBoxResetX->getText(), resetX);
+                        WStringConverter::toInt(editBoxResetY->getText(), resetY);
+                        WStringConverter::toInt(editBoxResetZ->getText(), resetZ);
+                        if (resetX != 0 && resetY != 0 && resetZ != 0)
+                        {
+                            if (resetX < 0) resetX = -resetX;
+                            if (resetZ > 0) resetZ = -resetZ;
+                            printf("reset: %d, %f (%d), %d\n", resetX, (float)TheEarth::getInstance()->getEarthHeight(resetX, -resetZ)+(float)resetY, resetY, resetZ);
+                            
+                            GamePlay::getInstance()->startStage(
+                                RaceManager::getInstance()->getCurrentStage(),
+                                VehicleTypeManager::getInstance()->getVehicleType(Player::getInstance()->getCompetitor()->getVehicleTypeName()),
+                                irr::core::vector3df((float)resetX*TILE_SIZE_F+TILE_HSIZE_F,(float)TheEarth::getInstance()->getEarthHeight(resetX, -resetZ)+(float)resetY,(float)resetZ*TILE_SIZE_F-TILE_HSIZE_F));
+                        }
+                        else
+                        {
+                            printf("unable to reset because reset fields are not int\n");
+                        }
+                        return true;
+                        break;
+                    }
                 };
                 break;
             }
@@ -544,23 +604,19 @@ bool MenuPageEditor::OnEvent(const irr::SEvent &event)
                 break;
             }
             case irr::gui::EGET_EDITBOX_CHANGED:
+            case irr::gui::EGET_EDITBOX_ENTER:
             {
                 switch (id)
                 {
                     case MI_EBNEWROADNAME:
                         refreshRoadEditBoxes(editBoxNewRoadName->getText());
                         break;
-                }
-                break;
-            }
-            case irr::gui::EGET_EDITBOX_ENTER:
-            {
-                switch (id)
-                {
+                    /*
                     case MI_EBITINERGD:
                         WStringConverter::toFloat(editBoxItinerGD->getText(), ItinerManager::getInstance()->editorGlobalDistance);
                         dprintf(MY_DEBUG_INFO, "set itiner global distance: %f\n", ItinerManager::getInstance()->editorGlobalDistance);
                         break;
+                    */
                     case MI_EBITINERLD:
                         WStringConverter::toFloat(editBoxItinerLD->getText(), ItinerManager::getInstance()->editorLocalDistance);
                         dprintf(MY_DEBUG_INFO, "set itiner local distance: %f\n", ItinerManager::getInstance()->editorLocalDistance);
