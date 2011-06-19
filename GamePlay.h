@@ -87,7 +87,8 @@ public:
     unsigned int competitorFinished(CompetitorResult* competitorResult);
 
 private:
-    void startStage(Stage* stage, VehicleType* vehicleType);
+    //irr::core::vector3df(4190225.f, 215.f, -6401350.f)
+    void startStage(Stage* stage, VehicleType* vehicleType, const irr::core::vector3df& initPos = irr::core::vector3df(4190225.f, 215.f, -6401350.f));
 
 private:
     static bool readStageStateList(const std::string& filename, stageStateList_t& stageStateList);

@@ -40,7 +40,7 @@ RoadManager::RoadManager()
       visualRoadListNew(),
       editorRoad(0),
       editorRadius(0),
-      editorColor(0)
+      editorColor(0x808080)
 {
     read();
 }
@@ -159,8 +159,11 @@ void RoadManager::addChunkListToVisible(const roadRoadChunkList_t& roadRoadChunk
         {
             if (rcit->road->roadPointVector[i].radius > 0)
             {
-                const unsigned int inX = abs((int)(rcit->road->roadPointVector[i].p.X)/TILE_FINE_SCALE) % TILE_FINE_POINTS_NUM;
-                const unsigned int inY = (abs((int)(rcit->road->roadPointVector[i].p.Z)/TILE_FINE_SCALE) % TILE_FINE_POINTS_NUM) + 1;
+                //const unsigned int inX = abs((int)(rcit->road->roadPointVector[i].p.X)/TILE_FINE_SCALE) % TILE_FINE_POINTS_NUM;
+                //const unsigned int inY = (abs((int)(rcit->road->roadPointVector[i].p.Z)/TILE_FINE_SCALE) % TILE_FINE_POINTS_NUM) + 1;
+                const unsigned int inX = abs((int)(rcit->road->roadPointVector[i].p.X/TILE_FINE_SCALE_F)) % TILE_FINE_POINTS_NUM;
+                const unsigned int inY = (abs((int)(rcit->road->roadPointVector[i].p.Z/TILE_FINE_SCALE_F)) % TILE_FINE_POINTS_NUM) + 1;
+                
 
                 tile->setFineColorAndZeroDensity(inX, inY, rcit->road->roadPointVector[i].radius, rcit->road->roadPointVector[i].color);
             }

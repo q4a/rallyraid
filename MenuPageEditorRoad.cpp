@@ -220,7 +220,7 @@ bool MenuPageEditorRoad::OnEvent(const irr::SEvent &event)
 void MenuPageEditorRoad::open()
 {
     dprintf(MY_DEBUG_NOTE, "MenuPageEditorRoad::open()\n");
-    refresh();
+    refreshColor();
     window->setVisible(true);
     TheGame::getInstance()->getEnv()->setFocus(window);
 }
@@ -301,4 +301,8 @@ void MenuPageEditorRoad::refreshColor()
     str = L"";
     str += RoadManager::getInstance()->editorColor.getBlue();
     editBoxBlue->setText(str.c_str());
+
+    str = L"";
+    str += RoadManager::getInstance()->editorRadius;
+    editBoxRadius->setText(str.c_str());
 }

@@ -201,9 +201,9 @@ bool GamePlay::saveGame(const std::string& saveName)
     return ret;
 }
 
-void GamePlay::startStage(Stage* stage, VehicleType* vehicleType)
+void GamePlay::startStage(Stage* stage, VehicleType* vehicleType, const irr::core::vector3df& initPos)
 {
-    irr::core::vector3df initialPos(4190225.f, 215.f, -6401350.f);
+    irr::core::vector3df initialPos(initPos);
     irr::core::vector3df initialDir(1.f, 0.f, 0.f);
     float deg = 0.f;
     

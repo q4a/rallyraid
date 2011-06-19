@@ -89,22 +89,90 @@ public:
         }
     }
     
-    void setFineColorAndZeroDensity(unsigned int x, unsigned int y, unsigned int radius, const irr::video::SColor& val)
+    void setFineColorAndZeroDensity(unsigned int x, unsigned int y, unsigned int reqradius, const irr::video::SColor& adjustColor)
     {
         if (!fineColors || !fineDensity) return;
-        for (unsigned int yy = y - radius, fy = TILE_FINE_POINTS_NUM*(y-radius); yy < y + radius; yy++, fy += TILE_FINE_POINTS_NUM)
+        const unsigned int radius = reqradius;// + 1;
+        const int adjustRed = ((int)adjustColor.getRed()-0x80);
+        const int adjustGreen = ((int)adjustColor.getGreen()-0x80);
+        const int adjustBlue = ((int)adjustColor.getBlue()-0x80);
+        //const int adjustRed2 = adjustRed / 2;
+        //const int adjustGreen2 = adjustGreen / 2;
+        //const int adjustBlue2 = adjustBlue / 2;
+        for (unsigned int yy = y - radius, fy = TILE_FINE_POINTS_NUM*(y-radius); yy <= y + radius; yy++, fy += TILE_FINE_POINTS_NUM)
         {
-            for (unsigned int xx = x - radius; xx < x + radius; xx++)
+            for (unsigned int xx = x - radius; xx <= x + radius; xx++)
             {
-                if (xx < TILE_FINE_POINTS_NUM && yy < TILE_FINE_POINTS_NUM)
+                if (xx < TILE_FINE_POINTS_NUM && yy < TILE_FINE_POINTS_NUM && !getAdjusted(xx + fy))
                 {
+                    int radjustRed = adjustRed;
+                    int radjustGreen = adjustGreen;
+                    int radjustBlue = adjustBlue;
+                    /*
+                    if (yy < y-reqradius || y+reqradius < yy || xx < x-reqradius || x+reqradius < xx)
+                    {
+                        unsigned int nextAdj = 0;
+                        if (yy - 1 < TILE_FINE_POINTS_NUM && getAdjusted((xx)+(fy-TILE_FINE_POINTS_NUM))) nextAdj++;
+                        if (yy + 1 < TILE_FINE_POINTS_NUM && getAdjusted((xx)+(fy+TILE_FINE_POINTS_NUM))) nextAdj++;
+                        if (xx - 1 < TILE_FINE_POINTS_NUM && getAdjusted((xx-1)+(fy))) nextAdj++;
+                        if (xx + 1 < TILE_FINE_POINTS_NUM && getAdjusted((xx+1)+(fy))) nextAdj++;
+                        if (nextAdj >= 2)
+                        {
+                            radjustRed = 255;//adjustRed2;
+                            radjustGreen = 255;//adjustGreen2;
+                            radjustBlue = 255;//adjustBlue2;
+                        }
+                        else
+                        {
+                            continue;
+                        }
+                    }
+                    */
                     fineDensity[xx + fy] = irr::video::SColor(0);
-                    fineColors[xx + fy] = val;
+                    setAdjusted(xx + fy);
+                    //fineColors[xx + fy] = val;
+                    int newVal = (int)fineColors[xx + fy].getRed() + radjustRed;
+                    if (newVal < 0) newVal = 0;
+                    if (newVal>0xff) newVal = 0xff;
+                    fineColors[xx + fy].setRed(newVal);
+
+                    newVal = (int)fineColors[xx + fy].getGreen() + radjustGreen;
+                    if (newVal < 0) newVal = 0;
+                    if (newVal>0xff) newVal = 0xff;
+                    fineColors[xx + fy].setGreen(newVal);
+
+                    newVal = (int)fineColors[xx + fy].getBlue() + radjustBlue;
+                    if (newVal < 0) newVal = 0;
+                    if (newVal>0xff) newVal = 0xff;
+                    fineColors[xx + fy].setBlue(newVal);
+                    /*
+                    int newColor = (int)fineColors[xx + fy].color + ((int)adjustColor.color-0x808080);
+                    if (newColor > 0)
+                    {
+                        fineColors[xx + fy].color = (unsigned int)newColor;
+                    }
+                    else
+                    {
+                        fineColors[xx + fy].color = 0;
+                    }
+                    */
                 }
             }
         }
     }
-    
+
+private:
+    bool getAdjusted(unsigned int pos) const
+    {
+        return (adjusted[pos/8] & (0x1 << (pos%8))) == (0x1 << (pos%8));
+    }
+
+    void setAdjusted(unsigned int pos)
+    {
+        adjusted[pos/8] |= (0x1 << (pos%8));
+    }
+
+public:
     bool getInUse() const {return inUse;}
     bool isInUse() const {return inUse;}
     void setInUse() {inUse = true;}
@@ -131,6 +199,7 @@ private:
     irr::video::SColor* colors;
     irr::video::SColor* fineColors;
     irr::video::SColor* fineDensity;
+    unsigned char*      adjusted;
     
     roadRoadChunkList_t roadRoadChunkList;
 
