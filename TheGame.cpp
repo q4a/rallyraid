@@ -394,7 +394,7 @@ void TheGame::loop()
                 }
                 while (/*lastPhysTick < tick && */physUpdate)
                 {
-                    if (physicsOngoing)
+                    if (physicsOngoing && player->getFirstPressed())
                     {
                         hk::step(step_sec);
                         physUpdateDone = true;
@@ -526,6 +526,19 @@ void TheGame::resetTick()
     lastPhysTick--;
 }
 
+void TheGame::doFewSteps(unsigned int stepCnt)
+{
+    const float step_sec = 1.f / (float)Settings::getInstance()->targetFps;
+    for (;stepCnt > 0; stepCnt--)
+    {
+        offsetManager->update(offsetManager->getOffset()+camera->getPosition());
+        objectWire->update(offsetManager->getOffset()+camera->getPosition());
+        hk::step(step_sec);
+        OffsetObject::updateDynamicToPhys();
+        handleUpdatePos(true); // update the camera to the player position
+    }
+}
+
 void TheGame::switchCamera()
 {
     irr::core::vector3df pos = camera->getPosition();
@@ -585,8 +598,10 @@ void TheGame::handleUpdatePos(bool phys)
         }
     }
 
-    if (phys)
+    if (phys && inGame)
     {
+        wayPointManager->update(offsetManager->getOffset()+camera->getPosition());
+        itinerManager->update(offsetManager->getOffset()+camera->getPosition());
         player->update();
     }
     

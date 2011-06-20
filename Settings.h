@@ -34,6 +34,7 @@ public:
     bool                    useTerrainDetail;
     bool                    showNames;
     unsigned int            difficulty;
+    bool                    navigationAssistant;
 };
 
 #endif // SETTINGS_H

@@ -34,7 +34,8 @@ Settings::Settings()
       objectDensity(10),
       useTerrainDetail(true),
       showNames(true),
-      difficulty(2)
+      difficulty(2),
+      navigationAssistant(false)
 {
 }
 
@@ -94,6 +95,9 @@ void Settings::read()
             } else if (keyName == "difficulty")
             {
                 difficulty = StringConverter::parseUnsignedInt(valName, 2);
+            } else if (keyName == "navigation_assistant")
+            {
+                navigationAssistant = StringConverter::parseBool(valName, true);
             }
         }
     }
@@ -123,6 +127,7 @@ void Settings::write()
     ret = fprintf(f, "use_terrain_detail=%s\n", useTerrainDetail?"yes":"no");
     ret = fprintf(f, "show_names=%s\n", showNames?"yes":"no");
     ret = fprintf(f, "difficulty=%u\n", difficulty);
+    ret = fprintf(f, "navigation_assistant=%s\n", navigationAssistant?"yes":"no");
 
     fclose(f);
 }

@@ -249,6 +249,7 @@ void GamePlay::startStage(Stage* stage, VehicleType* vehicleType, const irr::cor
 
     Hud::getInstance()->updateRoadBook();
 
+    TheGame::getInstance()->doFewSteps(60);
     TheGame::getInstance()->resetTick();
 }
 

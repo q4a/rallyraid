@@ -74,6 +74,9 @@ public:
     bool isCurrItinerValid(); //inline
     bool isItinerValid(const ItinerManager::itinerPointList_t::const_iterator& itinerIt); //inline
 
+    bool addPassedWayPointNum(unsigned int wpNum); // inline
+    bool isPassedWayPointNum(unsigned int wpNum); // inline
+
 private:
     Vehicle*        vehicle;
     Competitor*     competitor;
@@ -283,6 +286,16 @@ inline bool Player::isItinerValid(const ItinerManager::itinerPointList_t::const_
 {
     Stage* stage = RaceManager::getInstance()->getCurrentStage();
     return (stage!=0 && itinerIt != stage->getItinerPointList().end());
+}
+
+inline bool Player::addPassedWayPointNum(unsigned int wpNum)
+{
+    return passedWayPoints.insert(wpNum).second;
+}
+
+inline bool Player::isPassedWayPointNum(unsigned int wpNum)
+{
+    return passedWayPoints.count(wpNum) > 0;
 }
 
 #endif // PLAYER_H

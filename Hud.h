@@ -43,6 +43,7 @@ private:
     bool            visible;
     ScreenQuad*     miniMapQuad;
     ScreenQuad*     compassQuad;
+    ScreenQuad*     compassWPQuad;
     ScreenQuad*     tripMasterQuad;
     ScreenQuad*     roadBookBGQuad;
 

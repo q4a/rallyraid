@@ -8,6 +8,8 @@
 #include "stdafx.h"
 #include "StringConverter.h"
 #include "ObjectWire.h"
+#include "MessageManager.h"
+#include "Player.h"
 
 
 WayPointManager* WayPointManager::wayPointManager = 0;
@@ -30,7 +32,9 @@ WayPointManager* WayPointManager::wayPointManager = 0;
 }
 
 WayPointManager::WayPointManager()
-    : activeWayPointSet()
+    : activeWayPointSet(),
+      showCompass(false),
+      angle(0.f)
 {
 }
 
@@ -41,7 +45,39 @@ WayPointManager::~WayPointManager()
 
 bool WayPointManager::update(const irr::core::vector3df& newPos, bool force)
 {
-// activeWayPointSet
+    showCompass = false;
+    if (!activeWayPointSet.empty())
+    {
+        WayPoint* wp = *activeWayPointSet.begin();
+        float dist = wp->getPos().getDistanceFrom(newPos);
+        unsigned int wpNum = wp->getNum();
+
+        if (dist < 800.f)
+        {
+            bool isPassed = Player::getInstance()->isPassedWayPointNum(wpNum);
+            if (isPassed) return false;
+
+            if (dist < 50.f)
+            {
+                if (Player::getInstance()->addPassedWayPointNum(wpNum))
+                {
+                    irr::core::stringw str;
+                    str += L"You have just passed the ";
+                    str += wpNum;
+                    str += L". waypoint.";
+                    MessageManager::getInstance()->addText(str.c_str(), 3);
+                    return true;
+                }
+                assert(0);
+            }
+            else
+            {
+                irr::core::vector3df dir = wp->getPos() - newPos;
+                angle = (float)irr::core::vector2df(dir.X, dir.Z).getAngle();
+                showCompass = true;
+            }
+        }
+    }
     return false;
 }
 

@@ -234,15 +234,15 @@ void VisualRoad::switchToVisible()
     {
         roadNode->setMaterialFlag(irr::video::EMF_LIGHTING, false);
     }
-
+    //roadNode->getMaterial(0).UseMipMaps = false;
     roadNode->setMaterialTexture(0, roadType->texture);
     if (roadType->frictionMulti > 0.01f)
     {
-        roadNode->setMaterialType(Shaders::getInstance()->materialMap["normal"]);
+        roadNode->setMaterialType(Shaders::getInstance()->materialMap["road"]);
     }
     else
     {
-        roadNode->setMaterialType(Shaders::getInstance()->materialMap["normal_t"]);
+        roadNode->setMaterialType(Shaders::getInstance()->materialMap["road_t"]);
     }
 //////////////////
 #if 0

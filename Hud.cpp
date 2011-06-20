@@ -8,6 +8,7 @@
 #include "Player.h"
 #include "Vehicle.h"
 #include "ItinerPoint.h"
+#include "WayPointManager.h"
 
 
 // normalize angle between 0 and 360
@@ -36,7 +37,7 @@ static float normalizeAngle180(float &angle)
 
 #define COMPASS_WP_ARROW_DIFF   30
 #define COMPASS_WP_ARROW_HDIFF  (COMPASS_WP_ARROW_DIFF / 2)
-#define WP_ARROW_SIZE           (COMPASS_WP_ARROW_DIFF + COMPASS_SIZE)
+#define COMPASS_WP_ARROW_SIZE   (COMPASS_WP_ARROW_DIFF + COMPASS_SIZE)
 
 #define TM_TEXT_X               (107)
 #define TM_PART_TEXT_Y          (78)
@@ -96,6 +97,7 @@ Hud::Hud()
     : visible(true),
       miniMapQuad(0),
       compassQuad(0),
+      compassWPQuad(0),
       tripMasterQuad(0),
       roadBookBGQuad(0),
       compassText(0),
@@ -139,6 +141,19 @@ Hud::Hud()
         irr::core::dimension2di(COMPASS_TEXT_SIZE_X, COMPASS_TEXT_SIZE_Y)),
         false, false, 0, -1, false);
     compassText->setOverrideFont(FontManager::getInstance()->getFont(FontManager::FONT_EXTRALARGEBOLD));
+
+    compassWPQuad = new ScreenQuad(TheGame::getInstance()->getDriver(),
+        irr::core::position2di(TheGame::getInstance()->getDriver()->getScreenSize().Width - COMPASS_WP_ARROW_SIZE - HUD_PADDING,
+        TheGame::getInstance()->getDriver()->getScreenSize().Height - COMPASS_WP_ARROW_SIZE - COMPASS_HSIZE - HUD_PADDING*2),
+        irr::core::dimension2du(COMPASS_WP_ARROW_SIZE, COMPASS_WP_ARROW_SIZE), false);
+    compassWPQuad->getMaterial().MaterialType = Shaders::getInstance()->materialMap["quad2d_t"];
+    //compassWPQuad->getMaterial().MaterialTypeParam = 0.2f;
+    //compassWPQuad->getMaterial().MaterialTypeParam2 = 0.8f;
+    compassWPQuad->getMaterial().setFlag(irr::video::EMF_ANTI_ALIASING, false);
+    compassWPQuad->getMaterial().setFlag(irr::video::EMF_BILINEAR_FILTER, false);
+    compassWPQuad->getMaterial().setFlag(irr::video::EMF_TRILINEAR_FILTER, false);
+    compassWPQuad->getMaterial().UseMipMaps = false;
+    compassWPQuad->getMaterial().setTexture(0, TheGame::getInstance()->getDriver()->getTexture("data/hud/compass_wp.png"));
 
     tmPartText = TheGame::getInstance()->getEnv()->addStaticText(L"000.00",
         irr::core::recti(irr::core::position2di(TheGame::getInstance()->getDriver()->getScreenSize().Width - COMPASS_WP_ARROW_HDIFF - HUD_PADDING - TM_TEXT_X,
@@ -247,6 +262,12 @@ Hud::~Hud()
         compassQuad = 0;
     }
 
+    if (compassWPQuad)
+    {
+        delete compassWPQuad;
+        compassWPQuad = 0;
+    }
+
     if (tripMasterQuad)
     {
         delete tripMasterQuad;
@@ -282,6 +303,7 @@ void Hud::setVisible(bool newVisible)
     
     miniMapQuad->setVisible(visible);
     compassQuad->setVisible(visible);
+    compassWPQuad->setVisible(WayPointManager::getInstance()->getShowCompass() && visible);
     tripMasterQuad->setVisible(visible);
     roadBookBGQuad->setVisible(visible);
 
@@ -357,12 +379,20 @@ void Hud::preRender(float p_angle)
     }
     str += distp;
     tmTotalText->setText(str.c_str());
+
+    bool showWPCompass = WayPointManager::getInstance()->getShowCompass();
+    if (showWPCompass)
+    {
+        compassWPQuad->rotate(WayPointManager::getInstance()->getAngle());
+    }
+    compassWPQuad->setVisible(showWPCompass);
 }
 void Hud::render()
 {
     if (!visible) return;
     
     miniMapQuad->render();
+    compassWPQuad->render();
     compassQuad->render();
     tripMasterQuad->render();
     roadBookBGQuad->render();
