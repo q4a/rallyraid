@@ -337,7 +337,7 @@ void VisualRoad::switchToVisible()
         dprintf(MY_DEBUG_NOTE, "road build end\n");
     
         /*
-        printf("1 - %u\n", animatedMesh->getMeshBuffer(0)->getVertexCount());
+        dprintf(MY_DEBUG_NOTE, "1 - %u\n", animatedMesh->getMeshBuffer(0)->getVertexCount());
         hkShape = new hkpExtendedMeshShape();
         hkpExtendedMeshShape::TrianglesSubpart part;
         //animatedMesh->getMeshBuffer(0)->getVertices()
@@ -362,11 +362,11 @@ void VisualRoad::switchToVisible()
         part.m_materialStriding = sizeof(hkpMeshMaterial);
         part.m_numMaterials = 1;
 
-        printf("2\n");
+        dprintf(MY_DEBUG_NOTE, "2\n");
 
         ((hkpExtendedMeshShape*)hkShape)->addTrianglesSubpart(part);
 
-        printf("3\n");
+        dprintf(MY_DEBUG_NOTE, "3\n");
 
         hkpRigidBodyCinfo rbCi;
         rbCi.m_shape = hkShape;

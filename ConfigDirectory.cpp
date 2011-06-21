@@ -98,7 +98,7 @@ bool ConfigDirectory::mkdir(const std::string& directory)
         }
         else
         {
-            printf("directory already exist: %s\n", dir.c_str());
+            dprintf(MY_DEBUG_NOTE, "directory already exist: %s\n", dir.c_str());
         }
     }
     return true;

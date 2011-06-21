@@ -245,7 +245,7 @@ Vehicle::Vehicle(const std::string& vehicleTypeName, const irr::core::vector3df&
     for (unsigned int i = 0; i < vehicleType->gearMap.size(); i++)
     {
         transmission->m_gearsRatio[i] = vehicleType->gearMap[i+1];
-        printf("\t%d. gear ration: %f\n", i, transmission->m_gearsRatio[i]);
+        dprintf(MY_DEBUG_NOTE, "\t%d. gear ration: %f\n", i, transmission->m_gearsRatio[i]);
     }
 
     transmission->m_clutchDelayTime = vehicleType->changeGearTime / 50.0f;

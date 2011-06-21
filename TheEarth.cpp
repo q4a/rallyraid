@@ -16,6 +16,7 @@
 #include "TerrainLarge.h"
 #include "Settings.h"
 #include "RoadManager.h"
+#include "stdafx.h"
 
 
 const irr::core::vector3di TheEarth::VisualMembers::terrainPos[3][3] =
@@ -163,6 +164,7 @@ void TheEarth::VisualMembers::finalizeMembers()
 
 void TheEarth::VisualMembers::registerMembers()
 {
+    assert(0);
     for (unsigned int i = 0; i < 3; i++)
     {
         for (unsigned int j = 0; j < 3; j++)
@@ -660,7 +662,7 @@ bool TheEarth::readHeight()
     if (minHeight > maxHeight) minHeight = maxHeight;
 
     fclose(f);
-    printf("%ux%u map read height ok, min %hu, max %hu, diff %hu, step %hu\n",
+    dprintf(MY_DEBUG_NOTE, "%ux%u map read height ok, min %hu, max %hu, diff %hu, step %hu\n",
         xsize, ysize, minHeight, maxHeight, maxHeight - minHeight, (maxHeight-minHeight)/255);
     return true;
 }
@@ -709,7 +711,7 @@ bool TheEarth::readHasDetail()
     }
 
     fclose(f);
-    printf("%ux%u map read hasDetail ok\n", xsize, ysize);
+    dprintf(MY_DEBUG_NOTE, "%ux%u map read hasDetail ok\n", xsize, ysize);
     return true;
 }
 
@@ -757,7 +759,7 @@ bool TheEarth::readHasDetail()
     }
 
     fclose(f);
-    printf("%ux%u map read hasDetailTex ok\n", xsize, ysize);
+    dprintf(MY_DEBUG_NOTE, "%ux%u map read hasDetailTex ok\n", xsize, ysize);
     return true;
 }*/
 
@@ -766,7 +768,7 @@ bool TheEarth::readDensity()
 
     if (density) density->drop();
     density = TheGame::getInstance()->getDriver()->createImageFromFile("data/earthdata/earth_data_density.png");
-    printf("%ux%u map read density ok\n", density->getDimension().Width, density->getDimension().Height);
+    dprintf(MY_DEBUG_NOTE, "%ux%u map read density ok\n", density->getDimension().Width, density->getDimension().Height);
     assert(density->getDimension().Width == xsize && density->getDimension().Height == ysize);
     return true;
 }
@@ -776,7 +778,7 @@ bool TheEarth::readEarthTexture()
 
     if (earthTexture) earthTexture->drop();
     earthTexture = TheGame::getInstance()->getDriver()->createImageFromFile("data/earthdata/earth_data_texture.png");
-    printf("%ux%u map read texture ok\n", earthTexture->getDimension().Width, earthTexture->getDimension().Height);
+    dprintf(MY_DEBUG_NOTE, "%ux%u map read texture ok\n", earthTexture->getDimension().Width, earthTexture->getDimension().Height);
     assert(earthTexture->getDimension().Width == xsize && earthTexture->getDimension().Height == ysize);
     return true;
 }
@@ -824,7 +826,7 @@ bool TheEarth::writeHeight()
         i -= wsize;
     }
     fclose(f);
-    printf("%ux%u map write height ok, min %hu, max %hu, diff %hu, step %hu\n",
+    dprintf(MY_DEBUG_NOTE, "%ux%u map write height ok, min %hu, max %hu, diff %hu, step %hu\n",
         xsize, ysize, minHeight, maxHeight, maxHeight - minHeight, (maxHeight-minHeight)/255);
     return true;
 }
@@ -863,7 +865,7 @@ bool TheEarth::writeHasDetail()
     }
 
     fclose(f);
-    printf("%ux%u map write hasDetail ok\n", xsize, ysize);
+    dprintf(MY_DEBUG_NOTE, "%ux%u map write hasDetail ok\n", xsize, ysize);
     return true;
 }
 
@@ -901,7 +903,7 @@ bool TheEarth::writeHasDetail()
     }
 
     fclose(f);
-    printf("%ux%u map write hasDetailTex ok\n", xsize, ysize);
+    dprintf(MY_DEBUG_NOTE, "%ux%u map write hasDetailTex ok\n", xsize, ysize);
     return true;
 }*/
 
@@ -1027,20 +1029,20 @@ void TheEarth::createFirst(const irr::core::vector3df& apos, const irr::core::ve
     RoadManager::getInstance()->clearVisible();
 
     visualPart = new VisualMembers();
-    printf("create members ... ");
+    dprintf(MY_DEBUG_NOTE, "create members ... ");
     visualPart->createMembers(lastCenterPosi, lastLargeCenterPosi, this);
-    printf("done\nload members ... ");
+    dprintf(MY_DEBUG_NOTE, "done\nload members ... ");
     visualPart->loadMembers(this);
-    printf("done\ngenerate road stuff ... ");
+    dprintf(MY_DEBUG_NOTE, "done\ngenerate road stuff ... ");
     newVisualPart = visualPart;
     RoadManager::getInstance()->generateNewVisual();
     RoadManager::getInstance()->switchToNewVisual();
     newVisualPart = 0;
-    printf("done\nset visible members ... ");
+    dprintf(MY_DEBUG_NOTE, "done\nset visible members ... ");
     visualPart->setVisible(true);
-    printf("done\nrefresh minimap ... ");
+    dprintf(MY_DEBUG_NOTE, "done\nrefresh minimap ... ");
     refreshMiniMap();
-    printf("done\n");
+    dprintf(MY_DEBUG_NOTE, "done\n");
 
 }
 
@@ -1060,20 +1062,20 @@ void TheEarth::update(const irr::core::vector3df& apos, const irr::core::vector3
     }
     else if (newReadyVisualPart)
     {
-        printf("switch to new, set visible true ... \n");
+        dprintf(MY_DEBUG_NOTE, "switch to new, set visible true ... \n");
         delete visualPart;
         visualPart = newReadyVisualPart;
         newReadyVisualPart = 0;
         visualPart->setVisible(true);
         RoadManager::getInstance()->switchToNewVisual();
-        printf("switch to new, set visible true ... done\n");
+        dprintf(MY_DEBUG_NOTE, "switch to new, set visible true ... done\n");
         
         return;
     }
 
     if (!lastPosBox.isPointInside(irr::core::vector3df(apos.X, 0.0f, apos.Z)))
     {
-        printf("start create new ...\n");
+        dprintf(MY_DEBUG_NOTE, "start create new ...\n");
         //irr::core::vector3df compPos = apos;
         irr::core::vector3df compPos = apos + (dir * 200.0f);
         newVisualPart = new VisualMembers();
@@ -1098,7 +1100,7 @@ void TheEarth::update(const irr::core::vector3df& apos, const irr::core::vector3
         lastLargeCenterPosi = irr::core::vector3di(((int)(compPos.X/TILE_LARGE_SCALE_F))*TILE_LARGE_SCALE, 0, ((int)(compPos.Z/TILE_LARGE_SCALE_F))*TILE_LARGE_SCALE);
         newVisualPart->createMembers(lastCenterPosi, lastLargeCenterPosi, this);
 #endif
-        printf("start create new ... done\n");
+        dprintf(MY_DEBUG_NOTE, "start create new ... done\n");
         execute();
         refreshMiniMap();
     }
@@ -1109,12 +1111,12 @@ void TheEarth::run()
 {
     clearSetInUseFlagsForTiles();
     //RoadManager::getInstance()->clearVisible();
-    printf("loading visual part ...\n");
+    dprintf(MY_DEBUG_NOTE, "thread: loading visual part ...\n");
     newVisualPart->loadMembers(this);
-    printf("loading visual part ... done\n");
-    printf("generate road stuff ... \n");
+    dprintf(MY_DEBUG_NOTE, "thread: loading visual part ... done\n");
+    dprintf(MY_DEBUG_NOTE, "thread: generate road stuff ... \n");
     RoadManager::getInstance()->generateNewVisual();
-    printf("generate road stuff ... done\n");
+    dprintf(MY_DEBUG_NOTE, "thread: generate road stuff ... done\n");
     newReadyVisualPart = newVisualPart;
     newVisualPart = 0;
     removeNotInUseTiles();
@@ -1122,6 +1124,7 @@ void TheEarth::run()
 
 void TheEarth::registerVisual()
 {
+    assert(0);
     if (visualPart)
     {
         visualPart->registerMembers();
@@ -1130,7 +1133,6 @@ void TheEarth::registerVisual()
 
 void TheEarth::refreshMiniMap()
 {
-#if 1
     irr::core::dimension2di currentPos(abs(lastCenterPosi.X / TILE_SIZE), abs(lastCenterPosi.Z / TILE_SIZE));
 
     if (currentPos != lastMiniMapPos)
@@ -1163,25 +1165,6 @@ void TheEarth::refreshMiniMap()
         sprintf_s(miniMapName, "minimap_%d_%d", currentPos.Width, currentPos.Height);
         miniMapTexture = TheGame::getInstance()->getDriver()->addTexture(miniMapName, miniMap);
     }
-#else
-        for (int x = 0; x < TILE_POINTS_NUM; x++)
-        {
-            for (int y = 0; y < TILE_POINTS_NUM; y++)
-            {
-                irr::video::SColor col = tileMap.begin()->second->getColor(x, y);
-                miniMap->setPixel(x, y, col);
-                //printf("%u %u %u \n", col.getRed(), col.getGreen(), col.getBlue());
-                printf("%u ", col.getRed());
-            }
-            printf("\n\n");
-        }
-        printf("ptilepos: %u %u", tileMap.begin()->second->getPosX(), tileMap.begin()->second->getPosY());
-        char miniMapName[255];
-        sprintf_s(miniMapName, "minimap_1_1");
-        //TheGame::getInstance()->getSmgr()->getVideoDriver()->setTextureCreationFlag(irr::video::ETCF_CREATE_MIP_MAPS, false);
-        miniMapTexture = TheGame::getInstance()->getDriver()->addTexture(miniMapName, miniMap);
-        //TheGame::getInstance()->getSmgr()->getVideoDriver()->setTextureCreationFlag(irr::video::ETCF_CREATE_MIP_MAPS, true);
-#endif
 }
 
 float TheEarth::getHeight(float x, float z)

@@ -435,7 +435,7 @@ void EventReceiver::checkEvents()
 
         if (IS_PRESSED(FPS_CAMERA))
         {
-            printf("switch camera\n");
+            dprintf(MY_DEBUG_NOTE, "switch camera\n");
             TheGame::getInstance()->switchCamera();
         }
 

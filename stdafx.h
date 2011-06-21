@@ -12,7 +12,7 @@
 #include <stdio.h>
 #include <assert.h>
 //#include <tchar.h>
-#include <irrlicht.h>
+//#include <irrlicht.h>
 
 #define MY_DEBUG_SERROR  0
 #define MY_DEBUG_ERROR   1
@@ -21,14 +21,24 @@
 #define MY_DEBUG_INFO    4
 #define MY_DEBUG_NOTE    5
 
+//#ifdef MY_DEBUG
+//# ifndef MY_DEBUG_LEVEL
+//#  define MY_DEBUG_LEVEL MY_DEBUG_NOTE
+//# endif
+//# define dprintf(lev, x, ...) if (lev <= MY_DEBUG_LEVEL) printf((x), __VA_ARGS__)
+//#else
+//# define dprintf(lev, x, ...)
+//#endif
 #ifdef MY_DEBUG
 # ifndef MY_DEBUG_LEVEL
 #  define MY_DEBUG_LEVEL MY_DEBUG_NOTE
 # endif
-# define dprintf(lev, x, ...) if (lev <= MY_DEBUG_LEVEL) printf((x), __VA_ARGS__)
 #else
-# define dprintf(lev, x, ...)
+# ifndef MY_DEBUG_LEVEL
+#  define MY_DEBUG_LEVEL MY_DEBUG_INFO
+# endif
 #endif
+#define dprintf(lev, x, ...) if (lev <= MY_DEBUG_LEVEL) printf((x), __VA_ARGS__)
 
 // TODO: reference additional headers your program requires here
 

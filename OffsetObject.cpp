@@ -86,6 +86,7 @@ OffsetObject::~OffsetObject()
     if (iterator != offsetObjectList_t::Iterator())
     {
         printf("offsetObject is in list but under deletion\n");
+        assert(0);
         *iterator = 0;
     }
     if (dynamic)

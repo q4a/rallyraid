@@ -453,7 +453,7 @@ hkpShape* ObjectPool::calculateCollisionMesh(irr::scene::IAnimatedMesh* objectMe
     {
         if (objectMesh->getMeshBuffer(i)->getVertexType() != irr::video::EVT_STANDARD)
         {
-            printf("ojject %u type missmatch %u\n", i, objectMesh->getMeshBuffer(i)->getVertexType());
+            printf("object %u type mismatch %u\n", i, objectMesh->getMeshBuffer(i)->getVertexType());
             assert(0);
             return hkShape;
         }

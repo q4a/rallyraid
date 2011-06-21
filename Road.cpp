@@ -225,9 +225,9 @@ void Road::addRoadFarPoint(const irr::core::vector3df& pos)
             tmpp3d.X = (double)tmpp.X+(double)OffsetManager::getInstance()->getOffset().X;
             tmpp3d.Z = (double)tmpp.Y+(double)OffsetManager::getInstance()->getOffset().Z;
             tmpp3d.Y = TheEarth::getInstance()->getHeight(tmpp/*3d - OffsetManager::getInstance()->getOffset()*/);
-            printf("add rp 2: %f, %f (+ %f, %f) = %f, %f\n", tmpp.X, tmpp.Y,
-                OffsetManager::getInstance()->getOffset().X, OffsetManager::getInstance()->getOffset().Z,
-                tmpp3d.X, tmpp3d.Z);
+            //printf("add rp 2: %f, %f (+ %f, %f) = %f, %f\n", tmpp.X, tmpp.Y,
+            //    OffsetManager::getInstance()->getOffset().X, OffsetManager::getInstance()->getOffset().Z,
+            //    tmpp3d.X, tmpp3d.Z);
             addRoadPoint(tmpp3d);
         }
 #endif // 0 v 1

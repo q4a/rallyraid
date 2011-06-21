@@ -466,7 +466,7 @@ void TheGame::loop()
 
             driver->setRenderTarget(0, true, true, irr::video::SColor(0, 0, 0, 255));
             //printf("prerender\n");
-            earth->registerVisual();
+            //earth->registerVisual();
             hud->preRender(cameraAngle);
             //printf("scene mgr drawAll\n");
             smgr->drawAll();

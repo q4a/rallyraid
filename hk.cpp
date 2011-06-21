@@ -1,5 +1,6 @@
 
 #include "hk.h"
+#include "stdafx.h"
 
 #include <stdio.h>
 #include <assert.h>
@@ -85,28 +86,28 @@ hkBool HK_CALL hkTestReport(hkBool32 cond, const char* desc, const char* file, i
 
 void hk::initialize()
 {
-    printf("initialize Havok\n");
-    printf("initialize Havok: initPlatform\n");
+    dprintf(MY_DEBUG_NOTE, "initialize Havok\n");
+    dprintf(MY_DEBUG_NOTE, "initialize Havok: initPlatform\n");
 #if !defined(HK_PLATFORM_WIN32)
     extern void initPlatform();
     initPlatform();
 #endif
     hkMemorySystem::FrameInfo frameInfo(6*1024*1024);
 
-    printf("initialize Havok: memory list\n");
+    dprintf(MY_DEBUG_NOTE, "initialize Havok: memory list\n");
     hkMemoryRouter* memoryRouter = hkMemoryInitUtil::initDefault(hkMallocAllocator::m_defaultMallocAllocator, frameInfo);
 
-    printf("initialize Havok: memory\n");
+    dprintf(MY_DEBUG_NOTE, "initialize Havok: memory\n");
     hkResult res = hkBaseSystem::init(memoryRouter, errorReportFunction);
-    printf("initialize Havok: memory: %s\n", res == HK_SUCCESS?"Ok":"Not Ok");
+    dprintf(MY_DEBUG_NOTE, "initialize Havok: memory: %s\n", res == HK_SUCCESS?"Ok":"Not Ok");
     assert(res == HK_SUCCESS);
 
     // Get the number of physical threads available on the system
-    printf("initialize Havok: get HW info\n");
+    dprintf(MY_DEBUG_NOTE, "initialize Havok: get HW info\n");
     hkHardwareInfo hwInfo;
     hkGetHardwareInfo(hwInfo);
     totalNumThreadsUsed = hwInfo.m_numThreads;
-    printf("initialize Havok: get HW info: threads: %d\n", totalNumThreadsUsed);
+    dprintf(MY_DEBUG_NOTE, "initialize Havok: get HW info: threads: %d\n", totalNumThreadsUsed);
 
     // We use one less than this for our thread pool, because we must also use this thread for our simulation
     hkCpuJobThreadPoolCinfo threadPoolCinfo;
@@ -115,14 +116,14 @@ void hk::initialize()
     // This line enables timers collection, by allocating 200 Kb per thread.  If you leave this at its default (0),
     // timer collection will not be enabled.
     //threadPoolCinfo.m_timerBufferPerThreadAllocation = 200000;
-    printf("initialize Havok: new job thread\n");
+    dprintf(MY_DEBUG_NOTE, "initialize Havok: new job thread\n");
     threadPool = new hkCpuJobThreadPool( threadPoolCinfo );
 
     // We also need to create a Job queue. This job queue will be used by all Havok modules to run multithreaded work.
     // Here we only use it for physics.
     hkJobQueueCinfo info;
     info.m_jobQueueHwSetup.m_numCpuThreads = totalNumThreadsUsed;
-    printf("initialize Havok: new job queue\n");
+    dprintf(MY_DEBUG_NOTE, "initialize Havok: new job queue\n");
     jobQueue = new hkJobQueue(info);
 
     //
@@ -133,7 +134,7 @@ void hk::initialize()
     //printf("initialize Havok: monitor stream resize\n");
     //hkMonitorStream::getInstance().resize(200000);
 
-    printf("initialize Havok: world\n");
+    dprintf(MY_DEBUG_NOTE, "initialize Havok: world\n");
     hkpWorldCinfo winfo;
     //winfo.m_simulationType = hkpWorldCinfo::SIMULATION_TYPE_DISCRETE;
     winfo.m_simulationType = hkpWorldCinfo::SIMULATION_TYPE_MULTITHREADED;
@@ -154,7 +155,7 @@ void hk::initialize()
     filter->removeReference();
     hk::unlock();
 
-    printf("initialize Havok end\n");
+    dprintf(MY_DEBUG_NOTE, "initialize Havok end\n");
 }
 
 void hk::finalize()

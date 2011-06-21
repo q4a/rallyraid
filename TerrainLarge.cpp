@@ -8,6 +8,7 @@
 #include <math.h>
 #include "Shaders.h"
 #include "Settings.h"
+#include "stdafx.h"
 
 
 TerrainLarge::TerrainLarge(const irr::core::vector3di& posi, TheEarth* earth)
@@ -15,7 +16,7 @@ TerrainLarge::TerrainLarge(const irr::core::vector3di& posi, TheEarth* earth)
 {
     offsetX = (posi.X / TILE_LARGE_SCALE);
     offsetY = (posi.Z / TILE_LARGE_SCALE);
-    terrain = new irr::scene::TerrainSceneNode(0, 
+    terrain = new irr::scene::TerrainSceneNode(TheGame::getInstance()->getSmgr(), 
         TheGame::getInstance()->getSmgr(),
         TheGame::getInstance()->getDevice()->getFileSystem(),
         -1,
@@ -47,7 +48,7 @@ void TerrainLarge::load(TheEarth* earth)
         image = TheGame::getInstance()->getDriver()->createImage(irr::video::ECF_R8G8B8, irr::core::dimension2du(TILE_FINE_POINTS_NUM, TILE_FINE_POINTS_NUM));
         int offsetXFine = offsetX * TILE_FINE_RATE;
         int offsetYFine = offsetY * TILE_FINE_RATE;
-        printf("===============================\n%d %d\n===============================\n", offsetXFine, offsetYFine);
+        dprintf(MY_DEBUG_NOTE, "===============================\n%d %d\n===============================\n", offsetXFine, offsetYFine);
         for (int x = 0; x < TILE_FINE_POINTS_NUM; x++)
         {
             for (int z = 0; z < TILE_FINE_POINTS_NUM; z++)

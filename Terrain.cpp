@@ -8,6 +8,7 @@
 #include <math.h>
 #include "Shaders.h"
 #include "Settings.h"
+#include "stdafx.h"
 
 
 Terrain::Terrain(const std::string& prefix)
@@ -114,7 +115,7 @@ void Terrain::setVisible(bool p_visible)
         }
         else
         {
-            printf("no image\n");
+            dprintf(MY_DEBUG_NOTE, "Terrain::setVisible(): no image\n");
         }
         //printf("add to manager %s ... done 2\n", prefix.c_str());
     }

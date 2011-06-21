@@ -2,6 +2,7 @@
 #include "TheGame.h"
 #include "Tile.h"
 #include "TheEarth.h"
+#include "stdafx.h"
 
 const irr::video::SColor Tile::baseColor;
 
@@ -213,13 +214,13 @@ Tile::Tile(unsigned int posx, unsigned int posy, unsigned int tileNum,
         }
     }
 #endif // if 0
-    printf("tile pos(%u): %u, %u\n", posx + (TheEarth::getInstance()->getSizeX()*posy), posx, posy);
+    dprintf(MY_DEBUG_NOTE, "tile pos(%u): %u, %u\n", posx + (TheEarth::getInstance()->getSizeX()*posy), posx, posy);
     /*
-    printf("%u %u %u \n", color00.getRed(), color00.getGreen(), color00.getBlue());
-    printf("%u %u %u \n", color10.getRed(), color10.getGreen(), color10.getBlue());
-    printf("%u %u %u \n", color01.getRed(), color01.getGreen(), color01.getBlue());
-    printf("%u %u %u \n", color11.getRed(), color11.getGreen(), color11.getBlue());
-    printf("\n");
+    dprintf(MY_DEBUG_NOTE, "%u %u %u \n", color00.getRed(), color00.getGreen(), color00.getBlue());
+    dprintf(MY_DEBUG_NOTE, "%u %u %u \n", color10.getRed(), color10.getGreen(), color10.getBlue());
+    dprintf(MY_DEBUG_NOTE, "%u %u %u \n", color01.getRed(), color01.getGreen(), color01.getBlue());
+    dprintf(MY_DEBUG_NOTE, "%u %u %u \n", color11.getRed(), color11.getGreen(), color11.getBlue());
+    dprintf(MY_DEBUG_NOTE, "\n");
     */
     //assert(0);
     //RoadManager::getInstance()->addChunkListToVisible(roadRoadChunkList, this);
