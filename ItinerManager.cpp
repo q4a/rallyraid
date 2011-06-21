@@ -9,6 +9,9 @@
 #include "stdafx.h"
 #include "StringConverter.h"
 #include "ObjectWire.h"
+#include "Settings.h"
+#include "Player.h"
+#include "Hud.h"
 
 
 ItinerManager* ItinerManager::itinerManager = 0;
@@ -53,6 +56,21 @@ ItinerManager::~ItinerManager()
 bool ItinerManager::update(const irr::core::vector3df& newPos, bool force)
 {
 // activeItinerPointSet
+    //printf("ass: %s, valid: %s\n", Settings::getInstance()->navigationAssistant?"true":"false", Player::getInstance()->isCurrItinerValid()?"true":"false");
+    if (Settings::getInstance()->navigationAssistant && Player::getInstance()->isCurrItinerValid())
+    {
+        ItinerPoint* ip = *Player::getInstance()->getCurrItiner();
+        float dist = ip->getPos().getDistanceFrom(newPos);
+        //printf("%f\n", dist);
+
+        if (dist < 20.f)
+        {
+            dprintf(MY_DEBUG_NOTE, "step itiner by the assistant\n");
+            Player::getInstance()->stepItiner();
+            Player::getInstance()->resetDistance();
+            Hud::getInstance()->updateRoadBook();
+        }
+    }
     return false;
 }
 

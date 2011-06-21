@@ -537,7 +537,7 @@ void TheGame::doFewSteps(unsigned int stepCnt)
         objectWire->update(offsetManager->getOffset()+camera->getPosition());
         hk::step(step_sec);
         OffsetObject::updateDynamicToPhys();
-        handleUpdatePos(true); // update the camera to the player position
+        if (stepCnt == 1) handleUpdatePos(true); // update the camera to the player position
     }
 }
 

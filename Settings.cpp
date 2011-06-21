@@ -35,7 +35,7 @@ Settings::Settings()
       useTerrainDetail(true),
       showNames(true),
       difficulty(2),
-      navigationAssistant(false)
+      navigationAssistant(true)
 {
 }
 
