@@ -66,11 +66,7 @@ MyThread::MyThread()
 
 MyThread::~MyThread()
 {
-    if (!terminated)
-    {
-        kill();
-        while (!terminated) TheGame::getInstance()->getDevice()->sleep(100);
-    }
+    terminateAndWait();
 #ifdef __linux__
 //    pthread_mutex_destroy(&mutex[0]);
 //    pthread_mutex_destroy(&mutex[1]);
@@ -103,6 +99,15 @@ void MyThread::kill()
         WaitForSingleObject(handle, 2000);
     }
 #endif
+}
+
+void MyThread::terminateAndWait()
+{
+    if (!terminated)
+    {
+        kill();
+        while (!terminated) TheGame::getInstance()->getDevice()->sleep(100);
+    }
 }
 
 void MyThread::run_in()

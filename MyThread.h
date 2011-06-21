@@ -16,6 +16,7 @@ public:
     void execute();
     
     void kill();
+    void terminateAndWait();
     
 protected:
     virtual void run() = 0;

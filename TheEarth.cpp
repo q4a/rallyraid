@@ -164,7 +164,7 @@ void TheEarth::VisualMembers::finalizeMembers()
 
 void TheEarth::VisualMembers::registerMembers()
 {
-    assert(0);
+    //assert(0);
     for (unsigned int i = 0; i < 3; i++)
     {
         for (unsigned int j = 0; j < 3; j++)
@@ -1124,7 +1124,7 @@ void TheEarth::run()
 
 void TheEarth::registerVisual()
 {
-    assert(0);
+    //assert(0);
     if (visualPart)
     {
         visualPart->registerMembers();
