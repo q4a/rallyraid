@@ -28,6 +28,8 @@ public:
         MP_EDITORSTAGE,
         MP_EDITORROAD,
         MP_MAIN,
+        MP_STAGE,
+        MP_INGAME,
         NUMBER_OF_MENUPAGES
     };
 

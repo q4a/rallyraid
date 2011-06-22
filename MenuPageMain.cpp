@@ -1,5 +1,6 @@
 
 #include "MenuPageMain.h"
+#include "MenuPageStage.h"
 #include "TheGame.h"
 #include "stdafx.h"
 #include "WStringConverter.h"
@@ -22,6 +23,8 @@
 #include "VehicleType.h"
 #include "GamePlay.h"
 #include "Hud.h"
+#include "VehicleManager.h"
+#include <assert.h>
 
 
 MenuPageMain* MenuPageMain::menuPageMain = 0;
@@ -34,7 +37,8 @@ MenuPageMain::MenuPageMain()
       staticTextRaceData(0),
       staticTextVehicleData(0),
       selectedRace(0),
-      selectedVehicleType(0)
+      selectedVehicleType(0),
+      willOpenOtherWindow(false)
 {
     menuPageMain = this;
     window = TheGame::getInstance()->getEnv()->addImage(
@@ -140,8 +144,13 @@ bool MenuPageMain::OnEvent(const irr::SEvent &event)
                             selectedRace?selectedRace->getName().c_str():"-", selectedVehicleType?selectedVehicleType->getName().c_str():"-");
                         if (selectedRace && selectedVehicleType)
                         {
+                            willOpenOtherWindow = true;
+                            MenuPageStage::menuPageStage->selectedRace = selectedRace;
+                            MenuPageStage::menuPageStage->selectedStage = 0;
+                            MenuPageStage::menuPageStage->selectedVehicleType = selectedVehicleType;
                             MenuManager::getInstance()->close();
-                            GamePlay::getInstance()->startNewGame(selectedRace, selectedVehicleType);
+                            MenuManager::getInstance()->open(MenuManager::MP_STAGE);
+                            //GamePlay::getInstance()->startNewGame(selectedRace, selectedVehicleType);
                         }
                         return true;
                         break;
@@ -200,6 +209,8 @@ void MenuPageMain::open()
     refresh();
     window->setVisible(true);
     TheGame::getInstance()->getEnv()->setFocus(tableRaces);
+    
+    // stop necessarry elements in the game
     TheGame::getInstance()->setInGame(false);
     Hud::getInstance()->setVisible(false);
 }
@@ -208,8 +219,14 @@ void MenuPageMain::close()
 {
     dprintf(MY_DEBUG_NOTE, "MenuPageMain::close()\n");
     window->setVisible(false);
-    TheGame::getInstance()->setInGame(true);
-    Hud::getInstance()->setVisible(true);
+
+    // start necessarry elements in the game if returns
+    if (!willOpenOtherWindow)
+    {
+        TheGame::getInstance()->setInGame(true);
+        Hud::getInstance()->setVisible(true);
+    }
+    willOpenOtherWindow = false;
 }
 
 void MenuPageMain::refresh()

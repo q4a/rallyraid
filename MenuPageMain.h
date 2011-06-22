@@ -54,6 +54,8 @@ private:
     
     Race*                   selectedRace;
     VehicleType*            selectedVehicleType;
+    
+    bool                    willOpenOtherWindow;
 };
 
 #endif // MENUPAGEMAIN_H

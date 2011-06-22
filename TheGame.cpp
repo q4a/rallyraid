@@ -17,6 +17,7 @@
 #include "RaceManager.h"
 #include "MenuManager.h"
 #include "MenuPageEditor.h"
+#include "MenuPageStage.h"
 #include "Hud.h"
 #include "RoadManager.h"
 #include "RoadTypeManager.h"
@@ -482,7 +483,13 @@ void TheGame::loop()
             {
                 hud->render();
             }
+            
             env->drawAll();
+            
+            if (!inGame && MenuPageStage::menuPageStage->isVisible())
+            {
+                MenuPageStage::menuPageStage->render();
+            }
             //printf("hud render\n");
             //testQuad.render();
             driver->endScene();
