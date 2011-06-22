@@ -5,6 +5,7 @@
 #include "ConfigFile.h"
 #include "stdafx.h"
 #include "StringConverter.h"
+#include "TheGame.h"
 
 
 Stage::Stage(Day* parent, const std::string& raceName, const std::string& dayName, const std::string& stageName, bool& ret)
@@ -14,6 +15,7 @@ Stage::Stage(Day* parent, const std::string& raceName, const std::string& dayNam
       stageName(stageName),
       stageLongName(),
       shortDescription(),
+      imageName(STAGE_DIR(raceName, dayName, stageName)+"/"+DEFAULTSTAGE_IMG)
       globalObjectList(),
       itinerPointList(),
       wayPointList(),
@@ -78,9 +80,13 @@ bool Stage::readCfg()
             } else if (keyName == "stage_time")
             {
                 stageTime = StringConverter::parseUnsignedInt(valName, 1000);
+            } else if (keyName == "image")
+            {
+                imageName = valName;
             }
         }
     }
+    image = TheGame::getInstance()->getDriver()->getTexture(imageName.c_str());
     return true;
 }
 
@@ -134,6 +140,7 @@ bool Stage::writeCfg()
 
     ret = fprintf(f, "long_name=%s\n", stageLongName.c_str());
     ret = fprintf(f, "stage_time=%u\n", stageTime);
+    ret = fprintf(f, "image=%s\n", imageName.c_str());
 
     fclose(f);
     return true;

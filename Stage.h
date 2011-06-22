@@ -56,6 +56,7 @@ private:
     std::string                     stageName;
     std::string                     stageLongName;
     std::string                     shortDescription;
+    std::string                     imageName;
     RaceManager::globalObjectList_t globalObjectList;
     ItinerManager::itinerPointList_t itinerPointList;
     WayPointManager::wayPointList_t wayPointList;
@@ -63,6 +64,7 @@ private:
     bool                            active;
     RoadManager::roadMap_t          roadMap;
     unsigned int                    stageTime;
+    irr::video::ITexture*           image;
     
 
     friend class RaceManager;

@@ -39,7 +39,8 @@ MenuPageEditorStage::MenuPageEditorStage()
       editBoxNewRoadFilename(0),
       editBoxNewRoadName(0),
       editBoxNewRoadDataFilename(0),
-      editBoxStageTime(0)
+      editBoxStageTime(0),
+      editBoxImage(0)
 {
     window = TheGame::getInstance()->getEnv()->addWindow(
         irr::core::recti(TheGame::getInstance()->getScreenSize().Width-350, 50, TheGame::getInstance()->getScreenSize().Width-10, TheGame::getInstance()->getScreenSize().Height-150),
@@ -84,8 +85,14 @@ MenuPageEditorStage::MenuPageEditorStage()
         window,
         MI_EBSTAGETIME);
 
+    editBoxImage = TheGame::getInstance()->getEnv()->addEditBox(L"",
+        irr::core::recti(irr::core::position2di(2, 110), irr::core::dimension2di(window->getRelativePosition().getSize().Width - 4, 20)),
+        true,
+        window,
+        MI_EBIMAGE);
+
     irr::gui::IGUITabControl* tc = TheGame::getInstance()->getEnv()->addTabControl(
-        irr::core::recti(irr::core::position2di(2, 110), irr::core::dimension2di(window->getRelativePosition().getSize().Width - 4, window->getRelativePosition().getSize().Height - 112)),
+        irr::core::recti(irr::core::position2di(2, 132), irr::core::dimension2di(window->getRelativePosition().getSize().Width - 4, window->getRelativePosition().getSize().Height - 134)),
         window,
         true,
         true,
@@ -254,6 +261,7 @@ bool MenuPageEditorStage::OnEvent(const irr::SEvent &event)
                         WStringConverter::toString(editBoxLongName->getText(), RaceManager::getInstance()->editorStage->stageLongName);
                         WStringConverter::toString(editBoxShortDescription->getText(), RaceManager::getInstance()->editorStage->shortDescription);
                         WStringConverter::toUnsignedInt(editBoxStageTime->getText(), RaceManager::getInstance()->editorStage->stageTime);
+                        WStringConverter::toString(editBoxImage->getText(), RaceManager::getInstance()->editorStage->imageName);
                         RaceManager::getInstance()->editorStage->write();
                         return true;
                         break;
@@ -410,6 +418,10 @@ void MenuPageEditorStage::refreshEditBoxes()
     str = L"";
     str += RaceManager::getInstance()->editorStage->getStageTime();
     editBoxStageTime->setText(str.c_str());
+
+    str = L"";
+    str += RaceManager::getInstance()->editorStage->imageName.c_str();
+    editBoxImage->setText(str.c_str());
 }
 
 void MenuPageEditorStage::refreshRoads()

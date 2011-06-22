@@ -34,6 +34,7 @@ public:
         MI_EBNEWROADNAME,
         MI_EBNEWROADDATAFILENAME,
         MI_EBSTAGETIME,
+        MI_EBIMAGE,
 
         NUMBER_OF_MENUITEMS
     };
@@ -70,6 +71,7 @@ private:
     irr::gui::IGUIEditBox*  editBoxNewRoadName;
     irr::gui::IGUIEditBox*  editBoxNewRoadDataFilename;
     irr::gui::IGUIEditBox*  editBoxStageTime;
+    irr::gui::IGUIEditBox*  editBoxImage;
 };
 
 #endif // MENUPAGEEDITORSTAGE_H

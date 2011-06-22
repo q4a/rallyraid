@@ -32,6 +32,7 @@
 #define ITINER_CFG                  (std::string("itiner.cfg"))
 #define WAYPOINT_CFG                (std::string("waypoint.cfg"))
 #define AIPOINTS_CFG                (std::string("aipoints.cfg"))
+#define DEFAULTSTAGE_IMG            (std::string("stage.png"))
 
 class Race;
 class Day;
