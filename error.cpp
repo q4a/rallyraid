@@ -63,7 +63,7 @@ extern "C" void PrintError(int num, const char *msg, ...)
     _vsnprintf(s, sizeof(s), msg, ap);
     s[sizeof(s)-1] = 0;
     _printMessage(num, "Dakar 2012 error", msg, ap);
-#ifdef _MSC_VER
+#ifdef _NODEF// _MSC_VER
     irr::core::stringw ws = L" ";
     irr::core::stringw wtitle = L" ";
     ws = s;
@@ -83,8 +83,8 @@ extern "C" void PrintMessage(int num, const char *msg, ...)
     _snprintf(title, sizeof(title), "Dakar 2012 message - code: %d", num);
     _vsnprintf(s, sizeof(s), msg, ap);
     s[sizeof(s)-1] = 0;
-    printMessage(num, "Dakar 2012 message", msg, ap);
-#ifdef _MSC_VER
+    _printMessage(num, "Dakar 2012 message", msg, ap);
+#ifdef NODEF //_MSC_VER
     irr::core::stringw ws = L" ";
     irr::core::stringw wtitle = L" ";
     ws = s;
@@ -96,5 +96,4 @@ extern "C" void PrintMessage(int num, const char *msg, ...)
 //    printMessage (num,"ODE Message",msg,ap);
 }
 
-#endif
-
+#endif // WIN32

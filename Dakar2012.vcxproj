@@ -93,6 +93,7 @@
     <ClInclude Include="CTreeGenerator.h" />
     <ClInclude Include="CTreeSceneNode.h" />
     <ClInclude Include="Day.h" />
+    <ClInclude Include="error.h" />
     <ClInclude Include="EventReceiver.h" />
     <ClInclude Include="FontManager.h" />
     <ClInclude Include="GamePlay.h" />
@@ -115,6 +116,7 @@
     <ClInclude Include="MenuPageEditorRoad.h" />
     <ClInclude Include="MenuPageEditorStage.h" />
     <ClInclude Include="MenuPageMain.h" />
+    <ClInclude Include="MenuPageStage.h" />
     <ClInclude Include="MessageManager.h" />
     <ClInclude Include="MyLock.h" />
     <ClInclude Include="MySound.h" />
@@ -172,6 +174,7 @@
     <ClCompile Include="CTreeSceneNode.cpp" />
     <ClCompile Include="Dakar2012.cpp" />
     <ClCompile Include="Day.cpp" />
+    <ClCompile Include="error.cpp" />
     <ClCompile Include="EventReceiver.cpp" />
     <ClCompile Include="FontManager.cpp" />
     <ClCompile Include="GamePlay.cpp" />
@@ -191,6 +194,7 @@
     <ClCompile Include="MenuPageEditorRoad.cpp" />
     <ClCompile Include="MenuPageEditorStage.cpp" />
     <ClCompile Include="MenuPageMain.cpp" />
+    <ClCompile Include="MenuPageStage.cpp" />
     <ClCompile Include="MessageManager.cpp" />
     <ClCompile Include="MySound.cpp" />
     <ClCompile Include="MyThread.cpp" />

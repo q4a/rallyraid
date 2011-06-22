@@ -10,6 +10,7 @@
 class Race;
 class Stage;
 class VehicleType;
+class ScreenQuad;
 
 class MenuPageStage : public MenuPageBase
 {
@@ -20,7 +21,7 @@ public:
         MI_BUTTONSTART,
         MI_BUTTONBACK,
 
-        MI_SCROLLITINER,
+        MI_SCROLLROADBOOK,
 
         NUMBER_OF_MENUITEMS
     };
@@ -46,10 +47,11 @@ private:
     void updateRoadBook();
 
 private:
-    bool                    visble;
     irr::gui::IGUIImage*    window;
+    ScreenQuad*             bgQuad;
     //irr::gui::IGUIStaticText* staticTextRaceData;
     bool                    willOpenOtherWindow;
+    bool                    visible;
     
     Race*                   selectedRace;
     Stage*                  selectedStage;
@@ -68,6 +70,9 @@ private:
     };
     ScreenQuad*     roadBookBGQuad;
     RoadBookEntry   roadBookEntries[6];
+
+    ScreenQuad*     stageImageQuad;
+    irr::gui::IGUIScrollBar*    roadBookScrollBar;
     
     
     friend class MenuPageMain;
@@ -76,7 +81,7 @@ private:
 
 inline bool MenuPageStage::isVisible()
 {
-    return visble;
+    return visible;
 }
 
 #endif // MENUPAGESTAGE_H

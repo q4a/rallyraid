@@ -15,7 +15,7 @@ Stage::Stage(Day* parent, const std::string& raceName, const std::string& dayNam
       stageName(stageName),
       stageLongName(),
       shortDescription(),
-      imageName(STAGE_DIR(raceName, dayName, stageName)+"/"+DEFAULTSTAGE_IMG)
+      imageName(STAGE_DIR(raceName, dayName, stageName)+"/"+DEFAULTSTAGE_IMG),
       globalObjectList(),
       itinerPointList(),
       wayPointList(),

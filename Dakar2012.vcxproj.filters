@@ -246,6 +246,12 @@
     <ClInclude Include="VisualRoad.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="error.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MenuPageStage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -441,6 +447,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="VisualRoad.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="error.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MenuPageStage.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -63,7 +63,7 @@ bool ItinerManager::update(const irr::core::vector3df& newPos, bool force)
         float dist = ip->getPos().getDistanceFrom(newPos);
         //printf("%f\n", dist);
 
-        if (dist < 20.f)
+        if (dist < 30.f)
         {
             dprintf(MY_DEBUG_NOTE, "step itiner by the assistant\n");
             Player::getInstance()->stepItiner();

@@ -6,7 +6,7 @@
 class ScreenQuad
 {
 public:
-    ScreenQuad(irr::video::IVideoDriver* driver, const irr::core::position2di& pos, const irr::core::dimension2du size, bool antialiasing = true)
+    ScreenQuad(irr::video::IVideoDriver* driver, const irr::core::position2di& pos, const irr::core::dimension2du& size, bool antialiasing = true)
         : driver(driver)
     {
         Material.AntiAliasing = antialiasing;

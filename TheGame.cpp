@@ -483,13 +483,16 @@ void TheGame::loop()
             {
                 hud->render();
             }
+            else
+            {
+                if (MenuPageStage::menuPageStage->isVisible())
+                {
+                    MenuPageStage::menuPageStage->render();
+                }
+            }
             
             env->drawAll();
             
-            if (!inGame && MenuPageStage::menuPageStage->isVisible())
-            {
-                MenuPageStage::menuPageStage->render();
-            }
             //printf("hud render\n");
             //testQuad.render();
             driver->endScene();

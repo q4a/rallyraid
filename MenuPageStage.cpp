@@ -27,10 +27,11 @@
 #include "Shaders.h"
 #include "ItinerPoint.h"
 #include <assert.h>
+#include "FontManager.h"
 
 
+#define ROADBOOKBG_SIZE_X       (768)
 #define ROADBOOKBG_SIZE_Y       (128)
-#define ROADBOOKBG_SIZE_X       (6*ROADBOOKBG_SIZE_Y)
 #define ROADBOOKBG_HSIZE_X      (ROADBOOKBG_SIZE_X / 2)
 
 #define ROADBOOKENTRY_NUM_SIZE_X    (30) // 32
@@ -62,12 +63,16 @@ MenuPageStage* MenuPageStage::menuPageStage = 0;
 
 MenuPageStage::MenuPageStage()
     : window(0),
+      bgQuad(0),
       willOpenOtherWindow(false),
+      visible(true),
       selectedRace(0),
       selectedStage(0),
       selectedVehicleType(0),
       itinerIt(),
-      roadBookBGQuad(0)
+      roadBookBGQuad(0),
+      stageImageQuad(0),
+      roadBookScrollBar(0)
 {
     menuPageStage = this;
     window = TheGame::getInstance()->getEnv()->addImage(
@@ -75,7 +80,9 @@ MenuPageStage::MenuPageStage()
         0,
         MI_WINDOW);
     window->setScaleImage(true);
-    window->setImage(TheGame::getInstance()->getDriver()->getTexture("data/bg/3.jpg"));
+    //window->setColor(irr::video::SColor(255,0,0,0));
+    window->setUseAlphaChannel(true);
+    window->setImage(TheGame::getInstance()->getDriver()->getTexture("data/bg/transp.png"));
 
     TheGame::getInstance()->getEnv()->addButton(
         irr::core::recti(10,60,90,80),
@@ -89,6 +96,12 @@ MenuPageStage::MenuPageStage()
         MI_BUTTONBACK,
         L"Back To Main");
 
+    bgQuad = new ScreenQuad(TheGame::getInstance()->getDriver(),
+        window->getRelativePosition().UpperLeftCorner,
+        irr::core::dimension2du(window->getRelativePosition().getSize().Width, window->getRelativePosition().getSize().Height),
+        false);
+    bgQuad->getMaterial().MaterialType = Shaders::getInstance()->materialMap["quad2d"];
+    bgQuad->getMaterial().setTexture(0, TheGame::getInstance()->getDriver()->getTexture("data/bg/3.jpg"));
 
     // ----------------------------
     // RoadBook
@@ -96,13 +109,13 @@ MenuPageStage::MenuPageStage()
     roadBookBGQuad = new ScreenQuad(TheGame::getInstance()->getDriver(),
         irr::core::position2di(window->getRelativePosition().getSize().Width/2 - ROADBOOKBG_HSIZE_X,
         (window->getRelativePosition().getSize().Height*3/4) + 10),
-        irr::core::dimension2du(ROADBOOKBG_SIZE_X, ROADBOOKBG_SIZE_Y), false);
+        irr::core::dimension2du(ROADBOOKBG_SIZE_X-1, ROADBOOKBG_SIZE_Y-1), false);
     roadBookBGQuad->getMaterial().MaterialType = Shaders::getInstance()->materialMap["quad2d"];
     roadBookBGQuad->getMaterial().setFlag(irr::video::EMF_ANTI_ALIASING, false);
     roadBookBGQuad->getMaterial().setFlag(irr::video::EMF_BILINEAR_FILTER, false);
     roadBookBGQuad->getMaterial().setFlag(irr::video::EMF_TRILINEAR_FILTER, false);
     roadBookBGQuad->getMaterial().UseMipMaps = false;
-    roadBookBGQuad->getMaterial().setTexture(0, TheGame::getInstance()->getDriver()->getTexture("data/hud/roadbookbg.png"));
+    roadBookBGQuad->getMaterial().setTexture(0, TheGame::getInstance()->getDriver()->getTexture("data/hud/roadbookbg_menu.png"));
 
     for (unsigned int i = 0; i < 6; i++)
     {
@@ -113,7 +126,7 @@ MenuPageStage::MenuPageStage()
             false, false, window, -1, false);
         roadBookEntries[i].numText->setOverrideFont(FontManager::getInstance()->getFont(FontManager::FONT_SMALL));
         roadBookEntries[i].numText->setTextAlignment(irr::gui::EGUIA_LOWERRIGHT, irr::gui::EGUIA_UPPERLEFT);
-        if (i!=1) roadBookEntries[i].numText->setOverrideColor(irr::video::SColor(255, 127, 127, 127));
+        //if (i!=1) roadBookEntries[i].numText->setOverrideColor(irr::video::SColor(255, 127, 127, 127));
 
         roadBookEntries[i].globalDistanceText = TheGame::getInstance()->getEnv()->addStaticText(L"0,00",
             irr::core::recti(irr::core::position2di(window->getRelativePosition().getSize().Width/2 - ROADBOOKBG_HSIZE_X + ROADBOOKENTRY_GD_POS_X(i),
@@ -122,7 +135,7 @@ MenuPageStage::MenuPageStage()
             false, false, window, -1, false);
         roadBookEntries[i].globalDistanceText->setOverrideFont(FontManager::getInstance()->getFont(FontManager::FONT_EXTRALARGE));
         roadBookEntries[i].globalDistanceText->setTextAlignment(irr::gui::EGUIA_LOWERRIGHT, irr::gui::EGUIA_UPPERLEFT);
-        if (i!=1) roadBookEntries[i].globalDistanceText->setOverrideColor(irr::video::SColor(255, 127, 127, 127));
+        //if (i!=1) roadBookEntries[i].globalDistanceText->setOverrideColor(irr::video::SColor(255, 127, 127, 127));
 
         roadBookEntries[i].localDistanceText = TheGame::getInstance()->getEnv()->addStaticText(L"0,00",
             irr::core::recti(irr::core::position2di(window->getRelativePosition().getSize().Width/2 - ROADBOOKBG_HSIZE_X + ROADBOOKENTRY_LD_POS_X(i),
@@ -131,7 +144,7 @@ MenuPageStage::MenuPageStage()
             false, false, window, -1, false);
         roadBookEntries[i].localDistanceText->setOverrideFont(FontManager::getInstance()->getFont(FontManager::FONT_NORMALBOLD));
         roadBookEntries[i].localDistanceText->setTextAlignment(irr::gui::EGUIA_LOWERRIGHT, irr::gui::EGUIA_UPPERLEFT);
-        if (i!=1) roadBookEntries[i].localDistanceText->setOverrideColor(irr::video::SColor(255, 127, 127, 127));
+        //if (i!=1) roadBookEntries[i].localDistanceText->setOverrideColor(irr::video::SColor(255, 127, 127, 127));
 
         roadBookEntries[i].noteText = TheGame::getInstance()->getEnv()->addStaticText(L"0,00",
             irr::core::recti(irr::core::position2di(window->getRelativePosition().getSize().Width/2 - ROADBOOKBG_HSIZE_X + ROADBOOKENTRY_NOTE_POS_X(i),
@@ -140,7 +153,7 @@ MenuPageStage::MenuPageStage()
             false, true, window, -1, false);
         roadBookEntries[i].noteText->setOverrideFont(FontManager::getInstance()->getFont(FontManager::FONT_SMALLBOLD));
         roadBookEntries[i].noteText->setTextAlignment(irr::gui::EGUIA_LOWERRIGHT, irr::gui::EGUIA_LOWERRIGHT);
-        if (i!=1) roadBookEntries[i].noteText->setOverrideColor(irr::video::SColor(255, 127, 127, 127));
+        //if (i!=1) roadBookEntries[i].noteText->setOverrideColor(irr::video::SColor(255, 127, 127, 127));
 
         roadBookEntries[i].itinerQuad = new ScreenQuad(TheGame::getInstance()->getDriver(),
             irr::core::position2di(window->getRelativePosition().getSize().Width/2 - ROADBOOKBG_HSIZE_X + ROADBOOKENTRY_ITINER_POS_X(i),
@@ -165,6 +178,24 @@ MenuPageStage::MenuPageStage()
         roadBookEntries[i].itiner2Quad->getMaterial().setTexture(0, 0);
     }
 
+    stageImageQuad = new ScreenQuad(TheGame::getInstance()->getDriver(),
+        irr::core::position2di(window->getRelativePosition().getSize().Width/2 - ROADBOOKBG_HSIZE_X,
+        (window->getRelativePosition().getSize().Height/4)),
+        irr::core::dimension2du(ROADBOOKBG_SIZE_X, window->getRelativePosition().getSize().Height/2), false);
+    stageImageQuad->getMaterial().MaterialType = Shaders::getInstance()->materialMap["quad2d"];
+    stageImageQuad->getMaterial().setTexture(0, 0);
+
+    roadBookScrollBar = TheGame::getInstance()->getEnv()->addScrollBar(true, 
+            irr::core::recti(irr::core::position2di(window->getRelativePosition().getSize().Width/2 - ROADBOOKBG_HSIZE_X,
+            (window->getRelativePosition().getSize().Height*3/4) + 10 + ROADBOOKBG_SIZE_Y),
+            irr::core::dimension2di(ROADBOOKBG_SIZE_X, 20)),
+            window,
+            MI_SCROLLROADBOOK);
+    roadBookScrollBar->setMin(0);
+    roadBookScrollBar->setMax(0);
+    roadBookScrollBar->setLargeStep(5);
+    roadBookScrollBar->setSmallStep(1);
+
     setVisible(false);
 }
 
@@ -173,6 +204,21 @@ MenuPageStage::~MenuPageStage()
     //window->remove();
     menuPageStage = 0;
     close();
+    if (bgQuad)
+    {
+        delete bgQuad;
+        bgQuad = 0;
+    }
+    if (roadBookBGQuad)
+    {
+        delete roadBookBGQuad;
+        roadBookBGQuad = 0;
+    }
+    if (stageImageQuad)
+    {
+        delete stageImageQuad;
+        stageImageQuad = 0;
+    }
 }
 
 bool MenuPageStage::OnEvent(const irr::SEvent &event)
@@ -225,7 +271,25 @@ bool MenuPageStage::OnEvent(const irr::SEvent &event)
                 };
                 break;
             }
-            
+            case irr::gui::EGET_SCROLL_BAR_CHANGED:
+            {
+                switch (id)
+                {
+                    case MI_SCROLLROADBOOK:
+                    {
+                        int pos = roadBookScrollBar->getPos();
+                        dprintf(MY_DEBUG_NOTE, "stagemenu::scrollbar::clicked: pos: %d\n", pos);
+                        if (selectedStage)
+                        {
+                            itinerIt = selectedStage->getItinerPointList().begin();
+                            for (int i = 0; i < pos; i++, itinerIt++);
+                        }
+                        return true;
+                        break;
+                    }
+                };
+                break;
+            }
         };
     }
     return false;
@@ -255,6 +319,16 @@ void MenuPageStage::open()
     }
     assert(selectedStage);
     itinerIt = selectedStage->getItinerPointList().begin();
+    stageImageQuad->getMaterial().setTexture(0, selectedStage->getImage());
+    int size = (int)selectedStage->getItinerPointList().size();
+    if (size <= 6)
+    {
+        roadBookScrollBar->setMax(0);
+    }
+    else
+    {
+        roadBookScrollBar->setMax(size-6);
+    }
     refresh();
     setVisible(true);
     //TheGame::getInstance()->getEnv()->setFocus(tableRaces);
@@ -290,7 +364,9 @@ void MenuPageStage::setVisible(bool visible)
     this->visible = visible;
     
     window->setVisible(visible);
+    bgQuad->setVisible(visible);
     roadBookBGQuad->setVisible(visible);
+    stageImageQuad->setVisible(visible);
     updateRoadBook();
 }
 
@@ -301,7 +377,7 @@ void MenuPageStage::updateRoadBook()
     for (unsigned int i = 0; i < 6; i++)
     {
         itinerPoint = 0;
-        if (it != selectedStage->getItinerPointList().end())
+        if (selectedStage && it != selectedStage->getItinerPointList().end())
         {
             itinerPoint = *(it);
             it++;
@@ -387,7 +463,9 @@ void MenuPageStage::render()
 {
     if (!visible) return;
     
+    bgQuad->render();
     roadBookBGQuad->render();
+    stageImageQuad->render();
     for (unsigned int i = 0; i < 6; i++)
     {
         roadBookEntries[i].itinerQuad->render();

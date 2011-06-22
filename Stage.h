@@ -45,6 +45,7 @@ public:
     const AIPoint::AIPointList_t& getAIPointList() const; // inline
     Day* getParent() const; // inline
     unsigned int getStageTime(); // inline
+    irr::video::ITexture* getImage(); // inline
 
     void activate();
     void deactivate();
@@ -117,6 +118,11 @@ inline Day* Stage::getParent() const
 inline unsigned int Stage::getStageTime()
 {
     return stageTime;
+}
+
+inline irr::video::ITexture* Stage::getImage()
+{
+    return image;
 }
 
 #endif // STAGE_H
