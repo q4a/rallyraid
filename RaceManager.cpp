@@ -127,6 +127,11 @@ void RaceManager::activateStage(Stage* stage)
     currentStage->activate();
 }
 
+const heightModifierList_t& RaceManager::getCurrentHeightModifierList()
+{
+    return currentStage ? currentStage->getHeightModifierList() : emptyHeightModifierList;
+}
+
 /* static */ void RaceManager::readShortDescription(const std::string& fileName, std::string& shortDescription)
 {
     FILE* f;
@@ -303,7 +308,7 @@ void RaceManager::activateStage(Stage* stage)
     }
 }
 
-/* static */ void RaceManager::readGlobalObjects(const std::string& fileName, heightModifierList_t& heightModifierList)
+/* static */ void RaceManager::readHeightModifierList(const std::string& fileName, heightModifierList_t& heightModifierList)
 {
     FILE* f;
     int ret = 0;
@@ -320,7 +325,7 @@ void RaceManager::activateStage(Stage* stage)
     if (error)
     {
         printf("height modifiers file unable to open: %s\n", fileName.c_str());
-        return false;
+        return;
     }
     
     while (true)
@@ -337,7 +342,7 @@ void RaceManager::activateStage(Stage* stage)
     fclose(f);
 }
 
-/* static */ bool RaceManager::writeGlobalObjects(const std::string& fileName, const heightModifierList_t& heightModifierList)
+/* static */ bool RaceManager::writeHeightModifierList(const std::string& fileName, const heightModifierList_t& heightModifierList)
 {
     FILE* f;
     int ret = 0;

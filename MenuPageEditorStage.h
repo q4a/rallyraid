@@ -14,6 +14,7 @@ public:
         MI_BUTTONREFRESH,
         MI_BUTTONSAVE,
         MI_BUTTONCREATEROAD,
+        MI_BUTTONHMSET,
         MI_TABCONTROL,
 
         MI_TABGLOBALOBJECTS,
@@ -21,12 +22,14 @@ public:
         MI_TABITINER,
         MI_TABAI,
         MI_TABWP,
+        MI_TABHM,
 
         MI_TABLEGLOBALOBJECTS,
         MI_TABLEROADS,
         MI_TABLEITINER,
         MI_TABLEAI,
         MI_TABLEWP,
+        MI_TABLEHM,
 
         MI_EBLONGNAME,
         MI_EBSHORTDESCRIPTION,
@@ -35,6 +38,8 @@ public:
         MI_EBNEWROADDATAFILENAME,
         MI_EBSTAGETIME,
         MI_EBIMAGE,
+        MI_EBHMHEIGHT,
+        MI_EBHMRADIUS,
 
         NUMBER_OF_MENUITEMS
     };
@@ -57,6 +62,7 @@ private:
     void refreshItiner();
     void refreshAI();
     void refreshWP();
+    void refreshHM();
 
 private:
     irr::gui::IGUIWindow*   window;
@@ -65,6 +71,7 @@ private:
     irr::gui::IGUITable*    tableItiner;
     irr::gui::IGUITable*    tableAI;
     irr::gui::IGUITable*    tableWP;
+    irr::gui::IGUITable*    tableHM;
     irr::gui::IGUIEditBox*  editBoxLongName;
     irr::gui::IGUIEditBox*  editBoxShortDescription;
     irr::gui::IGUIEditBox*  editBoxNewRoadFilename;
@@ -72,6 +79,8 @@ private:
     irr::gui::IGUIEditBox*  editBoxNewRoadDataFilename;
     irr::gui::IGUIEditBox*  editBoxStageTime;
     irr::gui::IGUIEditBox*  editBoxImage;
+    irr::gui::IGUIEditBox*  editBoxHMHeight;
+    irr::gui::IGUIEditBox*  editBoxHMRadius;
 };
 
 #endif // MENUPAGEEDITORSTAGE_H

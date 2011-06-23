@@ -167,6 +167,7 @@ MenuPageEditor::MenuPageEditor()
     tableAction->addRow(A_AddItinerPoint);
     tableAction->addRow(A_AddAIPoint);
     tableAction->addRow(A_AddWayPoint);
+    tableAction->addRow(A_AddHeightModifier);
     tableAction->addRow(A_RemoveObjectGlobal);
     tableAction->addRow(A_RemoveObjectRace);
     tableAction->addRow(A_RemoveObjectDay);
@@ -186,6 +187,7 @@ MenuPageEditor::MenuPageEditor()
     tableAction->setCellText(A_AddItinerPoint, 0, L"add itiner point");
     tableAction->setCellText(A_AddAIPoint, 0, L"add AI point");
     tableAction->setCellText(A_AddWayPoint, 0, L"add waypoint");
+    tableAction->setCellText(A_AddHeightModifier, 0, L"add height modifier");
     tableAction->setCellText(A_RemoveObjectGlobal, 0, L"not used"/*L"remove object global"*/);
     tableAction->setCellText(A_RemoveObjectRace, 0, L"remove object race");
     tableAction->setCellText(A_RemoveObjectDay, 0, L"remove object day");
@@ -1366,6 +1368,18 @@ void MenuPageEditor::actionP()
                 {
                     dprintf(MY_DEBUG_INFO, "MenuPageEditor::action(): add waypoint not possible, because last WP is to close: %f < 2500.0\n", ld);
                 }
+            }
+            break;
+        }
+    case A_AddHeightModifier:
+        {
+            dprintf(MY_DEBUG_NOTE, "MenuPageEditor::action(): add height modifier editorStage: %p\n",
+                RaceManager::getInstance()->editorStage);
+            if (RaceManager::getInstance()->editorStage)
+            {
+                RaceManager::getInstance()->editorStage->editorHeightModifier.pos.X = apos.X;
+                RaceManager::getInstance()->editorStage->editorHeightModifier.pos.Z = apos.Z;
+                RaceManager::getInstance()->editorStage->heightModifierList.push_back(RaceManager::getInstance()->editorStage->editorHeightModifier);
             }
             break;
         }

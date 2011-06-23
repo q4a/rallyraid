@@ -79,8 +79,7 @@ public:
     Stage* getCurrentStage(); // inline
 
     void activateStage(Stage* stage);
-    
-    const heightModifierList_t& getCurrentHeightModifierList(); // inline
+    const heightModifierList_t& getCurrentHeightModifierList();
 
     static void readShortDescription(const std::string& fileName, std::string& shortDescription);
     static bool writeShortDescription(const std::string& fileName, const std::string& shortDescription);
@@ -92,8 +91,8 @@ public:
     static void addGlobalObjectsToObjectWire(const globalObjectList_t& globalObjectList);
     static void removeGlobalObjectsFromObjectWire(const globalObjectList_t& globalObjectList);
 
-    static void readGlobalObjects(const std::string& fileName, heightModifierList_t& heightModifierList);
-    static bool writeGlobalObjects(const std::string& fileName, const heightModifierList_t& heightModifierList);
+    static void readHeightModifierList(const std::string& fileName, heightModifierList_t& heightModifierList);
+    static bool writeHeightModifierList(const std::string& fileName, const heightModifierList_t& heightModifierList);
 
 private:
     static void editorRenderObjects(const globalObjectList_t& globalObjectList);
@@ -165,11 +164,6 @@ inline Day* RaceManager::getCurrentDay()
 inline Stage* RaceManager::getCurrentStage()
 {
     return currentStage;
-}
-
-inline const heightModifierList_t& RaceManager::getCurrentHeightModifierList()
-{
-    return currentStage ? currentStage->getHeightModifierList() : emptyHeightModifierList;
 }
 
 #endif // RACEMANAGER_H

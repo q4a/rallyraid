@@ -24,7 +24,8 @@ Stage::Stage(Day* parent, const std::string& raceName, const std::string& dayNam
       roadMap(),
       stageTime(1000),
       image(0),
-      heightModifierList()
+      heightModifierList(),
+      editorHeightModifier()
 {
     ret = read();
 }

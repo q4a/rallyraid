@@ -70,6 +70,7 @@ public:
         A_AddItinerPoint,
         A_AddAIPoint,
         A_AddWayPoint,
+        A_AddHeightModifier,
         A_RemoveObjectGlobal,
         A_RemoveObjectRace,
         A_RemoveObjectDay,

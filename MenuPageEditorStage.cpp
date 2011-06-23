@@ -34,13 +34,16 @@ MenuPageEditorStage::MenuPageEditorStage()
       tableItiner(0),
       tableAI(0),
       tableWP(0),
+      tableHM(0),
       editBoxLongName(0),
       editBoxShortDescription(0),
       editBoxNewRoadFilename(0),
       editBoxNewRoadName(0),
       editBoxNewRoadDataFilename(0),
       editBoxStageTime(0),
-      editBoxImage(0)
+      editBoxImage(0),
+      editBoxHMHeight(0),
+      editBoxHMRadius(0)
 {
     window = TheGame::getInstance()->getEnv()->addWindow(
         irr::core::recti(TheGame::getInstance()->getScreenSize().Width-350, 50, TheGame::getInstance()->getScreenSize().Width-10, TheGame::getInstance()->getScreenSize().Height-150),
@@ -214,6 +217,45 @@ MenuPageEditorStage::MenuPageEditorStage()
     tableWP->addColumn(L"X");
     tableWP->addColumn(L"Y");
 
+    // ----------------------------
+    // HeightManager tab
+    // ----------------------------
+    irr::gui::IGUITab* tabHM = tc->addTab(L"HM", MI_TABHM);
+
+    editBoxHMHeight = TheGame::getInstance()->getEnv()->addEditBox(L"0",
+        irr::core::recti(irr::core::position2di(0, 0), irr::core::dimension2di(tabHM->getRelativePosition().getSize().Width/3-2, 20)),
+        true,
+        tabHM,
+        MI_EBHMHEIGHT);
+
+    editBoxHMRadius = TheGame::getInstance()->getEnv()->addEditBox(L"0",
+        irr::core::recti(irr::core::position2di(tabHM->getRelativePosition().getSize().Width/3, 0), irr::core::dimension2di(tabHM->getRelativePosition().getSize().Width/3-2, 20)),
+        true,
+        tabHM,
+        MI_EBHMRADIUS);
+
+    TheGame::getInstance()->getEnv()->addButton(
+        irr::core::recti(irr::core::position2di(tabHM->getRelativePosition().getSize().Width*2/3, 0), irr::core::dimension2di(tabHM->getRelativePosition().getSize().Width/3-2, 20)),
+        tabHM,
+        MI_BUTTONHMSET, L"set");
+
+    tableHM = TheGame::getInstance()->getEnv()->addTable(
+        irr::core::recti(irr::core::position2di(0, 22), irr::core::dimension2di(tabHM->getRelativePosition().getSize().Width, tabHM->getRelativePosition().getSize().Height-22)),
+        //irr::core::recti(irr::core::position2di(0, 0), tabRoads->getRelativePosition().getSize()),
+        tabHM,
+        MI_TABLEHM,
+        true);
+
+    tableHM->addColumn(L"#");
+    tableHM->addColumn(L"X");
+    tableHM->setColumnWidth(1, 70);
+    tableHM->addColumn(L"Y");
+    tableHM->setColumnWidth(2, 70);
+    tableHM->addColumn(L"Z");
+    tableHM->setColumnWidth(3, 70);
+    tableHM->addColumn(L"radius");
+    tableHM->setColumnWidth(4, 30);
+
     window->setVisible(false);
 }
 
@@ -292,6 +334,30 @@ bool MenuPageEditorStage::OnEvent(const irr::SEvent &event)
                         return true;
                         break;
                     }
+                    case MI_BUTTONHMSET:
+                    {
+                        dprintf(MY_DEBUG_NOTE, "editor::stage::hmset\n");
+                        float height;
+                        float radius;
+                        WStringConverter::toFloat(editBoxHMHeight->getText(), height);
+                        WStringConverter::toFloat(editBoxHMRadius->getText(), radius);
+                        int w = tableHM->getSelected();
+                        int i = 0;
+                        for (heightModifierList_t::iterator it = RaceManager::getInstance()->editorStage->heightModifierList.begin();
+                             it != RaceManager::getInstance()->editorStage->heightModifierList.end();
+                             it++, i++)
+                        {
+                            if (i == w)
+                            {
+                                it->pos.Y = height;
+                                it->radius = radius;
+                                refreshHM();
+                                break;
+                            }
+                        }
+                        return true;
+                        break;
+                    }
                 };
                 break;
             }
@@ -327,6 +393,12 @@ bool MenuPageEditorStage::OnEvent(const irr::SEvent &event)
                     case MI_EBNEWROADNAME:
                         refreshRoadEditBoxes(editBoxNewRoadName->getText());
                         break;
+                    case MI_EBHMHEIGHT:
+                        WStringConverter::toFloat(editBoxHMHeight->getText(), RaceManager::getInstance()->editorStage->editorHeightModifier.pos.Y);
+                        break;
+                    case MI_EBHMRADIUS:
+                        WStringConverter::toFloat(editBoxHMRadius->getText(), RaceManager::getInstance()->editorStage->editorHeightModifier.radius);
+                        break;
                 }
                 break;
             }
@@ -357,6 +429,7 @@ void MenuPageEditorStage::refresh()
     refreshItiner();
     refreshAI();
     refreshWP();
+    refreshHM();
 }
 
 void MenuPageEditorStage::refreshGlobalObjects()
@@ -618,3 +691,40 @@ void MenuPageEditorStage::refreshWP()
     }
 }
 
+void MenuPageEditorStage::refreshHM()
+{
+    // ----------------------------
+    // HM
+    // ----------------------------
+    tableHM->clearRows();
+
+    const heightModifierList_t& hmList = RaceManager::getInstance()->editorStage->heightModifierList;
+    unsigned int i = 0;
+    for (heightModifierList_t::const_iterator it = hmList.begin();
+         it != hmList.end();
+         it++, i++)
+    {
+        irr::core::stringw str;
+        
+        tableHM->addRow(i);
+
+        str += i;
+        tableHM->setCellText(i, 0, str.c_str());
+
+        str = L"";
+        str += it->pos.X;
+        tableHM->setCellText(i, 1, str.c_str());
+
+        str = L"";
+        str += it->pos.Y;
+        tableHM->setCellText(i, 2, str.c_str());
+
+        str = L"";
+        str += it->pos.Z;
+        tableHM->setCellText(i, 3, str.c_str());
+
+        str = L"";
+        str += it->radius;
+        tableHM->setCellText(i, 4, str.c_str());
+    }
+}
