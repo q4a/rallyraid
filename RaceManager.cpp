@@ -15,6 +15,7 @@
 
 
 RaceManager* RaceManager::raceManager = 0;
+heightModifierList_t RaceManager::emptyHeightModifierList;
 
 void RaceManager::initialize()
 {
@@ -300,4 +301,59 @@ void RaceManager::activateStage(Stage* stage)
     {
         (*it)->editorRender(*it == globalObjectList.back());
     }
+}
+
+/* static */ void RaceManager::readGlobalObjects(const std::string& fileName, heightModifierList_t& heightModifierList)
+{
+    FILE* f;
+    int ret = 0;
+    float f1, f2, f3;
+    float radius;
+
+    if (!heightModifierList.empty())
+    {
+        dprintf(MY_DEBUG_WARNING, "height modifiers already exists for %s\n", fileName.c_str());
+        return;
+    }
+
+    errno_t error = fopen_s(&f, fileName.c_str(), "r");
+    if (error)
+    {
+        printf("height modifiers file unable to open: %s\n", fileName.c_str());
+        return false;
+    }
+    
+    while (true)
+    {
+        ret = fscanf_s(f, "%f %f %f %f\n", &f1, &f2, &f3, &radius);
+        if (ret < 4)
+        {
+            break;
+        }
+        HeightModifier hm;
+        hm.pos = irr::core::vector3df(f1, f2, f3);
+        hm.radius = radius;
+    }
+    fclose(f);
+}
+
+/* static */ bool RaceManager::writeGlobalObjects(const std::string& fileName, const heightModifierList_t& heightModifierList)
+{
+    FILE* f;
+    int ret = 0;
+    errno_t error = fopen_s(&f, fileName.c_str(), "w");
+    if (error)
+    {
+        printf("unable to open height modifiers file for write %s\n", fileName.c_str());
+        return false;
+    }
+
+    for (heightModifierList_t::const_iterator it = heightModifierList.begin(); 
+         it != heightModifierList.end(); it++)
+    {
+        ret = fprintf(f, "%f %f %f %f\n", it->pos.X, it->pos.Y, it->pos.Z, it->radius);
+    }
+
+    fclose(f);
+    return true;
 }

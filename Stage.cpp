@@ -22,7 +22,9 @@ Stage::Stage(Day* parent, const std::string& raceName, const std::string& dayNam
       AIPointList(),
       active(false),
       roadMap(),
-      stageTime(1000)
+      stageTime(1000),
+      image(0),
+      heightModifierList()
 {
     ret = read();
 }
@@ -35,6 +37,7 @@ Stage::~Stage()
     ItinerManager::clearItinerPointList(itinerPointList);
     WayPointManager::clearWayPointList(wayPointList);
     AIPoint::clearAIPointList(AIPointList);
+    heightModifierList.clear();
 }
 
 bool Stage::read()
@@ -47,6 +50,7 @@ bool Stage::read()
         readItinerPointList();
         readWayPointList();
         readAIPointList();
+        readHeightModifierList();
         RoadManager::readRoads(STAGE_ROADS(raceName, dayName, stageName), roadMap, false, true);
     }
     return ret;
@@ -115,6 +119,11 @@ void Stage::readAIPointList()
     AIPoint::readAIPointList(STAGE_DIR(raceName, dayName, stageName) + "/" + AIPOINTS_CFG, AIPointList);
 }
 
+void Stage::readHeightModifierList()
+{
+    RaceManager::readHeightModifierList(STAGE_DIR(raceName, dayName, stageName) + "/" + HEIGHTMODIFIERS_CFG, heightModifierList);
+}
+
 bool Stage::write()
 {
     bool ret = writeCfg();
@@ -123,6 +132,7 @@ bool Stage::write()
     ret &= writeItinerPointList();
     ret &= writeWayPointList();
     ret &= writeAIPointList();
+    ret &= writeHeightModifierList();
     return ret;
 }
 
@@ -169,6 +179,11 @@ bool Stage::writeWayPointList()
 bool Stage::writeAIPointList()
 {
     return AIPoint::writeAIPointList(STAGE_DIR(raceName, dayName, stageName) + "/" + AIPOINTS_CFG, AIPointList);
+}
+
+bool Stage::writeHeightModifierList()
+{
+    return RaceManager::writeHeightModifierList(STAGE_DIR(raceName, dayName, stageName) + "/" + HEIGHTMODIFIERS_CFG, heightModifierList);
 }
 
 void Stage::activate()

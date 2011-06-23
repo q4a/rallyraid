@@ -26,6 +26,7 @@ private:
     void readItinerPointList();
     void readWayPointList();
     void readAIPointList();
+    void readHeightModifierList();
 
     bool write();
     bool writeCfg();
@@ -34,6 +35,7 @@ private:
     bool writeItinerPointList();
     bool writeWayPointList();
     bool writeAIPointList();
+    bool writeHeightModifierList();
 
 public:
     const std::string& getName() const; // inline
@@ -46,6 +48,7 @@ public:
     Day* getParent() const; // inline
     unsigned int getStageTime(); // inline
     irr::video::ITexture* getImage(); // inline
+    const heightModifierList_t& getHeightModifierList(); // inline
 
     void activate();
     void deactivate();
@@ -66,6 +69,10 @@ private:
     RoadManager::roadMap_t          roadMap;
     unsigned int                    stageTime;
     irr::video::ITexture*           image;
+    heightModifierList_t            heightModifierList;
+    
+    
+    HeightModifier                  editorHeightModifier;
     
 
     friend class RaceManager;
@@ -123,6 +130,11 @@ inline unsigned int Stage::getStageTime()
 inline irr::video::ITexture* Stage::getImage()
 {
     return image;
+}
+
+inline const heightModifierList_t& Stage::getHeightModifierList()
+{
+    return heightModifierList;
 }
 
 #endif // STAGE_H

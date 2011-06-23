@@ -33,11 +33,20 @@
 #define WAYPOINT_CFG                (std::string("waypoint.cfg"))
 #define AIPOINTS_CFG                (std::string("aipoints.cfg"))
 #define DEFAULTSTAGE_IMG            (std::string("stage.png"))
+#define HEIGHTMODIFIERS_CFG         (std::string("heightmodifiers.cfg"))
 
 class Race;
 class Day;
 class Stage;
 class ObjectWireGlobalObject;
+
+class HeightModifier
+{
+public:
+    irr::core::vector3df    pos;
+    float                   radius;
+};
+typedef std::list<HeightModifier> heightModifierList_t;
 
 class RaceManager
 {
@@ -70,6 +79,8 @@ public:
     Stage* getCurrentStage(); // inline
 
     void activateStage(Stage* stage);
+    
+    const heightModifierList_t& getCurrentHeightModifierList(); // inline
 
     static void readShortDescription(const std::string& fileName, std::string& shortDescription);
     static bool writeShortDescription(const std::string& fileName, const std::string& shortDescription);
@@ -80,6 +91,9 @@ public:
     
     static void addGlobalObjectsToObjectWire(const globalObjectList_t& globalObjectList);
     static void removeGlobalObjectsFromObjectWire(const globalObjectList_t& globalObjectList);
+
+    static void readGlobalObjects(const std::string& fileName, heightModifierList_t& heightModifierList);
+    static bool writeGlobalObjects(const std::string& fileName, const heightModifierList_t& heightModifierList);
 
 private:
     static void editorRenderObjects(const globalObjectList_t& globalObjectList);
@@ -97,6 +111,8 @@ private:
     Race*       editorRace;
     Day*        editorDay;
     Stage*      editorStage;
+    
+    static heightModifierList_t emptyHeightModifierList;
 
 
     friend class MenuPageEditor;
@@ -149,6 +165,11 @@ inline Day* RaceManager::getCurrentDay()
 inline Stage* RaceManager::getCurrentStage()
 {
     return currentStage;
+}
+
+inline const heightModifierList_t& RaceManager::getCurrentHeightModifierList()
+{
+    return currentStage ? currentStage->getHeightModifierList() : emptyHeightModifierList;
 }
 
 #endif // RACEMANAGER_H
