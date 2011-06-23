@@ -15,6 +15,7 @@ public:
         MI_BUTTONCREATEROAD,
         MI_BUTTONACTIVATE,
         MI_BUTTONRESET,
+        MI_BUTTONRELOAD,
         MI_TABCONTROL,
 
         MI_TABSELECTED,

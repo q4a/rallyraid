@@ -102,6 +102,12 @@ MenuPageEditor::MenuPageEditor()
         MI_BUTTONRESET,
         L"reset");
 
+    TheGame::getInstance()->getEnv()->addButton(
+        irr::core::recti(190,22,230,42),
+        window,
+        MI_BUTTONRELOAD,
+        L"reload");
+
     irr::gui::IGUITabControl* tc = TheGame::getInstance()->getEnv()->addTabControl(
         irr::core::recti(irr::core::position2di(2, 44), irr::core::dimension2di(window->getRelativePosition().getSize().Width - 4, window->getRelativePosition().getSize().Height - 46)),
         window,
@@ -516,6 +522,15 @@ bool MenuPageEditor::OnEvent(const irr::SEvent &event)
                         {
                             printf("unable to reset because reset fields are not int\n");
                         }
+                        return true;
+                        break;
+                    }
+                    case MI_BUTTONRELOAD:
+                    {
+                        GamePlay::getInstance()->startStage(
+                            RaceManager::getInstance()->getCurrentStage(),
+                            VehicleTypeManager::getInstance()->getVehicleType(Player::getInstance()->getCompetitor()->getVehicleTypeName()),
+                            TheGame::getInstance()->getCamera()->getPosition()+OffsetManager::getInstance()->getOffset());
                         return true;
                         break;
                     }
@@ -1375,7 +1390,7 @@ void MenuPageEditor::actionP()
         {
             dprintf(MY_DEBUG_NOTE, "MenuPageEditor::action(): add height modifier editorStage: %p\n",
                 RaceManager::getInstance()->editorStage);
-            if (RaceManager::getInstance()->editorStage)
+            if (RaceManager::getInstance()->editorStage && RaceManager::getInstance()->editorStage->editorHeightModifier.pos.Y > 0.01f)
             {
                 RaceManager::getInstance()->editorStage->editorHeightModifier.pos.X = apos.X;
                 RaceManager::getInstance()->editorStage->editorHeightModifier.pos.Z = apos.Z;

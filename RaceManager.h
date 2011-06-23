@@ -43,6 +43,12 @@ class ObjectWireGlobalObject;
 class HeightModifier
 {
 public:
+    HeightModifier()
+        : pos(),
+          radius(0.0f)
+    {
+    }
+
     irr::core::vector3df    pos;
     float                   radius;
 };

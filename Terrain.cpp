@@ -111,6 +111,7 @@ void Terrain::setVisible(bool p_visible)
             //terrain->setMaterialFlag(irr::video::EMF_TEXTURE_WRAP, true);
             terrain->scaleTexture(1.0f, /*TILE_SIZE_F*/(float)TILE_POINTS_NUM);
             terrain->setMaterialType(Shaders::getInstance()->materialMap["terrain"]);
+            //terrain->setMaterialFlag(irr::video::EMF_WIREFRAME, true);
             //image->drop();
         }
         else

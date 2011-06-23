@@ -338,6 +338,7 @@ const heightModifierList_t& RaceManager::getCurrentHeightModifierList()
         HeightModifier hm;
         hm.pos = irr::core::vector3df(f1, f2, f3);
         hm.radius = radius;
+        heightModifierList.push_back(hm);
     }
     fclose(f);
 }

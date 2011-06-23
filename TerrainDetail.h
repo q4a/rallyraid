@@ -21,6 +21,7 @@ private:
     float get(int pos); // inline
     void set(int x, int y, float val); // inline
     void set(int pos, float val); // inline
+    void add(int x, int y, float val); // inline
 
 private:
     float* fineHeights;
@@ -49,4 +50,10 @@ inline void TerrainDetail::set(int pos, float val)
 {
     fineHeights[pos] = val;
 }
+
+inline void TerrainDetail::add(int x, int y, float val)
+{
+    fineHeights[(x+TILE_DETAIL_RATE) + ((TILE_DETAIL_POINTS_NUM+(3*TILE_DETAIL_RATE))*(y+TILE_DETAIL_RATE))] += val;
+}
+
 #endif // TERRAINDETAIL_H
