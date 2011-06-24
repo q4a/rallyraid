@@ -386,11 +386,11 @@ void TerrainDetail::load(TheEarth* earth)
          it != RaceManager::getInstance()->getCurrentHeightModifierList().end();
          it++)
     {
-        printf("point: %f, %f, terrain: %f, %f\n", it->pos.X, it->pos.Z, terrain->getPosition().X, terrain->getPosition().Z);
+        //printf("point: %f, %f, terrain: %f, %f\n", it->pos.X, it->pos.Z, terrain->getPosition().X, terrain->getPosition().Z);
         if (terrain->getPosition().X <= it->pos.X && it->pos.X <= terrain->getPosition().X+TILE_SIZE_F &&
             terrain->getPosition().Z <= it->pos.Z && it->pos.Z <= terrain->getPosition().Z+TILE_SIZE_F)
         {
-            printf("++++find HM add++++\n");
+            //printf("++++find HM add++++\n");
             add(abs((int)(it->pos.X/TILE_DETAIL_SCALE_F)-offsetX), abs((int)(it->pos.Z/TILE_DETAIL_SCALE_F)-offsetY), it->pos.Y);
         }
     }

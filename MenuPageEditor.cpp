@@ -174,6 +174,8 @@ MenuPageEditor::MenuPageEditor()
     tableAction->addRow(A_AddAIPoint);
     tableAction->addRow(A_AddWayPoint);
     tableAction->addRow(A_AddHeightModifier);
+    tableAction->addRow(A_AddHeightModifierLine);
+    tableAction->addRow(A_AddHeightModifierSquare);
     tableAction->addRow(A_RemoveObjectGlobal);
     tableAction->addRow(A_RemoveObjectRace);
     tableAction->addRow(A_RemoveObjectDay);
@@ -194,6 +196,8 @@ MenuPageEditor::MenuPageEditor()
     tableAction->setCellText(A_AddAIPoint, 0, L"add AI point");
     tableAction->setCellText(A_AddWayPoint, 0, L"add waypoint");
     tableAction->setCellText(A_AddHeightModifier, 0, L"add height modifier");
+    tableAction->setCellText(A_AddHeightModifierLine, 0, L"add height modifier line");
+    tableAction->setCellText(A_AddHeightModifierSquare, 0, L"add height modifier square");
     tableAction->setCellText(A_RemoveObjectGlobal, 0, L"not used"/*L"remove object global"*/);
     tableAction->setCellText(A_RemoveObjectRace, 0, L"remove object race");
     tableAction->setCellText(A_RemoveObjectDay, 0, L"remove object day");
@@ -1395,6 +1399,91 @@ void MenuPageEditor::actionP()
                 RaceManager::getInstance()->editorStage->editorHeightModifier.pos.X = apos.X;
                 RaceManager::getInstance()->editorStage->editorHeightModifier.pos.Z = apos.Z;
                 RaceManager::getInstance()->editorStage->heightModifierList.push_back(RaceManager::getInstance()->editorStage->editorHeightModifier);
+            }
+            break;
+        }
+    case A_AddHeightModifierLine:
+        {
+            dprintf(MY_DEBUG_NOTE, "MenuPageEditor::action(): add height modifier line editorStage: %p\n",
+                RaceManager::getInstance()->editorStage);
+            if (RaceManager::getInstance()->editorStage &&
+                RaceManager::getInstance()->editorStage->editorHeightModifier.pos.Y > 0.01f &&
+                !RaceManager::getInstance()->editorStage->heightModifierList.empty())
+            {
+                irr::core::vector2df pos2d = irr::core::vector2df(apos.X, apos.Z);
+                irr::core::vector2df bp = irr::core::vector2df(RaceManager::getInstance()->editorStage->heightModifierList.back().pos.X,
+                    (float)(RaceManager::getInstance()->editorStage->heightModifierList.back().pos.Z);
+                irr::core::vector2df dir = pos2d - bp;
+                irr::core::vector2df tmpp;
+                irr::core::vector2di lastDetailPos;
+                irr::core::vector2di currentDetailPos;
+                float dist = dir.getLength();
+                float cur = 0.f;
+                while (cur + TILE_DETAIL_SCALE_F < dist && dist < 1024.f)
+                {
+                    cur += TILE_DETAIL_SCALE_F;
+                    tmpp = bp + dir*(cur/dist);
+                    currentDetailPos.X = (int)(tmpp.X / TILE_DETAIL_SCALE_F);
+                    currentDetailPos.Y = (int)(tmpp.Y / TILE_DETAIL_SCALE_F);
+                    
+                    if (lastDetailPos != currentDetailPos)
+                    {
+                        RaceManager::getInstance()->editorStage->editorHeightModifier.pos.X = tmpp.X;
+                        RaceManager::getInstance()->editorStage->editorHeightModifier.pos.Z = tmpp.Y;
+                        RaceManager::getInstance()->editorStage->heightModifierList.push_back(RaceManager::getInstance()->editorStage->editorHeightModifier);
+                        lastDetailPos = currentDetailPos;
+                    }
+                }
+
+            }
+            break;
+        }
+    case A_AddHeightModifierSquare:
+        {
+            dprintf(MY_DEBUG_NOTE, "MenuPageEditor::action(): add height modifier line editorStage: %p\n",
+                RaceManager::getInstance()->editorStage);
+            if (RaceManager::getInstance()->editorStage &&
+                RaceManager::getInstance()->editorStage->editorHeightModifier.pos.Y > 0.01f &&
+                !RaceManager::getInstance()->editorStage->heightModifierList.empty())
+            {
+                irr::core::vector2df bp = irr::core::vector2df(RaceManager::getInstance()->editorStage->heightModifierList.back().pos.X,
+                    (float)(RaceManager::getInstance()->editorStage->heightModifierList.back().pos.Z);
+                bool first = true;
+                float distX = fabsf(apos.X - bp.X);
+                float distY = fabsf(apos.Z - bp.Y);
+                irr::core::vector2di lastDetailPos;
+                irr::core::vector2di currentDetailPos;
+                while (bp.X < apos.X && distX < 1024.f && distY < 1024)
+                {
+                    irr::core::vector2df pos2d = bp;
+                    if (first)
+                    {
+                        first = false;
+                    }
+                    else
+                    {
+                        pos2d.Y -= TILE_DETAIL_SCALE_F;
+                    }
+                    while (pos2d.Y + TILE_DETAIL_SCALE_F < apos.Z)
+                    {
+                        pos2d.Y += TILE_DETAIL_SCALE_F;
+                        currentDetailPos.X = (int)(pos2d.X / TILE_DETAIL_SCALE_F);
+                        currentDetailPos.Y = (int)(pos2d.Y / TILE_DETAIL_SCALE_F);
+                        
+                        if (lastDetailPos != currentDetailPos)
+                        {
+                            RaceManager::getInstance()->editorStage->editorHeightModifier.pos.X = pos2d.X;
+                            RaceManager::getInstance()->editorStage->editorHeightModifier.pos.Z = pos2d.Y;
+                            RaceManager::getInstance()->editorStage->heightModifierList.push_back(RaceManager::getInstance()->editorStage->editorHeightModifier);
+                            lastDetailPos = currentDetailPos;
+                        }
+                    }
+                    
+                    lastDetailPos.X = (int)(bp.X / TILE_DETAIL_SCALE_F);
+                    lastDetailPos.Y = (int)(bp.Y / TILE_DETAIL_SCALE_F);
+                    bp.X += TILE_DETAIL_SCALE_F;
+                }
+
             }
             break;
         }

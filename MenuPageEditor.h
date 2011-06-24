@@ -72,6 +72,8 @@ public:
         A_AddAIPoint,
         A_AddWayPoint,
         A_AddHeightModifier,
+        A_AddHeightModifierLine,
+        A_AddHeightModifierSquare,
         A_RemoveObjectGlobal,
         A_RemoveObjectRace,
         A_RemoveObjectDay,
