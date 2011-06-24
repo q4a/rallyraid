@@ -50,6 +50,7 @@ private:
     irr::gui::IGUIStaticText*   compassText;
     irr::gui::IGUIStaticText*   tmPartText;
     irr::gui::IGUIStaticText*   tmTotalText;
+    irr::gui::IGUIStaticText*   speedText;
 
     RoadBookEntry roadBookEntries[4];
 };

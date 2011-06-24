@@ -66,6 +66,7 @@ public:
     float getAngle() const;
     int getGear() const {return hkVehicle->m_currentGear+1;}
     float getSpeed() const {return hkVehicle->calcKMPH();}
+    float getRPM() const {return hkVehicle->calcRPM();}
     const irr::core::vector3df& getLinearVelocity() {return linearVelocity;}
     VehicleType* getVehicleType() {return vehicleType;}
     const irr::core::matrix4& getViewPos(unsigned int num) const;

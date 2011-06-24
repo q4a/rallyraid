@@ -102,10 +102,11 @@ Hud::Hud()
       roadBookBGQuad(0),
       compassText(0),
       tmPartText(0),
-      tmTotalText(0)
+      tmTotalText(0),
+      speedText(0)
 {
     miniMapQuad = new ScreenQuad(TheGame::getInstance()->getDriver(),
-        irr::core::position2di(HUD_PADDING, TheGame::getInstance()->getDriver()->getScreenSize().Height - MINIMAP_SIZE - HUD_PADDING),
+        irr::core::position2di(HUD_PADDING, TheGame::getInstance()->getDriver()->getScreenSize().Height - MINIMAP_SIZE - 2*HUD_PADDING - 30),
         irr::core::dimension2du(MINIMAP_SIZE, MINIMAP_SIZE), false);
     miniMapQuad->getMaterial().MaterialType = Shaders::getInstance()->materialMap["quad2d"];
 
@@ -246,6 +247,15 @@ Hud::Hud()
         roadBookEntries[i].itiner2Quad->getMaterial().UseMipMaps = false;
         roadBookEntries[i].itiner2Quad->getMaterial().setTexture(0, 0);
     }
+
+    speedText = TheGame::getInstance()->getEnv()->addStaticText(L"000.00",
+        irr::core::recti(irr::core::position2di(HUD_PADDING,
+        TheGame::getInstance()->getDriver()->getScreenSize().Height - HUD_PADDING - 30),
+        irr::core::dimension2di(300, 30)),
+        false, false, 0, -1, false);
+    speedText->setOverrideFont(FontManager::getInstance()->getFont(FontManager::FONT_EXTRALARGEBOLD));
+    speedText->setOverrideColor(irr::video::SColor(255, 255, 255, 255));
+
 }
 
 Hud::~Hud()
@@ -310,6 +320,7 @@ void Hud::setVisible(bool newVisible)
     compassText->setVisible(visible);
     tmPartText->setVisible(visible);
     tmTotalText->setVisible(visible);
+    speedText->setVisible(visible);
 
     updateRoadBook();
 }
@@ -379,6 +390,26 @@ void Hud::preRender(float p_angle)
     }
     str += distp;
     tmTotalText->setText(str.c_str());
+
+    str = L"";
+    int speed = (int)(Player::getInstance()->getVehicleSpeed());
+    int gear = (Player::getInstance()->getVehicleGear());
+    int rpm = (int)(Player::getInstance()->getVehicle()->getRPM());
+    if (speed < 10)
+    {
+        str += L"00";
+    }
+    else
+    if (speed < 100)
+    {
+        str += L"0";
+    }
+    str += speed;
+    str += L" | G: ";
+    str += gear;
+    str += L" | RPM: ";
+    str += rpm;
+    speedText->setText(str.c_str());      
 
     bool showWPCompass = WayPointManager::getInstance()->getShowCompass();
     if (showWPCompass)

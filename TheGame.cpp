@@ -439,10 +439,23 @@ void TheGame::loop()
                     if (TheEarth::getInstance()->threadIsRunning())
                     {
                         str += L"       thread is running";
+                    }                    
+                    str += L"\nDetail pos: ";
+                    str += (int)((offsetManager->getOffset().X+camera->getPosition().X)/TILE_DETAIL_SCALE_F);
+                    str += L", ";
+                    str += (int)((offsetManager->getOffset().Z+camera->getPosition().Z)/TILE_DETAIL_SCALE_F);
+                    if (!RaceManager::getInstance()->getCurrentHeightModifierList().empty)
+                    {
+                        str += L", last: ";
+                        str += (int)(RaceManager::getInstance()->getCurrentHeightModifierList().back().pos.X/TILE_DETAIL_SCALE_F);
+                        str += L", ";
+                        str += (int)(RaceManager::getInstance()->getCurrentHeightModifierList().back().pos.Z/TILE_DETAIL_SCALE_F);
                     }
+                    
+                    
                     testText->setText(str.c_str());
 
-  
+
                     earth->update(offsetManager->getOffset()+camera->getPosition(), cameraDirection);
                 }
             }
