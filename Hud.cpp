@@ -405,11 +405,12 @@ void Hud::preRender(float p_angle)
         str += L"0";
     }
     str += speed;
-    str += L" | G: ";
+    str += L" Km/h | G: ";
     str += gear;
     str += L" | RPM: ";
     str += rpm;
-    speedText->setText(str.c_str());      
+    speedText->setText(str.c_str());
+      
 
     bool showWPCompass = WayPointManager::getInstance()->getShowCompass();
     if (showWPCompass)

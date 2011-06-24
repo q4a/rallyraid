@@ -1412,7 +1412,7 @@ void MenuPageEditor::actionP()
             {
                 irr::core::vector2df pos2d = irr::core::vector2df(apos.X, apos.Z);
                 irr::core::vector2df bp = irr::core::vector2df(RaceManager::getInstance()->editorStage->heightModifierList.back().pos.X,
-                    (float)(RaceManager::getInstance()->editorStage->heightModifierList.back().pos.Z);
+                    (float)(RaceManager::getInstance()->editorStage->heightModifierList.back().pos.Z));
                 irr::core::vector2df dir = pos2d - bp;
                 irr::core::vector2df tmpp;
                 irr::core::vector2di lastDetailPos;
@@ -1447,15 +1447,37 @@ void MenuPageEditor::actionP()
                 !RaceManager::getInstance()->editorStage->heightModifierList.empty())
             {
                 irr::core::vector2df bp = irr::core::vector2df(RaceManager::getInstance()->editorStage->heightModifierList.back().pos.X,
-                    (float)(RaceManager::getInstance()->editorStage->heightModifierList.back().pos.Z);
+                    (float)(RaceManager::getInstance()->editorStage->heightModifierList.back().pos.Z));
                 bool first = true;
                 float distX = fabsf(apos.X - bp.X);
                 float distY = fabsf(apos.Z - bp.Y);
                 irr::core::vector2di lastDetailPos;
                 irr::core::vector2di currentDetailPos;
-                while (bp.X < apos.X && distX < 1024.f && distY < 1024)
+                irr::core::vector2df min;
+                irr::core::vector2df max;
+                if (bp.X < apos.X)
                 {
-                    irr::core::vector2df pos2d = bp;
+                    min.X = bp.X;
+                    max.X = apos.X;
+                }
+                else
+                {
+                    min.X = apos.X;
+                    max.X = bp.X;
+                }
+                if (bp.Y < apos.Z)
+                {
+                    min.Y = bp.Y;
+                    max.Y = apos.Z;
+                }
+                else
+                {
+                    min.Y = apos.Z;
+                    max.Y = bp.Y;
+                }
+                while (min.X < max.X && distX < 1024.f && distY < 1024.f)
+                {
+                    irr::core::vector2df pos2d = min;
                     if (first)
                     {
                         first = false;
@@ -1464,7 +1486,7 @@ void MenuPageEditor::actionP()
                     {
                         pos2d.Y -= TILE_DETAIL_SCALE_F;
                     }
-                    while (pos2d.Y + TILE_DETAIL_SCALE_F < apos.Z)
+                    while (pos2d.Y + TILE_DETAIL_SCALE_F < max.Y)
                     {
                         pos2d.Y += TILE_DETAIL_SCALE_F;
                         currentDetailPos.X = (int)(pos2d.X / TILE_DETAIL_SCALE_F);
@@ -1479,9 +1501,9 @@ void MenuPageEditor::actionP()
                         }
                     }
                     
-                    lastDetailPos.X = (int)(bp.X / TILE_DETAIL_SCALE_F);
-                    lastDetailPos.Y = (int)(bp.Y / TILE_DETAIL_SCALE_F);
-                    bp.X += TILE_DETAIL_SCALE_F;
+                    lastDetailPos.X = (int)(min.X / TILE_DETAIL_SCALE_F);
+                    lastDetailPos.Y = (int)(min.Y / TILE_DETAIL_SCALE_F);
+                    min.X += TILE_DETAIL_SCALE_F;
                 }
 
             }

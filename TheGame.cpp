@@ -27,6 +27,7 @@
 #include "WayPointManager.h"
 #include "FontManager.h"
 #include "MessageManager.h"
+#include "Terrain_defs.h"
 
 
 // static stuff
@@ -444,7 +445,7 @@ void TheGame::loop()
                     str += (int)((offsetManager->getOffset().X+camera->getPosition().X)/TILE_DETAIL_SCALE_F);
                     str += L", ";
                     str += (int)((offsetManager->getOffset().Z+camera->getPosition().Z)/TILE_DETAIL_SCALE_F);
-                    if (!RaceManager::getInstance()->getCurrentHeightModifierList().empty)
+                    if (!RaceManager::getInstance()->getCurrentHeightModifierList().empty())
                     {
                         str += L", last: ";
                         str += (int)(RaceManager::getInstance()->getCurrentHeightModifierList().back().pos.X/TILE_DETAIL_SCALE_F);
