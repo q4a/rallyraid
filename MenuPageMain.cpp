@@ -24,6 +24,7 @@
 #include "GamePlay.h"
 #include "Hud.h"
 #include "VehicleManager.h"
+#include "FontManager.h"
 #include <assert.h>
 
 
@@ -31,6 +32,7 @@ MenuPageMain* MenuPageMain::menuPageMain = 0;
 
 MenuPageMain::MenuPageMain()
     : window(0),
+      staticTextGameName(0),
       tableRaces(0),
       tableVehicles(0),
       checkBoxEditor(0),
@@ -60,6 +62,13 @@ MenuPageMain::MenuPageMain()
         MI_CBEDITORMODE,
         L"Editor Mode");
 
+    staticTextGameName = TheGame::getInstance()->getEnv()->addStaticText(L"Rally Raid 2012",
+        irr::core::recti(window->getRelativePosition().getSize().Width/2 - 400,54,window->getRelativePosition().getSize().Width/2 + 400,88),
+        false, false, window, 0, false);
+    staticTextGameName->setOverrideFont(FontManager::getInstance()->getFont(FontManager::FONT_SPECIAL18));
+    staticTextGameName->setOverrideColor(irr::video::SColor(255, 255, 255, 255));
+    staticTextGameName->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_UPPERLEFT);
+
 
     // ----------------------------
     // Races
@@ -80,6 +89,7 @@ MenuPageMain::MenuPageMain()
         window,
         MI_STRACEDATA,
         true);
+    staticTextRaceData->setOverrideFont(FontManager::getInstance()->getFont(FontManager::FONT_NORMALBOLD));
 
     // ----------------------------
     // Vehicles
@@ -100,6 +110,7 @@ MenuPageMain::MenuPageMain()
         window,
         MI_STRACEDATA,
         true);
+    staticTextVehicleData->setOverrideFont(FontManager::getInstance()->getFont(FontManager::FONT_NORMALBOLD));
 
     window->setVisible(false);
 }

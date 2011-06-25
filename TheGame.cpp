@@ -115,7 +115,7 @@ TheGame::TheGame()
     {
         terminate = false;
 
-        device->setWindowCaption(L"Dakar 2012");
+        device->setWindowCaption(L"Rally Raid 2012");
 
         dprintf(MY_DEBUG_NOTE, "Initialize Irrlicht members\n");
         driver = device->getVideoDriver();

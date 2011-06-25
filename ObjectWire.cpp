@@ -203,21 +203,21 @@ void ObjectWire::reset()
             }
         }
     }
-
-     for (globalObjectWire_t::iterator it = globalObjectWire.begin();
-          it != globalObjectWire.end();
-          it++)
-     {
-         for (globalObjectSet_t::const_iterator oit = it->second.begin();
-              oit != it->second.end();
-              oit++)
-         {
-             (*oit)->setVisible(false);
-         }
-         it->second.clear();
-     }
-     
-     lastWireCenter = irr::core::vector2di();
+    
+    for (globalObjectWire_t::iterator it = globalObjectWire.begin();
+        it != globalObjectWire.end();
+        it++)
+    {
+        for (globalObjectSet_t::const_iterator oit = it->second.begin();
+            oit != it->second.end();
+            oit++)
+        {
+            (*oit)->setVisible(false);
+        }
+        //it->second.clear();
+    }
+    
+    lastWireCenter = irr::core::vector2di();
 }
 
 bool ObjectWire::update(const irr::core::vector3df& newPos, bool force)

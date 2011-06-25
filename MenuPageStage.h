@@ -48,6 +48,8 @@ private:
 
 private:
     irr::gui::IGUIImage*    window;
+    irr::gui::IGUIStaticText*   staticTextStageName;
+    irr::gui::IGUIStaticText*   staticTextStageDescription;
     ScreenQuad*             bgQuad;
     //irr::gui::IGUIStaticText* staticTextRaceData;
     bool                    willOpenOtherWindow;

@@ -25,7 +25,7 @@ extern "C" void PrintError(int num, const char *msg, ...)
 {
     va_list ap;
     va_start(ap,msg);
-    _printMessage(num, "Dakar 2012 error", msg, ap);
+    _printMessage(num, "Rally Raid 2012 error", msg, ap);
     exit(1);
 }
 
@@ -33,7 +33,7 @@ extern "C" void PrintMessage(int num, const char *msg, ...)
 {
     va_list ap;
     va_start(ap, msg);
-    _printMessage(num, "Dakar 2012 message", msg, ap);
+    _printMessage(num, "Rally Raid 2012 message", msg, ap);
 }
 
 #endif
@@ -59,10 +59,10 @@ extern "C" void PrintError(int num, const char *msg, ...)
     va_list ap;
     va_start(ap, msg);
     char s[1000], title[100];
-    _snprintf(title, sizeof(title), "Dakar 2012 - code: %d", num);
+    _snprintf(title, sizeof(title), "Rally Raid 2012 - code: %d", num);
     _vsnprintf(s, sizeof(s), msg, ap);
     s[sizeof(s)-1] = 0;
-    _printMessage(num, "Dakar 2012 error", msg, ap);
+    _printMessage(num, "Rally Raid 2012 error", msg, ap);
 #ifdef _NODEF// _MSC_VER
     irr::core::stringw ws = L" ";
     irr::core::stringw wtitle = L" ";
@@ -80,10 +80,10 @@ extern "C" void PrintMessage(int num, const char *msg, ...)
     va_list ap;
     va_start(ap, msg);
     char s[1000], title[100];
-    _snprintf(title, sizeof(title), "Dakar 2012 message - code: %d", num);
+    _snprintf(title, sizeof(title), "Rally Raid 2012 message - code: %d", num);
     _vsnprintf(s, sizeof(s), msg, ap);
     s[sizeof(s)-1] = 0;
-    _printMessage(num, "Dakar 2012 message", msg, ap);
+    _printMessage(num, "Rally Raid 2012 message", msg, ap);
 #ifdef NODEF //_MSC_VER
     irr::core::stringw ws = L" ";
     irr::core::stringw wtitle = L" ";

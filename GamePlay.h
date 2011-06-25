@@ -112,6 +112,7 @@ private:
     friend class MenuPageEditorDay;
     friend class MenuPageEditorStage;
     friend class MenuPageMain;
+    friend class MenuPageInGame;
 };
 
 

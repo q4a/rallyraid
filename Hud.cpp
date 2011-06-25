@@ -251,7 +251,7 @@ Hud::Hud()
     speedText = TheGame::getInstance()->getEnv()->addStaticText(L"000.00",
         irr::core::recti(irr::core::position2di(HUD_PADDING,
         TheGame::getInstance()->getDriver()->getScreenSize().Height - HUD_PADDING - 30),
-        irr::core::dimension2di(300, 30)),
+        irr::core::dimension2di(350, 30)),
         false, false, 0, -1, false);
     speedText->setOverrideFont(FontManager::getInstance()->getFont(FontManager::FONT_EXTRALARGEBOLD));
     speedText->setOverrideColor(irr::video::SColor(255, 255, 255, 255));

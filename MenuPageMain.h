@@ -46,6 +46,7 @@ private:
 
 private:
     irr::gui::IGUIImage*    window;
+    irr::gui::IGUIStaticText* staticTextGameName;
     irr::gui::IGUITable*    tableRaces;
     irr::gui::IGUITable*    tableVehicles;
     irr::gui::IGUICheckBox* checkBoxEditor;

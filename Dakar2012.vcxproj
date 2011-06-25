@@ -40,10 +40,12 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)\$(ProjectName)\</OutDir>
+    <TargetName>rr2012</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)\$(ProjectName)\</OutDir>
+    <TargetName>rr2012</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -115,6 +117,7 @@
     <ClInclude Include="MenuPageEditorRace.h" />
     <ClInclude Include="MenuPageEditorRoad.h" />
     <ClInclude Include="MenuPageEditorStage.h" />
+    <ClInclude Include="MenuPageInGame.h" />
     <ClInclude Include="MenuPageMain.h" />
     <ClInclude Include="MenuPageStage.h" />
     <ClInclude Include="MessageManager.h" />
@@ -193,6 +196,7 @@
     <ClCompile Include="MenuPageEditorRace.cpp" />
     <ClCompile Include="MenuPageEditorRoad.cpp" />
     <ClCompile Include="MenuPageEditorStage.cpp" />
+    <ClCompile Include="MenuPageInGame.cpp" />
     <ClCompile Include="MenuPageMain.cpp" />
     <ClCompile Include="MenuPageStage.cpp" />
     <ClCompile Include="MessageManager.cpp" />
