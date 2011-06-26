@@ -59,6 +59,7 @@ public:
 
     void recalibrate();
     void checkEvents();
+    void checkEventsMenu();
     void updateWindow(unsigned int width, unsigned int height);
     void saveKeyMapping();
 
@@ -81,6 +82,10 @@ private:
     KeyConfig*          test_kc;
     keyNameMap_t        keyNameMap;
     KeyProperty         keyMap[NUMBER_OF_KEYNAMES];
+
+
+    friend class MenuPageOptions;
+    friend class MenuPageOptionsKB;
 };
 
 #endif // EVENTRECEIVER_H

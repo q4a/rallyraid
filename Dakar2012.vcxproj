@@ -119,6 +119,8 @@
     <ClInclude Include="MenuPageEditorStage.h" />
     <ClInclude Include="MenuPageInGame.h" />
     <ClInclude Include="MenuPageMain.h" />
+    <ClInclude Include="MenuPageOptions.h" />
+    <ClInclude Include="MenuPageOptionsKB.h" />
     <ClInclude Include="MenuPageStage.h" />
     <ClInclude Include="MessageManager.h" />
     <ClInclude Include="MyLock.h" />
@@ -198,6 +200,8 @@
     <ClCompile Include="MenuPageEditorStage.cpp" />
     <ClCompile Include="MenuPageInGame.cpp" />
     <ClCompile Include="MenuPageMain.cpp" />
+    <ClCompile Include="MenuPageOptions.cpp" />
+    <ClCompile Include="MenuPageOptionsKB.cpp" />
     <ClCompile Include="MenuPageStage.cpp" />
     <ClCompile Include="MessageManager.cpp" />
     <ClCompile Include="MySound.cpp" />

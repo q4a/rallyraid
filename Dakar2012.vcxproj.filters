@@ -255,6 +255,12 @@
     <ClInclude Include="MenuPageInGame.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="MenuPageOptions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MenuPageOptionsKB.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -459,6 +465,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="MenuPageInGame.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MenuPageOptions.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MenuPageOptionsKB.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

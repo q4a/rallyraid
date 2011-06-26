@@ -45,6 +45,7 @@ public:
     irr::scene::ICameraSceneNode*   getCamera();
     size_t                          getWindowId();
     irr::gui::IGUIEnvironment*      getEnv();
+    EventReceiver*                  getEventReceiver(); // inline
     const irr::core::dimension2du&  getScreenSize();
     unsigned int                    getTick();
     void                            switchCamera();
@@ -149,6 +150,11 @@ inline size_t TheGame::getWindowId()
 inline irr::gui::IGUIEnvironment* TheGame::getEnv()
 {
     return env;
+}
+
+inline EventReceiver* TheGame::getEventReceiver()
+{
+    return eventReceiver;
 }
 
 inline const irr::core::dimension2du& TheGame::getScreenSize()

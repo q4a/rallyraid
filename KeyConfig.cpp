@@ -8,6 +8,51 @@
 #include <math.h>
 #include <assert.h>
 
+static const char* keyCodes[] =
+{
+    "0x00","ESC","1","2","3","4","5","6","7","8","9","0",
+    "-","=","back","tab",
+    "Q","W","E","R","T","Y","U","I","O","P",
+    "(",")","Enter","Left Control",
+    "A","S","D","F","G","H","J","K","L",
+    ";","'","Grave","Left Shift","\\",
+    "Z","X","C","V","B","N","M",
+    ",",".","/","Right Shift","*","Left Alt","Space","Capital",
+    "F1","F2","F3","F4","F5","F6","F7","F8","F9","F10",
+    "Numlock","Scroll","numpad7","numpad8","numpad9","numpad-",
+    "numpad4","numpad5","numpad6","numpad+","numpad1","numpad2","numpad3",
+    "numpad0","numpad.","0x54","0x55","oem_102","F11","F12","0x59",
+    "0x5a","0x5b","0x5c","0x5d","0x5e","0x5f","0x60","0x61","0x62",
+    "0x63","F13","F14","F15","0x67","0x68","0x69","0x6a","0x6b",
+    "0x6c","0x6d","0x6e","0x6f","kana","0x71","0x72","abnt_c1",
+    "0x74","0x75","0x76","0x77","0x78","convert", "0x7a","noconvert", 
+    "0x7c","yen","abnt_c2","0x7f","0x80","0x81","0x82","0x83","0x84",
+    "0x85","0x86","0x87","0x88","0x89","0x8a","0x8b","0x8c",
+    "numpad=","0x8e","0x8f","prevtrack","at","colon","underline",
+    "kanji","stop","ax","unlabeled", "0x98","nexttrack", "0x9a",
+    "0x9b","numpadenter","rcontrol", "0x9e", "0x9f","mute","calculater",
+    "playpause", "0xa3","mediastop","0xa5","0xa6","0xa7","0xa8","0xa9",
+    "0xaa","0xab","0xac","0xad","volumedown", "0xaf","volumeup", "0xb1",
+    "webhome","numpadcomma", "0xb4","divide", "0xb6","prtscr","Right Alt",
+    "0xb9","0xba","0xbb","0xbc","0xbd","0xbe", "0xbf","0xc0","0xc1",
+    "0xc2","0xc3","0xc4","Pause","0xc6","Home","Up","Page Up","0xca",
+    "Left", "0xcc","Right", "0xce","End","Down","Page Down","Insert",
+    "Delete","0xd4","0xd5","0xd6","0xd7","0xd8","0xd9","0xda","Left Win",
+    "Right Win","Apps","Power","Sleep","0xe0","0xe1","0xe2","Wake", "0xe4",
+    "Web Search","Web Favorites","Web Stop","Web Forward","Web Back",
+    "My Computer","Mail","Media Select"
+};
+
+static const char* typeCodes[] =
+{
+    "Keyboard",
+    "JoystickButton",
+    "JoystickAxis",
+    "JoystickSliderX",
+    "JoystickSliderY",
+    "JoystickPov"
+};
+
 OIS::JoyStickState KeyConfig::centralJoystickState;
 
 KeyConfig* KeyConfig::getKeyConfig(OIS::Keyboard* keyboard, const OIS::JoyStickState& joystickState, float deadZone, bool continous)
@@ -276,6 +321,14 @@ void KeyConfigKeyboard::writeToFile(FILE* f, const std::string& prefix)
     fprintf_s(f, "%s_key=%u\n", prefix.c_str(), key);
 }
 
+const wchar_t* KeyConfigKeyboard::getName()
+{
+    name = typeCodes[type];
+    name += L" ";
+    name += keyCodes[key];
+    return name.c_str();
+}
+
 // class KeyConfigJoystickButton : public KeyConfig
 KeyConfigJoystickButton::KeyConfigJoystickButton()
     : KeyConfig(KeyConfig::JoystickButton)
@@ -295,6 +348,14 @@ void KeyConfigJoystickButton::writeToFile(FILE* f, const std::string& prefix)
 {
     fprintf_s(f, "%s_type=%u\n", prefix.c_str(), (unsigned int)type);
     fprintf_s(f, "%s_key=%u\n", prefix.c_str(), key);
+}
+
+const wchar_t* KeyConfigJoystickButton::getName()
+{
+    name = typeCodes[type];
+    name += L" ";
+    name += key;
+    return name.c_str();
 }
 
 // class KeyConfigJoystickPov : public KeyConfig
@@ -318,6 +379,45 @@ void KeyConfigJoystickPov::writeToFile(FILE* f, const std::string& prefix)
     fprintf_s(f, "%s_key=%u\n", prefix.c_str(), key);
     fprintf_s(f, "%s_key2=%u\n", prefix.c_str(), key2);
 }
+
+const wchar_t* KeyConfigJoystickPov::getName()
+{
+    name = typeCodes[type];
+    name += L" ";
+    name += key;
+    switch (key2)
+    {
+    case OIS::Pov::North:
+        name += L" up";
+        break;
+    case OIS::Pov::South:
+        name += L" down";
+        break;
+    case OIS::Pov::East:
+        name += L" right";
+        break;
+    case OIS::Pov::West:
+        name += L" left";
+        break;
+    case OIS::Pov::NorthEast:
+        name += L" up-right";
+        break;
+    case OIS::Pov::SouthEast:
+        name += L" down-right";
+        break;
+    case OIS::Pov::NorthWest:
+        name += L" up-left";
+        break;
+    case OIS::Pov::SouthWest:
+        name += L" down-left";
+        break;
+    default:
+        name += L" unknown";
+        break;
+    }
+    return name.c_str();
+}
+
 
 // class KeyConfigJoystickAxis : public KeyConfig
 KeyConfigJoystickAxis::KeyConfigJoystickAxis()
@@ -375,6 +475,21 @@ void KeyConfigJoystickAxis::writeToFile(FILE* f, const std::string& prefix)
     fprintf_s(f, "%s_to=%u\n", prefix.c_str(), to);
 }
 
+const wchar_t* KeyConfigJoystickAxis::getName()
+{
+    name = typeCodes[type];
+    name += L" ";
+    name += key;
+    if (to > from)
+    {
+        name += L" +";
+    }
+    else
+    {
+        name += L" -";
+    }
+    return name.c_str();
+}
 
 // class KeyConfigJoystickSliderX : public KeyConfigJoystickAxis
 KeyConfigJoystickSliderX::KeyConfigJoystickSliderX()

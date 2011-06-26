@@ -30,6 +30,8 @@ public:
         MP_MAIN,
         MP_STAGE,
         MP_INGAME,
+        MP_OPTIONS,
+        MP_OPTIONSKB,
         NUMBER_OF_MENUPAGES
     };
 

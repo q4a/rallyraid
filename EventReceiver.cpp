@@ -8,6 +8,7 @@
 #include "Vehicle.h"
 #include "MenuManager.h"
 #include "TheEarth.h"
+#include "MenuPageOptionsKB.h"
 
 #include "stdafx.h"
 
@@ -489,3 +490,25 @@ void EventReceiver::checkEvents()
 #endif // 0 or 1
 }
 
+void EventReceiver::checkEventsMenu()
+{
+    //Need to capture/update each device
+    keyboard->capture();
+    joystick->capture();
+
+    const OIS::JoyStickState joystickState = joystick->getJoyStickState();
+    
+    if (MenuPageOptionsKB::menuPageOptionsKB->isOpened())
+    {
+        if (test_kc == 0)
+        {
+            test_kc = KeyConfig::getKeyConfig(keyboard, joystickState, deadZone, false);
+            if (test_kc)
+            {
+                dprintf(MY_DEBUG_INFO, "test_kc assigned: %d\n", test_kc->key);
+                MenuPageOptionsKB::menuPageOptionsKB->keyConfigReceived(test_kc);
+                //assert(0);
+            }
+        }
+    }
+}

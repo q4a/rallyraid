@@ -440,7 +440,8 @@ void TheGame::loop()
                     if (TheEarth::getInstance()->threadIsRunning())
                     {
                         str += L"       thread is running";
-                    }                    
+                    }
+                    
                     str += L"\nDetail pos: ";
                     str += (int)((offsetManager->getOffset().X+camera->getPosition().X)/TILE_DETAIL_SCALE_F);
                     str += L", ";
@@ -462,6 +463,11 @@ void TheGame::loop()
             }
             else
             {
+                if (eventReceiver)
+                {
+                    eventReceiver->checkEventsMenu();
+                }
+
                 lastPhysTick = lastSlowTick = tick;
             }
             // -------------------------------

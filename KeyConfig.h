@@ -13,6 +13,7 @@ namespace OIS
 
 #include <OISJoyStick.h>
 #include <string>
+#include <irrlicht.h>
 
 class KeyConfig
 {
@@ -41,6 +42,7 @@ public:
     //virtual bool isPressed(OIS::Keyboard* keyboard, const OIS::JoyStickState& joystickState) = 0;
     virtual float getPercentage(OIS::Keyboard* keyboard, const OIS::JoyStickState& joystickState) = 0;
     virtual void writeToFile(FILE* f, const std::string& prefix) = 0;
+    virtual const wchar_t* getName() = 0;
 
     bool getPressed() {return lastActive == false && active == true;}
     bool getReleased() {return lastActive == true && active == false;}
@@ -52,6 +54,7 @@ public:
     static OIS::JoyStickState centralJoystickState;
 
 public:
+    irr::core::stringw  name;
     bool continous;
     bool active;
     bool lastActive;
@@ -68,6 +71,7 @@ public:
     //virtual bool isPressed(OIS::Keyboard* keyboard, const OIS::JoyStickState& joystickState);
     virtual float getPercentage(OIS::Keyboard* keyboard, const OIS::JoyStickState& joystickState);
     virtual void writeToFile(FILE* f, const std::string& prefix);
+    virtual const wchar_t* getName();
 };
 
 class KeyConfigJoystickButton : public KeyConfig
@@ -79,6 +83,7 @@ public:
     //virtual bool isPressed(OIS::Keyboard* keyboard, const OIS::JoyStickState& joystickState);
     virtual float getPercentage(OIS::Keyboard* keyboard, const OIS::JoyStickState& joystickState);
     virtual void writeToFile(FILE* f, const std::string& prefix);
+    virtual const wchar_t* getName();
 };
 
 class KeyConfigJoystickPov : public KeyConfig
@@ -90,6 +95,7 @@ public:
     //virtual bool isPressed(OIS::Keyboard* keyboard, const OIS::JoyStickState& joystickState);
     virtual float getPercentage(OIS::Keyboard* keyboard, const OIS::JoyStickState& joystickState);
     virtual void writeToFile(FILE* f, const std::string& prefix);
+    virtual const wchar_t* getName();
 
 public:
     unsigned int key2;
@@ -110,6 +116,7 @@ private:
 
 public:
     virtual void writeToFile(FILE* f, const std::string& prefix);
+    virtual const wchar_t* getName();
 
 protected:
     virtual float getPercentage(int state);

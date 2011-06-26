@@ -56,6 +56,12 @@ MenuPageMain::MenuPageMain()
         MI_BUTTONSTART,
         L"Start New Game");
 
+    TheGame::getInstance()->getEnv()->addButton(
+        irr::core::recti(10,90,90,110),
+        window,
+        MI_BUTTONOPTIONS,
+        L"Options");
+
     checkBoxEditor = TheGame::getInstance()->getEnv()->addCheckBox(TheGame::getInstance()->getEditorMode(),
         irr::core::recti(10,window->getRelativePosition().getSize().Height-30,150,window->getRelativePosition().getSize().Height-10),
         window,
@@ -163,6 +169,12 @@ bool MenuPageMain::OnEvent(const irr::SEvent &event)
                             MenuManager::getInstance()->open(MenuManager::MP_STAGE);
                             //GamePlay::getInstance()->startNewGame(selectedRace, selectedVehicleType);
                         }
+                        return true;
+                        break;
+                    case MI_BUTTONOPTIONS:
+                        dprintf(MY_DEBUG_NOTE, "mainmenu::optionsbutton::clicked\n");
+                        willOpenOtherWindow = false;
+                        MenuManager::getInstance()->open(MenuManager::MP_OPTIONS);
                         return true;
                         break;
                 };
