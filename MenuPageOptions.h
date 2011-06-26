@@ -4,6 +4,7 @@
 
 #include "MenuPageBase.h"
 #include "MenuManager.h"
+#include <map>
 
 
 class StageState;
@@ -20,6 +21,14 @@ public:
         MI_BUTTONSECONDARY,
 
         MI_TABLEKB,
+
+        MI_COMBOBOXDRIVERTYPE,
+        MI_COMBOBOXRESOLUTION,
+        MI_COMBOBOXDISPLAYBITS,
+
+        MI_CBFULLSCREEN,
+        MI_CBVSYNC,
+        MI_CBSHOWNAMES,
 
         NUMBER_OF_MENUITEMS
     };
@@ -46,7 +55,14 @@ private:
 private:
     irr::gui::IGUIWindow*   window;
     irr::gui::IGUITable*    tableKB;
+    irr::gui::IGUIComboBox* comboBoxDriverType;
+    irr::gui::IGUIComboBox* comboBoxResolution;
+    irr::gui::IGUIComboBox* comboBoxDisplayBits;
+    irr::gui::IGUICheckBox* cbFullScreen;
+    irr::gui::IGUICheckBox* cbVsync;
+    irr::gui::IGUICheckBox* cbShowNames;
 
+    std::map<int, int>      resolutionMap;
     int                     lastKeyName;
     bool                    primary;
 };

@@ -44,6 +44,7 @@ ItinerManager::ItinerManager()
       editorDescription()
 {
     readItinerImages();
+    readItinerImages2();
 }
 
 ItinerManager::~ItinerManager()

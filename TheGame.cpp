@@ -96,9 +96,9 @@ TheGame::TheGame()
     theGame = this;
 
     irr::SIrrlichtCreationParameters params;
-    params.DriverType = irr::video::EDT_DIRECT3D9 /*irr::video::EDT_OPENGL*/;
     params.HighPrecisionFPU = true;
-    params.WindowSize = irr::core::dimension2du(1280, 800);
+    //params.DriverType = irr::video::EDT_DIRECT3D9 /*irr::video::EDT_OPENGL*/;
+    //params.WindowSize = irr::core::dimension2du(1280, 800);
 
     readSettings(params);
 
@@ -306,7 +306,19 @@ TheGame::~TheGame()
 void TheGame::readSettings(irr::SIrrlichtCreationParameters& params)
 {
     Settings::initialize();
-    Settings::getInstance()->read();
+
+    if (Settings::getInstance()->driverType == "d3d9")
+    {
+        params.DriverType = irr::video::EDT_DIRECT3D9 /*irr::video::EDT_OPENGL*/;
+    }
+    else
+    {
+        params.DriverType = irr::video::EDT_OPENGL;
+    }
+    params.WindowSize = irr::core::dimension2du(Settings::getInstance()->resolutionX, Settings::getInstance()->resolutionY);
+    params.Fullscreen = Settings::getInstance()->fullScreen;
+    params.Bits = Settings::getInstance()->displayBits;
+    params.Vsync = Settings::getInstance()->vsync;
     //assert(0);
 }
 

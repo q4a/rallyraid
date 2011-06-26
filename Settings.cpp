@@ -35,8 +35,15 @@ Settings::Settings()
       useTerrainDetail(true),
       showNames(true),
       difficulty(2),
-      navigationAssistant(true)
+      navigationAssistant(true),
+      resolutionX(1280),
+      resolutionY(800),
+      displayBits(16),
+      driverType("opengl"),
+      fullScreen(true),
+      vsync(false)
 {
+    read();
 }
 
 Settings::~Settings()
@@ -98,6 +105,36 @@ void Settings::read()
             } else if (keyName == "navigation_assistant")
             {
                 navigationAssistant = StringConverter::parseBool(valName, true);
+            } else if (keyName == "resolution_x")
+            {
+                resolutionX = StringConverter::parseUnsignedInt(valName, 1280);
+            } else if (keyName == "resolution_y")
+            {
+                resolutionY = StringConverter::parseUnsignedInt(valName, 800);
+            } else if (keyName == "display_bits")
+            {
+                displayBits = StringConverter::parseUnsignedInt(valName, 16);
+                if (displayBits != 16 || displayBits != 32)
+                {
+                    displayBits = 16;
+                }
+            } else if (keyName == "driver_type")
+            {
+                driverType = valName;
+                if (driverType == "D3D9" || driverType == "d3d9")
+                {
+                    driverType = "d3d9";
+                }
+                else
+                {
+                    driverType = "opengl";
+                }
+            } else if (keyName == "full_screen")
+            {
+                fullScreen = StringConverter::parseBool(valName, true);
+            } else if (keyName == "vsync")
+            {
+                vsync = StringConverter::parseBool(valName, false);
             }
         }
     }
@@ -128,6 +165,12 @@ void Settings::write()
     ret = fprintf(f, "show_names=%s\n", showNames?"yes":"no");
     ret = fprintf(f, "difficulty=%u\n", difficulty);
     ret = fprintf(f, "navigation_assistant=%s\n", navigationAssistant?"yes":"no");
+    ret = fprintf(f, "resolution_x=%u\n", resolutionX);
+    ret = fprintf(f, "resolution_y=%u\n", resolutionY);
+    ret = fprintf(f, "display_bits=%u\n", displayBits);
+    ret = fprintf(f, "driver_type=%s\n", driverType.c_str());
+    ret = fprintf(f, "full_screen=%s\n", fullScreen?"yes":"no");
+    ret = fprintf(f, "vsync=%s\n", vsync?"yes":"no");
 
     fclose(f);
 }

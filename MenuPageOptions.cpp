@@ -12,15 +12,26 @@
 #include <assert.h>
 
 
+#define PADDING         3
+#define FTW             200
+#define LTW             0
+
 MenuPageOptions* MenuPageOptions::menuPageOptions = 0;
 
 MenuPageOptions::MenuPageOptions()
     : window(0),
       tableKB(0),
+      comboBoxDriverType(0),
+      comboBoxResolution(0),
+      comboBoxDisplayBits(0),
+      cbFullScreen(0),
+      resolutionMap(),
       lastKeyName(0),
       primary(true)
 {
     menuPageOptions = this;
+    irr::IrrlichtDevice* device = TheGame::getInstance()->getDevice();
+
     window = TheGame::getInstance()->getEnv()->addWindow(
         irr::core::recti(TheGame::getInstance()->getScreenSize().Width/2-350, TheGame::getInstance()->getScreenSize().Height/2-300, TheGame::getInstance()->getScreenSize().Width/2+350, TheGame::getInstance()->getScreenSize().Height/2+300),
         false,
@@ -46,6 +57,86 @@ MenuPageOptions::MenuPageOptions()
     // ----------------------------
     irr::gui::IGUITab* tabGeneral = tc->addTab(L"General", 0);
 
+    unsigned int line = PADDING;
+    TheGame::getInstance()->getEnv()->addStaticText(L"Driver Type",
+        irr::core::recti(irr::core::position2di(PADDING, line), irr::core::dimension2di(FTW, 16)),
+        false,
+        false,
+        tabGeneral);
+
+    comboBoxDriverType = TheGame::getInstance()->getEnv()->addComboBox(
+        irr::core::recti(irr::core::position2di(FTW+(PADDING*2), line), irr::core::dimension2di(tabGeneral->getRelativePosition().getSize().Width-(4*PADDING)-LTW-FTW, 16)),
+        tabGeneral,
+        MI_COMBOBOXDRIVERTYPE);
+    comboBoxDriverType->addItem(L"Direct 3D 9");
+    comboBoxDriverType->addItem(L"OpenGL");
+    
+    line += 20;
+    TheGame::getInstance()->getEnv()->addStaticText(L"Resolution",
+        irr::core::recti(irr::core::position2di(PADDING, line), irr::core::dimension2di(FTW, 16)),
+        false,
+        false,
+        tabGeneral);
+
+    comboBoxResolution = TheGame::getInstance()->getEnv()->addComboBox(
+        irr::core::recti(irr::core::position2di(FTW+(PADDING*2), line), irr::core::dimension2di(tabGeneral->getRelativePosition().getSize().Width-(4*PADDING)-LTW-FTW, 16)),
+        tabGeneral,
+        MI_COMBOBOXRESOLUTION);
+    int j = 0;
+    for(int i=0;i<device->getVideoModeList()->getVideoModeCount();i++)
+    {
+        irr::core::stringw str = L"";
+        irr::core::dimension2du res = device->getVideoModeList()->getVideoModeResolution(i);
+        int dep = device->getVideoModeList()->getVideoModeDepth(i);
+        if (res.Height >= 768)
+        {
+            str += res.Width;
+            str += L"x";
+            str += res.Height;
+            str += L"x";
+            str += dep;
+            comboBoxResolution->addItem(str.c_str());
+            resolutionMap[j] = i;
+            j++;
+            //if (auto_resolution==0 && resolutionX==res.Width && resolutionY==res.Height && display_bits==dep) resolution_cbox->setSelected(i+2);
+        }
+    }
+
+    line += 20;
+    TheGame::getInstance()->getEnv()->addStaticText(L"Full Screen",
+        irr::core::recti(irr::core::position2di(PADDING, line), irr::core::dimension2di(FTW, 16)),
+        false,
+        false,
+        tabGeneral);
+
+    cbFullScreen = TheGame::getInstance()->getEnv()->addCheckBox(Settings::getInstance()->fullScreen,
+        irr::core::recti(irr::core::position2di(FTW+(PADDING*2), line), irr::core::dimension2di(16, 16)),
+        tabGeneral,
+        MI_CBFULLSCREEN);
+
+    line += 20;
+    TheGame::getInstance()->getEnv()->addStaticText(L"Vsync",
+        irr::core::recti(irr::core::position2di(PADDING, line), irr::core::dimension2di(FTW, 16)),
+        false,
+        false,
+        tabGeneral);
+
+    cbVsync = TheGame::getInstance()->getEnv()->addCheckBox(Settings::getInstance()->vsync,
+        irr::core::recti(irr::core::position2di(FTW+(PADDING*2), line), irr::core::dimension2di(16, 16)),
+        tabGeneral,
+        MI_CBVSYNC);
+
+    line += 20;
+    TheGame::getInstance()->getEnv()->addStaticText(L"Show Names",
+        irr::core::recti(irr::core::position2di(PADDING, line), irr::core::dimension2di(FTW, 16)),
+        false,
+        false,
+        tabGeneral);
+
+    cbShowNames = TheGame::getInstance()->getEnv()->addCheckBox(Settings::getInstance()->showNames,
+        irr::core::recti(irr::core::position2di(FTW+(PADDING*2), line), irr::core::dimension2di(16, 16)),
+        tabGeneral,
+        MI_CBSHOWNAMES);
 
     // ----------------------------
     // Input
@@ -53,19 +144,19 @@ MenuPageOptions::MenuPageOptions()
     irr::gui::IGUITab* tabKB = tc->addTab(L"Input", 0);
 
     TheGame::getInstance()->getEnv()->addButton(
-        irr::core::recti(irr::core::position2di(0, 0), irr::core::dimension2di(tabKB->getRelativePosition().getSize().Width/3-2, 20)),
+        irr::core::recti(irr::core::position2di(0, 0), irr::core::dimension2di((tabKB->getRelativePosition().getSize().Width-16)/3-2, 20)),
         tabKB,
         MI_BUTTONCENTER,
         L"Recalibrate Joystick");
 
     TheGame::getInstance()->getEnv()->addButton(
-        irr::core::recti(irr::core::position2di(tabKB->getRelativePosition().getSize().Width/3, 0), irr::core::dimension2di(tabKB->getRelativePosition().getSize().Width/3-2, 20)),
+        irr::core::recti(irr::core::position2di((tabKB->getRelativePosition().getSize().Width-16)/3, 0), irr::core::dimension2di((tabKB->getRelativePosition().getSize().Width-16)/3-2, 20)),
         tabKB,
         MI_BUTTONPRIMARY,
         L"Set Primary");
 
     TheGame::getInstance()->getEnv()->addButton(
-        irr::core::recti(irr::core::position2di(tabKB->getRelativePosition().getSize().Width*2/3, 0), irr::core::dimension2di(tabKB->getRelativePosition().getSize().Width/3-2, 20)),
+        irr::core::recti(irr::core::position2di((tabKB->getRelativePosition().getSize().Width-16)*2/3, 0), irr::core::dimension2di((tabKB->getRelativePosition().getSize().Width-16)/3-2, 20)),
         tabKB,
         MI_BUTTONSECONDARY,
         L"Set Secondary");
@@ -152,12 +243,59 @@ bool MenuPageOptions::OnEvent(const irr::SEvent &event)
                 };
                 break;
             }
-            
             case irr::gui::EGET_TABLE_CHANGED:
             {
                 switch (id)
                 {
                     case MI_TABLEKB:
+                        return true;
+                        break;
+                };
+                break;
+            }
+            case irr::gui::EGET_COMBO_BOX_CHANGED:
+            {
+                switch (id)
+                {
+                    case MI_COMBOBOXDRIVERTYPE:
+                        if (comboBoxDriverType->getSelected() == 0)
+                        {
+                            Settings::getInstance()->driverType = "d3d9";
+                        }
+                        else
+                        {
+                            Settings::getInstance()->driverType = "opengl";
+                        }
+                        return true;
+                        break;
+                    case MI_COMBOBOXRESOLUTION:
+                    {
+                        int pos = resolutionMap[comboBoxResolution->getSelected()];
+                        irr::core::dimension2du res = TheGame::getInstance()->getDevice()->getVideoModeList()->getVideoModeResolution(pos);
+                        int dep = TheGame::getInstance()->getDevice()->getVideoModeList()->getVideoModeDepth(pos);
+                        Settings::getInstance()->resolutionX = res.Width;
+                        Settings::getInstance()->resolutionY = res.Height;
+                        Settings::getInstance()->displayBits = dep;
+                        return true;
+                        break;
+                    }
+                };
+                break;
+            }
+            case irr::gui::EGET_CHECKBOX_CHANGED:
+            {
+                switch (id)
+                {
+                    case MI_CBFULLSCREEN:
+                        Settings::getInstance()->fullScreen = ((irr::gui::IGUICheckBox*)event.GUIEvent.Caller)->isChecked();
+                        return true;
+                        break;
+                    case MI_CBVSYNC:
+                        Settings::getInstance()->vsync = ((irr::gui::IGUICheckBox*)event.GUIEvent.Caller)->isChecked();
+                        return true;
+                        break;
+                    case MI_CBSHOWNAMES:
+                        Settings::getInstance()->showNames = ((irr::gui::IGUICheckBox*)event.GUIEvent.Caller)->isChecked();
                         return true;
                         break;
                 };
@@ -190,6 +328,39 @@ void MenuPageOptions::refresh()
 
 void MenuPageOptions::refreshGeneral()
 {
+    irr::IrrlichtDevice* device = TheGame::getInstance()->getDevice();
+
+    if (Settings::getInstance()->driverType == "d3d9")
+    {
+        comboBoxDriverType->setSelected(0);
+    }
+    else
+    {
+        comboBoxDriverType->setSelected(1);
+    }
+
+    int j = 0;
+    for(int i=0;i<device->getVideoModeList()->getVideoModeCount();i++)
+    {
+        irr::core::stringw str = L"";
+        irr::core::dimension2du res = device->getVideoModeList()->getVideoModeResolution(i);
+        int dep = device->getVideoModeList()->getVideoModeDepth(i);
+        if (res.Height >= 768)
+        {
+            if (Settings::getInstance()->resolutionX==res.Width &&
+                Settings::getInstance()->resolutionY==res.Height &&
+                Settings::getInstance()->displayBits==dep)
+            {
+                comboBoxResolution->setSelected(j);
+                break;
+            }
+            j++;
+        }
+    }
+
+    cbFullScreen->setChecked(Settings::getInstance()->fullScreen);
+    cbVsync->setChecked(Settings::getInstance()->vsync);
+    cbShowNames->setChecked(Settings::getInstance()->showNames);
 }
 
 void MenuPageOptions::refreshKB()

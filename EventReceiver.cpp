@@ -142,7 +142,7 @@ void EventReceiver::saveKeyMapping()
         }
         if (keyMap[it->second].secondaryKeyConfig)
         {
-            keyMap[it->second].primaryKeyConfig->writeToFile(f, "secondary");
+            keyMap[it->second].secondaryKeyConfig->writeToFile(f, "secondary");
         }
     }
 

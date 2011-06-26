@@ -35,6 +35,12 @@ public:
     bool                    showNames;
     unsigned int            difficulty;
     bool                    navigationAssistant;
+    unsigned int            resolutionX;
+    unsigned int            resolutionY;
+    unsigned int            displayBits;
+    std::string             driverType;
+    bool                    fullScreen;
+    bool                    vsync;
 };
 
 #endif // SETTINGS_H
