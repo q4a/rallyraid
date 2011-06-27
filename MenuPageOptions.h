@@ -29,6 +29,7 @@ public:
         MI_CBFULLSCREEN,
         MI_CBVSYNC,
         MI_CBSHOWNAMES,
+        MI_CBNAVIGATIONASSISTANT,
 
         NUMBER_OF_MENUITEMS
     };
@@ -61,6 +62,7 @@ private:
     irr::gui::IGUICheckBox* cbFullScreen;
     irr::gui::IGUICheckBox* cbVsync;
     irr::gui::IGUICheckBox* cbShowNames;
+    irr::gui::IGUICheckBox* cbNavigationAssistant;
 
     std::map<int, int>      resolutionMap;
     int                     lastKeyName;

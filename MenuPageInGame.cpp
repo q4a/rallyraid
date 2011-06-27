@@ -24,6 +24,7 @@
 #include "GamePlay.h"
 #include "Hud.h"
 #include "VehicleManager.h"
+#include "FontManager.h"
 #include <assert.h>
 
 
@@ -31,8 +32,10 @@ MenuPageInGame* MenuPageInGame::menuPageInGame = 0;
 
 MenuPageInGame::MenuPageInGame()
     : window(0),
+      staticTextRaceName(0),
       tableStages(0),
-      tableCompetitors(0)
+      tableCompetitors(0),
+      tableCompetitorsG(0)
 {
     menuPageInGame = this;
     window = TheGame::getInstance()->getEnv()->addImage(
@@ -48,12 +51,25 @@ MenuPageInGame::MenuPageInGame()
         MI_BUTTONBACK,
         L"Back To Game");
 
+    TheGame::getInstance()->getEnv()->addButton(
+        irr::core::recti(10,90,90,110),
+        window,
+        MI_BUTTONOPTIONS,
+        L"Options");
+
+    staticTextRaceName = TheGame::getInstance()->getEnv()->addStaticText(L"",
+        irr::core::recti(window->getRelativePosition().getSize().Width/2 - 400,54,window->getRelativePosition().getSize().Width/2 + 400,88),
+        //irr::core::recti(120,54,1200,88),
+        false, false, window, 0, false);
+    staticTextRaceName->setOverrideFont(FontManager::getInstance()->getFont(FontManager::FONT_SPECIAL18));
+    staticTextRaceName->setOverrideColor(irr::video::SColor(255, 255, 255, 255));
+    staticTextRaceName->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_UPPERLEFT);
 
     // ----------------------------
     // Stages
     // ----------------------------
     tableStages = TheGame::getInstance()->getEnv()->addTable(
-        irr::core::recti(irr::core::position2di(window->getRelativePosition().getSize().Width/4, (window->getRelativePosition().getSize().Height*2)/3), irr::core::dimension2di(window->getRelativePosition().getSize().Width/4-2,(window->getRelativePosition().getSize().Height)/3-2)),
+        irr::core::recti(irr::core::position2di(window->getRelativePosition().getSize().Width/4, (window->getRelativePosition().getSize().Height)/3), irr::core::dimension2di(window->getRelativePosition().getSize().Width/4-2,(window->getRelativePosition().getSize().Height*2)/3-2)),
         window,
         MI_TABLESTAGES,
         true);
@@ -65,7 +81,7 @@ MenuPageInGame::MenuPageInGame()
     // Competitors
     // ----------------------------
     irr::gui::IGUITabControl* tc = TheGame::getInstance()->getEnv()->addTabControl(
-        irr::core::recti(irr::core::position2di(window->getRelativePosition().getSize().Width/2+2, (window->getRelativePosition().getSize().Height*2)/3), irr::core::dimension2di(window->getRelativePosition().getSize().Width/4-2,window->getRelativePosition().getSize().Height/3-2)),
+        irr::core::recti(irr::core::position2di(window->getRelativePosition().getSize().Width/2+2, (window->getRelativePosition().getSize().Height)/3), irr::core::dimension2di(window->getRelativePosition().getSize().Width/4-2,(window->getRelativePosition().getSize().Height*2)/3-2)),
         window,
         true,
         true,
@@ -141,6 +157,11 @@ bool MenuPageInGame::OnEvent(const irr::SEvent &event)
                         MenuManager::getInstance()->close();
                         return true;
                         break;
+                    case MI_BUTTONOPTIONS:
+                        dprintf(MY_DEBUG_NOTE, "ingamemenu::optionsbutton::clicked\n");
+                        MenuManager::getInstance()->open(MenuManager::MP_OPTIONS);
+                        return true;
+                        break;
                 };
                 break;
             }
@@ -188,6 +209,14 @@ void MenuPageInGame::close()
 void MenuPageInGame::refresh()
 {
     assert(!GamePlay::getInstance()->raceState.empty());
+
+    if (RaceManager::getInstance()->getCurrentRace())
+    {
+        irr::core::stringw str;
+        str += RaceManager::getInstance()->getCurrentRace()->getLongName().c_str();
+        staticTextRaceName->setText(str.c_str());
+    }
+
     refreshStages();
     refreshCompetitors(GamePlay::getInstance()->raceState.back());
 }

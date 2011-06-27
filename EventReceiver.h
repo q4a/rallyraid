@@ -30,6 +30,7 @@ private:
         BRAKE,
         LEFT,
         RIGHT,
+        HANDBRAKE,
         CLUTCH,
         PHYSICS,
         FPS_CAMERA,
@@ -39,6 +40,10 @@ private:
         OPEN_EDITOR,
         RESET_VEHICLE,
         SWITCH_INPUT,
+        EXIT_TO_MENU,
+        ROADBOOK_NEXT,
+        ROADBOOK_PREV,
+        RESET_PARTIAL,
         NUMBER_OF_KEYNAMES
     };
     struct KeyProperty
@@ -46,6 +51,7 @@ private:
         bool            continous;
         KeyConfig*      primaryKeyConfig;
         KeyConfig*      secondaryKeyConfig;
+        std::string     keyLongName;
     };
     typedef std::map<std::string, KeyName> keyNameMap_t;
     //typedef std::map<KeyName, KeyProperty> keyMap_t;

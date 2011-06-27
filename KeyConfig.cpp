@@ -70,7 +70,7 @@ KeyConfig* KeyConfig::getKeyConfig(OIS::Keyboard* keyboard, const OIS::JoyStickS
         return ret;
     }
 
-    for (/*OIS::KeyCode*/unsigned int i = OIS::KC_1; i <= OIS::KC_MEDIASELECT; i++)
+    for (/*OIS::KeyCode*/unsigned int i = OIS::KC_ESCAPE; i <= OIS::KC_MEDIASELECT; i++)
     {
         if (keyboard->isKeyDown((OIS::KeyCode)i))
         {

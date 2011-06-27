@@ -138,6 +138,18 @@ MenuPageOptions::MenuPageOptions()
         tabGeneral,
         MI_CBSHOWNAMES);
 
+    line += 20;
+    TheGame::getInstance()->getEnv()->addStaticText(L"Navigation Assistant",
+        irr::core::recti(irr::core::position2di(PADDING, line), irr::core::dimension2di(FTW, 16)),
+        false,
+        false,
+        tabGeneral);
+
+    cbNavigationAssistant = TheGame::getInstance()->getEnv()->addCheckBox(Settings::getInstance()->navigationAssistant,
+        irr::core::recti(irr::core::position2di(FTW+(PADDING*2), line), irr::core::dimension2di(16, 16)),
+        tabGeneral,
+        MI_CBNAVIGATIONASSISTANT);
+
     // ----------------------------
     // Input
     // ----------------------------
@@ -298,6 +310,10 @@ bool MenuPageOptions::OnEvent(const irr::SEvent &event)
                         Settings::getInstance()->showNames = ((irr::gui::IGUICheckBox*)event.GUIEvent.Caller)->isChecked();
                         return true;
                         break;
+                    case MI_CBNAVIGATIONASSISTANT:
+                        Settings::getInstance()->navigationAssistant = ((irr::gui::IGUICheckBox*)event.GUIEvent.Caller)->isChecked();
+                        return true;
+                        break;
                 };
                 break;
             }
@@ -361,6 +377,7 @@ void MenuPageOptions::refreshGeneral()
     cbFullScreen->setChecked(Settings::getInstance()->fullScreen);
     cbVsync->setChecked(Settings::getInstance()->vsync);
     cbShowNames->setChecked(Settings::getInstance()->showNames);
+    cbNavigationAssistant->setChecked(Settings::getInstance()->navigationAssistant);
 }
 
 void MenuPageOptions::refreshKB()
@@ -382,7 +399,7 @@ void MenuPageOptions::refreshKB()
         tableKB->addRow(i);
 
         str = L"";
-        str += it->first.c_str();
+        str += er->keyMap[it->second].keyLongName.c_str();
         tableKB->setCellText(i, 0, str.c_str());
         tableKB->setCellData(i, 0, (void*)(it->second));
 

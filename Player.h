@@ -245,8 +245,10 @@ inline void Player::update()
 inline void Player::stepItiner()
 {
     //Stage* stage = RaceManager::getInstance()->getCurrentStage();
+    //printf("try stepItiner\n");
     if (isCurrItinerValid()/*stage && currItinerIt != stage->getItinerPointList().end()*/)
     {
+        //printf("stepItiner\n");
         prevItinerIt = currItinerIt;
         currItinerIt++;
     }
@@ -254,11 +256,20 @@ inline void Player::stepItiner()
 
 inline void Player::stepBackItiner()
 {
-    //Stage* stage = RaceManager::getInstance()->getCurrentStage();
+    Stage* stage = RaceManager::getInstance()->getCurrentStage();
+    //printf("try stepBackItiner\n");
     if (isPrevItinerValid()/*stage && currItinerIt != stage->getItinerPointList().end()*/)
     {
+        //printf("stepBackItiner\n");
         currItinerIt = prevItinerIt;
-        prevItinerIt--;
+        if (prevItinerIt != stage->getItinerPointList().begin())
+        {
+            prevItinerIt--;
+        }
+        else
+        {
+            prevItinerIt = stage->getItinerPointList().end();
+        }
     }
 }
 

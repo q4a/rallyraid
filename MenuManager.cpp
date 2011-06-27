@@ -10,6 +10,7 @@
 #include "MenuPageEditorRoad.h"
 #include "MenuPageMain.h"
 #include "MenuPageStage.h"
+#include "MenuPageInGame.h"
 #include "MenuPageOptions.h"
 #include "MenuPageOptionsKB.h"
 
@@ -79,6 +80,7 @@ MenuManager::MenuManager()
     menuPages[MP_EDITORROAD] = new MenuPageEditorRoad();
     menuPages[MP_MAIN] = new MenuPageMain();
     menuPages[MP_STAGE] = new MenuPageStage();
+    menuPages[MP_INGAME] = new MenuPageInGame();
     menuPages[MP_OPTIONS] = new MenuPageOptions();
     menuPages[MP_OPTIONSKB] = new MenuPageOptionsKB();
 }

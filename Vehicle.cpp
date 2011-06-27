@@ -1,6 +1,7 @@
 
 #include "VehicleType.h"
 #include "Vehicle.h"
+#include "VehicleManager.h"
 #include "VehicleTypeManager.h"
 #include "ObjectPoolManager.h"
 #include "MySound.h"
@@ -396,6 +397,7 @@ Vehicle::Vehicle(const std::string& vehicleTypeName, const irr::core::vector3df&
         engineSound->setMinDistance(4.0f);
         // engineSound->setIsPaused(true);
     }
+    VehicleManager::getInstance()->addVehicle(this);
     //assert(0);
 }
 
@@ -412,6 +414,8 @@ Vehicle::~Vehicle()
         delete engineSound;
         engineSound = 0;
     }
+
+    VehicleManager::getInstance()->removeVehicle(this);
 
     ObjectPoolManager::getInstance()->putObject(offsetObject);
     offsetObject = 0;

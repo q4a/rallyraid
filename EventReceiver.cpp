@@ -9,6 +9,8 @@
 #include "MenuManager.h"
 #include "TheEarth.h"
 #include "MenuPageOptionsKB.h"
+#include "Hud.h"
+#include "Settings.h"
 
 #include "stdafx.h"
 
@@ -41,33 +43,61 @@ EventReceiver::EventReceiver()
     kp.primaryKeyConfig = kp.secondaryKeyConfig = 0;
     kp.continous = true;
     keyNameMap["accelerate"] = ACCELERATE;
+    kp.keyLongName = "Accelerate";
     keyMap[ACCELERATE] = kp;
     keyNameMap["brake"] = BRAKE;
+    kp.keyLongName = "Brake";
     keyMap[BRAKE] = kp;
     keyNameMap["left"] = LEFT;
+    kp.keyLongName = "Steer left";
     keyMap[LEFT] = kp;
     keyNameMap["right"] = RIGHT;
+    kp.keyLongName = "Steer right";
     keyMap[RIGHT] = kp;
+    keyNameMap["handbrake"] = HANDBRAKE;
+    kp.keyLongName = "Handbrake";
+    keyMap[HANDBRAKE] = kp;
     keyNameMap["clutch"] = CLUTCH;
+    kp.keyLongName = "Clutch";
     keyMap[CLUTCH] = kp;
     keyNameMap["look_left"] = LOOK_LEFT;
+    kp.keyLongName = "Look left";
     keyMap[LOOK_LEFT] = kp;
     keyNameMap["look_right"] = LOOK_RIGHT;
+    kp.keyLongName = "Look right";
     keyMap[LOOK_RIGHT] = kp;
 
     kp.continous = false;
     keyNameMap["physics"] = PHYSICS;
+    kp.keyLongName = "Switch Physics on/off";
     keyMap[PHYSICS] = kp;
     keyNameMap["fps_camera"] = FPS_CAMERA;
+    kp.keyLongName = "Change FPS camera";
     keyMap[FPS_CAMERA] = kp;
     keyNameMap["change_view"] = CHANGE_VIEW;
+    kp.keyLongName = "Change view";
     keyMap[CHANGE_VIEW] = kp;
     keyNameMap["open_editor"] = OPEN_EDITOR;
+    kp.keyLongName = "Open editor window";
     keyMap[OPEN_EDITOR] = kp;
     keyNameMap["reset_vehicle"] = RESET_VEHICLE;
+    kp.keyLongName = "Reset vehicle";
     keyMap[RESET_VEHICLE] = kp;
     keyNameMap["switch_input"] = SWITCH_INPUT;
+    kp.keyLongName = "Switch input while editor (game/editor)";
     keyMap[SWITCH_INPUT] = kp;
+    keyNameMap["exit_to_menu"] = EXIT_TO_MENU;
+    kp.keyLongName = "Game pause menu";
+    keyMap[EXIT_TO_MENU] = kp;
+    keyNameMap["roadbook_next"] = ROADBOOK_NEXT;
+    kp.keyLongName = "Go to the next roadbook element";
+    keyMap[ROADBOOK_NEXT] = kp;
+    keyNameMap["roadbook_prev"] = ROADBOOK_PREV;
+    kp.keyLongName = "Go to the previous roadbook element";
+    keyMap[ROADBOOK_PREV] = kp;
+    keyNameMap["reset_partial"] = RESET_PARTIAL;
+    kp.keyLongName = "Reset partial";
+    keyMap[RESET_PARTIAL] = kp;
 
     loadKeyMapping();
     //saveKeyMapping();
@@ -425,6 +455,16 @@ void EventReceiver::checkEvents()
             Player::getInstance()->getVehicle()->setSteer(0);
         }
 
+        if (IS_PRESSED(HANDBRAKE))
+        {
+            //dprintf(MY_DEBUG_NOTE, "brake pressed\n");
+            Player::getInstance()->getVehicle()->setHandbrake(1);
+        }
+        else
+        {
+            Player::getInstance()->getVehicle()->setHandbrake(0);
+        }
+
         if (IS_PRESSED(PHYSICS))
         {
             TheGame::getInstance()->setPhysicsOngoing(!TheGame::getInstance()->getPhysicsOngoing());
@@ -485,6 +525,29 @@ void EventReceiver::checkEvents()
         if (IS_PRESSED(SWITCH_INPUT))
         {
             MenuManager::getInstance()->refreshEventReceiver();
+        }
+
+        if (Settings::getInstance()->navigationAssistant == false)
+        {
+            if (IS_PRESSED(ROADBOOK_NEXT))
+            {
+                Player::getInstance()->stepItiner();
+                Hud::getInstance()->updateRoadBook();
+            }
+            else if (IS_PRESSED(ROADBOOK_PREV))
+            {
+                Player::getInstance()->stepBackItiner();
+                Hud::getInstance()->updateRoadBook();
+            }
+            if (IS_PRESSED(RESET_PARTIAL))
+            {
+                Player::getInstance()->resetDistance();
+            }
+        }
+
+        if (IS_PRESSED(EXIT_TO_MENU))
+        {
+            MenuManager::getInstance()->open(MenuManager::MP_INGAME);
         }
     }
 #endif // 0 or 1

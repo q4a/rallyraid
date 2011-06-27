@@ -15,6 +15,7 @@ public:
     {
         MI_WINDOW = MAX_MENU_ITEMS * MenuManager::MP_INGAME,
         MI_BUTTONBACK,
+        MI_BUTTONOPTIONS,
 
         MI_TABLESTAGES,
         MI_TABLECOMPETITORS,
@@ -41,6 +42,7 @@ private:
 
 private:
     irr::gui::IGUIImage*    window;
+    irr::gui::IGUIStaticText* staticTextRaceName;
     irr::gui::IGUITable*    tableStages;
     irr::gui::IGUITable*    tableCompetitors;
     irr::gui::IGUITable*    tableCompetitorsG;
