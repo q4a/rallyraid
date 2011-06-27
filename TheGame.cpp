@@ -28,6 +28,8 @@
 #include "FontManager.h"
 #include "MessageManager.h"
 #include "Terrain_defs.h"
+#include "Stage.h"
+#include "ItinerPoint.h"
 
 
 // static stuff
@@ -465,10 +467,17 @@ void TheGame::loop()
                         str += L", ";
                         str += (int)(RaceManager::getInstance()->getCurrentHeightModifierList().back().pos.Z/TILE_DETAIL_SCALE_F);
                     }
-                    
+                    str += L", Distance to last itinerary point: ";
+                    if (RaceManager::getInstance()->getCurrentStage() && !RaceManager::getInstance()->getCurrentStage()->getItinerPointList().empty())
+                    {
+                        str += (int)(RaceManager::getInstance()->getCurrentStage()->getItinerPointList().back()->getPos().getDistanceFrom(offsetManager->getOffset()+camera->getPosition()));
+                    }
+                    else
+                    {
+                        str += L"0";
+                    }
                     
                     testText->setText(str.c_str());
-
 
                     earth->update(offsetManager->getOffset()+camera->getPosition(), cameraDirection);
                 }
