@@ -40,7 +40,7 @@
 #endif
 #define dprintf(lev, x, ...) if (lev <= MY_DEBUG_LEVEL) printf((x), __VA_ARGS__)
 
-// TODO: reference additional headers your program requires here
-
+#define foreach(IT, STDCONT, STDCONT_T) for (STDCONT_T::const_iterator IT = STDCONT.begin(); IT != STDCONT.end(); IT++)
+#define foreach_nc(IT, STDCONT, STDCONT_T) for (STDCONT_T::iterator IT = STDCONT.begin(); IT != STDCONT.end(); IT++)
 
 #endif // STDAXF_H

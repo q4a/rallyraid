@@ -61,6 +61,7 @@ public:
     void lookRight(bool set); // inline
     void lookCenter(bool set); // inline
     void switchToNextView(); // inline
+    void resetVehicle(const irr::core::vector3df& newPos); // inline
 
     float getDistance() const; // inline
     void resetDistance(); // inline
@@ -221,6 +222,15 @@ inline void Player::switchToNextView()
 {
     SWITCH_TO_NEXT_VIEW(viewNum);
     recenterView = true;
+}
+
+inline void Player::resetVehicle(const irr::core::vector3df& newPos)
+{
+    if (vehicle)
+    {
+        vehicle->reset(newPos);
+        recenterView = true;
+    }
 }
 
 inline float Player::getDistance() const

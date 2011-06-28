@@ -513,13 +513,10 @@ void EventReceiver::checkEvents()
 
         if (IS_PRESSED(RESET_VEHICLE))
         {
-            if (Player::getInstance()->getVehicle())
-            {
-                Player::getInstance()->getVehicle()->reset(irr::core::vector3df(
+            Player::getInstance()->resetVehicle(irr::core::vector3df(
                     TheGame::getInstance()->getCamera()->getPosition().X,
                     TheEarth::getInstance()->getHeight(TheGame::getInstance()->getCamera()->getPosition())+2.5f,
                     TheGame::getInstance()->getCamera()->getPosition().Z));
-            }
         }
 
         if (IS_PRESSED(SWITCH_INPUT))

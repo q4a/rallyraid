@@ -287,9 +287,12 @@ void MenuPageMain::refresh()
 
     const VehicleTypeManager::vehicleTypeMap_t& vehicleTypeMap = VehicleTypeManager::getInstance()->getVehicleTypeMap();
     i = 0;
+    /*
     for (VehicleTypeManager::vehicleTypeMap_t::const_iterator vit = vehicleTypeMap.begin();
          vit != vehicleTypeMap.end();
          vit++, i++)
+    */
+    foreach(vit, VehicleTypeManager::getInstance()->getVehicleTypeMap(), VehicleTypeManager::vehicleTypeMap_t)
     {
         irr::core::stringw str;
         
@@ -304,6 +307,7 @@ void MenuPageMain::refresh()
         {
             selectedVehicleType = vit->second;
         }
+        i++;
     }
 }
 
