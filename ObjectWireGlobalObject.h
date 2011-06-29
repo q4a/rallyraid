@@ -20,6 +20,8 @@ public:
 
     void setVisible(bool p_visible);
     bool getVisible() {return visible;}
+    void setSoftVisible(bool softVisible); 
+    bool getSoftVisible(); // inline
 
     ObjectPool* getObjectPool() {return objectPool;}
     const irr::core::vector3df& getPos() {return apos;}
@@ -37,9 +39,15 @@ private:
     irr::core::vector3df    rot;
     irr::core::vector3df    scale;
     bool                    visible;
+    bool                    softVisible;
     OffsetObject*           offsetObject;
     
     friend class ObjectWire;
 };
+
+inline bool ObjectWireGlobalObject::getSoftVisible()
+{
+    return softVisible;
+}
 
 #endif // OBJECTWIREGLOBALOBJECT_H

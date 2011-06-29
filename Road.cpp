@@ -347,21 +347,33 @@ void Road::editorRender(bool editorRoad)
 {
     irr::video::IVideoDriver* driver = TheGame::getInstance()->getDriver();
 
+    unsigned int i = 0;
+    const unsigned int lastIndex = roadPointVector.size() - 1;
+
     for (roadPointVector_t::iterator it = roadPointVector.begin();
          it != roadPointVector.end();
          it++)
     {
-        irr::core::vector3df renderPos = irr::core::vector3df((float)(it->p.X - (double)OffsetManager::getInstance()->getOffset().X),
-            (float)(it->p.Y - (double)OffsetManager::getInstance()->getOffset().Y),
-            (float)(it->p.Z - (double)OffsetManager::getInstance()->getOffset().Z));
+        if (i == 0 || i == lastIndex || (i % 10) == 0)
+        {
+            irr::core::vector3df renderPos = irr::core::vector3df((float)(it->p.X - (double)OffsetManager::getInstance()->getOffset().X),
+                (float)(it->p.Y - (double)OffsetManager::getInstance()->getOffset().Y),
+                (float)(it->p.Z - (double)OffsetManager::getInstance()->getOffset().Z));
 
-        irr::core::vector3df min = renderPos;
-        irr::core::vector3df max = renderPos;
-        irr::video::SColor color(255, 0, 0, 255);
-        max.Y += 8.f;
+            irr::core::vector3df min = renderPos;
+            irr::core::vector3df max = renderPos;
+            irr::video::SColor color(255, 0, 0, 255);
+            max.Y += 8.f;
 
-        if (editorRoad) color.setRed(255);
+            if (editorRoad) color.setRed(255);
+            if (i == lastIndex)
+            {
+                color.setRed(255);
+                color.setBlue(0);
+            }
 
-        driver->draw3DLine(min, max, color);
+            driver->draw3DLine(min, max, color);
+        }
+        i++;
     }
 }

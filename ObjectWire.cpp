@@ -7,6 +7,7 @@
 #include "ObjectWireGlobalObject.h"
 #include "Settings.h"
 #include "TheEarth.h"
+#include "TheGame.h"
 #include "Terrain_defs.h"
 #include "stdafx.h"
 #include <assert.h>
@@ -16,11 +17,19 @@
 
 
 ObjectWireTile::ObjectWireTile(const irr::core::vector2df& apos, const irr::core::vector2di& rpos)
-    : apos(apos),
-        rpos(rpos),
-        objectList()
+    : irr::scene::ISceneNode(0, TheGame::getInstance()->getSmgr(), -1, irr::core::vector3df(apos.X, 0.f, apos.Y)),
+      apos(apos),
+      rpos(rpos),
+      bbox(),
+      offsetObject(0),
+      objectList()
 {
     //printf("ObjectWireTile::ObjectWireTile()\n");
+
+    offsetObject = new OffsetObject(this);
+    offsetObject->setUpdateCB(this);
+    offsetObject->addToManager();
+
     const unsigned int objectWireNum = Settings::getInstance()->objectWireNum;
     const unsigned int objectWireSize = Settings::getInstance()->objectWireSize;
     const unsigned int objectDensity = Settings::getInstance()->objectDensity;
@@ -109,6 +118,10 @@ ObjectWireTile::ObjectWireTile(const irr::core::vector2df& apos, const irr::core
     
 ObjectWireTile::~ObjectWireTile()
 {
+    offsetObject->removeFromManager();
+    delete offsetObject;
+    offsetObject = 0;
+
     for (std::list<OffsetObject*>::iterator it = objectList.begin();
             it != objectList.end();
             it++)
@@ -118,6 +131,29 @@ ObjectWireTile::~ObjectWireTile()
     objectList.clear();
 }
 
+void ObjectWireTile::handleUpdatePos(bool phys)
+{
+    const float objectWireSize = (float)Settings::getInstance()->objectWireSize;
+    bbox.MinEdge = getPosition();
+    bbox.MaxEdge = getPosition() + irr::core::vector3df(objectWireSize, 10000.f, objectWireSize);
+}
+
+void ObjectWireTile::setVisible(bool visible)
+{
+    if (this->IsVisible == visible) return;
+
+    this->IsVisible = visible;
+
+    for (std::list<OffsetObject*>::iterator it = objectList.begin();
+            it != objectList.end();
+            it++)
+    {
+        if ((*it)->getNode())
+        {
+            (*it)->getNode()->setVisible(visible);
+        }
+    }
+}
 
 
 ObjectWire* ObjectWire::objectWire = 0;
@@ -225,6 +261,8 @@ bool ObjectWire::update(const irr::core::vector3df& newPos, bool force)
     const unsigned int objectWireNum = Settings::getInstance()->objectWireNum;
     const unsigned int objectWireSize = Settings::getInstance()->objectWireSize;
     assert(objectWireNum);
+
+    bool ret = false;
     
     irr::core::vector2di newWireCenter = irr::core::vector2di((int)newPos.X/(int)objectWireSize, (int)newPos.Z/(int)objectWireSize);
     
@@ -237,24 +275,25 @@ bool ObjectWire::update(const irr::core::vector3df& newPos, bool force)
         memset(newTiles, 0, objectWireNum*objectWireNum*sizeof(ObjectWireTile*));
         
         // search for overlap in old tiles, if no overlap delete
-        for (unsigned int x = 0; x < objectWireNum; x++)
+        for (unsigned int y = 0, fy = 0; y < objectWireNum; y++, fy+=objectWireNum)
         {
-            for (unsigned int y = 0; y < objectWireNum; y++)
+            for (unsigned int x = 0; x < objectWireNum; x++)
             {
                 unsigned int newX = x - offset.X;
                 unsigned int newY = y + offset.Y;
-                if (newX < objectWireNum && newY < objectWireNum && tiles[x + objectWireNum*y])
+                unsigned int oldTileNum = x + fy;
+                if (newX < objectWireNum && newY < objectWireNum && tiles[oldTileNum/*x + objectWireNum*y*/])
                 {
                     // overlap
-                    newTiles[newX + objectWireNum*newY] = tiles[x + objectWireNum*y];
+                    newTiles[newX + objectWireNum*newY] = tiles[oldTileNum/*x + objectWireNum*y*/];
                     newTiles[newX + objectWireNum*newY]->rpos = irr::core::vector2di(newX, newY);
                 }
                 else
                 {
-                    if (tiles[x + objectWireNum*y])
+                    if (tiles[oldTileNum/*x + objectWireNum*y*/])
                     {
-                        delete tiles[x + objectWireNum*y];
-                        tiles[x + objectWireNum*y] = 0;
+                        delete tiles[oldTileNum/*x + objectWireNum*y*/];
+                        tiles[oldTileNum/*x + objectWireNum*y*/] = 0;
                         
                         // check globals
                         globalObjectWire_t::const_iterator it = globalObjectWire.find((lastWireCenter.X-(int)(objectWireNum/2)+(int)x) +
@@ -278,13 +317,14 @@ bool ObjectWire::update(const irr::core::vector3df& newPos, bool force)
         lastWireCenter = newWireCenter;
         
         // search for non-filed newTiles, create new
-        for (unsigned int x = 0; x < objectWireNum; x++)
+        for (unsigned int y = 0, fy = 0; y < objectWireNum; y++, fy += objectWireNum)
         {
-            for (unsigned int y = 0; y < objectWireNum; y++)
+            for (unsigned int x = 0; x < objectWireNum; x++)
             {
-                if (tiles[x + objectWireNum*y] == 0)
+                unsigned int tileNum = x + fy;
+                if (tiles[tileNum/*x + objectWireNum*y*/] == 0)
                 {
-                    tiles[x + objectWireNum*y] = new ObjectWireTile(
+                    tiles[tileNum/*x + objectWireNum*y*/] = new ObjectWireTile(
                         irr::core::vector2df(
                             (float)((lastWireCenter.X-(int)(objectWireNum/2)+(int)x)*(int)objectWireSize),
                             (float)((lastWireCenter.Y-1+(int)(objectWireNum/2)-(int)y)*(int)objectWireSize)),
@@ -308,9 +348,55 @@ bool ObjectWire::update(const irr::core::vector3df& newPos, bool force)
                 }
             }
         }
-        return true;
+        ret = true;
     }
-    return false;
+
+    const irr::core::aabbox3d<irr::f32>& cbbox = TheGame::getInstance()->getCamera()->getViewFrustum()->getBoundingBox();
+    for (unsigned int y = 0, fy = 0; y < objectWireNum; y++, fy += objectWireNum)
+    {
+        for (unsigned int x = 0; x < objectWireNum; x++)
+        {
+            unsigned int tileNum = x + fy;
+            
+            if (cbbox.intersectsWithBox(tiles[tileNum]->getBoundingBox()))
+            {
+                if (!tiles[tileNum]->isVisible())
+                {
+                    tiles[tileNum]->setVisible(true);
+                    globalObjectWire_t::const_iterator it = globalObjectWire.find((lastWireCenter.X-(int)(objectWireNum/2)+(int)x) +
+                                           (TheEarth::getInstance()->getSizeX() * (lastWireCenter.Y+(int)(objectWireNum/2)-(int)y)));
+                    if (it != globalObjectWire.end())
+                    {
+                        for (globalObjectSet_t::const_iterator oit = it->second.begin();
+                             oit != it->second.end();
+                             oit++)
+                        {
+                            (*oit)->setSoftVisible(true);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                if (tiles[tileNum]->isVisible())
+                {
+                    tiles[tileNum]->setVisible(false);
+                    globalObjectWire_t::const_iterator it = globalObjectWire.find((lastWireCenter.X-(int)(objectWireNum/2)+(int)x) +
+                                           (TheEarth::getInstance()->getSizeX() * (lastWireCenter.Y+(int)(objectWireNum/2)-(int)y)));
+                    if (it != globalObjectWire.end())
+                    {
+                        for (globalObjectSet_t::const_iterator oit = it->second.begin();
+                             oit != it->second.end();
+                             oit++)
+                        {
+                            (*oit)->setSoftVisible(false);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return ret;
 }
 
 ObjectWireGlobalObject* ObjectWire::addGlobalObject(const std::string& objectPoolName,

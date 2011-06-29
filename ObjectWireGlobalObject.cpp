@@ -16,6 +16,7 @@ ObjectWireGlobalObject::ObjectWireGlobalObject(ObjectPool* objectPool,
       rot(rot),
       scale(scale),
       visible(false),
+      softVisible(false),
       offsetObject(0)
 {
 }
@@ -44,6 +45,7 @@ void ObjectWireGlobalObject::setVisible(bool p_visible)
                 if (offsetObject)
                 {
                     offsetObject->getNode()->setRotation(rot);
+                    softVisible = true;
                 }
             }
         }
@@ -54,10 +56,19 @@ void ObjectWireGlobalObject::setVisible(bool p_visible)
         {
             objectPool->putObject(offsetObject);
             offsetObject = 0;
+            softVisible = false;
         }
     }
     
     updateVisible();
+}
+
+void ObjectWireGlobalObject::setSoftVisible(bool softVisible)
+{
+    if (softVisible == this->softVisible || offsetObject == 0 || offsetObject->getNode() == 0) return;
+
+    this->softVisible = softVisible;
+    offsetObject->getNode()->setVisible(softVisible);
 }
 
 void ObjectWireGlobalObject::editorRender(bool last)

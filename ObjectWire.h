@@ -7,19 +7,27 @@
 #include <set>
 #include <string>
 #include <list>
+#include "OffsetObject.h"
 
-class OffsetObject;
 class ObjectWireGlobalObject;
 
-class ObjectWireTile
+class ObjectWireTile : public OffsetObjectUpdateCB, public irr::scene::ISceneNode
 {
 private:
     ObjectWireTile(const irr::core::vector2df& apos, const irr::core::vector2di& rpos);
     ~ObjectWireTile();
 
+    virtual void render() {}
+    virtual const irr::core::aabbox3d<irr::f32>& getBoundingBox() const; // inline
+    virtual void handleUpdatePos(bool phys);
+
+    virtual void setVisible(bool visible);
+
 private:
     irr::core::vector2df        apos;
     irr::core::vector2di        rpos;
+    irr::core::aabbox3d<irr::f32>   bbox;
+    OffsetObject*               offsetObject;
     std::list<OffsetObject*>    objectList;
 
 
@@ -67,5 +75,10 @@ private:
 
     friend class MenuPageEditor;
 };
+
+inline const irr::core::aabbox3d<irr::f32>& ObjectWireTile::getBoundingBox() const
+{
+    return bbox;
+}
 
 #endif // OBJECTWIRE_H
