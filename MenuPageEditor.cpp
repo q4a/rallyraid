@@ -257,6 +257,7 @@ MenuPageEditor::MenuPageEditor()
     tableObjectWireTiles->addColumn(L"X");
     tableObjectWireTiles->addColumn(L"Y");
     tableObjectWireTiles->addColumn(L"objects");
+    tableObjectWireTiles->addColumn(L"visible");
 
     // ----------------------------
     // ObjectPool tab
@@ -926,6 +927,13 @@ void MenuPageEditor::refreshObjectWireTiles()
         str = L"";
         str += ObjectWire::getInstance()->tiles[i]->objectList.size();
         tableObjectWireTiles->setCellText(i, 3, str.c_str());
+
+        str = L"false";
+        if (ObjectWire::getInstance()->tiles[i]->isVisible())
+        {
+            str = L"true";
+        }
+        tableObjectWireTiles->setCellText(i, 4, str.c_str());
 
         i++;
     }

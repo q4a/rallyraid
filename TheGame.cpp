@@ -451,6 +451,8 @@ void TheGame::loop()
                     str += ((int)offsetManager->getOffset().X+(int)camera->getPosition().X)/TILE_SIZE;
                     str += L", ";
                     str += abs((int)offsetManager->getOffset().Z+(int)camera->getPosition().Z)/TILE_SIZE;
+                    str += L"        Polygon count: ";
+                    str += driver->getPrimitiveCountDrawn();
                     if (TheEarth::getInstance()->threadIsRunning())
                     {
                         str += L"       thread is running";
@@ -565,8 +567,7 @@ void TheGame::reset(const irr::core::vector3df& apos, const irr::core::vector3df
     camera->setPosition(apos);
     camera->setTarget(camera->getPosition()+dir);
 
-    // cameraOffsetObject is deleted by the OffsetManager::reset()
-    cameraOffsetObject = new OffsetObject(camera, true);
+    cameraOffsetObject = new OffsetObject(camera/*, true*/);
     cameraOffsetObject->addToManager();
     offsetManager->update(camera->getPosition());
     cameraOffsetObject->setUpdateCB(this);

@@ -351,7 +351,20 @@ bool ObjectWire::update(const irr::core::vector3df& newPos, bool force)
         ret = true;
     }
 
-    const irr::core::aabbox3d<irr::f32>& cbbox = TheGame::getInstance()->getCamera()->getViewFrustum()->getBoundingBox();
+    //return ret;
+
+    const float newDistance = (float)(objectWireNum*objectWireSize) * 0.75f;
+    const float rate = newDistance / TheGame::getInstance()->getCamera()->getFarValue();
+    const irr::core::vector3df& cpos = TheGame::getInstance()->getCamera()->getPosition();
+    irr::core::aabbox3d<irr::f32> cbbox = TheGame::getInstance()->getCamera()->getViewFrustum()->getBoundingBox();
+
+    // normalize
+    cbbox.MinEdge = ((cbbox.MinEdge - cpos) * rate) + cpos;
+    cbbox.MaxEdge = ((cbbox.MaxEdge - cpos) * rate) + cpos;
+    //printf("%f, %f, %f - %f, %f, %f\n",
+    //    cbbox.MinEdge.X, cbbox.MinEdge.Y, cbbox.MinEdge.Z,
+    //    cbbox.MaxEdge.X, cbbox.MaxEdge.Y, cbbox.MaxEdge.Z);
+
     for (unsigned int y = 0, fy = 0; y < objectWireNum; y++, fy += objectWireNum)
     {
         for (unsigned int x = 0; x < objectWireNum; x++)
