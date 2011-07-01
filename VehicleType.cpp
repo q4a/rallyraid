@@ -28,6 +28,10 @@ VehicleTypeTyre::~VehicleTypeTyre()
 {
 }
 
+float VehicleType::maxMaxBrakeForce = 0.f;
+float VehicleType::maxMaxSpeed = 0.f;
+float VehicleType::maxMaxTorque = 0.f;
+float VehicleType::maxMaxSteerAngle = 0.f;
 
 VehicleType::VehicleType(const std::string& vehicleTypeName, const std::string& vehicleTypeFilename, bool& ret)
     : vehicleTypeName(vehicleTypeName),
@@ -351,6 +355,10 @@ bool VehicleType::read(const std::string& vehicleTypeFilename)
             }
         }
     }
+    if (maxSpeed > maxMaxSpeed) maxMaxSpeed = maxSpeed;
+    if (maxBrakeForce > maxMaxBrakeForce) maxMaxBrakeForce = maxBrakeForce;
+    if (maxTorque > maxMaxTorque) maxMaxTorque = maxTorque;
+    if (maxSteerAngle > maxMaxSteerAngle) maxMaxSteerAngle = maxSteerAngle;
     return true;
 }
 

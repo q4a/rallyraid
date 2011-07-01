@@ -331,25 +331,25 @@ void MenuPageMain::refreshVehicleData(VehicleType* vehicleType)
 
     str += L"\n\nSpeed: ";
     if ((int)vehicleType->maxSpeed)
-        str += ((int)vehicleType->maxSpeed*10) / 250;
+        str += (int)((vehicleType->maxSpeed*10) / VehicleType::maxMaxSpeed);
     else
         str += L"0";
 
     str += L" / 10\nBrake: ";
     if ((int)vehicleType->maxBrakeForce)
-        str += ((int)vehicleType->maxBrakeForce*10) / 3000;
+        str += (int)((vehicleType->maxBrakeForce*10) / VehicleType::maxMaxBrakeForce);
     else
         str += L"0";
 
     str += L" / 10\nAccelerate: ";
     if ((int)vehicleType->maxTorque)
-        str += ((int)vehicleType->maxTorque*10) / 14000;
+        str += (int)((vehicleType->maxTorque*10) / VehicleType::maxMaxTorque);
     else
         str += L"0";
 
     str += L" / 10\nSteering: ";
     if ((int)vehicleType->maxSteerAngle)
-        str += ((int)vehicleType->maxSteerAngle*10) / 36;
+        str += (int)((vehicleType->maxSteerAngle*10) / VehicleType::maxMaxSteerAngle);
     else
         str += L"0";
     
