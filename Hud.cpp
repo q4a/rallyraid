@@ -120,6 +120,7 @@ Hud::Hud()
     tripMasterQuad->getMaterial().setFlag(irr::video::EMF_ANTI_ALIASING, false);
     tripMasterQuad->getMaterial().setFlag(irr::video::EMF_BILINEAR_FILTER, false);
     tripMasterQuad->getMaterial().setFlag(irr::video::EMF_TRILINEAR_FILTER, false);
+    tripMasterQuad->getMaterial().setFlag(irr::video::EMF_BLEND_OPERATION, true);
     tripMasterQuad->getMaterial().UseMipMaps = false;
     tripMasterQuad->getMaterial().setTexture(0, TheGame::getInstance()->getDriver()->getTexture("data/hud/tripmaster.png"));
 
@@ -133,6 +134,7 @@ Hud::Hud()
     compassQuad->getMaterial().setFlag(irr::video::EMF_ANTI_ALIASING, false);
     compassQuad->getMaterial().setFlag(irr::video::EMF_BILINEAR_FILTER, false);
     compassQuad->getMaterial().setFlag(irr::video::EMF_TRILINEAR_FILTER, false);
+    compassQuad->getMaterial().setFlag(irr::video::EMF_BLEND_OPERATION, true);
     compassQuad->getMaterial().UseMipMaps = false;
     compassQuad->getMaterial().setTexture(0, TheGame::getInstance()->getDriver()->getTexture("data/hud/compass.png"));
 
@@ -153,6 +155,7 @@ Hud::Hud()
     compassWPQuad->getMaterial().setFlag(irr::video::EMF_ANTI_ALIASING, false);
     compassWPQuad->getMaterial().setFlag(irr::video::EMF_BILINEAR_FILTER, false);
     compassWPQuad->getMaterial().setFlag(irr::video::EMF_TRILINEAR_FILTER, false);
+    compassWPQuad->getMaterial().setFlag(irr::video::EMF_BLEND_OPERATION, true);
     compassWPQuad->getMaterial().UseMipMaps = false;
     compassWPQuad->getMaterial().setTexture(0, TheGame::getInstance()->getDriver()->getTexture("data/hud/compass_wp.png"));
 

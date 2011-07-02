@@ -1,4 +1,5 @@
-#include "common.cg"
+#include "data/materials/sm20/common.cg"
+
 
 void main_v(float4 position : POSITION,
             float3 normal   : NORMAL,
@@ -16,7 +17,7 @@ void main_v(float4 position : POSITION,
 //            uniform float4x4 mTextureMatrix
 )
 {
-  oPosition = mul(mWorldViewProj, position);
+  oPosition = mul(position, mWorldViewProj);
   //oPosition = position;
   oUv = Uv;
   //objPos = position.xyz;

@@ -1,9 +1,9 @@
 
-float4 calc_multip(float4 color, float m)
+float calc_multip(float color, float m)
 {
-    float3 ret = float3(1.0, 1.0, 1.0) - color.xyz;
+    float ret = 1.0 - color;
     ret = ret * m;
-    return float4(float3(1.0, 1.0, 1.0)-ret, color.a);
+    return (1.0-ret);
 }
 
 

@@ -65,10 +65,10 @@ void OffsetManager::removeObject(OffsetObject* object)
 }
 
 //#warning use proper value for the offset unit
-#define OFFSET_UNIT 4096
+#define OFFSET_UNIT 4096.f
 bool OffsetManager::update(const irr::core::vector3df& newPos, bool force)
 {
-    const irr::core::vector3di new_((irr::s32)(newPos.X/OFFSET_UNIT), 0, (irr::s32)(newPos.Z/OFFSET_UNIT));
+    const irr::core::vector3di new_((irr::s32)(newPos.X/OFFSET_UNIT), 0, (irr::s32)(newPos.Z/OFFSET_UNIT)-1);
     
     if (last.X != new_.X || last.Z != new_.Z || force)
     {

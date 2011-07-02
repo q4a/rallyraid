@@ -1,4 +1,5 @@
-#include "common.cg"
+#include "data/materials/sm20/common.cg"
+
 
 void main_v(float4 vPosition        : POSITION,
             float3 vNormal          : NORMAL,
@@ -20,7 +21,7 @@ void main_v(float4 vPosition        : POSITION,
             uniform float3   mLightPos
 )
 {
-    oPosition = mul(mWorldViewProj, vPosition);
+    oPosition = mul(vPosition, mWorldViewProj);
     oUv0 = Uv0;
     oUv1 = Uv1;
     oNormal = vNormal;
@@ -31,7 +32,7 @@ void main_v(float4 vPosition        : POSITION,
 // no need for non d3d calculate shadow
 //    oTexCoordProj.xy = oTexCoordProj.xy / oTexCoordProj.w + float2(0.5, 0.5);
 
-    float3 normal = mul(float4(vNormal,0.0), mInvWorld).xyz;
+    float3 normal = mul(mInvWorld, float4(vNormal,0.0)).xyz;
 
     // renormalize normal 
     normal = normalize(normal);
@@ -64,14 +65,15 @@ void main_f(float4 position         : POSITION,
     float4 col0 = tex2D(tex0, Uv0);  // sample color map
     //float2 Uv1_ = Uv0*128.0; // frac(Uv0*128.0);
     float4 col1 = tex2D(tex1, Uv1);  // detailmap
-    float4 multip = calc_multip(color, 0.35);
+    float multip = calc_multip(color, 0.6);
 
     float4 col = ((col0) + ((col1-0.5)*0.5)) * 1.0;
     //float4 col = col0 * multip;
-    col *= multip;
+    //col *= multip;
     //color + multip;
 
-    oColor = col;
+    oColor.xyz = col.xyz * (multip * 1.5);
+    oColor.a = col.a;
     // * 1.5;
     //oColor = float4(1.0, 1.0, 1.0, 1.0);
 }

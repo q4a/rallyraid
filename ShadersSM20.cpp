@@ -1,15 +1,11 @@
 
 #include <irrlicht.h>
-#include <Cg/cg.h>
 #include <set>
 #include <assert.h>
 
 #include "ShadersSM20.h"
-#include "IrrCg.h"
 #include "TheGame.h"
 #include "ConfigFile.h"
-
-using namespace IrrCg;
 
 /*
 #define ADD_TEXTURE_MATRIX_V \
@@ -24,55 +20,58 @@ using namespace IrrCg;
         }
 */
 #define ADD_WORLD_VIEW_PROJ_V \
-    WorldViewProjection = cgGetNamedParameter(Vertex, "mWorldViewProj"); \
     irr::core::matrix4 cworldViewProj; \
     cworldViewProj = driver->getTransform(irr::video::ETS_PROJECTION); \
     cworldViewProj *= driver->getTransform(irr::video::ETS_VIEW); \
     cworldViewProj *= driver->getTransform(irr::video::ETS_WORLD); \
-    services->setMatrix(WorldViewProjection,ICGT_MATRIX_IDENTITY,cworldViewProj);
+    services->setVertexShaderConstant("mWorldViewProj",cworldViewProj.pointer(), 16);
 
 #define ADD_WORLD_V \
-    World = cgGetNamedParameter(Vertex, "mWorld"); \
     irr::core::matrix4 cworld; \
     cworld = driver->getTransform(irr::video::ETS_WORLD); \
-    services->setMatrix(World,ICGT_MATRIX_IDENTITY,cworld); 
+    services->setVertexShaderConstant("mWorld",cworld.pointer(), 16);
+
+#define ADD_TRANS_WORLD_V \
+    irr::core::matrix4 ctransWorld; \
+    ctransWorld = driver->getTransform(irr::video::ETS_WORLD); \
+    ctransWorld = ctransWorld.getTransposed(); \
+    services->setVertexShaderConstant("mTransWorld",ctransWorld.pointer(), 16);
 
 #define ADD_INV_WORLD_V \
-    InvWorld = cgGetNamedParameter(Vertex, "mInvWorld"); \
     irr::core::matrix4 cinvWorld = driver->getTransform(irr::video::ETS_WORLD); \
     cinvWorld.makeInverse(); \
-    services->setMatrix(InvWorld,ICGT_MATRIX_IDENTITY,cinvWorld);
+    services->setVertexShaderConstant("mInvWorld",cinvWorld.pointer(), 16);
 
 #define ADD_LIGHT_COL_V \
-    lightColor = cgGetNamedParameter(Vertex, "mLightColor"); \
-    services->setParameter3f(lightColor, 0.98f, 0.98f, 0.98f);
+    irr::video::SColorf col(0.98f, 0.98f, 0.98f); \
+    services->setVertexShaderConstant("mLightColor",&col.r, 4);
 //    irr::video::SColorf col = m_lnode->getLightData().DiffuseColor; \
 //    services->setParameter3f(lightColor, col.r, col.g, col.b);
 
 #define ADD_LIGHT_POS_V \
-    lightPosition = cgGetNamedParameter(Vertex, "mLightPos"); \
-    services->setParameter3f(lightPosition, 0.01f, -1.0f, 0.03f);
+    irr::core::vector3df pos(0.01f, -1.0f, 0.03f); \
+    services->setVertexShaderConstant("mLightPos",&pos.X, 3);
 //    irr::core::vector3df pos = m_lnode->getLightData().Position; \
 //    services->setParameter3f(lightPosition, pos.X, pos.Y, pos.Z);
 
 #define ADD_EYEPOSITION_SHINE_V \
-        eyePosition = cgGetNamedParameter(Vertex, "eyePosition"); \
-        if (eyePosition) \
-        { \
-            irr::core::vector3df CameraPosition = device->getSceneManager()->getActiveCamera()->getPosition(); \
-            services->setParameter3f(eyePosition, CameraPosition.X, CameraPosition.Y, CameraPosition.Z); \
-            shininess = cgGetNamedParameter(Vertex, "shininess"); \
-            if (shininess) \
-                services->setParameter1f(shininess, 0.7f); \
-        }
+        irr::core::vector3df cameraPos = device->getSceneManager()->getActiveCamera()->getPosition(); \
+        services->setVertexShaderConstant("eyePosition",&cameraPos.X, 3); \
+        float shininess = 0.7f; \
+        services->setVertexShaderConstant("shininess",&shininess, 1);
 
 #define ADD_PARAM_F \
-        param = cgGetNamedParameter(Pixel, "param"); \
-        if (param) \
-           services->setParameter1f(param, Material.MaterialTypeParam);
+        services->setPixelShaderConstant("param", &material.MaterialTypeParam, 1);
 
+#define ADD_TEX0 \
+        float tex0 = 0.f; \
+        services->setVertexShaderConstant("tex0", &tex0, 1);
 
-class SM20_ShaderCallback : public ICgShaderConstantSetCallBack
+#define ADD_TEX1 \
+        float tex1 = 1.f; \
+        services->setVertexShaderConstant("tex1", &tex1, 1);
+
+class SM20_ShaderCallback : public irr::video::IShaderConstantSetCallBack
 {
 public:
     SM20_ShaderCallback()
@@ -81,7 +80,7 @@ public:
         callbacks.insert(this);
     }
 
-    virtual void OnSetConstants(ICgServices* services,const CGeffect& Effect,const CGpass& Pass,const CGprogram& Vertex,const CGprogram& Pixel,const irr::video::SMaterial& Material)
+    virtual void OnSetConstants(irr::video::IMaterialRendererServices* services, int userData)
     {
         //assert(0);
     }
@@ -114,13 +113,11 @@ public:
 class SM20_ShaderCallback_terrain : public SM20_ShaderCallback
 {
 public:
-    CGparameter WorldViewProjection, World, InvWorld, ptextureMatrix, lightColor, lightPosition;
-public:
     SM20_ShaderCallback_terrain()
     {
     }
 
-    virtual void OnSetConstants(ICgServices* services,const CGeffect& Effect,const CGpass& Pass,const CGprogram& Vertex,const CGprogram& Pixel,const irr::video::SMaterial& Material)
+    virtual void OnSetConstants(irr::video::IMaterialRendererServices* services, int userData)
     {
         ADD_WORLD_V
         ADD_WORLD_VIEW_PROJ_V
@@ -128,6 +125,8 @@ public:
         //ADD_TEXTURE_MATRIX_V
         ADD_LIGHT_COL_V
         ADD_LIGHT_POS_V
+        //ADD_TEX0
+        //ADD_TEX1
     }
 
 };
@@ -135,13 +134,11 @@ public:
 class SM20_ShaderCallback_road : public SM20_ShaderCallback
 {
 public:
-    CGparameter WorldViewProjection, World, InvWorld, ptextureMatrix, lightColor, lightPosition, eyePosition, shininess;
-public:
     SM20_ShaderCallback_road()
     {
     }
 
-    virtual void OnSetConstants(ICgServices* services,const CGeffect& Effect,const CGpass& Pass,const CGprogram& Vertex,const CGprogram& Pixel,const irr::video::SMaterial& Material)
+    virtual void OnSetConstants(irr::video::IMaterialRendererServices* services, int userData)
     {
         ADD_WORLD_V
         ADD_WORLD_VIEW_PROJ_V
@@ -150,6 +147,7 @@ public:
         ADD_LIGHT_COL_V
         ADD_LIGHT_POS_V
         //ADD_EYEPOSITION_SHINE_V
+        //ADD_TEX0
     }
 
 };
@@ -157,13 +155,11 @@ public:
 class SM20_ShaderCallback_road_t : public SM20_ShaderCallback
 {
 public:
-    CGparameter WorldViewProjection, World, param;
-public:
     SM20_ShaderCallback_road_t()
     {
     }
 
-    virtual void OnSetConstants(ICgServices* services,const CGeffect& Effect,const CGpass& Pass,const CGprogram& Vertex,const CGprogram& Pixel,const irr::video::SMaterial& Material)
+    virtual void OnSetConstants(irr::video::IMaterialRendererServices* services, int userData)
     {
         ADD_WORLD_V
         ADD_WORLD_VIEW_PROJ_V
@@ -172,7 +168,29 @@ public:
         //ADD_LIGHT_COL_V
         //ADD_LIGHT_POS_V
         //ADD_EYEPOSITION_SHINE_V
-        ADD_PARAM_F
+        //ADD_TEX0
+        //ADD_PARAM_F
+    }
+
+};
+
+class SM20_ShaderCallback_vehicle : public SM20_ShaderCallback
+{
+public:
+    SM20_ShaderCallback_vehicle()
+    {
+    }
+
+    virtual void OnSetConstants(irr::video::IMaterialRendererServices* services, int userData)
+    {
+        ADD_WORLD_V
+        ADD_WORLD_VIEW_PROJ_V
+        ADD_INV_WORLD_V
+        //ADD_TEXTURE_MATRIX_V
+        ADD_LIGHT_COL_V
+        ADD_LIGHT_POS_V
+        ADD_EYEPOSITION_SHINE_V
+        //ADD_TEX0
     }
 
 };
@@ -209,7 +227,11 @@ void ShadersSM20::loadSM20Materials()
     const irr::c8* ogl_ps_version = "arbfp1";
     const irr::c8* d3d_vs_version = "vs_2_0";
     const irr::c8* d3d_ps_version = "ps_2_0";
+    const irr::video::E_VERTEX_SHADER_TYPE vs_version = irr::video::EVST_VS_2_0;
+    const irr::video::E_PIXEL_SHADER_TYPE  ps_version = irr::video::EPST_PS_2_0;
     bool doAssert = false;
+    bool doSleep = false;
+    irr::video::E_GPU_SHADING_LANGUAGE shadingLanguage = irr::video::EGSL_CG;
 
     ConfigFile cf;
     cf.load("data/materials/sm20.cfg");
@@ -230,6 +252,11 @@ void ShadersSM20::loadSM20Materials()
             doAssert = true;
             continue;
         }
+        if (materialName == "sleep")
+        {
+            doSleep = true;
+            continue;
+        }
         for (ConfigFile::SettingsMultiMap::iterator i = settings->begin(); i != settings->end(); ++i)
         {
             keyName = i->first;
@@ -246,46 +273,77 @@ void ShadersSM20::loadSM20Materials()
         {
             irr::video::E_MATERIAL_TYPE baseMaterial = irr::video::EMT_SOLID;
             materialMap_t::const_iterator it = materialMap.find(materialName);
+            printf("material: %s\n", materialName.c_str());
             if (it != materialMap.end())
             {
+                printf("found\n");
                 baseMaterial = it->second;
             }
             if (materialName=="terrain")
             {
                 // use specific shader CB
-                materialMap[materialName] = (irr::video::E_MATERIAL_TYPE)gpu->addCgShaderMaterialFromFiles(CG_SOURCE,
-                    shaderFile.c_str(), "main_v", ogl_vs_version, d3d_vs_version,
-                    shaderFile.c_str(), "main_f", ogl_ps_version, d3d_ps_version,
-                    new SM20_ShaderCallback_terrain(), irr::video::EMT_SOLID/*irr::video::EMT_TRANSPARENT_ALPHA_CHANNEL baseMaterial*/);
+                materialMap[materialName] = (irr::video::E_MATERIAL_TYPE)gpu->addHighLevelShaderMaterialFromFiles(
+                    shaderFile.c_str(), "main_v", vs_version,
+                    shaderFile.c_str(), "main_f", ps_version,
+                    new SM20_ShaderCallback_terrain(), irr::video::EMT_SOLID/*irr::video::EMT_TRANSPARENT_ALPHA_CHANNEL baseMaterial*/, 0, shadingLanguage);
             }
             else if (materialName=="road")
             {
                 // use specific shader CB
-                materialMap[materialName] = (irr::video::E_MATERIAL_TYPE)gpu->addCgShaderMaterialFromFiles(CG_SOURCE,
-                    shaderFile.c_str(), "main_v", ogl_vs_version, d3d_vs_version,
-                    shaderFile.c_str(), "main_f", ogl_ps_version, d3d_ps_version,
-                    new SM20_ShaderCallback_road(), /*irr::video::EMT_SOLIDirr::video::EMT_TRANSPARENT_ALPHA_CHANNEL*/baseMaterial);
+                materialMap[materialName] = (irr::video::E_MATERIAL_TYPE)gpu->addHighLevelShaderMaterialFromFiles(
+                    shaderFile.c_str(), "main_v", vs_version,
+                    shaderFile.c_str(), "main_f", ps_version,
+                    new SM20_ShaderCallback_road(), /*irr::video::EMT_SOLIDirr::video::EMT_TRANSPARENT_ALPHA_CHANNEL*/baseMaterial, 0, shadingLanguage);
             }
             else if (materialName=="road_t")
             {
                 // use specific shader CB
-                materialMap[materialName] = (irr::video::E_MATERIAL_TYPE)gpu->addCgShaderMaterialFromFiles(CG_SOURCE,
-                    shaderFile.c_str(), "main_v", ogl_vs_version, d3d_vs_version,
-                    shaderFile.c_str(), "main_f", ogl_ps_version, d3d_ps_version,
-                    new SM20_ShaderCallback_road_t(), /*irr::video::EMT_SOLIDirr::video::EMT_TRANSPARENT_ALPHA_CHANNEL*/baseMaterial);
+                materialMap[materialName] = (irr::video::E_MATERIAL_TYPE)gpu->addHighLevelShaderMaterialFromFiles(
+                    shaderFile.c_str(), "main_v", vs_version,
+                    shaderFile.c_str(), "main_f", ps_version,
+                    new SM20_ShaderCallback_road_t(), /*irr::video::EMT_SOLIDirr::video::EMT_TRANSPARENT_ALPHA_CHANNEL*/baseMaterial, 0, shadingLanguage);
+            }
+            else if (materialName=="normal")
+            {
+                // use specific shader CB
+                materialMap[materialName] = (irr::video::E_MATERIAL_TYPE)gpu->addHighLevelShaderMaterialFromFiles(
+                    shaderFile.c_str(), "main_v", vs_version,
+                    shaderFile.c_str(), "main_f", ps_version,
+                    new SM20_ShaderCallback_road(), /*irr::video::EMT_SOLIDirr::video::EMT_TRANSPARENT_ALPHA_CHANNEL*/baseMaterial, 0, shadingLanguage);
+            }
+            else if (materialName=="normal_t")
+            {
+                // use specific shader CB
+                materialMap[materialName] = (irr::video::E_MATERIAL_TYPE)gpu->addHighLevelShaderMaterialFromFiles(
+                    shaderFile.c_str(), "main_v", vs_version,
+                    shaderFile.c_str(), "main_f", ps_version,
+                    new SM20_ShaderCallback_road_t(), /*irr::video::EMT_SOLIDirr::video::EMT_TRANSPARENT_ALPHA_CHANNEL*/baseMaterial, 0, shadingLanguage);
+            }
+            else if (materialName=="vehicle")
+            {
+                // use specific shader CB
+                materialMap[materialName] = (irr::video::E_MATERIAL_TYPE)gpu->addHighLevelShaderMaterialFromFiles(
+                    shaderFile.c_str(), "main_v", vs_version,
+                    shaderFile.c_str(), "main_f", ps_version,
+                    new SM20_ShaderCallback_vehicle(), /*irr::video::EMT_SOLIDirr::video::EMT_TRANSPARENT_ALPHA_CHANNEL*/baseMaterial, 0, shadingLanguage);
             }
             else
             {
-                materialMap[materialName] = (irr::video::E_MATERIAL_TYPE)gpu->addCgShaderMaterialFromFiles(CG_SOURCE,
-                    shaderFile.c_str(), "main_v", ogl_vs_version, d3d_vs_version,
-                    shaderFile.c_str(), "main_f", ogl_ps_version, d3d_ps_version,
-                    new SM20_ShaderCallback(), /*irr::video::EMT_SOLIDirr::video::EMT_TRANSPARENT_ALPHA_CHANNEL*/baseMaterial);
+                printf("material: %s, base: %d\n", materialName.c_str(), baseMaterial);
+                materialMap[materialName] = (irr::video::E_MATERIAL_TYPE)gpu->addHighLevelShaderMaterialFromFiles(
+                    shaderFile.c_str(), "main_v", vs_version,
+                    shaderFile.c_str(), "main_f", ps_version,
+                    new SM20_ShaderCallback(), /*irr::video::EMT_SOLIDirr::video::EMT_TRANSPARENT_ALPHA_CHANNEL*/baseMaterial, 0 , shadingLanguage);
             }
         }
     }
     if (doAssert)
     {
         assert(0);
+    }
+    if (doSleep)
+    {
+        TheGame::getInstance()->getDevice()->sleep(30000);
     }
 }
 

@@ -242,6 +242,7 @@ OffsetObject* ObjectPool::createNewInstance()
                 treeNode->getLeafNode()->getMaterial(0).TextureLayer[0].AnisotropicFilter = true;
                 treeNode->getLeafNode()->getMaterial(0).TextureLayer[0].BilinearFilter = false;
                 //treeNode->getLeafNode()->getMaterial(0).MaterialTypeParam = 0.5f;
+                treeNode->getLeafNode()->setMaterialFlag(irr::video::EMF_BLEND_OPERATION, true);
                 
                 treeNode->getLeafNode()->setMaterialTexture(0, texture2);
                 treeNode->getLeafNode()->setMaterialType(material2);
@@ -265,6 +266,7 @@ OffsetObject* ObjectPool::createNewInstance()
             objectNode->setMaterialFlag(irr::video::EMF_LIGHTING, false);
             leaf->setMaterialFlag(irr::video::EMF_LIGHTING, false);
             leaf->setMaterialFlag(irr::video::EMF_TEXTURE_WRAP, true);
+            leaf->setMaterialFlag(irr::video::EMF_BLEND_OPERATION, true);
 
             objectNode->setMaterialTexture(0, texture);
             objectNode->setMaterialType(material);
@@ -282,6 +284,7 @@ OffsetObject* ObjectPool::createNewInstance()
                 objectNode->setMaterialFlag(irr::video::EMF_TEXTURE_WRAP, true);
                 objectNode->getMaterial(0).UseMipMaps = false;
             }
+            objectNode->setMaterialFlag(irr::video::EMF_BLEND_OPERATION, true);
             objectNode->setMaterialTexture(0, texture);
             objectNode->setMaterialTexture(1, texture2);
             break;

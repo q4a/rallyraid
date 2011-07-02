@@ -6,11 +6,6 @@
 #include <map>
 #include <string>
 
-namespace IrrCg
-{
-    class ICgProgrammingServices;
-}
-
 
 class Shaders
 {
@@ -39,12 +34,12 @@ private:
     void loadBaseMaterials();
     
 protected:
-    IrrCg::ICgProgrammingServices*  gpu;
-    unsigned int                    supportedSMVersion;
+    irr::video::IGPUProgrammingServices*    gpu;
+    unsigned int                            supportedSMVersion;
 
 // materials
 public:
-    materialMap_t                   materialMap;
+    materialMap_t                           materialMap;
 
 };
 

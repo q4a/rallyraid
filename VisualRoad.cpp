@@ -242,6 +242,7 @@ void VisualRoad::switchToVisible()
     }
     else
     {
+        roadNode->setMaterialFlag(irr::video::EMF_BLEND_OPERATION, true);
         roadNode->setMaterialType(Shaders::getInstance()->materialMap["road_t"]);
     }
 //////////////////
