@@ -238,12 +238,12 @@ void VisualRoad::switchToVisible()
     roadNode->setMaterialTexture(0, roadType->texture);
     if (roadType->frictionMulti > 0.01f)
     {
-        roadNode->setMaterialType(Shaders::getInstance()->materialMap["road"]);
+        roadNode->setMaterialType(Shaders::getInstance()->materialMap["normal"]);
     }
     else
     {
         roadNode->setMaterialFlag(irr::video::EMF_BLEND_OPERATION, true);
-        roadNode->setMaterialType(Shaders::getInstance()->materialMap["road_t"]);
+        roadNode->setMaterialType(Shaders::getInstance()->materialMap["normal_no_light_t"]);
     }
 //////////////////
 #if 0

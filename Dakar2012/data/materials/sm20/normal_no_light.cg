@@ -47,9 +47,9 @@ struct pixel
 };
 
 pixel main_f(fragment IN,
-             uniform sampler2D tex0 : register(s0),
+             uniform sampler2D tex0 : register(s0)
 //             uniform sampler2D shadowMap : register(s1),
-             uniform float param
+//             uniform float param
 //             uniform float shadowParam,
 //             uniform float shadowRes
 	      )
@@ -60,7 +60,7 @@ pixel main_f(fragment IN,
 //    float4 shadowCoeff = calculate_shadow_ter(IN.texCoordProj, shadowMap, shadowParam, shadowRes, day_multi);
 
 //    col.a = col.a * 0.3;
-    clip(col.a - param);
+//    clip(col.a - param);
 
     OUT.color = col;
 //    add_shadow(OUT.color, shadowCoeff /* shadowCoeff2*/);

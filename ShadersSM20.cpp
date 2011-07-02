@@ -131,10 +131,10 @@ public:
 
 };
 
-class SM20_ShaderCallback_road : public SM20_ShaderCallback
+class SM20_ShaderCallback_normal : public SM20_ShaderCallback
 {
 public:
-    SM20_ShaderCallback_road()
+    SM20_ShaderCallback_normal()
     {
     }
 
@@ -152,10 +152,10 @@ public:
 
 };
 
-class SM20_ShaderCallback_road_t : public SM20_ShaderCallback
+class SM20_ShaderCallback_normal_no_light : public SM20_ShaderCallback
 {
 public:
-    SM20_ShaderCallback_road_t()
+    SM20_ShaderCallback_normal_no_light()
     {
     }
 
@@ -273,10 +273,8 @@ void ShadersSM20::loadSM20Materials()
         {
             irr::video::E_MATERIAL_TYPE baseMaterial = irr::video::EMT_SOLID;
             materialMap_t::const_iterator it = materialMap.find(materialName);
-            printf("material: %s\n", materialName.c_str());
             if (it != materialMap.end())
             {
-                printf("found\n");
                 baseMaterial = it->second;
             }
             if (materialName=="terrain")
@@ -287,37 +285,21 @@ void ShadersSM20::loadSM20Materials()
                     shaderFile.c_str(), "main_f", ps_version,
                     new SM20_ShaderCallback_terrain(), irr::video::EMT_SOLID/*irr::video::EMT_TRANSPARENT_ALPHA_CHANNEL baseMaterial*/, 0, shadingLanguage);
             }
-            else if (materialName=="road")
+            else if (materialName=="normal" || materialName=="normal_t")
             {
                 // use specific shader CB
                 materialMap[materialName] = (irr::video::E_MATERIAL_TYPE)gpu->addHighLevelShaderMaterialFromFiles(
                     shaderFile.c_str(), "main_v", vs_version,
                     shaderFile.c_str(), "main_f", ps_version,
-                    new SM20_ShaderCallback_road(), /*irr::video::EMT_SOLIDirr::video::EMT_TRANSPARENT_ALPHA_CHANNEL*/baseMaterial, 0, shadingLanguage);
+                    new SM20_ShaderCallback_normal(), /*irr::video::EMT_SOLIDirr::video::EMT_TRANSPARENT_ALPHA_CHANNEL*/baseMaterial, 0, shadingLanguage);
             }
-            else if (materialName=="road_t")
+            else if (materialName=="normal_no_light" || materialName=="normal_no_light_t")
             {
                 // use specific shader CB
                 materialMap[materialName] = (irr::video::E_MATERIAL_TYPE)gpu->addHighLevelShaderMaterialFromFiles(
                     shaderFile.c_str(), "main_v", vs_version,
                     shaderFile.c_str(), "main_f", ps_version,
-                    new SM20_ShaderCallback_road_t(), /*irr::video::EMT_SOLIDirr::video::EMT_TRANSPARENT_ALPHA_CHANNEL*/baseMaterial, 0, shadingLanguage);
-            }
-            else if (materialName=="normal")
-            {
-                // use specific shader CB
-                materialMap[materialName] = (irr::video::E_MATERIAL_TYPE)gpu->addHighLevelShaderMaterialFromFiles(
-                    shaderFile.c_str(), "main_v", vs_version,
-                    shaderFile.c_str(), "main_f", ps_version,
-                    new SM20_ShaderCallback_road(), /*irr::video::EMT_SOLIDirr::video::EMT_TRANSPARENT_ALPHA_CHANNEL*/baseMaterial, 0, shadingLanguage);
-            }
-            else if (materialName=="normal_t")
-            {
-                // use specific shader CB
-                materialMap[materialName] = (irr::video::E_MATERIAL_TYPE)gpu->addHighLevelShaderMaterialFromFiles(
-                    shaderFile.c_str(), "main_v", vs_version,
-                    shaderFile.c_str(), "main_f", ps_version,
-                    new SM20_ShaderCallback_road_t(), /*irr::video::EMT_SOLIDirr::video::EMT_TRANSPARENT_ALPHA_CHANNEL*/baseMaterial, 0, shadingLanguage);
+                    new SM20_ShaderCallback_normal_no_light(), /*irr::video::EMT_SOLIDirr::video::EMT_TRANSPARENT_ALPHA_CHANNEL*/baseMaterial, 0, shadingLanguage);
             }
             else if (materialName=="vehicle")
             {
@@ -329,7 +311,6 @@ void ShadersSM20::loadSM20Materials()
             }
             else
             {
-                printf("material: %s, base: %d\n", materialName.c_str(), baseMaterial);
                 materialMap[materialName] = (irr::video::E_MATERIAL_TYPE)gpu->addHighLevelShaderMaterialFromFiles(
                     shaderFile.c_str(), "main_v", vs_version,
                     shaderFile.c_str(), "main_f", ps_version,
