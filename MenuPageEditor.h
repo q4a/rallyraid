@@ -143,6 +143,8 @@ private:
     irr::gui::IGUIEditBox*  editBoxResetZ;
     irr::gui::IGUICheckBox* checkBoxRender;
     irr::gui::IGUIStaticText* staticTextItinerGD;
+    irr::gui::IGUIImage*    itinerImage;
+    irr::gui::IGUIImage*    itinerImage2;
 
     Action                  currentAction;
     irr::video::SMaterial   material;

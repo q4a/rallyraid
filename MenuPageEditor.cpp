@@ -61,6 +61,8 @@ MenuPageEditor::MenuPageEditor()
       editBoxResetZ(0),
       checkBoxRender(0),
       staticTextItinerGD(0),
+      itinerImage(0),
+      itinerImage2(0),
       currentAction(A_None),
       material(),
       lastTick(0),
@@ -405,15 +407,29 @@ MenuPageEditor::MenuPageEditor()
         tabItiner,
         MI_EBITINERDESCRIPTION);
 
+    itinerImage = TheGame::getInstance()->getEnv()->addImage(
+        irr::core::recti(irr::core::position2di(0, 3*22), irr::core::dimension2di(64,64)),
+        tabItiner);
+    itinerImage->setScaleImage(true);
+    itinerImage->setImage(0);
+
+    itinerImage2 = TheGame::getInstance()->getEnv()->addImage(
+        irr::core::recti(irr::core::position2di(96, 3*22), irr::core::dimension2di(64,64)),
+        tabItiner);
+    itinerImage2->setScaleImage(true);
+    itinerImage2->setImage(0);
+
+  /* delme
     tableItiner = TheGame::getInstance()->getEnv()->addTable(
         irr::core::recti(irr::core::position2di(0, 3*22), irr::core::dimension2di(tabItiner->getRelativePosition().getSize().Width, tabItiner->getRelativePosition().getSize().Height-(3*22))),
         //irr::core::recti(irr::core::position2di(0, 0), tabRoads->getRelativePosition().getSize()),
         tabItiner,
         MI_TABLEITINER,
         true);
+  */
 
     tableItiner = TheGame::getInstance()->getEnv()->addTable(
-        irr::core::recti(irr::core::position2di(0, 3*22), irr::core::dimension2di(tabItiner->getRelativePosition().getSize().Width, (tabItiner->getRelativePosition().getSize().Height-(3*22))/2 - 1)),
+        irr::core::recti(irr::core::position2di(0, 3*22+66), irr::core::dimension2di(tabItiner->getRelativePosition().getSize().Width, (tabItiner->getRelativePosition().getSize().Height-(3*22+66))/2 - 1)),
         //irr::core::recti(irr::core::position2di(0, 0), tabRoads->getRelativePosition().getSize()),
         tabItiner,
         MI_TABLEITINER,
@@ -423,7 +439,7 @@ MenuPageEditor::MenuPageEditor()
     tableItiner->setColumnWidth(0, 200);
 
     tableItiner2 = TheGame::getInstance()->getEnv()->addTable(
-        irr::core::recti(irr::core::position2di(0, 3*22 + (tabItiner->getRelativePosition().getSize().Height-(3*22))/2 + 1), irr::core::dimension2di(tabItiner->getRelativePosition().getSize().Width, (tabItiner->getRelativePosition().getSize().Height-(3*22))/2-1)),
+        irr::core::recti(irr::core::position2di(0, 3*22+66 + (tabItiner->getRelativePosition().getSize().Height-(3*22+66))/2 + 1), irr::core::dimension2di(tabItiner->getRelativePosition().getSize().Width, (tabItiner->getRelativePosition().getSize().Height-(3*22+66))/2-1)),
         //irr::core::recti(irr::core::position2di(0, 0), tabRoads->getRelativePosition().getSize()),
         tabItiner,
         MI_TABLEITINER2,
@@ -573,6 +589,7 @@ bool MenuPageEditor::OnEvent(const irr::SEvent &event)
                     case MI_TABLEITINER:
                     {
                         WStringConverter::toString(tableItiner->getCellText(tableItiner->getSelected(), 0), ItinerManager::getInstance()->editorItinerImageName);
+                        itinerImage->setImage((irr::video::ITexture*)tableItiner->getCellData(tableItiner->getSelected(), 0));
                         MenuPageEditor::menuPageEditor->refreshSelected();
                         return true;
                         break;
@@ -580,6 +597,7 @@ bool MenuPageEditor::OnEvent(const irr::SEvent &event)
                     case MI_TABLEITINER2:
                     {
                         WStringConverter::toString(tableItiner2->getCellText(tableItiner2->getSelected(), 0), ItinerManager::getInstance()->editorItinerImageName2);
+                        itinerImage2->setImage((irr::video::ITexture*)tableItiner2->getCellData(tableItiner2->getSelected(), 0));
                         MenuPageEditor::menuPageEditor->refreshSelected();
                         return true;
                         break;
@@ -1186,6 +1204,7 @@ void MenuPageEditor::refreshItiner()
     tableItiner->addRow(i);
     str = L"none";
     tableItiner->setCellText(i, 0, str.c_str());
+    tableItiner->setCellData(i, 0, (void*)0);
 
     i++;
 
@@ -1198,6 +1217,7 @@ void MenuPageEditor::refreshItiner()
         str = L"";
         str += it->first.c_str();
         tableItiner->setCellText(i, 0, str.c_str());
+        tableItiner->setCellData(i, 0, (void*)it->second);
     }
 
     tableItiner2->clearRows();
@@ -1208,6 +1228,7 @@ void MenuPageEditor::refreshItiner()
     tableItiner2->addRow(i);
     str = L"none";
     tableItiner2->setCellText(i, 0, str.c_str());
+    tableItiner2->setCellData(i, 0, (void*)0);
 
     i++;
 
@@ -1220,6 +1241,7 @@ void MenuPageEditor::refreshItiner()
         str = L"";
         str += it->first.c_str();
         tableItiner2->setCellText(i, 0, str.c_str());
+        tableItiner2->setCellData(i, 0, (void*)it->second);
     }
 }
 
