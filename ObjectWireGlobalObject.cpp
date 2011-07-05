@@ -41,7 +41,7 @@ void ObjectWireGlobalObject::setVisible(bool p_visible)
             //printf("opos: %f %f %f\n", objectPos.X, objectPos.Y, objectPos.Z);
             if (objectPos.Y > 10.f)
             {
-                offsetObject = objectPool->getObject(objectPos);
+                offsetObject = objectPool->getObject(objectPos, scale, rot);
                 if (offsetObject)
                 {
                     offsetObject->getNode()->setRotation(rot);

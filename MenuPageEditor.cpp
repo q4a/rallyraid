@@ -59,6 +59,8 @@ MenuPageEditor::MenuPageEditor()
       editBoxResetX(0),
       editBoxResetY(0),
       editBoxResetZ(0),
+      editBoxScale(0),
+      editBoxRot(0),
       checkBoxRender(0),
       staticTextItinerGD(0),
       itinerImage(0),
@@ -266,8 +268,20 @@ MenuPageEditor::MenuPageEditor()
     // ----------------------------
     irr::gui::IGUITab* tabObjectPool = tc->addTab(L"OPool", MI_TABOBJECTPOOL);
 
+    editBoxScale = TheGame::getInstance()->getEnv()->addEditBox(L"1",
+        irr::core::recti(irr::core::position2di(0, 0), irr::core::dimension2di(68, 20)),
+        true,
+        tabObjectPool,
+        MI_EBSCALE);
+
+    editBoxRot = TheGame::getInstance()->getEnv()->addEditBox(L"0",
+        irr::core::recti(irr::core::position2di(70, 0), irr::core::dimension2di(68, 20)),
+        true,
+        tabObjectPool,
+        MI_EBROT);
+
     tableObjectPool = TheGame::getInstance()->getEnv()->addTable(
-        irr::core::recti(irr::core::position2di(0, 0), tabObjectPool->getRelativePosition().getSize()),
+        irr::core::recti(irr::core::position2di(0, 22), irr::core::dimension2di(tabObjectPool->getRelativePosition().getSize().Width, tabObjectPool->getRelativePosition().getSize().Height-22)),
         tabObjectPool,
         MI_TABLEOBJECTPOOL,
         true);
@@ -664,6 +678,14 @@ bool MenuPageEditor::OnEvent(const irr::SEvent &event)
                     case MI_EBITINERDESCRIPTION:
                         WStringConverter::toString(editBoxItinerDescription->getText(), ItinerManager::getInstance()->editorDescription);
                         dprintf(MY_DEBUG_INFO, "set itiner description: [%s]\n", ItinerManager::getInstance()->editorDescription.c_str());
+                        break;
+                    case MI_EBSCALE:
+                        WStringConverter::toFloat(editBoxScale->getText(), ObjectPoolManager::getInstance()->editorScale);
+                        dprintf(MY_DEBUG_INFO, "set object scale: %f\n", ObjectPoolManager::getInstance()->editorScale);
+                        break;
+                    case MI_EBROT:
+                        WStringConverter::toFloat(editBoxRot->getText(), ObjectPoolManager::getInstance()->editorRot);
+                        dprintf(MY_DEBUG_INFO, "set object rotation: %f\n", ObjectPoolManager::getInstance()->editorRot);
                         break;
                 }
                 break;
@@ -1290,7 +1312,10 @@ void MenuPageEditor::actionP()
                 RaceManager::getInstance()->editorRace, ObjectPoolManager::getInstance()->editorPool);
             if (RaceManager::getInstance()->editorRace && ObjectPoolManager::getInstance()->editorPool)
             {
-                ObjectWireGlobalObject* go = new ObjectWireGlobalObject(ObjectPoolManager::getInstance()->editorPool, apos);
+                ObjectWireGlobalObject* go = new ObjectWireGlobalObject(ObjectPoolManager::getInstance()->editorPool,
+                    apos,
+                    irr::core::vector3df(0.f, ObjectPoolManager::getInstance()->editorRot, 0.f),
+                    irr::core::vector3df(ObjectPoolManager::getInstance()->editorScale, ObjectPoolManager::getInstance()->editorScale, ObjectPoolManager::getInstance()->editorScale));
                 RaceManager::getInstance()->editorRace->globalObjectList.push_back(go);
                 if (RaceManager::getInstance()->editorRace->active)
                 {
@@ -1306,7 +1331,10 @@ void MenuPageEditor::actionP()
                 RaceManager::getInstance()->editorDay, ObjectPoolManager::getInstance()->editorPool);
             if (RaceManager::getInstance()->editorDay && ObjectPoolManager::getInstance()->editorPool)
             {
-                ObjectWireGlobalObject* go = new ObjectWireGlobalObject(ObjectPoolManager::getInstance()->editorPool, apos);
+                ObjectWireGlobalObject* go = new ObjectWireGlobalObject(ObjectPoolManager::getInstance()->editorPool,
+                    apos,
+                    irr::core::vector3df(0.f, ObjectPoolManager::getInstance()->editorRot, 0.f),
+                    irr::core::vector3df(ObjectPoolManager::getInstance()->editorScale, ObjectPoolManager::getInstance()->editorScale, ObjectPoolManager::getInstance()->editorScale));
                 RaceManager::getInstance()->editorDay->globalObjectList.push_back(go);
                 if (RaceManager::getInstance()->editorDay->active)
                 {
@@ -1322,7 +1350,10 @@ void MenuPageEditor::actionP()
                 RaceManager::getInstance()->editorStage, ObjectPoolManager::getInstance()->editorPool);
             if (RaceManager::getInstance()->editorStage && ObjectPoolManager::getInstance()->editorPool)
             {
-                ObjectWireGlobalObject* go = new ObjectWireGlobalObject(ObjectPoolManager::getInstance()->editorPool, apos);
+                ObjectWireGlobalObject* go = new ObjectWireGlobalObject(ObjectPoolManager::getInstance()->editorPool,
+                    apos,
+                    irr::core::vector3df(0.f, ObjectPoolManager::getInstance()->editorRot, 0.f),
+                    irr::core::vector3df(ObjectPoolManager::getInstance()->editorScale, ObjectPoolManager::getInstance()->editorScale, ObjectPoolManager::getInstance()->editorScale));
                 RaceManager::getInstance()->editorStage->globalObjectList.push_back(go);
                 if (RaceManager::getInstance()->editorStage->active)
                 {

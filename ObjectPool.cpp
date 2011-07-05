@@ -112,7 +112,7 @@ ObjectPool::~ObjectPool()
     }
 }
 
-OffsetObject* ObjectPool::getObject(const irr::core::vector3df& apos, const irr::core::vector3df& scale, bool addToOffsetManager)
+OffsetObject* ObjectPool::getObject(const irr::core::vector3df& apos, const irr::core::vector3df& scale, const irr::core::vector3df& rot, bool addToOffsetManager)
 {
     //dprintf(MY_DEBUG_NOTE, "ObjectPool::getObject(): %s\n", name.c_str());
     OffsetObject* offsetObject = 0;
@@ -130,6 +130,7 @@ OffsetObject* ObjectPool::getObject(const irr::core::vector3df& apos, const irr:
     //offsetObject->setPos(apos);
     offsetObject->getNode()->setPosition(apos);
     offsetObject->getNode()->setScale(scale);
+    offsetObject->getNode()->setRotation(rot);
     offsetObject->getNode()->setMaterialType(material);
     if (Shaders::getInstance()->getSupportedSMVersion() < 2)
     {
@@ -144,10 +145,17 @@ OffsetObject* ObjectPool::getObject(const irr::core::vector3df& apos, const irr:
 
     if (hkShape)
     {
+    
         hk::lock();
         hkpRigidBodyCinfo groundInfo;
         groundInfo.m_shape = hkShape;
         groundInfo.m_position.set(apos.X, apos.Y, apos.Z);
+        if (rot != irr::core::vector3df())
+        {
+            irr::core::vector3fd rotRad = rot * irr::core::DEGTORAD;
+            irr::core::quaternion rotQuat(rotQuad);
+            groundInfo.m_rotation = hkQuaternion(rotQuat.X, rotQuat.Y, rotQuat.Z, rotQuat.W);
+        }
         if (objectType == Vehicle)
         {
             groundInfo.m_motionType = hkpMotion::MOTION_BOX_INERTIA;

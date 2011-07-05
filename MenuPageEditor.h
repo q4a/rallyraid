@@ -51,6 +51,8 @@ public:
         MI_EBRESETX,
         MI_EBRESETY,
         MI_EBRESETZ,
+        MI_EBSCALE,
+        MI_EBROT,
 
         MI_CBRENDER,
         
@@ -141,6 +143,8 @@ private:
     irr::gui::IGUIEditBox*  editBoxResetX;
     irr::gui::IGUIEditBox*  editBoxResetY;
     irr::gui::IGUIEditBox*  editBoxResetZ;
+    irr::gui::IGUIEditBox*  editBoxScale;
+    irr::gui::IGUIEditBox*  editBoxRot;
     irr::gui::IGUICheckBox* checkBoxRender;
     irr::gui::IGUIStaticText* staticTextItinerGD;
     irr::gui::IGUIImage*    itinerImage;
