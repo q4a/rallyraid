@@ -79,6 +79,7 @@ private:
 
 public:
     void startNewGame(Race* race, VehicleType* vehicleType);
+    bool goToNextStage();
     bool loadGame(const std::string& saveName);
     bool saveGame(const std::string& saveName);
 

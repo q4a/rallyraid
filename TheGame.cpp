@@ -494,6 +494,7 @@ void TheGame::loop()
 
                     earth->update(offsetManager->getOffset()+camera->getPosition(), cameraDirection);
                 }
+                gamePlay->update(tick, offsetManager->getOffset()+camera->getPosition());
             }
             else
             {

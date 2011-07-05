@@ -125,6 +125,63 @@ void GamePlay::startNewGame(Race* race, VehicleType* vehicleType)
     }
 }
 
+bool GamePlay::goToNextStage()
+{
+    if (Player::getInstance()->getStarter() != 0 && Player::getInstance()->getStarter()->finishTime == 0)
+    {
+        return false;
+    }
+
+    VehicleType* vehicleType = VehicleTypeManager::getInstance()->getVehicleType(Player::getInstance()->getCompetitor()->getVehicleTypeName());
+    if (vehicleType)
+    {
+        Stage* stage = RaceManager::getInstance()->getNestStage();
+        
+        if (stage == 0)
+        {
+            return false;
+        }
+
+        // release old resources
+        if (raceEngine)
+        {
+            while (raceEngine && raceEngine->update(0, irr::core::vector3df(), RaceEngine::AtTheEnd));
+            delete raceEngine;
+            raceEngine = 0;
+        }
+        
+        assert(!raceState.empty());
+
+        // reinitalize new resources
+        StageState* stageState = new StageState;
+
+        stageState->stage = stage;
+        const competitorResultList_t& competitorResultList = raceState.back()->competitorResultListStage;
+        for (competitorResultList_t::const_iterator it = competitorResultList.begin();
+             it != competitorResultList.end();
+             it++)
+        {
+            CompetitorResult* competitorResult = new CompetitorResult(
+                (*it)->competitor, 0, 0, (*it)->globalTime, (*it)->globalPenalityTime);
+            stageState->competitorResultListStage.push_back(competitorResult);
+        }
+
+        raceState.push_back(stageState);
+
+        if (TheGame::getInstance()->getEditorMode()==false)
+        {
+            raceEngine = new RaceEngine(stageState, raceState.size());
+            clearCompetitorResultList(stageState->competitorResultListStage);
+            while (raceEngine && raceEngine->update(0, irr::core::vector3df(), RaceEngine::AtStart));
+        }
+        else
+        {
+            clearCompetitorResultList(stageState->competitorResultListStage);
+        }
+        startStage(stage, vehicleType);
+    }
+}
+
 bool GamePlay::loadGame(const std::string& saveName)
 {
     assert(TheGame::getInstance()->getEditorMode()==false);
@@ -267,10 +324,13 @@ void GamePlay::update(unsigned int tick, const irr::core::vector3df& apos)
 {
     if (raceEngine)
     {
-        assert(Player::getInstance()->getStarter()!=0);
-        if (Player::getInstance()->getStarter()->startTime==0 ||
+        //assert(Player::getInstance()->getStarter()!=0);
+        if (Player::getInstance()->getStarter() == 0 ||
+            Player::getInstance()->getStarter()->startTime==0 ||
             (Player::getInstance()->getStarter()->startTime!=0 && Player::getInstance()->getFirstPressed()))
-        raceEngine->update(tick, apos, RaceEngine::InTheMiddle);
+        {
+            raceEngine->update(tick, apos, RaceEngine::InTheMiddle);
+        }
     }
 }
 
