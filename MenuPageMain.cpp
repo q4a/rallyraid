@@ -82,6 +82,13 @@ MenuPageMain::MenuPageMain()
     staticTextGameName->setOverrideColor(irr::video::SColor(255, 255, 255, 255));
     staticTextGameName->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_UPPERLEFT);
 
+    irr::video::ITexture* havok_logo = TheGame::getInstance()->getDriver()->getTexture("data/menu_textures/havok_logo_1_128.png");
+    irr::gui::IGUIImage* havok_image = TheGame::getInstance()->getEnv()->addImage(
+        irr::core::recti(irr::core::position2di(window->getRelativePosition().getSize().Width - 10 - havok_logo->getOriginalSize().Width, window->getRelativePosition().getSize().Height - 10 - havok_logo->getOriginalSize().Height), havok_logo->getOriginalSize()),
+        window);
+    havok_image->setScaleImage(false);
+    havok_image->setUseAlphaChannel(true);
+    havok_image->setImage(havok_logo);
 
     // ----------------------------
     // Races

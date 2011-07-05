@@ -16,6 +16,7 @@
 #include "stdafx.h"
 #include "ConfigDirectory.h"
 #include "Hud.h"
+#include "error.h"
 #include <assert.h>
 
 
@@ -135,7 +136,7 @@ bool GamePlay::goToNextStage()
     VehicleType* vehicleType = VehicleTypeManager::getInstance()->getVehicleType(Player::getInstance()->getCompetitor()->getVehicleTypeName());
     if (vehicleType)
     {
-        Stage* stage = RaceManager::getInstance()->getNestStage();
+        Stage* stage = RaceManager::getInstance()->getNextStage();
         
         if (stage == 0)
         {
@@ -179,7 +180,9 @@ bool GamePlay::goToNextStage()
             clearCompetitorResultList(stageState->competitorResultListStage);
         }
         startStage(stage, vehicleType);
+        return true;
     }
+    return false;
 }
 
 bool GamePlay::loadGame(const std::string& saveName)
@@ -263,7 +266,7 @@ bool GamePlay::saveGame(const std::string& saveName)
     if (!ret)
     {
         dprintf(MY_DEBUG_ERROR, "GamePlay::saveGame(): unable to write save game: %s\n", saveName.c_str());
-        PrintMessage(1, "Unable to save game: [%s]", saveName.c_str());
+        //PrintMessage(1, "Unable to save game: [%s]", saveName.c_str());
     }
     return ret;
 }
@@ -417,6 +420,8 @@ void GamePlay::refreshLoadableGames()
     {
         std::string saveName = it->c_str();
         char raceName[256];
+        FILE* f;
+        int rc;
         
         errno_t error = fopen_s(&f, SAVE_STATE(saveName).c_str(), "r");
         if (error)
@@ -424,8 +429,8 @@ void GamePlay::refreshLoadableGames()
             printf("stage state file unable to open: %s\n", SAVE_STATE(saveName).c_str());
             continue;
         }
-        ret = fscanf_s(f, "%s\n", raceName);
-        if (ret < 1)
+        rc = fscanf_s(f, "%s\n", raceName);
+        if (rc < 1)
         {
             printf("stage state unable to read race name: %s\n", SAVE_STATE(saveName).c_str());
             fclose(f);

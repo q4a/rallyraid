@@ -137,7 +137,9 @@ TheGame::TheGame()
         fix_camera = smgr->addCameraSceneNode();
         fps_camera = smgr->addCameraSceneNodeFPS(0, 100.f, 0.1f);
         fix_camera->setFarValue(28000.f);
+        fix_camera->setNearValue(0.5f);
         fps_camera->setFarValue(28000.f);
+        fps_camera->setNearValue(0.5f);
         camera = fix_camera;
         smgr->setActiveCamera(camera);
         lastScreenSize = getScreenSize();

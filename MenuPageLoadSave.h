@@ -45,6 +45,7 @@ private:
 private:
     irr::gui::IGUIImage*    window;
     irr::gui::IGUIStaticText* staticTextName;
+    irr::gui::IGUIButton*   buttonLoadSave;
     irr::gui::IGUITable*    tableLoadableGames;
     irr::gui::IGUIEditBox*  editBoxSaveName;
     

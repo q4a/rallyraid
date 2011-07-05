@@ -14,6 +14,7 @@
 #include "GamePlay.h"
 #include "FontManager.h"
 #include "MessageManager.h"
+#include "Hud.h"
 #include <assert.h>
 
 
@@ -22,6 +23,7 @@ MenuPageLoadSave* MenuPageLoadSave::menuPageLoadSave = 0;
 MenuPageLoadSave::MenuPageLoadSave()
     : window(0),
       staticTextName(0),
+      buttonLoadSave(0),
       tableLoadableGames(0),
       editBoxSaveName(0),
       willOpenOtherWindow(false),
@@ -43,7 +45,7 @@ MenuPageLoadSave::MenuPageLoadSave()
         MI_BUTTONBACK,
         L"Back");
 
-    TheGame::getInstance()->getEnv()->addButton(
+    buttonLoadSave = TheGame::getInstance()->getEnv()->addButton(
         irr::core::recti(10,90,90,110),
         window,
         MI_BUTTONLOADSAVE,
@@ -61,18 +63,18 @@ MenuPageLoadSave::MenuPageLoadSave()
     // Loadable games
     // ----------------------------
     tableLoadableGames = TheGame::getInstance()->getEnv()->addTable(
-        irr::core::recti(irr::core::position2di(window->getRelativePosition().getSize().Width/3, (window->getRelativePosition().getSize().Height*2)/2), irr::core::dimension2di(window->getRelativePosition().getSize().Width/3,(window->getRelativePosition().getSize().Height)/2-2)),
+        irr::core::recti(irr::core::position2di(window->getRelativePosition().getSize().Width/3, (window->getRelativePosition().getSize().Height)/2), irr::core::dimension2di(window->getRelativePosition().getSize().Width/3,(window->getRelativePosition().getSize().Height)/2-2)),
         window,
         MI_TABLELOADABLEGAMES,
         true);
 
     tableLoadableGames->addColumn(L"Name");
-    tableLoadableGames->setColumnWidth(0, ((tableRaces->getRelativePosition().getSize().Width-16))/3);
+    tableLoadableGames->setColumnWidth(0, ((tableLoadableGames->getRelativePosition().getSize().Width-16))/3);
     tableLoadableGames->addColumn(L"Race");
-    tableLoadableGames->setColumnWidth(1, ((tableRaces->getRelativePosition().getSize().Width-16)*2)/3);
+    tableLoadableGames->setColumnWidth(1, ((tableLoadableGames->getRelativePosition().getSize().Width-16)*2)/3);
 
     editBoxSaveName = TheGame::getInstance()->getEnv()->addEditBox(L"new save name",
-        irr::core::recti(irr::core::position2di(window->getRelativePosition().getSize().Width/3, (window->getRelativePosition().getSize().Height*2)/2-22), irr::core::dimension2di(window->getRelativePosition().getSize().Width/3, 20)),
+        irr::core::recti(irr::core::position2di(window->getRelativePosition().getSize().Width/3, (window->getRelativePosition().getSize().Height)/2-22), irr::core::dimension2di(window->getRelativePosition().getSize().Width/3, 20)),
         true,
         window,
         MI_EBSAVENAME);
@@ -123,11 +125,11 @@ bool MenuPageLoadSave::OnEvent(const irr::SEvent &event)
                         MenuManager::getInstance()->open(prevMP);
                         return true;
                         break;
-                    case MI_BUTTON:
+                    case MI_BUTTONLOADSAVE:
                         dprintf(MY_DEBUG_NOTE, "LoadSavemenu::optionsbutton::clicked\n");
                         if (load)
                         {
-                            if (!saveName.empty)
+                            if (!saveName.empty())
                             {
                                 willOpenOtherWindow = false;
                                 if (GamePlay::getInstance()->loadGame(saveName))
@@ -146,7 +148,7 @@ bool MenuPageLoadSave::OnEvent(const irr::SEvent &event)
                         }
                         else
                         {
-                            if (!saveName.empty)
+                            if (!saveName.empty())
                             {
                                 if (GamePlay::getInstance()->saveGame(saveName))
                                 {
@@ -204,6 +206,8 @@ void MenuPageLoadSave::open()
     {
         editBoxSaveName->setVisible(false);
         saveName = "";
+        buttonLoadSave->setText(L"Load Game");
+        staticTextName->setText(L"Load Game");
     }
     else
     {
@@ -214,6 +218,8 @@ void MenuPageLoadSave::open()
         }
         
         editBoxSaveName->setVisible(true);
+        buttonLoadSave->setText(L"Save Game");
+        staticTextName->setText(L"Save Game");
     }
     refresh();
     window->setVisible(true);

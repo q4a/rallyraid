@@ -44,7 +44,7 @@ void ObjectWireGlobalObject::setVisible(bool p_visible)
                 offsetObject = objectPool->getObject(objectPos, scale, rot);
                 if (offsetObject)
                 {
-                    offsetObject->getNode()->setRotation(rot);
+                    //offsetObject->getNode()->setRotation(rot);
                     softVisible = true;
                 }
             }

@@ -152,8 +152,8 @@ OffsetObject* ObjectPool::getObject(const irr::core::vector3df& apos, const irr:
         groundInfo.m_position.set(apos.X, apos.Y, apos.Z);
         if (rot != irr::core::vector3df())
         {
-            irr::core::vector3fd rotRad = rot * irr::core::DEGTORAD;
-            irr::core::quaternion rotQuat(rotQuad);
+            irr::core::vector3df rotRad = rot * irr::core::DEGTORAD;
+            irr::core::quaternion rotQuat(rotRad);
             groundInfo.m_rotation = hkQuaternion(rotQuat.X, rotQuat.Y, rotQuat.Z, rotQuat.W);
         }
         if (objectType == Vehicle)

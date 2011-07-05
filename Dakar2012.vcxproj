@@ -118,6 +118,7 @@
     <ClInclude Include="MenuPageEditorRoad.h" />
     <ClInclude Include="MenuPageEditorStage.h" />
     <ClInclude Include="MenuPageInGame.h" />
+    <ClInclude Include="MenuPageLoadSave.h" />
     <ClInclude Include="MenuPageMain.h" />
     <ClInclude Include="MenuPageOptions.h" />
     <ClInclude Include="MenuPageOptionsKB.h" />
@@ -199,6 +200,7 @@
     <ClCompile Include="MenuPageEditorRoad.cpp" />
     <ClCompile Include="MenuPageEditorStage.cpp" />
     <ClCompile Include="MenuPageInGame.cpp" />
+    <ClCompile Include="MenuPageLoadSave.cpp" />
     <ClCompile Include="MenuPageMain.cpp" />
     <ClCompile Include="MenuPageOptions.cpp" />
     <ClCompile Include="MenuPageOptionsKB.cpp" />
