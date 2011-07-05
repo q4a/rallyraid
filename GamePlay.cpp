@@ -43,8 +43,10 @@ GamePlay::GamePlay()
     : currentRace(0),
       currentStage(0),
       raceState(),
-      raceEngine(0)
+      raceEngine(0),
+      loadableGames()
 {
+    refreshLoadableGames();
 }
 
 GamePlay::~GamePlay()
@@ -181,22 +183,30 @@ bool GamePlay::saveGame(const std::string& saveName)
 
     bool ret = ((raceEngine != 0) && (currentRace != 0) && (!raceState.empty()));
 
-
     if (ret)
     {
-        ret = writeStageStateList(SAVE_STATE(saveName), raceState);
+        ret = ConfigDirectory::mkdir(SAVE_DIR);
         if (ret)
         {
-            ret = raceEngine->save(SAVE_ENGINE(saveName));
+            ret = ConfigDirectory::mkdir(SAVE_DIR_DIR(saveName));
             if (ret)
             {
-                ret = Player::getInstance()->save(SAVE_PLAYER(saveName));
+                ret = writeStageStateList(SAVE_STATE(saveName), raceState);
+                if (ret)
+                {
+                    ret = raceEngine->save(SAVE_ENGINE(saveName));
+                    if (ret)
+                    {
+                        ret = Player::getInstance()->save(SAVE_PLAYER(saveName));
+                    }
+                }
             }
         }
     }
     if (!ret)
     {
         dprintf(MY_DEBUG_ERROR, "GamePlay::saveGame(): unable to write save game: %s\n", saveName.c_str());
+        PrintMessage(1, "Unable to save game: [%s]", saveName.c_str());
     }
     return ret;
 }
@@ -323,6 +333,54 @@ unsigned int GamePlay::competitorFinished(CompetitorResult* competitorResult)
     }
 
     return insertPos;
+}
+
+void GamePlay::refreshLoadableGames()
+{
+    loadableGames.clear();
+
+    ConfigDirectory::fileList_t fileList;
+    
+    dprintf(MY_DEBUG_NOTE, "Read [%s] directory:\n", SAVE_DIR.c_str());
+
+    bool ret = ConfigDirectory::load(SAVE_DIR.c_str(), "racestate", fileList);
+    
+    if (!ret)
+    {
+        dprintf(MY_DEBUG_WARNING, "unable to read [%s] directory\n", SAVE_DIR.c_str());
+        return;
+    }
+    
+    for (ConfigDirectory::fileList_t::const_iterator it = fileList.begin();
+         it != fileList.end();
+         it++)
+    {
+        std::string saveName = it->c_str();
+        char raceName[256];
+        
+        errno_t error = fopen_s(&f, SAVE_STATE(saveName).c_str(), "r");
+        if (error)
+        {
+            printf("stage state file unable to open: %s\n", SAVE_STATE(saveName).c_str());
+            continue;
+        }
+        ret = fscanf_s(f, "%s\n", raceName);
+        if (ret < 1)
+        {
+            printf("stage state unable to read race name: %s\n", SAVE_STATE(saveName).c_str());
+            fclose(f);
+            continue;
+        }
+        Race* race = RaceManager::getInstance()->getRace(raceName);
+        if (race == 0)
+        {
+            printf("unable to find race: %s\n", raceName);
+            fclose(f);
+            continue;
+        }
+        loadableGames[saveName] = race->getLongName();
+        fclose(f);
+    }
 }
 
 /* static */ bool GamePlay::readStageStateList(const std::string& filename, stageStateList_t& stageStateList)

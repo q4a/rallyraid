@@ -1,6 +1,7 @@
 
 #include "MenuPageMain.h"
 #include "MenuPageStage.h"
+#include "MenuPageLoadSave.h"
 #include "TheGame.h"
 #include "stdafx.h"
 #include "WStringConverter.h"
@@ -58,6 +59,12 @@ MenuPageMain::MenuPageMain()
 
     TheGame::getInstance()->getEnv()->addButton(
         irr::core::recti(10,90,90,110),
+        window,
+        MI_BUTTONLOAD,
+        L"Load Game");
+
+    TheGame::getInstance()->getEnv()->addButton(
+        irr::core::recti(10,120,90,140),
         window,
         MI_BUTTONOPTIONS,
         L"Options");
@@ -169,6 +176,15 @@ bool MenuPageMain::OnEvent(const irr::SEvent &event)
                             MenuManager::getInstance()->open(MenuManager::MP_STAGE);
                             //GamePlay::getInstance()->startNewGame(selectedRace, selectedVehicleType);
                         }
+                        return true;
+                        break;
+                    case MI_BUTTONLOAD:
+                        dprintf(MY_DEBUG_NOTE, "mainmenu::loadbutton::clicked\n");
+                        willOpenOtherWindow = true;
+                        MenuPageLoadSave::menuPageLoadSave->load = true;
+                        MenuPageLoadSave::menuPageLoadSave->prevMP = MenuManager::MP_MAIN;
+                        MenuManager::getInstance()->close();
+                        MenuManager::getInstance()->open(MenuManager::MP_LOADSAVE);
                         return true;
                         break;
                     case MI_BUTTONOPTIONS:
