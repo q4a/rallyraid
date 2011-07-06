@@ -9,11 +9,12 @@
 #include "RoadType.h"
 #include "OffsetObject.h"
 #include "OffsetManager.h"
+#include "ObjectPool.h"
 #include "stdafx.h"
 #include "Shaders.h"
 
-#include <Physics/Collide/Shape/Compound/Collection/ExtendedMeshShape/hkpExtendedMeshShape.h>
-#include <Physics/Collide/Shape/Compound/Collection/Mesh/hkpMeshMaterial.h>
+//#include <Physics/Collide/Shape/Compound/Collection/ExtendedMeshShape/hkpExtendedMeshShape.h>
+//#include <Physics/Collide/Shape/Compound/Collection/Mesh/hkpMeshMaterial.h>
 //#include <Physics/Collide/Shape/Compound/Collection/ExtendedMeshShape/hkpExtendedMeshShape.inl>
 
 
@@ -246,9 +247,9 @@ void VisualRoad::switchToVisible()
         roadNode->setMaterialType(Shaders::getInstance()->materialMap["normal_no_light_t"]);
     }
 //////////////////
-#if 0
     if (roadType->frictionMulti > 0.01f)
     {
+#if 0
         hkVector4* hkVertexArray = 0;
         dprintf(MY_DEBUG_NOTE, "road build begin %d\n", animatedMesh->getMeshBufferCount());
         {
@@ -368,21 +369,31 @@ void VisualRoad::switchToVisible()
         ((hkpExtendedMeshShape*)hkShape)->addTrianglesSubpart(part);
 
         dprintf(MY_DEBUG_NOTE, "3\n");
+        */
+#endif // 0 or 1
 
-        hkpRigidBodyCinfo rbCi;
-        rbCi.m_shape = hkShape;
-        rbCi.m_motionType = hkpMotion::MOTION_FIXED;
-        hkBody = new hkpRigidBody(rbCi);
-        hkpPropertyValue val(1);
-        hkBody->addProperty(roadID, val);
-        hkWorld->addEntity(hkBody);
-
+        hkShape = ObjectPool::calculateNonConvexCollisionMeshMeshes(animatedMesh);
+        if (hkShape) 
+        {
+            hk::lock();
+            hkpRigidBodyCinfo rbCi;
+            rbCi.m_shape = hkShape;
+            rbCi.m_motionType = hkpMotion::MOTION_FIXED;
+            rbCi.m_collisionFilterInfo = hkpGroupFilter::calcFilterInfo(hk::materialType::roadId);
+            hkBody = new hkpRigidBody(rbCi);
+            
+            hkpPropertyValue val(1);
+            hkBody->addProperty(hk::materialType::roadId, val);
+            
+            hkWorld->addEntity(hkBody);
+            hk::unlock();
+        }
+        /*
         delete [] (char*)hkVertexArray;
         delete [] tmpv;
         delete part.m_materialBase;
         */
     }
-#endif // 0 or 1
 ////////////////////////
     roadNode->setPosition(basePoint);
     assert(offsetObject == 0);
