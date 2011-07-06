@@ -66,7 +66,7 @@ ObjectPool::ObjectPool(const std::string& name,
         default:
             if (meshFilename.rfind(".mso") != std::string::npos)
             {
-                objectMesh = readMySimpleObject(meshFilename, (objectType==MyTree)?mass:1.0f);
+                objectMesh = readMySimpleObject(meshFilename, (objectType!=Vehicle)?mass:1.0f);
             }
             else
             {
@@ -503,7 +503,7 @@ hkpShape* ObjectPool::calculateCollisionMesh(irr::scene::IAnimatedMesh* objectMe
     return hkShape;
 }
 
-static hkpExtendedMeshShape* ObjectPool::calculateNonConvexCollisionMeshMeshes(irr::scene::IAnimatedMesh* objectMesh)
+/* static */ hkpExtendedMeshShape* ObjectPool::calculateNonConvexCollisionMeshMeshes(irr::scene::IAnimatedMesh* objectMesh)
 {
     hk::lock();
     hkpExtendedMeshShape* hkShape = new hkpExtendedMeshShape;
@@ -544,6 +544,8 @@ static hkpExtendedMeshShape* ObjectPool::calculateNonConvexCollisionMeshMeshes(i
         hk::lock();
         hkShape->addTrianglesSubpart(part); 
         hk::unlock();
+        
+        //delete [] vertexBuffer;
     }
     
     return hkShape;
