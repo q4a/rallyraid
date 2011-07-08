@@ -494,8 +494,14 @@ void TheGame::loop()
                             str += (int)(RaceManager::getInstance()->getCurrentHeightModifierList().back().pos.X/TILE_DETAIL_SCALE_F);
                             str += L", ";
                             str += (int)(RaceManager::getInstance()->getCurrentHeightModifierList().back().pos.Z/TILE_DETAIL_SCALE_F);
+                            str += L", diff: ";
+                            str += (int)((offsetManager->getOffset().X+camera->getPosition().X)/TILE_DETAIL_SCALE_F) -
+                                (int)(RaceManager::getInstance()->getCurrentHeightModifierList().back().pos.X/TILE_DETAIL_SCALE_F);
+                            str += L", ";
+                            str += (int)((offsetManager->getOffset().Z+camera->getPosition().Z)/TILE_DETAIL_SCALE_F) -
+                                (int)(RaceManager::getInstance()->getCurrentHeightModifierList().back().pos.Z/TILE_DETAIL_SCALE_F);
                         }
-                        str += L", Distance to last itinerary point: ";
+                        str += L",     Distance to last itinerary point: ";
                         if (RaceManager::getInstance()->getCurrentStage() && !RaceManager::getInstance()->getCurrentStage()->getItinerPointList().empty())
                         {
                             str += (int)(RaceManager::getInstance()->getCurrentStage()->getItinerPointList().back()->getPos().getDistanceFrom(offsetManager->getOffset()+camera->getPosition()));

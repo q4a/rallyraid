@@ -244,6 +244,9 @@ const heightModifierList_t& RaceManager::getCurrentHeightModifierList()
     }
 
     unsigned int id = 1;
+    char fillZero[5] = {'0', '0', '0', '0', 0};
+
+    assert(globalObjectList.size() < 100000);
 
     for (globalObjectList_t::const_iterator it = globalObjectList.begin();
          it != globalObjectList.end();
@@ -253,7 +256,27 @@ const heightModifierList_t& RaceManager::getCurrentHeightModifierList()
         {
             fprintf_s(f, "\n");
         }
-        fprintf_s(f, "[%u]\n", id);
+        if (id < 10)
+        {
+            fillZero[4] = 0;
+        }
+        else if (id < 100)
+        {
+            fillZero[3] = 0;
+        }
+        else if (id < 1000)
+        {
+            fillZero[2] = 0;
+        }
+        else if (id < 10000)
+        {
+            fillZero[1] = 0;
+        }
+        else
+        {
+            fillZero[0] = 0;
+        }
+        fprintf_s(f, "[%s%u]\n", fillZero, id);
 
         fprintf_s(f, "type=%s\n", (*it)->getObjectPool()->getName().c_str());
         fprintf_s(f, "pos=%f %f %f\n", (*it)->getPos().X, (*it)->getPos().Y, (*it)->getPos().Z);
