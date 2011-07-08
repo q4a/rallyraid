@@ -302,6 +302,7 @@ bool MenuPageStage::OnEvent(const irr::SEvent &event)
                         {
                             itinerIt = selectedStage->getItinerPointList().begin();
                             for (int i = 0; i < pos; i++, itinerIt++);
+                            updateRoadBook();
                         }
                         return true;
                         break;

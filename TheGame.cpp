@@ -30,6 +30,7 @@
 #include "Terrain_defs.h"
 #include "Stage.h"
 #include "ItinerPoint.h"
+#include "LoadingThread.h"
 
 
 // static stuff
@@ -79,6 +80,7 @@ TheGame::TheGame()
       wayPointManager(0),
       fontManager(0),
       messageManager(0),
+      loadingThread(0),
       terminate(true),
       windowId(0),
       lastScreenSize(),
@@ -144,19 +146,25 @@ TheGame::TheGame()
         smgr->setActiveCamera(camera);
         lastScreenSize = getScreenSize();
 
-        dprintf(MY_DEBUG_NOTE, "Initialize event receiver\n");
-        eventReceiver = new EventReceiver();
         dprintf(MY_DEBUG_NOTE, "Initialize shaders\n");
         Shaders::initialize();
         shaders = Shaders::getInstance();
-        dprintf(MY_DEBUG_NOTE, "Initialize Havok\n");
-        hk::initialize();
         dprintf(MY_DEBUG_NOTE, "Initialize font manager\n");
         FontManager::initialize();
         fontManager = FontManager::getInstance();
         dprintf(MY_DEBUG_NOTE, "Initialize message manager\n");
         MessageManager::initialize();
         messageManager = MessageManager::getInstance();
+        dprintf(MY_DEBUG_NOTE, "Initialize loading thread\n");
+        LoadingThread::initialize();
+        loadingThread = LoadingThread::getInstance();
+
+        loadingThread->startLoading();
+
+        dprintf(MY_DEBUG_NOTE, "Initialize event receiver\n");
+        eventReceiver = new EventReceiver();
+        dprintf(MY_DEBUG_NOTE, "Initialize Havok\n");
+        hk::initialize();
         dprintf(MY_DEBUG_NOTE, "Initialize offset manager\n");
         OffsetManager::initialize();
         offsetManager = OffsetManager::getInstance();
@@ -195,6 +203,9 @@ TheGame::TheGame()
         dprintf(MY_DEBUG_NOTE, "Initialize race manager\n");
         RaceManager::initialize();
         raceManager = RaceManager::getInstance();
+
+        loadingThread->endLoading();
+
         dprintf(MY_DEBUG_NOTE, "Initialize menu manager\n");
         MenuManager::initialize();
         menuManager = MenuManager::getInstance();
@@ -237,6 +248,7 @@ TheGame::~TheGame()
         delete cameraOffsetObject;
         cameraOffsetObject = 0;
     }
+    loadingThread = 0;
     messageManager = 0;
     fontManager = 0;
     offsetManager = 0;
@@ -287,6 +299,8 @@ TheGame::~TheGame()
     OffsetManager::finalize();
     dprintf(MY_DEBUG_NOTE, "Finalize objectPoolManager\n");
     ObjectPoolManager::finalize();
+    dprintf(MY_DEBUG_NOTE, "Finalize loading thread\n");
+    LoadingThread::finalize();
     dprintf(MY_DEBUG_NOTE, "Finalize message manager\n");
     MessageManager::finalize();
     dprintf(MY_DEBUG_NOTE, "Finalize font manager\n");
