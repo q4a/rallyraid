@@ -113,7 +113,7 @@ MenuPageMain::MenuPageMain()
         window,
         MI_STRACEDATA,
         true);
-    staticTextRaceData->setOverrideFont(FontManager::getInstance()->getFont(FontManager::FONT_NORMALBOLD));
+    staticTextRaceData->setOverrideFont(FontManager::getInstance()->getFont(FontManager::FONT_NORMAL));
 
     // ----------------------------
     // Vehicles

@@ -92,30 +92,30 @@ void RaceManager::read()
     }
 }
 
-void RaceManager::activateStage(Stage* stage)
+void RaceManager::activateStage(Stage* stage, bool forceReload)
 {
-    if (currentStage == stage) return;
+    if (currentStage == stage && !forceReload) return;
 
     RoadManager::getInstance()->clearStageRoads();
 
     Day* newDay = stage->parent;
     Race* newRace = stage->parent->parent;
 
-    if (currentStage && stage != currentStage)
+    if (currentStage && (stage != currentStage || forceReload))
     {
         currentStage->deactivate();
     }
     currentStage = stage;
     currentStageName = currentStage->getName();
 
-    if (currentDay && currentDay != newDay)
+    if (currentDay && (currentDay != newDay || forceReload))
     {
         currentDay->deactivate();
     }
     currentDay = newDay;
     currentDayName = currentDay->getName();
 
-    if (currentRace && currentRace != newRace)
+    if (currentRace && (currentRace != newRace || forceReload))
     {
         currentRace->deactivate();
     }
