@@ -280,7 +280,7 @@ void GamePlay::startStage(Stage* stage, VehicleType* vehicleType, const irr::cor
     dprintf(MY_DEBUG_INFO, "GamePlay::startGame(): stage: %p, vehicleType: %p\n", stage, vehicleType);
     assert(vehicleType);
 
-    if (stage)
+    if (stage && !forceReload)
     {
         unsigned int size = stage->getAIPointList().size();
         

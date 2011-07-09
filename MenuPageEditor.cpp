@@ -562,22 +562,24 @@ bool MenuPageEditor::OnEvent(const irr::SEvent &event)
                             if (resetX < 0) resetX = -resetX;
                             if (resetZ > 0) resetZ = -resetZ;
                             printf("reset: %d, %f (%d), %d\n", resetX, (float)TheEarth::getInstance()->getEarthHeight(resetX, -resetZ)+(float)resetY, resetY, resetZ);
-                            currentAction = A_None;
+                            MenuManager::getInstance()->close();
                             GamePlay::getInstance()->startStage(
                                 RaceManager::getInstance()->getCurrentStage(),
                                 VehicleTypeManager::getInstance()->getVehicleType(Player::getInstance()->getCompetitor()->getVehicleTypeName()),
-                                irr::core::vector3df((float)resetX*TILE_SIZE_F+TILE_HSIZE_F,(float)TheEarth::getInstance()->getEarthHeight(resetX, -resetZ)+(float)resetY,(float)resetZ*TILE_SIZE_F-TILE_HSIZE_F));
+                                irr::core::vector3df((float)resetX*TILE_SIZE_F+TILE_HSIZE_F,(float)TheEarth::getInstance()->getEarthHeight(resetX, -resetZ)+(float)resetY,(float)resetZ*TILE_SIZE_F-TILE_HSIZE_F),
+                                true);
                         }
                         else
                         {
                             printf("unable to reset because reset fields are not int\n");
+                            MessageManager::getInstance()->addText(L"unable to reset because reset fields are not int", 1);
                         }
                         return true;
                         break;
                     }
                     case MI_BUTTONRELOAD:
                     {
-                        currentAction = A_None;
+                        MenuManager::getInstance()->close();
                         GamePlay::getInstance()->startStage(
                             RaceManager::getInstance()->getCurrentStage(),
                             VehicleTypeManager::getInstance()->getVehicleType(Player::getInstance()->getCompetitor()->getVehicleTypeName()),
@@ -728,6 +730,7 @@ bool MenuPageEditor::OnEvent(const irr::SEvent &event)
 void MenuPageEditor::open()
 {
     dprintf(MY_DEBUG_NOTE, "MenuPageEditor::open()\n");
+    currentAction = A_None;
     refresh();
     window->setVisible(true);
     TheGame::getInstance()->getEnv()->setFocus(window);
@@ -736,6 +739,7 @@ void MenuPageEditor::open()
 void MenuPageEditor::close()
 {
     dprintf(MY_DEBUG_NOTE, "MenuPageEditor::close()\n");
+    currentAction = A_None;
     window->setVisible(false);
 }
 
