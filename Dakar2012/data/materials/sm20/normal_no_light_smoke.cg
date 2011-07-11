@@ -47,11 +47,12 @@ struct pixel
 };
 
 pixel main_f(fragment IN,
-             uniform sampler2D tex0 : register(s0)
+             uniform sampler2D tex0 : register(s0),
 //             uniform sampler2D shadowMap : register(s1),
 //             uniform float param
 //             uniform float shadowParam,
 //             uniform float shadowRes
+             uniform float param2
 	      )
 {
     pixel OUT;
@@ -61,6 +62,7 @@ pixel main_f(fragment IN,
 
 //    col.a = col.a * 0.3;
 //    clip(col.a - param);
+	col.a = col.a * 0.3 * (param2+0.2);
 
     OUT.color = col;
 //    add_shadow(OUT.color, shadowCoeff /* shadowCoeff2*/);

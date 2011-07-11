@@ -31,6 +31,7 @@
 #include "Stage.h"
 #include "ItinerPoint.h"
 #include "LoadingThread.h"
+#include <CSceneNodeAnimatorCameraFPS.h>
 
 
 // static stuff
@@ -510,6 +511,8 @@ void TheGame::loop()
                         {
                             str += L"0";
                         }
+                        str += L"     FPS speed: ";
+                        str += (int)(getFPSSpeed()*10.f);
                         
                         hud->getEditorText()->setText(str.c_str());
                     }
@@ -641,6 +644,54 @@ void TheGame::switchCamera()
     camera->setTarget(tar);
     if (cameraOffsetObject) cameraOffsetObject->setNode(camera);
 }
+
+float TheGame::getFPSSpeed()
+{
+    float ret = 0.0f;
+    if (!fps_camera->getAnimators().empty())
+    {
+        ret = ((irr::scene::CSceneNodeAnimatorCameraFPS*)(*(fps_camera->getAnimators().begin())))->getMoveSpeed();
+    }
+    return ret;
+}
+
+void TheGame::setFPSSpeed(float speed)
+{
+    if (!fps_camera->getAnimators().empty())
+    {
+        ((irr::scene::CSceneNodeAnimatorCameraFPS*)(*(fps_camera->getAnimators().begin())))->setMoveSpeed(speed);
+    }
+}
+
+void TheGame::incFPSSpeed()
+{
+    float fpsSpeed = getFPSSpeed();
+    if (fpsSpeed > 1.95f)
+    {
+        fpsSpeed = 2.0f;
+    }
+    else
+    {
+        fpsSpeed += 0.1f;
+    }
+    setFPSSpeed(fpsSpeed);
+}
+
+void TheGame::decFPSSpeed()
+{
+    float fpsSpeed = getFPSSpeed();
+    if (fpsSpeed < 0.15f)
+    {
+        fpsSpeed = 0.1f;
+    }
+    else
+    {
+        fpsSpeed -= 0.1f;
+    }
+    setFPSSpeed(fpsSpeed);
+}
+
+
 
 void TheGame::handleUpdatePos(bool phys)
 {

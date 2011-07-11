@@ -61,7 +61,10 @@
         services->setVertexShaderConstant("shininess",&shininess, 1);
 
 #define ADD_PARAM_F \
-        services->setPixelShaderConstant("param", &material.MaterialTypeParam, 1);
+        services->setPixelShaderConstant("param", &material->MaterialTypeParam, 1);
+
+#define ADD_PARAM2_F \
+        services->setPixelShaderConstant("param2", &material->MaterialTypeParam2, 1);
 
 #define ADD_TEX0 \
         float tex0 = 0.f; \
@@ -75,7 +78,7 @@ class SM20_ShaderCallback : public irr::video::IShaderConstantSetCallBack
 {
 public:
     SM20_ShaderCallback()
-        : device(TheGame::getInstance()->getDevice()), driver(TheGame::getInstance()->getDriver())
+        : device(TheGame::getInstance()->getDevice()), driver(TheGame::getInstance()->getDriver()), material(0)
     {
         callbacks.insert(this);
     }
@@ -85,9 +88,15 @@ public:
         //assert(0);
     }
 
+	virtual void OnSetMaterial(const irr::video::SMaterial& material)
+    {
+        this->material = &material;
+    }
+
 public:
     irr::IrrlichtDevice*        device;
     irr::video::IVideoDriver*   driver;
+    irr::video::SMaterial*      material;
 
 public:
     static std::set<SM20_ShaderCallback*> callbacks;
@@ -170,6 +179,29 @@ public:
         //ADD_EYEPOSITION_SHINE_V
         //ADD_TEX0
         //ADD_PARAM_F
+    }
+
+};
+
+class SM20_ShaderCallback_normal_no_light_smoke : public SM20_ShaderCallback
+{
+public:
+    SM20_ShaderCallback_normal_no_light()
+    {
+    }
+
+    virtual void OnSetConstants(irr::video::IMaterialRendererServices* services, int userData)
+    {
+        ADD_WORLD_V
+        ADD_WORLD_VIEW_PROJ_V
+        //ADD_INV_WORLD_V
+        //ADD_TEXTURE_MATRIX_V
+        //ADD_LIGHT_COL_V
+        //ADD_LIGHT_POS_V
+        //ADD_EYEPOSITION_SHINE_V
+        //ADD_TEX0
+        //ADD_PARAM_F
+        ADD_PARAM2_F
     }
 
 };
@@ -300,6 +332,14 @@ void ShadersSM20::loadSM20Materials()
                     shaderFile.c_str(), "main_v", vs_version,
                     shaderFile.c_str(), "main_f", ps_version,
                     new SM20_ShaderCallback_normal_no_light(), /*irr::video::EMT_SOLIDirr::video::EMT_TRANSPARENT_ALPHA_CHANNEL*/baseMaterial, 0, shadingLanguage);
+            }
+            else if (materialName=="smoke")
+            {
+                // use specific shader CB
+                materialMap[materialName] = (irr::video::E_MATERIAL_TYPE)gpu->addHighLevelShaderMaterialFromFiles(
+                    shaderFile.c_str(), "main_v", vs_version,
+                    shaderFile.c_str(), "main_f", ps_version,
+                    new SM20_ShaderCallback_normal_no_light_smoke(), /*irr::video::EMT_SOLIDirr::video::EMT_TRANSPARENT_ALPHA_CHANNEL*/baseMaterial, 0, shadingLanguage);
             }
             else if (materialName=="vehicle")
             {

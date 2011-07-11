@@ -22,6 +22,7 @@
 class VehicleType;
 class VehicleTypeTyre;
 class MySound;
+class Smoke;
 
 
 // -------------------------------------------------------
@@ -85,6 +86,8 @@ public:
 private:
     virtual void handleUpdatePos(bool phys);
     void updateToMatrix();
+    void addSmoke(const float speed, const vector3df &pos, float offset);
+    void updateSmoke();
 
 private:
     VehicleType*                vehicleType;
@@ -99,6 +102,7 @@ private:
     irr::core::vector3df        linearVelocity;
     float                       distance;
     irr::core::vector3df        lastPos;
+    Smoke**                     smokes;
     
 
     friend class FrictionMapVehicleRaycastWheelCollide;
