@@ -240,7 +240,7 @@ TheEarth::TheEarth()
       miniMapTexture(0),
       lastMiniMapPos(),
       smokeTexture(0),
-      smokeMaterial(0),
+      smokeMaterial((irr::video::E_MATERIAL_TYPE)0),
       xsize(0),
       ysize(0),
       height(0),

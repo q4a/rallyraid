@@ -8,6 +8,7 @@
 #include "stdafx.h"
 #include "Shaders.h"
 #include "TheEarth.h"
+#include "TheGame.h"
 
 #include <Physics/Vehicle/WheelCollide/RayCast/hkpVehicleRayCastWheelCollide.h>
 #include <Physics/Vehicle/hkpVehicleInstance.h>
@@ -57,10 +58,13 @@ public:
     void renew(const float speed, const irr::core::vector3df& pos, float offset/*, float p_waterHeight*/);
     
 private:
-    scene::IBillboardSceneNode* node;
-    float speed;
-    int animePhase;
-    OffsetObject* offsetObject;
+    irr::scene::IBillboardSceneNode*    node;
+    float                               speed;
+    int                                 animePhase;
+    OffsetObject*                       offsetObject;
+
+
+    friend class Vehicle;
 };
 
 
@@ -132,7 +136,8 @@ Vehicle::Vehicle(const std::string& vehicleTypeName, const irr::core::vector3df&
       linearVelocity(),
       distance(0.0f),
       lastPos(),
-      smokes(new Smoke*[MAX_SMOKES])
+      smokes(new Smoke*[MAX_SMOKES]),
+      physUpdates(0)
 {
     dprintf(MY_DEBUG_NOTE, "Vehicle::Vehicle(): %p, [%s]\n", this, vehicleTypeName.c_str());
     vehicleType = VehicleTypeManager::getInstance()->getVehicleType(vehicleTypeName);
@@ -481,6 +486,9 @@ void Vehicle::handleUpdatePos(bool phys)
 {
     if (phys)
     {
+        physUpdates++;
+        const bool actual = ((physUpdates % 3) == 0);
+
         hkVector4 hkLV = hkBody->getLinearVelocity();
         hkVector4 hkPos = /*hkVehicle->getChassis()*/hkBody->getPosition();
         hkQuaternion hkQuat = /*hkVehicle->getChassis()*/hkBody->getRotation();
@@ -496,9 +504,9 @@ void Vehicle::handleUpdatePos(bool phys)
         linearVelocity.Y = hkLV(1);
         linearVelocity.Z = hkLV(2);
 
-        float speed = getSpeed();
-        float angularVelocity = fabsf(speed);
-        float ssSpeed = angularVelocity/80.f+1.0f;
+        const float speed = getSpeed();
+        const float angularVelocity = fabsf(speed);
+        const float ssSpeed = angularVelocity/80.f+1.0f;
         float ssGear = (hkVehicle->calcRPM() * 1.5f) / vehicleType->maxTorque + 1.0f;
 
         if (ssGear > 2.5f) ssGear = 2.5f;
@@ -537,9 +545,9 @@ void Vehicle::handleUpdatePos(bool phys)
             if (tyres[i]->hitBody)
             {
                 onGround = true;
-                if (tyres[i]->hitBody->hasProperty(hk::materialType::terrainId))
+                if (tyres[i]->hitBody->hasProperty(hk::materialType::terrainId) && actual && speed > 5.f)
                 {
-                    addSmoke(getSpeed()*0.4f, tyres[i]->node->getPosition(), tyres[i]->radius);
+                    addSmoke(speed*0.4f, tyres[i]->node->getPosition(), tyres[i]->radius);
                 }
             }
         }
@@ -702,13 +710,13 @@ void Vehicle::updateSmoke()
     
     for(;ind<MAX_SMOKES;ind++)
     {
-        if (smokes[ind])
+        if (smokes[ind] && smokes[ind]->animePhase >= 0)
         {
             if (smokes[ind]->animePhase < MAX_SMOKES/3)
             {
-                //printf("update smoke\n");
+                //printf("update smoke ind: %d, ap: %d\n", ind, smokes[ind]->animePhase);
                 irr::core::dimension2df size(1.f,1.f);
-                float scale = (smokes[ind]->speed/100.f);
+                float scale = (smokes[ind]->speed/90.f);
 
                 //size = smokes[ind]->node->getSize();
                 size *= smokes[ind]->animePhase * scale;
@@ -731,51 +739,50 @@ void Vehicle::updateSmoke()
 }
 
 Smoke::Smoke(const float speed, const irr::core::vector3df& pos, float offset/*, float p_waterHeight*/)
-    : speed(fabsf(speed)),
+    : speed(speed),
       animePhase(0),
       offsetObject(0)
 {
-    //printf("add smoke\n");
+    //printf("new smoke\n");
     float addrX = (float)((rand()%20) - 10) / 20.0f;
     float addrZ = (float)((rand()%20) - 10) / 20.0f;
 
-    node = smgr->addBillboardSceneNode(0, irr::core::dimension2df(0.2f, 0.2f), irr::core::vector3df(pos.X+addrX, pos.Y, pos.Z+addrZ));
-	//node->setMaterialFlag(video::EMF_LIGHTING, false);
+    node = TheGame::getInstance()->getSmgr()->addBillboardSceneNode(0, irr::core::dimension2df(0.2f, 0.2f), irr::core::vector3df(pos.X+addrX, pos.Y, pos.Z+addrZ));
+    //node->setMaterialFlag(video::EMF_LIGHTING, false);
     node->setMaterialFlag(irr::video::EMF_LIGHTING, false);
     node->setMaterialFlag(irr::video::EMF_TEXTURE_WRAP, true);
     node->setMaterialFlag(irr::video::EMF_BLEND_OPERATION, true);
-	node->setMaterialType(TheEarth::getInstance()->getSmokeMaterial()/*Shaders::getInstance()->materialMap["normal_no_light_t"]*/);
+    node->setMaterialType(TheEarth::getInstance()->getSmokeMaterial()/*Shaders::getInstance()->materialMap["normal_no_light_t"]*/);
     node->getMaterial(0).MaterialTypeParam2 = 1.0f;
     //if (pos.Y - offset > p_waterHeight)
     //{
-	   node->setMaterialTexture(0, TheEarth::getInstance()->getSmokeTexture());
+       node->setMaterialTexture(0, TheEarth::getInstance()->getSmokeTexture());
     //}
     //else
     //{
-	//   node->setMaterialTexture(0, smokeWaterTexture);
+    //   node->setMaterialTexture(0, smokeWaterTexture);
     //}
 }
 
-void NewtonRaceCar::Smoke::renew(const float speed, const irr::core::vector3df& pos, float offset/*, float p_waterHeight*/)
+void Smoke::renew(const float speed, const irr::core::vector3df& pos, float offset/*, float p_waterHeight*/)
 {
-    //printf("add smoke\n");
+    //printf("renew smoke\n");
     float addrX = (float)((rand()%20) - 10) / 20.0f;
     float addrZ = (float)((rand()%20) - 10) / 20.0f;
     
-    this->speed = fabsf(speed);
+    this->speed = speed;
     animePhase = 0;
 
     node->getMaterial(0).MaterialTypeParam2 = 1.0f;
-    node->setSize(core::dimension2d<f32>(0.2f, 0.2f));
-    node->setPosition(vector3df(pos.X+addrX, pos.Y, pos.Z+addrZ));
+    node->setSize(irr::core::dimension2df(0.2f, 0.2f));
+    node->setPosition(irr::core::vector3df(pos.X+addrX, pos.Y, pos.Z+addrZ));
     node->setVisible(true);
     //if (pos.Y - offset > p_waterHeight)
     //{
-	   node->setMaterialTexture(0, TheEarth::getInstance()->getSmokeTexture());
+       node->setMaterialTexture(0, TheEarth::getInstance()->getSmokeTexture());
     //}
     //else
     //{
-	//   node->setMaterialTexture(0, smokeWaterTexture);
+    //   node->setMaterialTexture(0, smokeWaterTexture);
     //}
 }
-

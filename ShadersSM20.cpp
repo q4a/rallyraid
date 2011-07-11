@@ -94,9 +94,9 @@ public:
     }
 
 public:
-    irr::IrrlichtDevice*        device;
-    irr::video::IVideoDriver*   driver;
-    irr::video::SMaterial*      material;
+    irr::IrrlichtDevice*            device;
+    irr::video::IVideoDriver*       driver;
+    const irr::video::SMaterial*    material;
 
 public:
     static std::set<SM20_ShaderCallback*> callbacks;
@@ -186,7 +186,7 @@ public:
 class SM20_ShaderCallback_normal_no_light_smoke : public SM20_ShaderCallback
 {
 public:
-    SM20_ShaderCallback_normal_no_light()
+    SM20_ShaderCallback_normal_no_light_smoke()
     {
     }
 

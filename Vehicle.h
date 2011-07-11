@@ -86,7 +86,7 @@ public:
 private:
     virtual void handleUpdatePos(bool phys);
     void updateToMatrix();
-    void addSmoke(const float speed, const vector3df &pos, float offset);
+    void addSmoke(const float speed, const irr::core::vector3df& pos, float offset);
     void updateSmoke();
 
 private:
@@ -103,7 +103,8 @@ private:
     float                       distance;
     irr::core::vector3df        lastPos;
     Smoke**                     smokes;
-    
+    unsigned int                physUpdates;
+
 
     friend class FrictionMapVehicleRaycastWheelCollide;
     friend class VehicleTyre;
