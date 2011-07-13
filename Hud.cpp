@@ -10,6 +10,7 @@
 #include "ItinerPoint.h"
 #include "WayPointManager.h"
 #include "WStringConverter.h"
+#include "ShadowRenderer.h"
 
 
 // normalize angle between 0 and 360
@@ -101,6 +102,7 @@ Hud::Hud()
       compassWPQuad(0),
       tripMasterQuad(0),
       roadBookBGQuad(0),
+      roadBookBGOQuad(0),
       compassText(0),
       tmPartText(0),
       tmTotalText(0),
@@ -111,6 +113,8 @@ Hud::Hud()
     miniMapQuad = new ScreenQuad(TheGame::getInstance()->getDriver(),
         irr::core::position2di(HUD_PADDING, TheGame::getInstance()->getDriver()->getScreenSize().Height - MINIMAP_SIZE - (3*HUD_PADDING) - (2*25)),
         irr::core::dimension2du(MINIMAP_SIZE, MINIMAP_SIZE), false);
+//        irr::core::position2di(HUD_PADDING, TheGame::getInstance()->getDriver()->getScreenSize().Height - MINIMAP_SIZE*3 - (3*HUD_PADDING) - (2*25)),
+//        irr::core::dimension2du(MINIMAP_SIZE*3, MINIMAP_SIZE*3), false);
     miniMapQuad->getMaterial().MaterialType = Shaders::getInstance()->materialMap["quad2d"];
 
     tripMasterQuad = new ScreenQuad(TheGame::getInstance()->getDriver(),
@@ -125,7 +129,7 @@ Hud::Hud()
     tripMasterQuad->getMaterial().setFlag(irr::video::EMF_TRILINEAR_FILTER, false);
     tripMasterQuad->getMaterial().setFlag(irr::video::EMF_BLEND_OPERATION, true);
     tripMasterQuad->getMaterial().UseMipMaps = false;
-    tripMasterQuad->getMaterial().setTexture(0, TheGame::getInstance()->getDriver()->getTexture("data/hud/tripmaster.png"));
+    tripMasterQuad->getMaterial().setTexture(0, TheGame::getInstance()->getDriver()->getTexture("data/hud/tripmaster2.png"));
 
     compassQuad = new ScreenQuad(TheGame::getInstance()->getDriver(),
         irr::core::position2di(TheGame::getInstance()->getDriver()->getScreenSize().Width - COMPASS_SIZE - COMPASS_WP_ARROW_HDIFF - HUD_PADDING,
@@ -187,6 +191,18 @@ Hud::Hud()
     roadBookBGQuad->getMaterial().setFlag(irr::video::EMF_TRILINEAR_FILTER, false);
     roadBookBGQuad->getMaterial().UseMipMaps = false;
     roadBookBGQuad->getMaterial().setTexture(0, TheGame::getInstance()->getDriver()->getTexture("data/hud/roadbookbg.png"));
+
+    roadBookBGOQuad = new ScreenQuad(TheGame::getInstance()->getDriver(),
+        irr::core::position2di(TheGame::getInstance()->getDriver()->getScreenSize().Width/2 - ROADBOOKBG_HSIZE_X,
+        TheGame::getInstance()->getDriver()->getScreenSize().Height - ROADBOOKBG_SIZE_Y - HUD_PADDING),
+        irr::core::dimension2du(ROADBOOKBG_SIZE_X, ROADBOOKBG_SIZE_Y), false);
+    roadBookBGOQuad->getMaterial().MaterialType = Shaders::getInstance()->materialMap["quad2d_t"];
+    roadBookBGOQuad->getMaterial().setFlag(irr::video::EMF_ANTI_ALIASING, false);
+    roadBookBGOQuad->getMaterial().setFlag(irr::video::EMF_BILINEAR_FILTER, false);
+    roadBookBGOQuad->getMaterial().setFlag(irr::video::EMF_TRILINEAR_FILTER, false);
+    roadBookBGOQuad->getMaterial().setFlag(irr::video::EMF_BLEND_OPERATION, true);
+    roadBookBGOQuad->getMaterial().UseMipMaps = false;
+    roadBookBGOQuad->getMaterial().setTexture(0, TheGame::getInstance()->getDriver()->getTexture("data/hud/roadbookbg_over.png"));
 
     for (unsigned int i = 0; i < 4; i++)
     {
@@ -305,6 +321,12 @@ Hud::~Hud()
         roadBookBGQuad = 0;
     }
 
+    if (roadBookBGOQuad)
+    {
+        delete roadBookBGOQuad;
+        roadBookBGOQuad = 0;
+    }
+
     for (unsigned int i = 0; i < 4; i++)
     {
         if (roadBookEntries[i].itinerQuad)
@@ -331,6 +353,7 @@ void Hud::setVisible(bool newVisible)
     compassWPQuad->setVisible(WayPointManager::getInstance()->getShowCompass() && visible);
     tripMasterQuad->setVisible(visible);
     roadBookBGQuad->setVisible(visible);
+    roadBookBGOQuad->setVisible(visible);
 
     compassText->setVisible(visible);
     tmPartText->setVisible(visible);
@@ -349,7 +372,7 @@ void Hud::preRender(float p_angle)
     float angle = -p_angle-90.f;
     irr::core::stringw str;
 
-    miniMapQuad->getMaterial().setTexture(0, TheEarth::getInstance()->getMiniMapTexture());
+    miniMapQuad->getMaterial().setTexture(0, TheEarth::getInstance()->getMiniMapTexture()/*ShadowRenderer::getInstance()->getShadowMap()*/);
     compassQuad->rotate(angle);
 
     str = L"";
@@ -453,6 +476,7 @@ void Hud::render()
         roadBookEntries[i].itinerQuad->render();
         roadBookEntries[i].itiner2Quad->render();
     }
+    roadBookBGOQuad->render();
 }
 
 void Hud::updateRoadBook()

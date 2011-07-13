@@ -6,4 +6,80 @@ float calc_multip(float color, float m)
     return (1.0-ret);
 }
 
+float4 calculate_shadow_ter(in float4 texCoordProj,
+                            in sampler2D shadowMap,
+                            in float shadowParam,
+                            in float shadowRes,
+                            in float height
+)
+{
+  const float4 nshadow = float4(1.0, 1.0, 1.0, 1.0);
+  const float4 hshadow = float4(0.7, 0.7, 0.7, 1.0);
+  float4 col = nshadow;
 
+  float4 sh = tex2D(shadowMap, float2(texCoordProj.x, texCoordProj.y*shadowParam));
+//  float shh = ((sh.x * 256) + sh.y)*256;
+  float shd = sh.z;
+  if (0<=texCoordProj.x && texCoordProj.x<=1.0 && 0<=texCoordProj.y && texCoordProj.y<=1.0
+      && shadowParam!=0.0 &&
+      shd > 0.01
+//      && shh > height
+     )
+  {
+      col = lerp(nshadow, hshadow, shd);
+  }
+  return col;
+}
+
+float4 calculate_shadow_obj(in float4 texCoordProj,
+                            in sampler2D shadowMap,
+                            in float shadowParam,
+                            in float shadowRes,
+                            in float height
+)
+{
+  const float4 nshadow = float4(1.0, 1.0, 1.0, 1.0);
+  const float4 hshadow = float4(0.7, 0.7, 0.7, 1.0);
+  float4 col = nshadow;
+
+  float4 sh = tex2D(shadowMap, float2(texCoordProj.x, texCoordProj.y*shadowParam));
+//  float shh = ((sh.x * 256) + sh.y)*256;
+  float sht = sh.y;
+  float shd = sh.z;
+  if (0<=texCoordProj.x && texCoordProj.x<=1.0 && 0<=texCoordProj.y && texCoordProj.y<=1.0
+      && shadowParam!=0.0 &&
+      shd > 0.01
+      && sht > 0.01
+//      && shh > height
+     )
+  {
+      col = lerp(nshadow, hshadow, shd);
+  }
+  return col;
+}
+
+float4 calculate_shadow_vehicle(in float4 texCoordProj,
+                                in sampler2D shadowMap,
+                                in float shadowParam,
+                                in float shadowRes
+)
+{
+  const float4 nshadow = float4(1.0, 1.0, 1.0, 1.0);
+  const float4 hshadow = float4(0.7, 0.7, 0.7, 1.0);
+  float4 col = nshadow;
+
+  float3 shd = tex2D(shadowMap, float2(texCoordProj.x, texCoordProj.y*shadowParam)).xyz;
+  if (0<=texCoordProj.x && texCoordProj.x<=1.0 && 0<=texCoordProj.y && texCoordProj.y<=1.0
+      && shadowParam!=0.0 &&
+      shd.z > 0.01 && shd.y < 0.01
+)
+  {
+      col = lerp(nshadow, hshadow, shd.z);
+  }
+  return col;
+}
+
+void add_shadow(in out float4 oColor, in float4 shadowCoeff)
+{
+    oColor.xyz *= shadowCoeff.xyz;
+}

@@ -31,6 +31,7 @@
 #include "Stage.h"
 #include "ItinerPoint.h"
 #include "LoadingThread.h"
+#include "ShadowRenderer.h"
 #include <CSceneNodeAnimatorCameraFPS.h>
 
 
@@ -171,6 +172,8 @@ TheGame::TheGame()
         offsetManager = OffsetManager::getInstance();
         dprintf(MY_DEBUG_NOTE, "Initialize object pool manager\n");
         ObjectPoolManager::initialize();
+        dprintf(MY_DEBUG_NOTE, "Initialize shadow renderer\n");
+        ShadowRenderer::initialize();
         dprintf(MY_DEBUG_NOTE, "Initialize road type manager\n");
         RoadTypeManager::initialize();
         roadTypeManager = RoadTypeManager::getInstance();
@@ -296,6 +299,8 @@ TheGame::~TheGame()
     RoadManager::finalize();
     dprintf(MY_DEBUG_NOTE, "Finalize road type manager\n");
     RoadTypeManager::finalize();
+    dprintf(MY_DEBUG_NOTE, "Finalize shadow renderer\n");
+    ShadowRenderer::finalize();
     dprintf(MY_DEBUG_NOTE, "Finalize offsetManager\n");
     OffsetManager::finalize();
     dprintf(MY_DEBUG_NOTE, "Finalize objectPoolManager\n");
@@ -547,6 +552,8 @@ void TheGame::loop()
                 continue;
             }
             failed_render = 0;
+
+            ShadowRenderer::getInstance()->renderShadowNodes();
 
             driver->setRenderTarget(0, true, true, irr::video::SColor(0, 0, 0, 255));
             //printf("prerender\n");

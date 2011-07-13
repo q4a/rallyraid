@@ -1,0 +1,38 @@
+//#include "common.cg"
+
+void main_v(float4 vPosition    : POSITION,
+            float3 vNormal      : NORMAL,
+
+            out float4 oPosition: POSITION,
+            out float4 color    : COLOR,
+            out float3 objPos   : TEXCOORD0,
+            out float3 oNormal  : TEXCOORD1,
+
+            uniform float4x4 mWorldViewProj,
+            uniform float4x4 mWorld
+)
+{
+    oPosition = mul(vPosition, mWorldViewProj);
+// + float4(normalize(vNormal), 1.0)*0.2
+    oNormal = vNormal;
+    //objPos = vPosition;
+//    objPos = mul(mWorld, vPosition).xyz;
+    objPos = mul(vPosition, mWorld).xyz;
+    objPos.y = objPos.y - 0.3;
+//    objPos = vPosition.xyz;
+    color = float4(0, 0, 0, 1.0);
+}
+
+void main_f(float4 position : POSITION,
+            float4 color    : COLOR,
+            float3 objPos   : TEXCOORD0,
+            float3 normal   : TEXCOORD1,
+
+            uniform float  max_shadow,
+
+            out float4 oColor   : COLOR
+)
+{
+//    oColor = float4(objPos.y/(256*256), fmod(objPos.y, 256)/256, 1.0, 1.0);
+    oColor = float4(0, max_shadow, 1.0, 1.0);
+}

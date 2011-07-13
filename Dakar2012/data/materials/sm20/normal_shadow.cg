@@ -10,12 +10,12 @@ void main_v(float4 vPosition    : POSITION,
             out float2 oUv          : TEXCOORD0,
             out float3 objPos       : TEXCOORD1,
             out float3 oNormal      : TEXCOORD2,
-//            out float4 oTexCoordProj: TEXCOORD3,
+            out float4 oTexCoordProj: TEXCOORD3,
 
             uniform float4x4    mWorldViewProj,
             uniform float4x4    mWorld,
             uniform float4x4    mInvWorld,
-//            uniform float4x4    mTextureMatrix,
+            uniform float4x4    mTextureMatrix,
             uniform float3      mLightColor,
             uniform float3      mLightPos
 //            uniform float3      eyePosition,
@@ -25,7 +25,9 @@ void main_v(float4 vPosition    : POSITION,
   oPosition = mul(vPosition, mWorldViewProj);
   oUv = Uv;
   oNormal = vNormal;
-  objPos = mul(mWorld, vPosition).xyz;
+//  objPos = mul(mWorld, vPosition).xyz;
+  objPos = mul(vPosition, mWorld).xyz;
+//  objPos = vPosition.xyz;
 
   float3 normal = mul(mInvWorld, float4(vNormal,0.0)).xyz;
 
@@ -52,10 +54,8 @@ void main_v(float4 vPosition    : POSITION,
   float3 tmp = mLightColor * max(dot(-L, normal), 0.0);
   color = float4(tmp.x, tmp.y, tmp.z, 1.0);
 
-//  oTexCoordProj = mul(mTextureMatrix, vPosition);
-//  oTexCoordProj.xy = float2(oTexCoordProj.x, -oTexCoordProj.y) * 0.5;
-// no need for non d3d calculate shadow
-//  oTexCoordProj.xy = oTexCoordProj.xy / oTexCoordProj.w + float2(0.5, 0.5);
+  oTexCoordProj = mul(vPosition, mTextureMatrix);
+  oTexCoordProj.xy = float2(oTexCoordProj.x, -oTexCoordProj.y) * 0.5 + float2(0.5, 0.5);
 }
 
 void main_f(float4 position         : POSITION,
@@ -63,16 +63,16 @@ void main_f(float4 position         : POSITION,
             float2 Uv               : TEXCOORD0,
             float3 objPos           : TEXCOORD1,
             float3 normal           : TEXCOORD2,
-//            float4 texCoordProj : TEXCOORD3,
+            float4 texCoordProj     : TEXCOORD3,
             uniform sampler2D tex0  : register(s0),
-//            uniform sampler2D shadowMap : register(s1),
-//            uniform float shadowParam,
-//            uniform float shadowRes,
-            out float4 oColor   : COLOR0
+            uniform sampler2D tex1  : register(s1),
+            uniform float shadowParam,
+            uniform float shadowRes,
+            out float4 oColor       : COLOR0
 )
 {
     float4 col = tex2D(tex0, Uv);
-//    float4 shadowCoeff = calculate_shadow_ter(texCoordProj, shadowMap, shadowParam, shadowRes, day_multi);
+    float4 shadowCoeff = calculate_shadow_obj(texCoordProj, tex1, shadowParam, shadowRes, objPos.y);
     float multip = calc_multip(color.x, 0.7);
 
 //    oColor = (color + float4(0.2, 0.2, 0.2, 1.0)) * col;
@@ -80,5 +80,5 @@ void main_f(float4 position         : POSITION,
     oColor.xyz = col.xyz * (multip * 1.6);
 
     oColor.a = col.a;
-//    add_shadow(oColor, shadowCoeff /* shadowCoeff2*/);
+    add_shadow(oColor, shadowCoeff);
 }
