@@ -46,6 +46,8 @@ private:
         RESET_PARTIAL,
         INC_FPS_SPEED,
         DEC_FPS_SPEED,
+        PRINT_MEM_LEAKS,
+        PRINT_MEM_LEAKS_IRR,
         NUMBER_OF_KEYNAMES
     };
     struct KeyProperty
