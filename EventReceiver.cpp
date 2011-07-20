@@ -1,14 +1,4 @@
 
-#ifdef _DEBUG
-#define DETECT_MEM_LEAKS 1
-#endif // _DEBUG 
-
-#ifdef DETECT_MEM_LEAKS
-//#define _CRTDBG_MAP_ALLOC
-//#include <stdlib.h>
-//#include <crtdbg.h>
-#include <vld.h>
-#endif // DETECT_MEM_LEAKS
 
 #include "EventReceiver.h"
 #include "TheGame.h"
@@ -32,6 +22,13 @@
 #include <OISMouse.h>
 #include <OISJoyStick.h>
 
+#ifdef DETECT_MEM_LEAKS
+//#define _CRTDBG_MAP_ALLOC
+//#include <stdlib.h>
+//#include <crtdbg.h>
+#include <vld.h>
+#endif // DETECT_MEM_LEAKS
+
 const std::string EventReceiver::keyMappingFilename = "data/Dakar2012_keymapping.cfg";
 
 EventReceiver::EventReceiver()
@@ -45,10 +42,11 @@ EventReceiver::EventReceiver()
 {
     inputManager = OIS::InputManager::createInputSystem(TheGame::getInstance()->getWindowId());
 
-    for (unsigned int i = 0; i < 10; i++)
-    {
-        new char[100+i];
-    }
+    // for mem leak test
+    //for (unsigned int i = 0; i < 10; i++)
+    //{
+    //    new char[100+i];
+    //}
 
     if (inputManager->getNumberOfDevices(OIS::OISKeyboard) <= 0)
     {
