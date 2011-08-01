@@ -5,6 +5,7 @@
 #include "Competitor.h"
 #include "RaceEngine.h"
 #include "ItinerPoint.h"
+#include "Settings.h"
 #include <assert.h>
 
 
@@ -64,7 +65,7 @@ void Player::initializeVehicle(const std::string& vehicleTypeName, const irr::co
 {
     assert(vehicle == 0);
     competitor->setVehicleTypeName(vehicleTypeName);
-    vehicle = new Vehicle(vehicleTypeName, apos, rotation);
+    vehicle = new Vehicle(vehicleTypeName, apos, rotation, Settings::getInstance()->manualGearShifting, Settings::getInstance()->sequentialGearShifting);
     recenterView = true;
     firstPressed = false;
     distance = savedDistance;

@@ -9,6 +9,7 @@
 #include "EventReceiver.h"
 #include "Settings.h"
 #include "KeyConfig.h"
+#include "Player.h"
 #include <assert.h>
 
 
@@ -25,6 +26,11 @@ MenuPageOptions::MenuPageOptions()
       comboBoxResolution(0),
       comboBoxDisplayBits(0),
       cbFullScreen(0),
+      cbVsync(0),
+      cbShowNames(0),
+      cbNavigationAssistant(0),
+      cbManualShifting(0),
+      cbSequentialShifting(0),
       resolutionMap(),
       lastKeyName(0),
       primary(true)
@@ -149,6 +155,30 @@ MenuPageOptions::MenuPageOptions()
         irr::core::recti(irr::core::position2di(FTW+(PADDING*2), line), irr::core::dimension2di(16, 16)),
         tabGeneral,
         MI_CBNAVIGATIONASSISTANT);
+
+    line += 20;
+    TheGame::getInstance()->getEnv()->addStaticText(L"Manual shifting",
+        irr::core::recti(irr::core::position2di(PADDING, line), irr::core::dimension2di(FTW, 16)),
+        false,
+        false,
+        tabGeneral);
+
+    cbManualShifting = TheGame::getInstance()->getEnv()->addCheckBox(Settings::getInstance()->manualGearShifting,
+        irr::core::recti(irr::core::position2di(FTW+(PADDING*2), line), irr::core::dimension2di(16, 16)),
+        tabGeneral,
+        MI_CBMANUALSHIFTING);
+
+    line += 20;
+    TheGame::getInstance()->getEnv()->addStaticText(L"Sequential shifting (if manual)",
+        irr::core::recti(irr::core::position2di(PADDING, line), irr::core::dimension2di(FTW, 16)),
+        false,
+        false,
+        tabGeneral);
+
+    cbSequentialShifting = TheGame::getInstance()->getEnv()->addCheckBox(Settings::getInstance()->sequentialGearShifting,
+        irr::core::recti(irr::core::position2di(FTW+(PADDING*2), line), irr::core::dimension2di(16, 16)),
+        tabGeneral,
+        MI_CBSEQUENTIALSHIFTING);
 
     // ----------------------------
     // Input
@@ -314,6 +344,22 @@ bool MenuPageOptions::OnEvent(const irr::SEvent &event)
                         Settings::getInstance()->navigationAssistant = ((irr::gui::IGUICheckBox*)event.GUIEvent.Caller)->isChecked();
                         return true;
                         break;
+                    case MI_CBMANUALSHIFTING:
+                        Settings::getInstance()->manualGearShifting = ((irr::gui::IGUICheckBox*)event.GUIEvent.Caller)->isChecked();
+                        if (Player::getInstance()->getVehicle())
+                        {
+                            Player::getInstance()->getVehicle()->setGearShifting(Settings::getInstance()->manualGearShifting, Settings::getInstance()->sequentialGearShifting);
+                        }
+                        return true;
+                        break;
+                    case MI_CBSEQUENTIALSHIFTING:
+                        Settings::getInstance()->sequentialGearShifting = ((irr::gui::IGUICheckBox*)event.GUIEvent.Caller)->isChecked();
+                        if (Player::getInstance()->getVehicle())
+                        {
+                            Player::getInstance()->getVehicle()->setGearShifting(Settings::getInstance()->manualGearShifting, Settings::getInstance()->sequentialGearShifting);
+                        }
+                        return true;
+                        break;
                 };
                 break;
             }
@@ -378,6 +424,8 @@ void MenuPageOptions::refreshGeneral()
     cbVsync->setChecked(Settings::getInstance()->vsync);
     cbShowNames->setChecked(Settings::getInstance()->showNames);
     cbNavigationAssistant->setChecked(Settings::getInstance()->navigationAssistant);
+    cbManualShifting->setChecked(Settings::getInstance()->manualGearShifting);
+    cbSequentialShifting->setChecked(Settings::getInstance()->sequentialGearShifting);
 }
 
 void MenuPageOptions::refreshKB()

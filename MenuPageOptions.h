@@ -30,6 +30,8 @@ public:
         MI_CBVSYNC,
         MI_CBSHOWNAMES,
         MI_CBNAVIGATIONASSISTANT,
+        MI_CBMANUALSHIFTING,
+        MI_CBSEQUENTIALSHIFTING,
 
         NUMBER_OF_MENUITEMS
     };
@@ -63,6 +65,8 @@ private:
     irr::gui::IGUICheckBox* cbVsync;
     irr::gui::IGUICheckBox* cbShowNames;
     irr::gui::IGUICheckBox* cbNavigationAssistant;
+    irr::gui::IGUICheckBox* cbManualShifting;
+    irr::gui::IGUICheckBox* cbSequentialShifting;
 
     std::map<int, int>      resolutionMap;
     int                     lastKeyName;
