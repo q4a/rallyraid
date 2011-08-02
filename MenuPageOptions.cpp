@@ -31,6 +31,8 @@ MenuPageOptions::MenuPageOptions()
       cbNavigationAssistant(0),
       cbManualShifting(0),
       cbSequentialShifting(0),
+      scrollSuspensionSpring(0),
+      scrollSuspensionDamper(0),
       resolutionMap(),
       lastKeyName(0),
       primary(true)
@@ -216,6 +218,42 @@ MenuPageOptions::MenuPageOptions()
     tableKB->addColumn(L"Secondary");
     tableKB->setColumnWidth(2, (tableKB->getRelativePosition().getSize().Width-16)/3);
 
+    // ----------------------------
+    // Vehicle
+    // ----------------------------
+    irr::gui::IGUITab* tabVehicle = tc->addTab(L"Vehicle", 0);
+
+    line = PADDING;
+    TheGame::getInstance()->getEnv()->addStaticText(L"Suspension spring",
+        irr::core::recti(irr::core::position2di(PADDING, line), irr::core::dimension2di(FTW, 16)),
+        false,
+        false,
+        tabVehicle);
+
+    scrollSuspensionSpring = TheGame::getInstance()->getEnv()->addScrollBar(true, 
+            irr::core::recti(irr::core::position2di(FTW+(PADDING*2), line), irr::core::dimension2di(tabGeneral->getRelativePosition().getSize().Width-(4*PADDING)-LTW-FTW, 16)),
+            tabVehicle,
+            MI_SCROLLSUSPENSIONSPRING);
+    scrollSuspensionSpring->setMin(-20);
+    scrollSuspensionSpring->setMax(20);
+    scrollSuspensionSpring->setLargeStep(5);
+    scrollSuspensionSpring->setSmallStep(1);
+
+    line += 20;
+    TheGame::getInstance()->getEnv()->addStaticText(L"Suspension damping",
+        irr::core::recti(irr::core::position2di(PADDING, line), irr::core::dimension2di(FTW, 16)),
+        false,
+        false,
+        tabVehicle);
+
+    scrollSuspensionDamper = TheGame::getInstance()->getEnv()->addScrollBar(true, 
+            irr::core::recti(irr::core::position2di(FTW+(PADDING*2), line), irr::core::dimension2di(tabGeneral->getRelativePosition().getSize().Width-(4*PADDING)-LTW-FTW, 16)),
+            tabVehicle,
+            MI_SCROLLSUSPENSIONDAMPER);
+    scrollSuspensionDamper->setMin(-20);
+    scrollSuspensionDamper->setMax(20);
+    scrollSuspensionDamper->setLargeStep(5);
+    scrollSuspensionDamper->setSmallStep(1);
 
     window->setVisible(false);
 }
@@ -363,6 +401,29 @@ bool MenuPageOptions::OnEvent(const irr::SEvent &event)
                 };
                 break;
             }
+            case irr::gui::EGET_SCROLL_BAR_CHANGED:
+            {
+                switch (id)
+                {
+                    case MI_SCROLLSUSPENSIONSPRING:
+                    {
+                        int pos = scrollSuspensionSpring->getPos();
+                        dprintf(MY_DEBUG_NOTE, "options::scrollbarsuspensionspring::clicked: pos: %d\n", pos);
+                        Player::getInstance()->setSuspensionSpringModifier((float)pos);
+                        return true;
+                        break;
+                    }
+                    case MI_SCROLLSUSPENSIONDAMPER:
+                    {
+                        int pos = scrollSuspensionDamper->getPos();
+                        dprintf(MY_DEBUG_NOTE, "options::scrollbarsuspensiondamper::clicked: pos: %d\n", pos);
+                        Player::getInstance()->setSuspensionDamperModifier((float)pos);
+                        return true;
+                        break;
+                    }
+                };
+                break;
+            }
         };
     }
     return false;
@@ -386,6 +447,7 @@ void MenuPageOptions::refresh()
 {
     refreshGeneral();
     refreshKB();
+    refreshVehicle();
 }
 
 void MenuPageOptions::refreshGeneral()
@@ -473,6 +535,12 @@ void MenuPageOptions::refreshKB()
         }
         tableKB->setCellText(i, 2, str.c_str());
     }
+}
+
+void MenuPageOptions::refreshVehicle()
+{
+    scrollSuspensionSpring->setPos((int)Player::getInstance()->getSuspensionSpringModifier());
+    scrollSuspensionDamper->setPos((int)Player::getInstance()->getSuspensionDamperModifier());
 }
 
 void MenuPageOptions::optionKBClosed()

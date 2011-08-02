@@ -60,8 +60,11 @@ typedef std::vector<VehicleTyre*> tyreVector_t;
 class Vehicle : public OffsetObjectUpdateCB
 {
 public:
+    /* constructor:
+            suspensionSpringModifier and damperModifier must be between -20 .. 20,
+    */
     Vehicle(const std::string& vehicleTypeName, const irr::core::vector3df& apos, const irr::core::vector3df& rotation,
-        bool manual = false, bool sequential = true);
+        bool manual = false, bool sequential = true, float suspensionSpringModifier = 0.0f, float suspensionDamperModifier = 0.0f);
     ~Vehicle();
 
     void reset(const irr::core::vector3df& pos);
@@ -87,6 +90,15 @@ public:
     void setGear(char gear);
     void incGear();
     void decGear();
+
+    /* constructor:
+            suspensionSpringModifier must be between -20 .. 20,
+    */
+    void modifySuspensionSpring(float suspensionSpringModifier = 0.0f);
+    /* constructor:
+            damperModifier must be between -20 .. 20,
+    */
+    void modifySuspensionDamper(float suspensionDamperModifier = 0.0f);
     
     void pause();
     void resume();
@@ -113,6 +125,8 @@ private:
     Smoke**                     smokes;
     unsigned int                physUpdates;
     float                       clutch;
+    float                       suspensionSpringModifier;
+    float                       suspensionDamperModifier;
 
 
     friend class FrictionMapVehicleRaycastWheelCollide;

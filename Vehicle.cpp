@@ -223,7 +223,7 @@ VehicleTyre::~VehicleTyre()
 // -------------------------------------------------------
 
 Vehicle::Vehicle(const std::string& vehicleTypeName, const irr::core::vector3df& apos, const irr::core::vector3df& rotation,
-    bool manual, bool sequential)
+    bool manual, bool sequential, float suspensionSpringModifier, float suspensionDamperModifier)
     : vehicleType(0),
       matrix(),
       node(0),
@@ -237,7 +237,9 @@ Vehicle::Vehicle(const std::string& vehicleTypeName, const irr::core::vector3df&
       lastPos(),
       smokes(new Smoke*[MAX_SMOKES]),
       physUpdates(0),
-      clutch(0.0f)
+      clutch(0.0f),
+      suspensionSpringModifier(suspensionSpringModifier),
+      suspensionDamperModifier(suspensionDamperModifier)
 {
     dprintf(MY_DEBUG_NOTE, "Vehicle::Vehicle(): %p, [%s]\n", this, vehicleTypeName.c_str());
     vehicleType = VehicleTypeManager::getInstance()->getVehicleType(vehicleTypeName);
@@ -290,9 +292,21 @@ Vehicle::Vehicle(const std::string& vehicleTypeName, const irr::core::vector3df&
 
     // Inertia tensor for each axis is calculated by using :
     // (1 / chassis_mass) * (torque(axis)Factor / chassisUnitInertia)
-    hkVehicle->m_data->m_torqueRollFactor = 0.625f;
-    hkVehicle->m_data->m_torquePitchFactor = 0.5f;
-    hkVehicle->m_data->m_torqueYawFactor = 0.35f;
+    // roll - x, yaw - y, pitch - z
+//    hkVehicle->m_data->m_torquePitchFactor = 0.5f;
+////    hkVehicle->m_data->m_torqueYawFactor = 0.35f;
+////    hkVehicle->m_data->m_torqueRollFactor = 0.8f;
+////    hkVehicle->m_data->m_torquePitchFactor = 0.6f;
+//    hkVehicle->m_data->m_torqueYawFactor = 0.425f;
+///    hkVehicle->m_data->m_torqueRollFactor = 0.625f;
+///    hkVehicle->m_data->m_torquePitchFactor = 0.6f;
+///    hkVehicle->m_data->m_torqueYawFactor = 0.6f;
+//    hkVehicle->m_data->m_torqueRollFactor = 0.675f;
+//    hkVehicle->m_data->m_torquePitchFactor = 0.675f;
+//    hkVehicle->m_data->m_torqueYawFactor = 0.8f;
+    hkVehicle->m_data->m_torqueRollFactor = 1.0f;
+    hkVehicle->m_data->m_torquePitchFactor = 1.0f;
+    hkVehicle->m_data->m_torqueYawFactor = 1.0f;
 
     hkVehicle->m_data->m_chassisUnitInertiaYaw = 1.0f;
     hkVehicle->m_data->m_chassisUnitInertiaRoll = 1.0f;
@@ -301,7 +315,7 @@ Vehicle::Vehicle(const std::string& vehicleTypeName, const irr::core::vector3df&
     // Adds or removes torque around the yaw axis 
     // based on the current steering angle.  This will 
     // affect steering.
-    hkVehicle->m_data->m_extraTorqueFactor = -0.5f;
+    hkVehicle->m_data->m_extraTorqueFactor = -2.0f;// -0.5f;
     hkVehicle->m_data->m_maxVelocityForPositionalFriction = 0.0f;
 
     // ------------------------------------------------
@@ -338,7 +352,7 @@ Vehicle::Vehicle(const std::string& vehicleTypeName, const irr::core::vector3df&
     steering->m_maxSteeringAngle = vehicleType->maxSteerAngle * ( HK_REAL_PI / 180 );
     // [mph/h] The steering angle decreases linearly 
     // based on your overall max speed of the vehicle. 
-    steering->m_maxSpeedFullSteeringAngle = 70.0f * (1.605f / 3.6f);
+    steering->m_maxSpeedFullSteeringAngle = /*70.0f*/(vehicleType->maxSpeed * 0.5f) * (1.605f / 3.6f);
     for (unsigned int i = 0; i < tyres.size(); i++)
     {
         steering->m_doesWheelSteer[i] = tyres[i]->tyreType->steerable;
@@ -461,24 +475,27 @@ Vehicle::Vehicle(const std::string& vehicleTypeName, const irr::core::vector3df&
     suspension->m_wheelParams.setSize(hkVehicle->m_data->m_numWheels);
     suspension->m_wheelSpringParams.setSize(hkVehicle->m_data->m_numWheels);
 
+    modifySuspensionSpring(suspensionSpringModifier);
+    modifySuspensionDamper(suspensionDamperModifier);
+
     const hkVector4 downDirection(0.0f, -1.0f, 0.0f);
-    const hkVector4 downDirectionp(0.0f, -1.0f, 0.1f);
-    const hkVector4 downDirectionm(0.0f, -1.0f, -0.1f);
+    const hkVector4 downDirectionp(0.0f, -1.0f, 0.5f);
+    const hkVector4 downDirectionm(0.0f, -1.0f, -0.5f);
     for (unsigned int i = 0; i < tyres.size(); i++)
     {
-        suspension->m_wheelParams[i].m_length = tyres[i]->tyreType->suspensionLength;
-        suspension->m_wheelSpringParams[i].m_strength = tyres[i]->tyreType->suspensionSpring;
-        suspension->m_wheelSpringParams[i].m_dampingCompression = tyres[i]->tyreType->suspensionDamper;
-        suspension->m_wheelSpringParams[i].m_dampingRelaxation = tyres[i]->tyreType->suspensionDamper;
+        //suspension->m_wheelParams[i].m_length = tyres[i]->tyreType->suspensionLength;
+        //suspension->m_wheelSpringParams[i].m_strength = tyres[i]->tyreType->suspensionSpring;
+        //suspension->m_wheelSpringParams[i].m_dampingCompression = tyres[i]->tyreType->suspensionDamper;
+        //suspension->m_wheelSpringParams[i].m_dampingRelaxation = tyres[i]->tyreType->suspensionDamper;
         suspension->m_wheelParams[i].m_hardpointChassisSpace.set(tyres[i]->tyreType->localPos.X, -0.05f, tyres[i]->tyreType->localPos.Z); 
         /*
-        if (m_tires[i]->tirePosition.Z > 0.0f)
+        if (tyres[i]->tyreType->localPos.Z > 0.0f)
         {
-            suspension.m_wheelParams[i].m_directionChassisSpace = downDirectionp;
+            suspension->m_wheelParams[i].m_directionChassisSpace = downDirectionp;
         }
         else
         {
-            suspension.m_wheelParams[i].m_directionChassisSpace = downDirectionm;
+            suspension->m_wheelParams[i].m_directionChassisSpace = downDirectionm;
         }
         */
         suspension->m_wheelParams[i].m_directionChassisSpace = downDirection;
@@ -746,7 +763,7 @@ void Vehicle::reset(const irr::core::vector3df& pos)
         if (rot.Y < 0) rot.Y+=360.f;
     }
     rot.Z = rot.X = 0.f;
-    dprintf(MY_DEBUG_NOTE, "reset car:  mod rot: %f %f %f\n", rot.X, rot.Y, rot.Z);
+    dprintf(MY_DEBUG_NOTE, "reset car:  mod rot: %f %f %f, action-world: %p\n", rot.X, rot.Y, rot.Z, hkVehicle->getWorld());
     matrix.setTranslation(pos);
     // vector3df(0.f, rot.Y, 0.f)
     matrix.setRotationDegrees(rot);
@@ -869,6 +886,42 @@ void Vehicle::decGear()
     if (((VehicleTransmission*)hkVehicle->m_transmission)->gear-1 >= -1)
     {
         ((VehicleTransmission*)hkVehicle->m_transmission)->gear--;
+    }
+}
+
+void Vehicle::modifySuspensionSpring(float suspensionSpringModifier)
+{
+    if (suspensionSpringModifier < -20.f) suspensionSpringModifier = -20.f;
+    if (suspensionSpringModifier > 20.f) suspensionSpringModifier = 20.f;
+    this->suspensionSpringModifier = suspensionSpringModifier;
+    for (unsigned int i = 0; i < tyres.size(); i++)
+    {
+        ((hkpVehicleDefaultSuspension*)hkVehicle->m_suspension)->m_wheelSpringParams[i].m_strength = 
+            tyres[i]->tyreType->suspensionSpring = 30.f + suspensionSpringModifier;
+
+        float suspensionLengthModifier = ((suspensionSpringModifier) * 0.015f);
+        if (suspensionLengthModifier > (tyres[i]->tyreType->suspensionLength*0.25f)) suspensionLengthModifier = (tyres[i]->tyreType->suspensionLength*0.25f);
+        ((hkpVehicleDefaultSuspension*)hkVehicle->m_suspension)->m_wheelParams[i].m_length =
+            tyres[i]->tyreType->suspensionLength - suspensionLengthModifier;
+
+        tyres[i]->tyreType->suspensionDamper = (tyres[i]->tyreType->suspensionSpring * (30.f - suspensionDamperModifier)) / 100.f;
+        ((hkpVehicleDefaultSuspension*)hkVehicle->m_suspension)->m_wheelSpringParams[i].m_dampingCompression = 
+            ((hkpVehicleDefaultSuspension*)hkVehicle->m_suspension)->m_wheelSpringParams[i].m_dampingRelaxation = 
+            tyres[i]->tyreType->suspensionDamper;
+    }
+}
+
+void Vehicle::modifySuspensionDamper(float suspensionDamperModifier)
+{
+    if (suspensionDamperModifier < -20.f) suspensionDamperModifier = -20.f;
+    if (suspensionDamperModifier > 20.f) suspensionDamperModifier = 20.f;
+    this->suspensionDamperModifier = suspensionDamperModifier;
+    for (unsigned int i = 0; i < tyres.size(); i++)
+    {
+        tyres[i]->tyreType->suspensionDamper = (tyres[i]->tyreType->suspensionSpring * (30.f - suspensionDamperModifier)) / 100.f;
+        ((hkpVehicleDefaultSuspension*)hkVehicle->m_suspension)->m_wheelSpringParams[i].m_dampingCompression = 
+            ((hkpVehicleDefaultSuspension*)hkVehicle->m_suspension)->m_wheelSpringParams[i].m_dampingRelaxation = 
+            tyres[i]->tyreType->suspensionDamper;
     }
 }
 

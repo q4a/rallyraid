@@ -33,6 +33,9 @@ public:
         MI_CBMANUALSHIFTING,
         MI_CBSEQUENTIALSHIFTING,
 
+        MI_SCROLLSUSPENSIONSPRING,
+        MI_SCROLLSUSPENSIONDAMPER,
+
         NUMBER_OF_MENUITEMS
     };
 
@@ -54,6 +57,7 @@ private:
     void refresh();
     void refreshGeneral();
     void refreshKB();
+    void refreshVehicle();
 
 private:
     irr::gui::IGUIWindow*   window;
@@ -67,6 +71,8 @@ private:
     irr::gui::IGUICheckBox* cbNavigationAssistant;
     irr::gui::IGUICheckBox* cbManualShifting;
     irr::gui::IGUICheckBox* cbSequentialShifting;
+    irr::gui::IGUIScrollBar* scrollSuspensionSpring;
+    irr::gui::IGUIScrollBar* scrollSuspensionDamper;
 
     std::map<int, int>      resolutionMap;
     int                     lastKeyName;
