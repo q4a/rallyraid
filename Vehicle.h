@@ -54,6 +54,14 @@ private:
 typedef std::vector<VehicleTyre*> tyreVector_t;
 
 
+class VehicleCollisionCB
+{
+protected:
+    virtual ~VehicleCollisionCB() {}
+    virtual void handleCollision(float w) = 0;
+};
+
+
 // -------------------------------------------------------
 //                       Vehicle
 // -------------------------------------------------------
@@ -105,6 +113,7 @@ public:
     void resume();
 
     void setNameText(irr::scene::ITextSceneNode* nameText) {this->nameText = nameText;}
+    void setVehicleCollisionCB(VehicleCollisionCB* vehicleCollisionCB) {this->vehicleCollisionCB = vehicleCollisionCB;}
 
 private:
     virtual void handleUpdatePos(bool phys);
@@ -132,6 +141,7 @@ private:
     float                       suspensionSpringModifier;
     float                       suspensionDamperModifier;
     irr::scene::ITextSceneNode* nameText;
+    VehicleCollisionCB*         vehicleCollsionCB;
 
 
     friend class FrictionMapVehicleRaycastWheelCollide;

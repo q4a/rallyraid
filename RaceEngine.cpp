@@ -124,6 +124,12 @@ Starter::~Starter()
     }
 }
 
+void Starter::handleCollision(float w)
+{
+    assert(vehicle);
+    penaltyTime += unsigned int(w*(float)COLLISION_PENALTY/2);
+}
+
 bool Starter::update(unsigned int currentTime, const irr::core::vector3df& apos, bool camActive)
 {
     if (finishTime) return false;
@@ -131,7 +137,7 @@ bool Starter::update(unsigned int currentTime, const irr::core::vector3df& apos,
 
     if (!competitor->getAi())
     {
-        Player::getInstance()->setStageTime((currentTime - startTime) + penaltyTime);
+        Player::getInstance()->setStageTime((currentTime - startTime), penaltyTime);
         if (!stage->getAIPointList().empty())
         {
             irr::core::vector3df cp(OffsetManager::getInstance()->getOffset()+Player::getInstance()->getVehicleMatrix().getTranslation());
@@ -170,7 +176,7 @@ bool Starter::update(unsigned int currentTime, const irr::core::vector3df& apos,
         if (crashedForever || crashTime)
         {
             vehicle->setHandbrake(1.0f);
-            vehicle->setSteer(0.0f);
+            vehicle->setSteer(0.1f);
             vehicle->setTorque(0.0f);
             
             if (crashTime && lastCrashUpdate != currentTime)
@@ -396,6 +402,18 @@ bool Starter::update(unsigned int currentTime, const irr::core::vector3df& apos,
             if ((currentTime % competitor->getNum()) == 0)
             {
                 generateRandomFailure(camActive);
+                if (crashedForever || crashTime)
+                {
+                    if (!finishTime && nextPoint != stage->getAIPointList().begin() && nextPoint != stage->getAIPointList().end())
+                    {
+                        irr::core::vector3df cp((*prevPoint)->getPos());
+                        irr::core::vector3df ncp((*nextPoint)->getPos());
+                        dir = (ncp - cp);
+                        dir.rotateXZBy(90.0f);
+                        dir.setLength(10.f);
+                        currentPos = cp + dir;
+                    }
+                }
             }
         }
         
@@ -431,6 +449,7 @@ void Starter::switchToVisible()
         irr::core::vector3df(currentPos.X, currentPos.Y+1.7f, currentPos.Z),
         irr::core::vector3df(0.f, rot, 0.f));
     vehicle->setNameText(nameText);
+    vehicle->setVehicleCollisionCB(this);
     raceEngine->addUpdater(this);
     if (Settings::getInstance()->showNames)
     {
@@ -450,6 +469,7 @@ void Starter::switchToNotVisible()
     {
         irr::core::vector3df cp(OffsetManager::getInstance()->getOffset()+vehicle->getMatrix().getTranslation());
         //vehicle->setNameText(0);
+        //vehicle->setVehicleCollisionCB(0);
         delete vehicle;
         vehicle = 0;
         currentPos = cp;

@@ -548,6 +548,11 @@ void Hud::preRender(float p_angle)
       
     str = L"Time: ";
     WStringConverter::addTimeToStr(str, Player::getInstance()->getStageTime());
+    if (Player::getInstance()->getStagePenaltyTime())
+    {
+        str += L", Penalty: ";
+        WStringConverter::addTimeToStr(str, Player::getInstance()->getStagePenaltyTime());
+    }
     stageTimeText->setText(str.c_str());
 
     bool showWPCompass = WayPointManager::getInstance()->getShowCompass();

@@ -94,6 +94,7 @@ private:
         assert(vehicle->hkBody == body);
 
         hkpRigidBody* otherBody = event.getBody(1-event.m_source);
+        Vehicle* otherVehicle = 0;
 
         float speed = vehicle->getSpeed();
         MySound* sound = hitSound;
@@ -105,7 +106,15 @@ private:
             {
                 playSound = false;
             }
-        } else if (otherBody->hasProperty(hk::materialType::terrainId))
+            else
+            {
+                if (otherBody->areContactListenersAdded())
+                {
+                    otherVehicle = ((VehicleCollisionListener*)otherBody->getContactListeners()[0])->vehicle;
+                }
+            }
+        }
+        else if (otherBody->hasProperty(hk::materialType::terrainId))
         {
             sound = hitSoundGround;
         }
@@ -120,6 +129,13 @@ private:
             sound->play();
         }
 
+        // check for penalties
+        if (vehicle && otherVehicle)
+        {
+            assert(vehicle != otherVehicle);
+            checkForPenalties(vehicle, otherVehicle);
+        }
+        
         // call vehicle collision
         irr::core::matrix4 mat = vehicle->matrix;
         mat.makeInverse();
@@ -138,6 +154,12 @@ private:
             , localNormal.X, localNormal.Y, localNormal.Z,
             speed
             );
+    }
+
+private:
+    static void checkForPenalties(Vehicle* vehicle, Vehicle* otherVehicle)
+    {
+        // do not use speed and direction, use instead the linear velocity
     }
 
 private:
@@ -940,16 +962,25 @@ int Vehicle::getGear() const
 float Vehicle::getAngle() const
 {
     irr::core::vector3df rot = matrix.getRotationDegrees();
-    //dprintf(printf("reset car: orig rot: %f %f %f\n", rot.X, rot.Y, rot.Z));
+    irr::core::vector3df roto = rot;
+    if (fabsf(roto.Z-180.f) < 90.f)
+    {
+        if (roto.Y < 90.f)
+            roto.Y = 180.f - roto.Y;
+        if (roto.Y > 270.f)
+            roto.Y = 540.f - roto.Y;
+    }
     if (fabsf(rot.Z-180.f) < 90.f)
     {
-        if (rot.Y < 90.f)
-            rot.Y = 180.f - rot.Y;
-        if (rot.Y > 270.f)
-            rot.Y = 540.f - rot.Y;
+        rot.Y = rot.Y - 180.f;
     }
-    rot.Z = rot.X = 0.f;
-    //dprintf(printf("reset car:  mod rot: %f %f %f\n", rot.X, rot.Y, rot.Z));
+    else
+    {
+        rot.Y = -rot.Y;
+        if (rot.Y < 0) rot.Y+=360.f;
+    }
+    //rot.Z = rot.X = 0.f;
+    printf("Vehicle::getAngle: %f, orig: %f\n", rot.Y, roto.Y);
     return rot.Y;
 }
 

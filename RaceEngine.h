@@ -6,17 +6,17 @@
 #include <set>
 #include <irrlicht.h>
 #include "AIPoint.h"
+#include "Vehicle.h"
 
 class RaceEngine;
 class OffsetObject;
-class Vehicle;
 class Stage;
 class Race;
 class Competitor;
 class CompetitorResult;
 class StageState;
 
-class Starter
+class Starter : public VehicleCollisionCB
 {
 public:
     Starter(Stage* stage,
@@ -26,7 +26,9 @@ public:
             unsigned int place,
             unsigned int globalTime,
             unsigned int globalPenaltyTime);
-    ~Starter();
+    virtual ~Starter();
+
+    virtual void handleCollision(float w);
     
     /*
         update the starter

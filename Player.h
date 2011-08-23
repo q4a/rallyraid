@@ -18,7 +18,7 @@ class Competitor;
 class Starter;
 //class Stage;
 
-class Player
+class Player : public VehicleCollisionCB
 {
 public:
     static void initialize();
@@ -62,7 +62,7 @@ public:
     void lookRight(bool set); // inline
     void lookCenter(bool set); // inline
     void switchToNextView(); // inline
-    void resetVehicle(const irr::core::vector3df& newPos); // inline
+    void resetVehicle(const irr::core::vector3df& newPos);
 
     float getDistance() const; // inline
     void resetDistance(); // inline
@@ -77,7 +77,8 @@ public:
     bool isItinerValid(const ItinerManager::itinerPointList_t::const_iterator& itinerIt); //inline
 
     unsigned int getStageTime(); // inline
-    void setStageTime(unsigned int stageTime); // inline
+    unsigned int getStagePenaltyTime(); // inline
+    void setStageTime(unsigned int stageTime, unsigned int stagePenaltyTime); // inline
 
     float getSuspensionSpringModifier() const; // inline
     float getSuspensionDamperModifier() const; // inline
@@ -89,6 +90,9 @@ public:
 
     const irr::core::vector3df& getSavedPos(); // inline
     const irr::core::vector3df& getSavedRot(); // inline
+
+private:
+    virtual void handleCollision(float w);
 
 private:
     Vehicle*        vehicle;
@@ -104,6 +108,8 @@ private:
     float           savedVehicleDistance;
     unsigned int    stageTime;
     unsigned int    savedStageTime;
+    unsigned int    stagePenaltyTime;
+    unsigned int    savedStagePenaltyTime;
     float           suspensionSpringModifier;
     float           suspensionDamperModifier;
     bool            loaded;
@@ -139,6 +145,15 @@ inline Starter* Player::getStarter()
 inline void Player::setStarter(Starter* starter)
 {
     this->starter = starter;
+    assert(vehicle);
+    if (starter)
+    {
+        vehicle->setVehicleCollisionCB(this);
+    }
+    else
+    {
+        vehicle->setVehicleCollisionCB(0);
+    }
 }
 
 inline bool Player::getFirstPressed() const
@@ -243,15 +258,6 @@ inline void Player::switchToNextView()
     recenterView = true;
 }
 
-inline void Player::resetVehicle(const irr::core::vector3df& newPos)
-{
-    if (vehicle)
-    {
-        vehicle->reset(newPos);
-        recenterView = true;
-    }
-}
-
 inline float Player::getDistance() const
 {
     return distance;
@@ -345,9 +351,15 @@ inline unsigned int Player::getStageTime()
     return stageTime;
 }
 
-inline void Player::setStageTime(unsigned int stageTime)
+inline unsigned int Player::getStagePenaltyTime()
+{
+    return stagePenaltyTime;
+}
+
+inline void Player::setStageTime(unsigned int stageTime, unsigned int stagePenaltyTime)
 {
     this->stageTime = stageTime;
+    this->stagePenaltyTime = stagePenaltyTime;
 }
 
 inline float Player::getSuspensionSpringModifier() const

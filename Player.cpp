@@ -45,6 +45,8 @@ Player::Player()
       savedVehicleDistance(0.f),
       stageTime(0),
       savedStageTime(0),
+      stagePenaltyTime(0),
+      savedStagePenaltyTime(0),
       suspensionSpringModifier(0.0f),
       suspensionDamperModifier(0.0f),
       loaded(false),
@@ -78,6 +80,7 @@ void Player::initializeVehicle(const std::string& vehicleTypeName, const irr::co
     lastVehicleDistance = savedVehicleDistance;
     vehicle->setDistance(savedVehicleDistance);
     stageTime = savedStageTime;
+    stagePenaltyTime = savedStagePenaltyTime;
     if (loaded)
     {
         prevItinerIt = savedPrevItinerIt;
@@ -109,6 +112,7 @@ void Player::initializeVehicle(const std::string& vehicleTypeName, const irr::co
     savedCurrItinerIt = helperItinerPointList.end()/*ItinerManager::itinerPointList_t::const_iterator()*/;
     savedPassedWayPoints.clear();
     savedStageTime = 0;
+    savedStagePenaltyTime = 0;
     loaded = false;
 }
 
@@ -149,6 +153,7 @@ bool Player::save(const std::string& filename)
     ret = fprintf(f, "%u\n", (stage && prevItinerIt!=stage->getItinerPointList().end())?(*prevItinerIt)->getNum():0);
     ret = fprintf(f, "%u\n", (stage && currItinerIt!=stage->getItinerPointList().end())?(*currItinerIt)->getNum():0);
     ret = fprintf(f, "%u\n", stageTime);
+    ret = fprintf(f, "%u\n", stagePenaltyTime);
     ret = fprintf(f, "%f\n", suspensionSpringModifier);
     ret = fprintf(f, "%f\n", suspensionDamperModifier);
     ret = fprintf(f, "%f %f %f\n", savedPos.X, savedPos.Y, savedPos.Z);
@@ -249,10 +254,10 @@ bool Player::load(const std::string& filename, Stage* stage)
         }
     }
 
-    ret = fscanf_s(f, "%u\n", &savedStageTime);
-    if (ret < 1)
+    ret = fscanf_s(f, "%u\n%u\n", &savedStageTime, &savedStagePenaltyTime);
+    if (ret < 2)
     {
-        printf("player file unable to read stage time: %s\n", filename.c_str());
+        printf("player file unable to read stage time and stage penalty time: %s\n", filename.c_str());
         fclose(f);
         return false;
     }
@@ -312,3 +317,35 @@ bool Player::load(const std::string& filename, Stage* stage)
     return true;
 }
 
+void Player::resetVehicle(const irr::core::vector3df& newPos)
+{
+    if (vehicle)
+    {
+        vehicle->reset(newPos);
+        recenterView = true;
+        
+        if (starter)
+        {
+            unsigned int penalty = (RESET_PENALITY - (15*Settings::getInstance()->difficulty));
+            starter->penaltyTime += penalty;
+            core::stringw str = L"Unfair behaviour!\n\nAdd ";
+            WStringConverter::addTimeToStr(str, penalty);
+            str += L" penality, because of restoring car.";
+            MessageManager::getInstance()->addText(str.c_str(), 2);
+        }
+    }
+}
+
+void Player::handleCollision(float w)
+{
+    assert(vehicle);
+    if (starter)
+    {
+        unsigned int penalty = (unsigned int)(w*(float)(COLLISION_PENALITY - (15*Settings::getInstance()->difficulty)));
+        starter->penaltyTime += penalty;
+        core::stringw str = L"Add ";
+        WStringConverter::addTimeToStr(str, penalty);
+        str += L" penality, because of hitting the opponent's car.";
+        MessageManager::getInstance()->addText(str.c_str(), 2);
+    }
+}
