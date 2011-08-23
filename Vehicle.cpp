@@ -96,33 +96,33 @@ private:
         hkpRigidBody* otherBody = event.getBody(1-event.m_source);
         Vehicle* otherVehicle = 0;
 
-        float speed = vehicle->getSpeed();
+        float speed = 0.0f;
         MySound* sound = hitSound;
-        bool playSound = true;
         if (otherBody->hasProperty(hk::materialType::vehicleId))
         {
-            // the other object is also a vehicle: do not play sound for both only the lowest
-            if (body > otherBody)
+            if (otherBody->areContactListenersAdded())
             {
-                playSound = false;
-            }
-            else
-            {
-                if (otherBody->areContactListenersAdded())
-                {
-                    otherVehicle = ((VehicleCollisionListener*)otherBody->getContactListeners()[0])->vehicle;
-                }
+                otherVehicle = ((VehicleCollisionListener*)otherBody->getContactListeners()[0])->vehicle;
             }
         }
         else if (otherBody->hasProperty(hk::materialType::terrainId))
         {
             sound = hitSoundGround;
         }
+
+        if (otherVehicle)
+        {
+            speed = (otherVehicle->getLinearVelocity()-vehicle->getLinearVelocity()).getLength() * 3.6f;
+        }
+        else
+        {
+            speed = vehicle->getLinearVelocity().getLength() * 3.6f;
+        }
         
-        if (playSound && sound)
+        if (sound)
         {
             // play sound
-            float soundVolume = speed / 100.f;
+            float soundVolume = speed / 130.f;
             if (soundVolume > 1.0f) soundVolume = 1.0f;
             sound->setVolume(soundVolume);
             sound->setPosition(point);
@@ -944,8 +944,30 @@ void Vehicle::reset(const irr::core::vector3df& pos)
     hkBody->activate();
     
     //hkVehicle->
-    hkBody->applyLinearImpulse(/*hkVector4(-hkBody->getLinearVelocity()(0), -hkBody->getLinearVelocity()(1), -hkBody->getLinearVelocity()(2))*/hkVector4(0.0f, 1.0f, 0.0f));
+    //hkBody->applyLinearImpulse(/*hkVector4(-hkBody->getLinearVelocity()(0), -hkBody->getLinearVelocity()(1), -hkBody->getLinearVelocity()(2))*/hkVector4(0.0f, 1.0f, 0.0f));
+    //hkBody->applyLinearImpulse(hkVector4(10000.0f, 0.0f, 0.0f));
     updateToMatrix();
+}
+
+void Vehicle::addStartImpulse(float initialSpeed, const irr::core::vector3df& dir)
+{
+    float v = initialSpeed / 3.6f; // km/h -> m/s
+    float m = hkBody->getMass();
+    hkBody->applyLinearImpulse(hkVector4(dir.X*m*v, dir.Y*m*v, dir.Z*m*v));
+}
+
+float Vehicle::getAngle() const
+{
+    irr::core::vector3df rot = matrix.getRotationDegrees();
+    if (fabsf(rot.Z-180.f) < 90.f)
+    {
+        if (rot.Y < 90.f)
+            rot.Y = 180.f - rot.Y;
+        if (rot.Y > 270.f)
+            rot.Y = 540.f - rot.Y;
+    }
+    //rot.Z = rot.X = 0.f;
+    return rot.Y;
 }
 
 int Vehicle::getGear() const
@@ -958,30 +980,6 @@ int Vehicle::getGear() const
     {
         return hkVehicle->m_currentGear+1;
     }
-}
-float Vehicle::getAngle() const
-{
-    irr::core::vector3df rot = matrix.getRotationDegrees();
-    irr::core::vector3df roto = rot;
-    if (fabsf(roto.Z-180.f) < 90.f)
-    {
-        if (roto.Y < 90.f)
-            roto.Y = 180.f - roto.Y;
-        if (roto.Y > 270.f)
-            roto.Y = 540.f - roto.Y;
-    }
-    if (fabsf(rot.Z-180.f) < 90.f)
-    {
-        rot.Y = rot.Y - 180.f;
-    }
-    else
-    {
-        rot.Y = -rot.Y;
-        if (rot.Y < 0) rot.Y+=360.f;
-    }
-    //rot.Z = rot.X = 0.f;
-    printf("Vehicle::getAngle: %f, orig: %f\n", rot.Y, roto.Y);
-    return rot.Y;
 }
 
 const irr::core::matrix4& Vehicle::getViewPos(unsigned int num) const

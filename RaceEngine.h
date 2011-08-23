@@ -28,7 +28,8 @@ public:
             unsigned int globalPenaltyTime);
     virtual ~Starter();
 
-    virtual void handleCollision(float w);
+    virtual void handleHardCollision(float w);
+    virtual void handleSoftCollision(float w);
     
     /*
         update the starter

@@ -6,6 +6,9 @@
 #include "RaceEngine.h"
 #include "ItinerPoint.h"
 #include "Settings.h"
+#include "GamePlay_defs.h"
+#include "WStringConverter.h"
+#include "MessageManager.h"
 #include <assert.h>
 
 
@@ -52,6 +55,7 @@ Player::Player()
       loaded(false),
       savedPos(),
       savedRot(),
+      savedSpeed(),
       prevItinerIt(helperItinerPointList.end()),
       currItinerIt(helperItinerPointList.end()),
       savedPrevItinerIt(helperItinerPointList.end()),
@@ -79,12 +83,16 @@ void Player::initializeVehicle(const std::string& vehicleTypeName, const irr::co
     distance = savedDistance;
     lastVehicleDistance = savedVehicleDistance;
     vehicle->setDistance(savedVehicleDistance);
+    vehicle->setVehicleCollisionCB(this);
     stageTime = savedStageTime;
     stagePenaltyTime = savedStagePenaltyTime;
     if (loaded)
     {
         prevItinerIt = savedPrevItinerIt;
         currItinerIt = savedCurrItinerIt;
+        irr::core::vector3df dir(1.0f, 0.0f, 0.0f);
+        dir = rotation.rotationToDirection(dir);
+        vehicle->addStartImpulse(savedSpeed, dir);
     }
     else
     {
@@ -158,6 +166,7 @@ bool Player::save(const std::string& filename)
     ret = fprintf(f, "%f\n", suspensionDamperModifier);
     ret = fprintf(f, "%f %f %f\n", savedPos.X, savedPos.Y, savedPos.Z);
     ret = fprintf(f, "%f %f %f\n", savedRot.X, savedRot.Y, savedRot.Z);
+    ret = fprintf(f, "%f\n", savedSpeed);
     
     ret = fprintf(f, "%lu\n", passedWayPoints.size());
     for (WayPointManager::wayPointNumSet_t::const_iterator it = passedWayPoints.begin();
@@ -286,6 +295,14 @@ bool Player::load(const std::string& filename, Stage* stage)
         return false;
     }
     
+    ret = fscanf_s(f, "%f\n", &savedSpeed);
+    if (ret < 1)
+    {
+        printf("player file unable to read speed: %s\n", filename.c_str());
+        fclose(f);
+        return false;
+    }
+    
     savedPassedWayPoints.clear();
     ret = fscanf_s(f, "%lu\n", &numOfPWP);
     if (ret < 1)
@@ -326,9 +343,9 @@ void Player::resetVehicle(const irr::core::vector3df& newPos)
         
         if (starter)
         {
-            unsigned int penalty = (RESET_PENALITY - (15*Settings::getInstance()->difficulty));
+            unsigned int penalty = (RESET_PENALTY - (15*Settings::getInstance()->difficulty));
             starter->penaltyTime += penalty;
-            core::stringw str = L"Unfair behaviour!\n\nAdd ";
+            irr::core::stringw str = L"Unfair behaviour!\n\nAdd ";
             WStringConverter::addTimeToStr(str, penalty);
             str += L" penality, because of restoring car.";
             MessageManager::getInstance()->addText(str.c_str(), 2);
@@ -336,16 +353,21 @@ void Player::resetVehicle(const irr::core::vector3df& newPos)
     }
 }
 
-void Player::handleCollision(float w)
+void Player::handleHardCollision(float w)
 {
     assert(vehicle);
     if (starter)
     {
-        unsigned int penalty = (unsigned int)(w*(float)(COLLISION_PENALITY - (15*Settings::getInstance()->difficulty)));
+        unsigned int penalty = (unsigned int)(w*(float)(COLLISION_PENALTY - (15*Settings::getInstance()->difficulty)));
         starter->penaltyTime += penalty;
-        core::stringw str = L"Add ";
+        irr::core::stringw str = L"Add ";
         WStringConverter::addTimeToStr(str, penalty);
         str += L" penality, because of hitting the opponent's car.";
         MessageManager::getInstance()->addText(str.c_str(), 2);
     }
+}
+
+void Player::handleSoftCollision(float w)
+{
+    assert(vehicle);
 }

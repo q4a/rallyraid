@@ -92,7 +92,8 @@ public:
     const irr::core::vector3df& getSavedRot(); // inline
 
 private:
-    virtual void handleCollision(float w);
+    virtual void handleHardCollision(float w);
+    virtual void handleSoftCollision(float w);
 
 private:
     Vehicle*        vehicle;
@@ -115,6 +116,7 @@ private:
     bool            loaded;
     irr::core::vector3df savedPos;
     irr::core::vector3df savedRot;
+    float           savedSpeed;
 
     ItinerManager::itinerPointList_t::const_iterator prevItinerIt;
     ItinerManager::itinerPointList_t::const_iterator currItinerIt;
@@ -145,14 +147,16 @@ inline Starter* Player::getStarter()
 inline void Player::setStarter(Starter* starter)
 {
     this->starter = starter;
-    assert(vehicle);
-    if (starter)
+    if (vehicle)
     {
-        vehicle->setVehicleCollisionCB(this);
-    }
-    else
-    {
-        vehicle->setVehicleCollisionCB(0);
+        if (starter)
+        {
+            vehicle->setVehicleCollisionCB(this);
+        }
+        else
+        {
+            vehicle->setVehicleCollisionCB(0);
+        }
     }
 }
 
@@ -277,6 +281,7 @@ inline void Player::update()
     lastVehicleDistance = vehicleDistance;
     savedPos = vehicle->getMatrix().getTranslation() + OffsetManager::getInstance()->getOffset();
     savedRot = vehicle->getMatrix().getRotationDegrees();
+    savedSpeed = vehicle->getSpeed();
 }
 
 inline void Player::stepItiner()

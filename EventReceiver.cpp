@@ -547,7 +547,7 @@ void EventReceiver::checkEvents()
         if (IS_PRESSED(HANDBRAKE))
         {
             //dprintf(MY_DEBUG_NOTE, "brake pressed\n");
-            Player::getInstance()->getVehicle()->setHandbrake(1);
+            Player::getInstance()->getVehicle()->setHandbrake(1.0f);
         }
         else
         {

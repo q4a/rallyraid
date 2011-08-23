@@ -32,7 +32,7 @@
 #endif
 #define REACHED_POINT_DIST 15.f
 #define REACHED_POINT_DIST_NEAR 20.f
-#define ANGLE_LIMIT 30.f
+#define ANGLE_LIMIT 45.f
 #define AI_STEP (1.15f) // orig: (1.05f)
 
 
@@ -124,10 +124,16 @@ Starter::~Starter()
     }
 }
 
-void Starter::handleCollision(float w)
+void Starter::handleHardCollision(float w)
 {
     assert(vehicle);
     penaltyTime += unsigned int(w*(float)COLLISION_PENALTY/2);
+}
+
+void Starter::handleSoftCollision(float w)
+{
+    assert(vehicle);
+    // do some avoiding stuff
 }
 
 bool Starter::update(unsigned int currentTime, const irr::core::vector3df& apos, bool camActive)
@@ -303,6 +309,9 @@ bool Starter::update(unsigned int currentTime, const irr::core::vector3df& apos,
         //pdprintf(printf("speed: %f, dist: %f, nA %f\n", speed, distToNextPoint, nextPointAngle);)
         
         // calculate torque base
+        // below the low limit - full throttle
+        // abovw the high limit - 0 torque
+        // between them linear interpolate or something
         if (speed < speedLimitLow)
         {
             torque = 1.0f;
@@ -367,9 +376,26 @@ bool Starter::update(unsigned int currentTime, const irr::core::vector3df& apos,
             }
             brake = brake * brakeMulti;
         }
-        vehicle->setHandbrake(brake);
+        //if (competitor->getNum() == 456)
+        //{
+        //    printf("t: %f, b: %f, s: %f\n", torque, brake, steer);
+        //}
         vehicle->setSteer(steer);
-        vehicle->setTorque(-torque);
+        if (brake > 0.9f)
+        {
+            vehicle->setHandbrake(brake);
+            vehicle->setTorque(brake); // + value is brake
+        }
+        else if (brake > 0.0001f)
+        {
+            vehicle->setTorque(brake); // + value is brake
+            vehicle->setHandbrake(0.0f);
+        }
+        else
+        {
+            vehicle->setTorque(-torque); // - value is accelerate
+            vehicle->setHandbrake(0.0f);
+        }
         passedDistance += distanceStep/10.f;
     }
     else // not visible or there is no free pool vehicle
@@ -439,17 +465,25 @@ void Starter::switchToVisible()
 {
     dprintf(MY_DEBUG_INFO, "%d became visible\n", competitor->getNum());
     float rot = 0.f;
+    bool addImpulse = false;
     if (nextPoint != stage->getAIPointList().begin() && nextPoint != stage->getAIPointList().end())
     {
         irr::core::vector2df cp((*nextPoint)->getPos().X, (*nextPoint)->getPos().Z);
         irr::core::vector2df pcp((*prevPoint)->getPos().X, (*prevPoint)->getPos().Z);
         rot = (float)(cp-pcp).getAngle();
+        dir = ((*nextPoint)->getPos() - (*prevPoint)->getPos());
+        dir.normalize();
+        addImpulse = true;
     }
     vehicle = new Vehicle(competitor->getVehicleTypeName(),
         irr::core::vector3df(currentPos.X, currentPos.Y+1.7f, currentPos.Z),
         irr::core::vector3df(0.f, rot, 0.f));
     vehicle->setNameText(nameText);
     vehicle->setVehicleCollisionCB(this);
+    if (addImpulse)
+    {
+        vehicle->addStartImpulse(60.f, dir);
+    }
     raceEngine->addUpdater(this);
     if (Settings::getInstance()->showNames)
     {

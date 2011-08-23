@@ -58,7 +58,18 @@ class VehicleCollisionCB
 {
 protected:
     virtual ~VehicleCollisionCB() {}
-    virtual void handleCollision(float w) = 0;
+
+    /*
+        called when the driven vehicle caused the collision and
+        result in penalty
+    */
+    virtual void handleHardCollision(float w) = 0;
+
+    /*
+        the vehicle participate in collision, but
+        not result in penalty
+    */
+    virtual void handleSoftCollision(float w) = 0;
 };
 
 
@@ -77,6 +88,7 @@ public:
     ~Vehicle();
 
     void reset(const irr::core::vector3df& pos);
+    void addStartImpulse(float initialSpeed, const irr::core::vector3df& dir);
     float getAngle() const;
     int getGear() const;
     float getSpeed() const {return hkVehicle->calcKMPH();}
@@ -141,7 +153,7 @@ private:
     float                       suspensionSpringModifier;
     float                       suspensionDamperModifier;
     irr::scene::ITextSceneNode* nameText;
-    VehicleCollisionCB*         vehicleCollsionCB;
+    VehicleCollisionCB*         vehicleCollisionCB;
 
 
     friend class FrictionMapVehicleRaycastWheelCollide;
