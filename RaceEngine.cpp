@@ -225,6 +225,7 @@ bool Starter::update(unsigned int currentTime, const irr::core::vector3df& apos,
         
         float torque = 1.0f;
         float brake = 0.0f;
+        float brake2 = 0.0f;
         float steer = 0.0f;
         float vehicleAngle = vehicle->getAngle(); normalizeAngle(vehicleAngle);
         const float speed = vehicle->getSpeed();
@@ -232,10 +233,12 @@ bool Starter::update(unsigned int currentTime, const irr::core::vector3df& apos,
         const float speedLimitDist = 40.f;
         const float speedLimitLow = (((vehicle->getVehicleType()->getMaxSpeed()-speedLimitDist-(float)(Settings::getInstance()->difficulty*5)) * ((float)competitor->getStrength()+currentRand+stageRand)) / 100.f);
         const float speedLimitHigh = speedLimitLow + speedLimitDist;
-        const float angleLimit = ANGLE_LIMIT;
-        const float angleLimitMax = 180.f;
-        const float brakeSpeedLimit = 30.f;
-        const float brakeSpeedLimitMax = 5.f;
+        const float angleLimit = ANGLE_LIMIT;       // for the steer calculation
+        const float angleLimitMax = ANGLE_LIMIT*2;  // for the desired speed calculation
+        const float angleLimitMin = 10.f;           // for the desired speed calculation
+        //const float angleLimitMax = 180.f;
+        const float brakeSpeedLimit = 20.f;         // for the desired speed calculation
+        //const float brakeSpeedLimitMax = 5.f;
         
         if (fabsf(speed) < 0.5f)
         {
@@ -304,45 +307,26 @@ bool Starter::update(unsigned int currentTime, const irr::core::vector3df& apos,
         }
         float angleToNext = nextPointAngle - vehicleAngle; normalizeAngle180(angleToNext);
         float angleToNextNext = nextNextPointAngle - vehicleAngle; normalizeAngle180(angleToNextNext);
+        float angleToNextAbs = fabsf(angleToNext);
+        float angleToNextNextAbs = fabsf(angleToNextNext);
         
         //pdprintf(printf("nextPoint: %d, va: %f, nToA %f\n", nextPoint, vehicleAngle, angleToNext);)
         //pdprintf(printf("speed: %f, dist: %f, nA %f\n", speed, distToNextPoint, nextPointAngle);)
-        
-        // calculate torque base
-        // below the low limit - full throttle
-        // abovw the high limit - 0 torque
-        // between them linear interpolate or something
-        if (speed < speedLimitLow)
+        if (competitor->getNum() == 456)
         {
-            torque = 1.0f;
-        }
-        else if (speed > speedLimitHigh)
-        {
-            torque = 0.0f;
-        }
-        else
-        {
-            torque = 0.75f + ((speedLimitHigh - speed)/speedLimitDist) * 0.25f;
+            printf("speed: %f, dist: %f, a2n %f, a2n %f\n", speed, distToNextPoint, angleToNext, angleToNextNext);
         }
         
-        // calculate torque more, and brake
+        // calculate steer
         if (angleToNext > angleLimit)
         {
-            // big difference
-            if (speed > brakeSpeedLimit)
-            {
-                brake = 1.0f;
-            }
+            // big difference +
             steer = 1.0f;
         }
         else
         if (angleToNext < -angleLimit)
         {
-            // big difference
-            if (speed > brakeSpeedLimit)
-            {
-                brake = 1.0f;
-            }
+            // big difference -
             steer = -1.0f;
         }
         else
@@ -351,35 +335,75 @@ bool Starter::update(unsigned int currentTime, const irr::core::vector3df& apos,
             steer = angleToNext / (angleLimit*2.0f);
         }
         
-        // if we are near to the nextPoint calculate some to the next-next point
-        if (distToNextPoint<(REACHED_POINT_DIST_NEAR+(speed*0.5f)) && fabsf(angleToNextNext) > (angleLimit*2.f)/3.f)
+        float desiredSpeed = speedLimitHigh + 6.f;
+
+        // calculate a desired speed to the given angle of next point
+        if (angleToNextAbs > angleLimitMin)
         {
-            float brakeMulti = 0.0f;
-            if (speed > brakeSpeedLimit*4)
+            if (angleToNextAbs > angleLimitMax)
             {
-                brake = 1.0f;
+                desiredSpeed = brakeSpeedLimit;
             }
             else
-            if (speed > brakeSpeedLimit)
             {
-                brake = (speed - brakeSpeedLimit) / (brakeSpeedLimit*3);
+                desiredSpeed = 110.f - angleToNextAbs;
             }
-            
-            if (fabsf(angleToNextNext) > (angleLimit*2.f))
-            {
-                brakeMulti = 1.0f;
-            }
-            else
-            if (fabsf(angleToNextNext) > (angleLimit*2.f)/3.f)
-            {
-                brakeMulti = (fabsf(angleToNextNext) - (angleLimit*2.f)/3.f) / (angleLimit+(angleLimit/3.f));
-            }
-            brake = brake * brakeMulti;
         }
-        //if (competitor->getNum() == 456)
-        //{
-        //    printf("t: %f, b: %f, s: %f\n", torque, brake, steer);
-        //}
+
+        // calculate a desired speed to the given angle of next next point if we are near
+        if (distToNextPoint<(REACHED_POINT_DIST_NEAR+(speed*0.5f)) && angleToNextNextAbs > angleLimitMin)
+        {
+            float desiredSpeed2 = speed;
+            if (angleToNextNextAbs > angleLimitMax)
+            {
+                desiredSpeed2 = brakeSpeedLimit;
+            }
+            else
+            {
+                desiredSpeed2 = 110.f - angleToNextNextAbs;
+            }
+            if (desiredSpeed2 < desiredSpeed) desiredSpeed = desiredSpeed2;
+        }
+
+        if (speed < desiredSpeed - 5.f)
+        {
+            // calculate torque base
+            // below the low limit - full throttle
+            // abovw the high limit - 0 torque
+            // between them linear interpolate or something
+            if (speed < speedLimitLow)
+            {
+                torque = 1.0f;
+            }
+            else if (speed > speedLimitHigh)
+            {
+                torque = 0.0f;
+            }
+            else
+            {
+                torque = 0.75f + ((speedLimitHigh - speed)/speedLimitDist) * 0.25f;
+            }
+        }
+        else if (desiredSpeed - 5.0f < speed && speed < desiredSpeed + 5.0f)
+        {
+            torque = 0.0f;
+        }
+        else // desiredSpeed + 5.0f < speed
+        {
+            torque = 0.0f;
+            float speedDiff = speed - desiredSpeed;
+
+            brake = 1.0f;
+            if (speedDiff < speedLimitDist)
+            {
+                brake = speedDiff / speedLimitDist;
+            }
+        }
+
+        if (competitor->getNum() == 456)
+        {
+            printf("t: %f, b: %f, s: %f, desiredSpeed: %f\n", torque, brake, steer, desiredSpeed);
+        }
         vehicle->setSteer(steer);
         if (brake > 0.9f)
         {
