@@ -88,6 +88,7 @@ public:
     bool crashedForever;
     unsigned int crashTime;
     unsigned int lastCrashUpdate;
+    float lastAngleToNextAbs;
 };
 
 class RaceEngine

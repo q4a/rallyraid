@@ -30,10 +30,14 @@
 #else
 # define START_SECS 60
 #endif
-#define REACHED_POINT_DIST 15.f
+#define REACHED_POINT_DIST      15.f
 #define REACHED_POINT_DIST_NEAR 20.f
-#define ANGLE_LIMIT 45.f
-#define AI_STEP (1.15f) // orig: (1.05f)
+#define ANGLE_LIMIT             45.f
+#define ANGLE_LIMIT_MAX         (ANGLE_LIMIT * 3.f)
+#define ANGLE_LIMIT_MIN         10.f
+#define BRAKE_SPEED_LIMIT_MIN   20.f
+#define BRAKE_SPEED_LIMIT_MAX   110.f
+#define AI_STEP                 (1.15f) // orig: (1.05f)
 
 
 // normalize angle between 0 and 360
@@ -50,6 +54,35 @@ static float normalizeAngle180(float &angle)
     while (angle < -180.f) angle += 360.f;
     return angle;
 }
+
+static float calcDesiredSpeed(float angleToNextAbs, float speedMax)
+{
+    const float angleLimit = ANGLE_LIMIT;           // for the steer calculation
+    const float angleLimitMax = ANGLE_LIMIT_MAX;    // for the desired speed calculation
+    const float angleLimitMin = ANGLE_LIMIT_MIN;    // for the desired speed calculation
+    return (speedMax - angleToNextAbs + angleLimitMin);
+    /*
+    //const float angleLimitMax = 180.f;
+    const float brakeSpeedLimitMin = BRAKE_SPEED_LIMIT_MIN;             // for the desired speed calculation
+    const float brakeSpeedLimitMax = speedMax; //BRAKE_SPEED_LIMIT_MAX;             // for the desired speed calculation
+    const float angleLimitSize = angleLimitMax - angleLimitMin;
+    const float brakeSpeedLimitSize = brakeSpeedLimitMax - brakeSpeedLimitMin;
+
+    const float low = 0.5f;
+    const float high = 1 / low; //2.0f;
+    const float size = high - low;
+
+    float x = ((angleToNextAbs - angleLimitMin) * (size / angleLimitSize)) + low;
+
+    float y = ((1 / x) - low);
+//    float x = ((angleLimitMax - angleToNextAbs) * (size / angleLimitSize)) + low;
+
+//    float y = -((1 / x) - low - size);
+
+    return brakeSpeedLimitMin + ((y * brakeSpeedLimitSize) / size);
+    */
+}
+
 
 Starter::Starter(Stage* stage,
                  RaceEngine* raceEngine,
@@ -70,7 +103,8 @@ Starter::Starter(Stage* stage,
       currentRand(0.f), nameText(0), nameTextOffsetObject(0),
       passedDistance(0.f), distanceStep(0.f), stageRand(0.f),
       globalTime(globalTime), globalPenaltyTime(globalPenaltyTime),
-      crashedForever(false), crashTime(0), lastCrashUpdate(0)
+      crashedForever(false), crashTime(0), lastCrashUpdate(0),
+      lastAngleToNextAbs(180.f)
 {
     const static float placeHardening[3] = {20.f, 8.f, 4.f};
     irr::core::stringw namePlusCar = L"";
@@ -233,12 +267,12 @@ bool Starter::update(unsigned int currentTime, const irr::core::vector3df& apos,
         const float speedLimitDist = 40.f;
         const float speedLimitLow = (((vehicle->getVehicleType()->getMaxSpeed()-speedLimitDist-(float)(Settings::getInstance()->difficulty*5)) * ((float)competitor->getStrength()+currentRand+stageRand)) / 100.f);
         const float speedLimitHigh = speedLimitLow + speedLimitDist;
-        const float angleLimit = ANGLE_LIMIT;       // for the steer calculation
-        const float angleLimitMax = ANGLE_LIMIT*2;  // for the desired speed calculation
-        const float angleLimitMin = 10.f;           // for the desired speed calculation
+        const float angleLimit = ANGLE_LIMIT;           // for the steer calculation
+        const float angleLimitMax = ANGLE_LIMIT_MAX;    // for the desired speed calculation
+        const float angleLimitMin = ANGLE_LIMIT_MIN;    // for the desired speed calculation
         //const float angleLimitMax = 180.f;
-        const float brakeSpeedLimit = 20.f;         // for the desired speed calculation
-        //const float brakeSpeedLimitMax = 5.f;
+        const float brakeSpeedLimitMin = BRAKE_SPEED_LIMIT_MIN;         // for the desired speed calculation
+        //const float brakeSpeedLimitMax = BRAKE_SPEED_LIMIT_MAX;         // for the desired speed calculation
         
         if (fabsf(speed) < 0.5f)
         {
@@ -314,7 +348,8 @@ bool Starter::update(unsigned int currentTime, const irr::core::vector3df& apos,
         //pdprintf(printf("speed: %f, dist: %f, nA %f\n", speed, distToNextPoint, nextPointAngle);)
         if (competitor->getNum() == 456)
         {
-            printf("speed: %f, dist: %f, a2n %f, a2n %f\n", speed, distToNextPoint, angleToNext, angleToNextNext);
+            printf("sp: %d (%d), di: %d, a2n %f, a2n %f\n",
+                (int)speed, (int)(speedLimitHigh+6.f), (int)distToNextPoint, angleToNext, angleToNextNext);
         }
         
         // calculate steer
@@ -322,47 +357,81 @@ bool Starter::update(unsigned int currentTime, const irr::core::vector3df& apos,
         {
             // big difference +
             steer = 1.0f;
+            if (competitor->getNum() == 456) printf("s1");
         }
         else
         if (angleToNext < -angleLimit)
         {
             // big difference -
             steer = -1.0f;
+            if (competitor->getNum() == 456) printf("s2");
         }
         else
         {
             // small difference
-            steer = angleToNext / (angleLimit*2.0f);
+            steer = angleToNext / (angleLimit/*2.0f*/);
+            if (angleToNextAbs > lastAngleToNextAbs)
+            {
+                steer *= 2.0f;
+                if (competitor->getNum() == 456) printf("s3");
+                if (steer < -1.0f) steer = -1.0f;
+                if (steer >  1.0f) steer =  1.0f;
+            }
+            else
+            {
+                if (competitor->getNum() == 456) printf("s4");
+            }
         }
+        lastAngleToNextAbs = angleToNextAbs;
         
-        float desiredSpeed = speedLimitHigh + 6.f;
+        float desiredSpeed = speedLimitHigh + 10.f;
+        if (speed > desiredSpeed) desiredSpeed = speed;
 
         // calculate a desired speed to the given angle of next point
         if (angleToNextAbs > angleLimitMin)
         {
             if (angleToNextAbs > angleLimitMax)
             {
-                desiredSpeed = brakeSpeedLimit;
+                desiredSpeed = brakeSpeedLimitMin;
+                if (competitor->getNum() == 456) printf("n1");
             }
             else
             {
-                desiredSpeed = 110.f - angleToNextAbs;
+                desiredSpeed = calcDesiredSpeed(angleToNextAbs, desiredSpeed);//brakeSpeedLimitMax - angleToNextAbs;
+                if (competitor->getNum() == 456) printf("n2");
             }
+        }
+        else
+        {
+            if (competitor->getNum() == 456) printf("n0");
         }
 
         // calculate a desired speed to the given angle of next next point if we are near
         if (distToNextPoint<(REACHED_POINT_DIST_NEAR+(speed*0.5f)) && angleToNextNextAbs > angleLimitMin)
         {
-            float desiredSpeed2 = speed;
+            float desiredSpeed2 = speedLimitHigh;
+            if (speed > desiredSpeed2) desiredSpeed2 = speed;
+
             if (angleToNextNextAbs > angleLimitMax)
             {
-                desiredSpeed2 = brakeSpeedLimit;
+                desiredSpeed2 = brakeSpeedLimitMin;
+                if (competitor->getNum() == 456) printf("nn1");
             }
             else
             {
-                desiredSpeed2 = 110.f - angleToNextNextAbs;
+                desiredSpeed2 = calcDesiredSpeed(angleToNextNextAbs, desiredSpeed2);//brakeSpeedLimitMax - angleToNextNextAbs;
+                if (competitor->getNum() == 456) printf("nn2");
             }
-            if (desiredSpeed2 < desiredSpeed) desiredSpeed = desiredSpeed2;
+
+            if (desiredSpeed2 < desiredSpeed)
+            {
+                desiredSpeed = desiredSpeed2;
+                if (competitor->getNum() == 456) printf("nn3");
+            }
+        }
+        else
+        {
+            if (competitor->getNum() == 456) printf("nn0");
         }
 
         if (speed < desiredSpeed - 5.f)
@@ -402,7 +471,7 @@ bool Starter::update(unsigned int currentTime, const irr::core::vector3df& apos,
 
         if (competitor->getNum() == 456)
         {
-            printf("t: %f, b: %f, s: %f, desiredSpeed: %f\n", torque, brake, steer, desiredSpeed);
+            printf("\nt: %f, b: %f, s: %f, desiredSpeed: %f\n", torque, brake, steer, desiredSpeed);
         }
         vehicle->setSteer(steer);
         if (brake > 0.9f)
@@ -516,6 +585,7 @@ void Starter::switchToVisible()
     nameTextOffsetObject = new OffsetObject(nameText, true);
     nameTextOffsetObject->addToManager();
     visible = true;
+    lastAngleToNextAbs = 180.f;
     dprintf(MY_DEBUG_INFO, "%d became visible end\n", competitor->getNum());
 }
 
@@ -555,6 +625,7 @@ void Starter::goToNextPoint(unsigned int currentTime, bool camActive)
             prevPointNum = nextPointNum;
             nextPoint++;
             nextPointNum++;
+            lastAngleToNextAbs = 180.f;
         }
         else
         {
