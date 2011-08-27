@@ -92,19 +92,20 @@ Starter::Starter(Stage* stage,
                  unsigned int globalTime,
                  unsigned int globalPenaltyTime
 )
-    : stage(stage), raceEngine(raceEngine),
-      competitor(competitor), startingCD(startingCD),
-      startTime(0), finishTime(0), penaltyTime(0),
+    : raceEngine(raceEngine), stage(stage), competitor(competitor),
+      globalTime(globalTime), globalPenaltyTime(globalPenaltyTime),
+      startingCD(startingCD), startTime(0), finishTime(0), penaltyTime(0),
+      prevPointNum(0), nextPointNum(0), currentPos(),
+      passedDistance(0.f), distanceStep(0.f), 
+      crashedForever(false), crashTime(0),
       prevPoint(stage->getAIPointList().begin()),
       nextPoint(stage->getAIPointList().begin()),
-      prevPointNum(0), nextPointNum(0), currentPos(),
-      visible(false), vehicle(0), forResetCnt(0),
-      forBigResetCnt(0), forNonResetCnt(500),
+      visible(false), vehicle(0),
+      forResetCnt(0), forBigResetCnt(0), forNonResetCnt(500),
       currentRand(0.f), nameText(0), nameTextOffsetObject(0),
-      passedDistance(0.f), distanceStep(0.f), stageRand(0.f),
-      globalTime(globalTime), globalPenaltyTime(globalPenaltyTime),
-      crashedForever(false), crashTime(0), lastCrashUpdate(0),
-      lastAngleToNextAbs(180.f)
+      dir(), stageRand(0.f), lastCrashUpdate(0),
+      lastAngleToNext(0.0f), lastAngleToNextAbs(180.f),
+      collisionCD(0)
 {
     const static float placeHardening[3] = {20.f, 8.f, 4.f};
     irr::core::stringw namePlusCar = L"";
@@ -168,6 +169,14 @@ void Starter::handleSoftCollision(float w)
 {
     assert(vehicle);
     // do some avoiding stuff
+    if (w < 0.0f)
+    {
+        collisionCD = -6;
+    }
+    else
+    {
+        collisionCD = 6;
+    }
 }
 
 bool Starter::update(unsigned int currentTime, const irr::core::vector3df& apos, bool camActive)
@@ -367,21 +376,36 @@ bool Starter::update(unsigned int currentTime, const irr::core::vector3df& apos,
             if (competitor->getNum() == 456) printf("s2");
         }
         else
+        if (angleToNextAbs > 1.5f)
         {
             // small difference
-            steer = angleToNext / (angleLimit/*2.0f*/);
-            if (angleToNextAbs > lastAngleToNextAbs)
+            steer = angleToNext / (angleLimit*2.0f);
+            if ((lastAngleToNext > 0.0f && angleToNext < 0.0f) ||
+                (lastAngleToNext < 0.0f && angleToNext > 0.0f))
             {
-                steer *= 2.0f;
-                if (competitor->getNum() == 456) printf("s3");
-                if (steer < -1.0f) steer = -1.0f;
-                if (steer >  1.0f) steer =  1.0f;
+                if (competitor->getNum() == 456) printf("sh");
+                steer *= 0.3f;
             }
             else
             {
-                if (competitor->getNum() == 456) printf("s4");
+                if (angleToNextAbs > lastAngleToNextAbs)
+                {
+                    steer *= 3.0f;
+                    if (competitor->getNum() == 456) printf("sd");
+                    if (steer < -1.0f) steer = -1.0f;
+                    if (steer >  1.0f) steer =  1.0f;
+                }
+                else
+                {
+                    if (competitor->getNum() == 456) printf("s3");
+                }
             }
         }
+        else
+        {
+            if (competitor->getNum() == 456) printf("s4");
+        }
+        lastAngleToNext = angleToNext;
         lastAngleToNextAbs = angleToNextAbs;
         
         float desiredSpeed = speedLimitHigh + 10.f;
@@ -467,6 +491,18 @@ bool Starter::update(unsigned int currentTime, const irr::core::vector3df& apos,
             {
                 brake = speedDiff / speedLimitDist;
             }
+        }
+
+        if (collisionCD > 0)
+        {
+            collisionCD--;
+            brake = 1.0f;
+            steer = 1.0f;
+        } else if (collisionCD < 0)
+        {
+            collisionCD++;
+            brake = 1.0f;
+            steer = -1.0f;
         }
 
         if (competitor->getNum() == 456)
@@ -567,6 +603,7 @@ void Starter::switchToVisible()
         dir = ((*nextPoint)->getPos() - (*prevPoint)->getPos());
         dir.normalize();
         addImpulse = true;
+        collisionCD = 0;
     }
     vehicle = new Vehicle(competitor->getVehicleTypeName(),
         irr::core::vector3df(currentPos.X, currentPos.Y+1.7f, currentPos.Z),

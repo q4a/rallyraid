@@ -133,7 +133,7 @@ private:
         if (vehicle && otherVehicle)
         {
             assert(vehicle != otherVehicle);
-            checkForPenalties(vehicle, otherVehicle);
+            checkTwoVehicleCollision(vehicle, otherVehicle);
         }
         
         // call vehicle collision
@@ -157,9 +157,17 @@ private:
     }
 
 private:
-    static void checkForPenalties(Vehicle* vehicle, Vehicle* otherVehicle)
+    static void checkTwoVehicleCollision(Vehicle* vehicle, Vehicle* otherVehicle)
     {
         // do not use speed and direction, use instead the linear velocity
+        if (vehicle->vehicleCollisionCB)
+        {
+            vehicle->vehicleCollisionCB->handleSoftCollision(1.0f);
+        }
+        if (otherVehicle->vehicleCollisionCB)
+        {
+            otherVehicle->vehicleCollisionCB->handleSoftCollision(-1.0f);
+        }
     }
 
 private:

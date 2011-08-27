@@ -58,21 +58,31 @@ public:
     void generateRandomFailure(bool camActive);
 
 public:
+    // main things
+    RaceEngine* raceEngine;
     Stage* stage;
     Competitor* competitor;
+
+    // members to save
+    unsigned int globalTime;
+    unsigned int globalPenaltyTime;
     unsigned int startingCD;
     unsigned int startTime;
     unsigned int finishTime;
     unsigned int penaltyTime;
-    //int nextPoint;
-    AIPoint::AIPointList_t::const_iterator prevPoint;
-    AIPoint::AIPointList_t::const_iterator nextPoint;
     unsigned int prevPointNum;
     unsigned int nextPointNum;
     irr::core::vector3df currentPos;
+    float passedDistance;
+    float distanceStep;
+    bool crashedForever;
+    unsigned int crashTime;
+
+    // members for AI calculations
+    AIPoint::AIPointList_t::const_iterator prevPoint;
+    AIPoint::AIPointList_t::const_iterator nextPoint;
     bool visible;
     Vehicle* vehicle;
-    RaceEngine* raceEngine;
     unsigned int forResetCnt;
     unsigned int forBigResetCnt;
     unsigned int forNonResetCnt;
@@ -80,15 +90,11 @@ public:
     irr::scene::ITextSceneNode* nameText;
     OffsetObject* nameTextOffsetObject;
     irr::core::vector3df dir;
-    float passedDistance;
-    float distanceStep;
     float stageRand;
-    unsigned int globalTime;
-    unsigned int globalPenaltyTime;
-    bool crashedForever;
-    unsigned int crashTime;
     unsigned int lastCrashUpdate;
+    float lastAngleToNext;
     float lastAngleToNextAbs;
+    int collisionCD;
 };
 
 class RaceEngine

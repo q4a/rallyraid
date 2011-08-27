@@ -70,6 +70,9 @@ protected:
         not result in penalty
     */
     virtual void handleSoftCollision(float w) = 0;
+
+
+    friend class VehicleCollisionListener;
 };
 
 
