@@ -162,7 +162,10 @@ Starter::~Starter()
 void Starter::handleHardCollision(float w)
 {
     assert(vehicle);
-    penaltyTime += unsigned int(w*(float)COLLISION_PENALTY/2);
+    if (w > 0.001f)
+    {
+        penaltyTime += unsigned int(w*(float)COLLISION_PENALTY/2);
+    }
 }
 
 void Starter::handleSoftCollision(float w)
@@ -355,25 +358,25 @@ bool Starter::update(unsigned int currentTime, const irr::core::vector3df& apos,
         
         //pdprintf(printf("nextPoint: %d, va: %f, nToA %f\n", nextPoint, vehicleAngle, angleToNext);)
         //pdprintf(printf("speed: %f, dist: %f, nA %f\n", speed, distToNextPoint, nextPointAngle);)
-        if (competitor->getNum() == 456)
-        {
-            printf("sp: %d (%d), di: %d, a2n %f, a2n %f\n",
-                (int)speed, (int)(speedLimitHigh+6.f), (int)distToNextPoint, angleToNext, angleToNextNext);
-        }
+        //if (competitor->getNum() == 456)
+        //{
+        //    printf("sp: %d (%d), di: %d, a2n %f, a2n %f\n",
+        //        (int)speed, (int)(speedLimitHigh+6.f), (int)distToNextPoint, angleToNext, angleToNextNext);
+        //}
         
         // calculate steer
         if (angleToNext > angleLimit)
         {
             // big difference +
             steer = 1.0f;
-            if (competitor->getNum() == 456) printf("s1");
+            //if (competitor->getNum() == 456) printf("s1");
         }
         else
         if (angleToNext < -angleLimit)
         {
             // big difference -
             steer = -1.0f;
-            if (competitor->getNum() == 456) printf("s2");
+            //if (competitor->getNum() == 456) printf("s2");
         }
         else
         if (angleToNextAbs > 1.5f)
@@ -383,7 +386,7 @@ bool Starter::update(unsigned int currentTime, const irr::core::vector3df& apos,
             if ((lastAngleToNext > 0.0f && angleToNext < 0.0f) ||
                 (lastAngleToNext < 0.0f && angleToNext > 0.0f))
             {
-                if (competitor->getNum() == 456) printf("sh");
+                //if (competitor->getNum() == 456) printf("sh");
                 steer *= 0.3f;
             }
             else
@@ -391,19 +394,19 @@ bool Starter::update(unsigned int currentTime, const irr::core::vector3df& apos,
                 if (angleToNextAbs > lastAngleToNextAbs)
                 {
                     steer *= 3.0f;
-                    if (competitor->getNum() == 456) printf("sd");
+                    //if (competitor->getNum() == 456) printf("sd");
                     if (steer < -1.0f) steer = -1.0f;
                     if (steer >  1.0f) steer =  1.0f;
                 }
                 else
                 {
-                    if (competitor->getNum() == 456) printf("s3");
+                    //if (competitor->getNum() == 456) printf("s3");
                 }
             }
         }
         else
         {
-            if (competitor->getNum() == 456) printf("s4");
+            //if (competitor->getNum() == 456) printf("s4");
         }
         lastAngleToNext = angleToNext;
         lastAngleToNextAbs = angleToNextAbs;
@@ -417,17 +420,17 @@ bool Starter::update(unsigned int currentTime, const irr::core::vector3df& apos,
             if (angleToNextAbs > angleLimitMax)
             {
                 desiredSpeed = brakeSpeedLimitMin;
-                if (competitor->getNum() == 456) printf("n1");
+                //if (competitor->getNum() == 456) printf("n1");
             }
             else
             {
                 desiredSpeed = calcDesiredSpeed(angleToNextAbs, desiredSpeed);//brakeSpeedLimitMax - angleToNextAbs;
-                if (competitor->getNum() == 456) printf("n2");
+                //if (competitor->getNum() == 456) printf("n2");
             }
         }
         else
         {
-            if (competitor->getNum() == 456) printf("n0");
+            //if (competitor->getNum() == 456) printf("n0");
         }
 
         // calculate a desired speed to the given angle of next next point if we are near
@@ -439,23 +442,23 @@ bool Starter::update(unsigned int currentTime, const irr::core::vector3df& apos,
             if (angleToNextNextAbs > angleLimitMax)
             {
                 desiredSpeed2 = brakeSpeedLimitMin;
-                if (competitor->getNum() == 456) printf("nn1");
+                //if (competitor->getNum() == 456) printf("nn1");
             }
             else
             {
                 desiredSpeed2 = calcDesiredSpeed(angleToNextNextAbs, desiredSpeed2);//brakeSpeedLimitMax - angleToNextNextAbs;
-                if (competitor->getNum() == 456) printf("nn2");
+                //if (competitor->getNum() == 456) printf("nn2");
             }
 
             if (desiredSpeed2 < desiredSpeed)
             {
                 desiredSpeed = desiredSpeed2;
-                if (competitor->getNum() == 456) printf("nn3");
+                //if (competitor->getNum() == 456) printf("nn3");
             }
         }
         else
         {
-            if (competitor->getNum() == 456) printf("nn0");
+            //if (competitor->getNum() == 456) printf("nn0");
         }
 
         if (speed < desiredSpeed - 5.f)
@@ -505,10 +508,10 @@ bool Starter::update(unsigned int currentTime, const irr::core::vector3df& apos,
             steer = -1.0f;
         }
 
-        if (competitor->getNum() == 456)
-        {
-            printf("\nt: %f, b: %f, s: %f, desiredSpeed: %f\n", torque, brake, steer, desiredSpeed);
-        }
+        //if (competitor->getNum() == 456)
+        //{
+        //    printf("\nt: %f, b: %f, s: %f, desiredSpeed: %f\n", torque, brake, steer, desiredSpeed);
+        //}
         vehicle->setSteer(steer);
         if (brake > 0.9f)
         {

@@ -358,12 +358,17 @@ void Player::handleHardCollision(float w)
     assert(vehicle);
     if (starter)
     {
-        unsigned int penalty = (unsigned int)(w*(float)(COLLISION_PENALTY - (15*Settings::getInstance()->difficulty)));
-        starter->penaltyTime += penalty;
-        irr::core::stringw str = L"Add ";
-        WStringConverter::addTimeToStr(str, penalty);
-        str += L" penality, because of hitting the opponent's car.";
-        MessageManager::getInstance()->addText(str.c_str(), 2);
+        if (w < 0.001f) w = 1.0f; // totally front hit, the AI does not do it normally
+
+        if (w > 0.09f)
+        {
+            unsigned int penalty = (unsigned int)(w*(float)(COLLISION_PENALTY - (15*Settings::getInstance()->difficulty)));
+            starter->penaltyTime += penalty;
+            irr::core::stringw str = L"Add ";
+            WStringConverter::addTimeToStr(str, penalty);
+            str += L" penality, because of hitting the opponent's car.";
+            MessageManager::getInstance()->addText(str.c_str(), 2);
+        }
     }
 }
 

@@ -129,13 +129,6 @@ private:
             sound->play();
         }
 
-        // check for penalties
-        if (vehicle && otherVehicle)
-        {
-            assert(vehicle != otherVehicle);
-            checkTwoVehicleCollision(vehicle, otherVehicle);
-        }
-        
         // call vehicle collision
         irr::core::matrix4 mat = vehicle->matrix;
         mat.makeInverse();
@@ -154,10 +147,18 @@ private:
             , localNormal.X, localNormal.Y, localNormal.Z,
             speed
             );
+
+        // check for penalties
+        if (vehicle && otherVehicle)
+        {
+            assert(vehicle != otherVehicle);
+            checkTwoVehicleCollision(vehicle, localPoint, otherVehicle, point, speed);
+        }
     }
 
 private:
-    static void checkTwoVehicleCollision(Vehicle* vehicle, Vehicle* otherVehicle)
+    static void checkTwoVehicleCollision(Vehicle* vehicle, const irr::core::vector3df& localPoint,
+        Vehicle* otherVehicle, const irr::core::vector3df& point, float hit)
     {
         // do not use speed and direction, use instead the linear velocity
         if (vehicle->vehicleCollisionCB)
@@ -167,6 +168,41 @@ private:
         if (otherVehicle->vehicleCollisionCB)
         {
             otherVehicle->vehicleCollisionCB->handleSoftCollision(-1.0f);
+        }
+
+        float w = hit / 130.f;
+        if (w > 1.0f) w = 1.0f;
+
+        irr::core::matrix4 mat = otherVehicle->matrix;
+        mat.makeInverse();
+        irr::core::vector3df otherLocalPoint;
+        mat.transformVect(otherLocalPoint, point);
+
+        irr::core::vector2df localPoint2D(localPoint.X, localPoint.Z);
+        irr::core::vector2df otherLocalPoint2D(otherLocalPoint.X, otherLocalPoint.Z);
+
+        bool blame = false;
+        bool otherBlame = false;
+        int blameCnt = 0;
+
+        float angle = (float)localPoint2D.getAngle();
+        float otherAngle = (float)otherLocalPoint2D.getAngle();
+
+        if (fabsf(angle) < 45.f) {blame = true; blameCnt++;}
+        if (fabsf(otherAngle) < 45.f) {otherBlame = true; blameCnt++;}
+
+        if (blameCnt > 1) w = 0.0f;
+        w /= blameCnt;
+
+        if (blame && vehicle->vehicleCollisionCB)
+        {
+            dprintf(MY_DEBUG_NOTE, "vehicle collision, w: %f\n", w);
+            vehicle->vehicleCollisionCB->handleHardCollision(w);
+        }
+        if (otherBlame && otherVehicle->vehicleCollisionCB)
+        {
+            dprintf(MY_DEBUG_NOTE, "other vehicle collision, w: %f\n", w);
+            otherVehicle->vehicleCollisionCB->handleHardCollision(w);
         }
     }
 
