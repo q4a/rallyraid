@@ -43,7 +43,7 @@
 // normalize angle between 0 and 360
 static float normalizeAngle(float &angle)
 {
-    while (angle > 360.f) angle -= 360.f;
+    while (angle >= 360.f) angle -= 360.f;
     while (angle < 0.f) angle += 360.f;
     return angle;
 }
@@ -60,7 +60,11 @@ static float calcDesiredSpeed(float angleToNextAbs, float speedMax)
     const float angleLimit = ANGLE_LIMIT;           // for the steer calculation
     const float angleLimitMax = ANGLE_LIMIT_MAX;    // for the desired speed calculation
     const float angleLimitMin = ANGLE_LIMIT_MIN;    // for the desired speed calculation
-    return (speedMax - angleToNextAbs + angleLimitMin);
+
+    float desiredSpeed = (speedMax - angleToNextAbs + angleLimitMin);
+    if (desiredSpeed < BRAKE_SPEED_LIMIT_MIN) desiredSpeed = BRAKE_SPEED_LIMIT_MIN;
+
+    return desiredSpeed;
     /*
     //const float angleLimitMax = 180.f;
     const float brakeSpeedLimitMin = BRAKE_SPEED_LIMIT_MIN;             // for the desired speed calculation
@@ -161,6 +165,7 @@ Starter::~Starter()
 
 void Starter::handleHardCollision(float w)
 {
+    dprintf(MY_DEBUG_NOTE, "AI collision, w: %f\n", w);
     assert(vehicle);
     if (w > 0.001f)
     {
@@ -622,8 +627,8 @@ void Starter::switchToVisible()
     {
         nameText->setVisible(true);
     }
-    nameTextOffsetObject = new OffsetObject(nameText, true);
-    nameTextOffsetObject->addToManager();
+    //nameTextOffsetObject = new OffsetObject(nameText, true);
+    //nameTextOffsetObject->addToManager();
     visible = true;
     lastAngleToNextAbs = 180.f;
     dprintf(MY_DEBUG_INFO, "%d became visible end\n", competitor->getNum());

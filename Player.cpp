@@ -355,6 +355,7 @@ void Player::resetVehicle(const irr::core::vector3df& newPos)
 
 void Player::handleHardCollision(float w)
 {
+    dprintf(MY_DEBUG_NOTE, "Player collision, w: %f\n", w);
     assert(vehicle);
     if (starter)
     {

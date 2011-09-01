@@ -16,6 +16,21 @@
 #include <Physics/Collide/Query/CastUtil/hkpWorldRayCastOutput.h>
 #include <Physics/Dynamics/Collide/ContactListener/hkpContactListener.h>
 
+// normalize angle between 0 and 360
+static float normalizeAngle(float &angle)
+{
+    while (angle >= 360.f) angle -= 360.f;
+    while (angle < 0.f) angle += 360.f;
+    return angle;
+}
+
+static float normalizeAngle180(float &angle)
+{
+    while (angle > 180.f) angle -= 360.f;
+    while (angle < -180.f) angle += 360.f;
+    return angle;
+}
+
 // -------------------------------------------------------
 //                   Collision handler
 // -------------------------------------------------------
@@ -24,7 +39,7 @@ class VehicleCollisionListener : public hkReferencedObject, public hkpContactLis
 {
 public:
     VehicleCollisionListener(Vehicle* vehicle)
-        : vehicle(vehicle), hitSound(0), hitSoundGround(0), lastTick(0)
+        : vehicle(vehicle), hitSound(0), hitSoundGround(0), lastTick(0), lastTickVehicle(0)
     {
         hitSound = MySoundEngine::getInstance()->play3D("data/sounds/puff_02.wav", irr::core::vector3df(), false, true, true);
         if (hitSound)
@@ -64,7 +79,6 @@ private:
         unsigned int tick = TheGame::getInstance()->getTick();
 
         if (tick - lastTick < 500) return;
-        lastTick = tick;
         
         irr::core::vector3df point(event.m_contactPoint->getPosition()(0),
             event.m_contactPoint->getPosition()(1),
@@ -80,14 +94,19 @@ private:
             "\tnormal: %f %f %f\n" \
             "\tfourth: %f\n" \
             "\tdistance: %f\n" \
-            "\tsource: %u\n"
+            "\tsource: %u\n" \
+            "\ttick: %u\n" \
+            "\tlastTick: %u\n"
             , point.X, point.Y, point.Z
             , normal.X, normal.Y, normal.Z,
             fourth,
             distance,
-            event.m_source
+            event.m_source,
+            tick,
+            lastTick
             );
 
+        lastTick = tick;
         assert(event.m_source == hkpCollisionEvent::SOURCE_A);
 
         hkpRigidBody* body = event.getBody(event.m_source);
@@ -113,6 +132,7 @@ private:
         if (otherVehicle)
         {
             speed = (otherVehicle->getLinearVelocity()-vehicle->getLinearVelocity()).getLength() * 3.6f;
+            otherVehicle->collisionListener->lastTick = tick;
         }
         else
         {
@@ -134,10 +154,12 @@ private:
         mat.makeInverse();
         irr::core::vector3df localPoint;
         irr::core::vector3df localNormal;
+        irr::core::vector3df localLinearVelocity;
 
         mat.transformVect(localPoint, point);
         mat.setTranslation(irr::core::vector3df());
         mat.transformVect(localNormal, normal);
+        mat.transformVect(localLinearVelocity, vehicle->getLinearVelocity());
 
         dprintf(MY_DEBUG_NOTE, "local collision data:\n" \
             "\tpoint: %f %f %f\n" \
@@ -149,15 +171,28 @@ private:
             );
 
         // check for penalties
-        if (vehicle && otherVehicle)
+        if (vehicle && otherVehicle &&
+            tick - lastTickVehicle > 5000 &&
+            tick - otherVehicle->collisionListener->lastTickVehicle > 5000)
         {
             assert(vehicle != otherVehicle);
-            checkTwoVehicleCollision(vehicle, localPoint, otherVehicle, point, speed);
+            lastTickVehicle = otherVehicle->collisionListener->lastTickVehicle = tick;
+            checkTwoVehicleCollision(vehicle, localPoint, localLinearVelocity, otherVehicle, point, speed);
         }
     }
 
 private:
-    static void checkTwoVehicleCollision(Vehicle* vehicle, const irr::core::vector3df& localPoint,
+    /*
+        first edition:
+        
+            1. determine the hit points for both vehicle in their local space
+            2. if the hitpoint vector's angle is smaller than 45 degrees and larger
+               than -45 degrees, the vehicle is the blame. so need to give penalty
+            3. if both blame, then the w is 0, which means the player will get the
+               penalty
+    */
+
+    static void checkTwoVehicleCollision(Vehicle* vehicle, const irr::core::vector3df& localPoint, const irr::core::vector3df& localLinearVelocity,
         Vehicle* otherVehicle, const irr::core::vector3df& point, float hit)
     {
         // do not use speed and direction, use instead the linear velocity
@@ -187,12 +222,20 @@ private:
 
         float angle = (float)localPoint2D.getAngle();
         float otherAngle = (float)otherLocalPoint2D.getAngle();
+        normalizeAngle180(angle);
+        normalizeAngle180(otherAngle);
+        angle = fabsf(angle);
+        otherAngle = fabsf(otherAngle);
 
-        if (fabsf(angle) < 45.f) {blame = true; blameCnt++;}
-        if (fabsf(otherAngle) < 45.f) {otherBlame = true; blameCnt++;}
+        dprintf(MY_DEBUG_NOTE, "collision vehicles, angle: %f, other angle: %f\n", angle, otherAngle);
+
+        //if (angle < 45.f) {blame = true; blameCnt++;}
+        //if (otherAngle < 45.f) {otherBlame = true; blameCnt++;}
+        if (angle < 45.f && (angle < 10.f || angle <= otherAngle)) {blame = true; blameCnt++;}
+        if (otherAngle < 45.f && (otherAngle < 10.f || angle > otherAngle)) {otherBlame = true; blameCnt++;}
 
         if (blameCnt > 1) w = 0.0f;
-        w /= blameCnt;
+        //w /= blameCnt;
 
         if (blame && vehicle->vehicleCollisionCB)
         {
@@ -206,11 +249,77 @@ private:
         }
     }
 
+    /*
+        second edition
+    */
+/*
+    static void checkTwoVehicleCollision(Vehicle* vehicle, const irr::core::vector3df& localPoint, const irr::core::vector3df& localLinearVelocity,
+        Vehicle* otherVehicle, const irr::core::vector3df& point, float hit)
+    {
+        // do not use speed and direction, use instead the linear velocity
+        if (vehicle->vehicleCollisionCB)
+        {
+            vehicle->vehicleCollisionCB->handleSoftCollision(1.0f);
+        }
+        if (otherVehicle->vehicleCollisionCB)
+        {
+            otherVehicle->vehicleCollisionCB->handleSoftCollision(-1.0f);
+        }
+
+        float w = hit / 130.f;
+        if (w > 1.0f) w = 1.0f;
+
+        irr::core::matrix4 mat = otherVehicle->matrix;
+        mat.makeInverse();
+        irr::core::vector3df otherLocalPoint;
+        mat.transformVect(otherLocalPoint, point);
+
+        irr::core::vector3df otherLocalLinearVelocity;
+        mat.setTranslation(irr::core::vector3df());
+        mat.transformVect(otherLocalLinearVelocity, otherVehicle->getLinearVelocity());
+
+        const irr::core::vector2df localPoint2D(localPoint.X, localPoint.Z);
+        const irr::core::vector2df otherLocalPoint2D(otherLocalPoint.X, otherLocalPoint.Z);
+        const irr::core::vector2df localLinearVelocity2D(localLinearVelocity.X, localLinearVelocity.Z);
+        const irr::core::vector2df otherLocalLinearVelocity2D(otherLocalLinearVelocity.X, otherLocalLinearVelocity.Z);
+
+        bool blame = false;
+        bool otherBlame = false;
+        int blameCnt = 0;
+
+        float angle = (float)(localPoint2D.getAngle() - localLinearVelocity2D.getAngle());
+        float otherAngle = (float)(otherLocalPoint2D.getAngle() - otherLocalLinearVelocity2D.getAngle());
+        normalizeAngle180(angle);
+        normalizeAngle180(otherAngle);
+        angle = fabsf(angle);
+        otherAngle = fabsf(otherAngle);
+
+        dprintf(MY_DEBUG_NOTE, "collision vehicles, angle: %f, other angle: %f\n", angle, otherAngle);
+
+        if (angle < 60.f && (angle < 10.f || angle <= otherAngle)) {blame = true; blameCnt++;}
+        if (otherAngle < 60.f && (otherAngle < 10.f || angle > otherAngle)) {otherBlame = true; blameCnt++;}
+
+        if (blameCnt > 1) w = 0.0f;
+        //w /= blameCnt;
+
+        if (blame && vehicle->vehicleCollisionCB)
+        {
+            dprintf(MY_DEBUG_NOTE, "vehicle collision, w: %f\n", w);
+            vehicle->vehicleCollisionCB->handleHardCollision(w);
+        }
+        if (otherBlame && otherVehicle->vehicleCollisionCB)
+        {
+            dprintf(MY_DEBUG_NOTE, "other vehicle collision, w: %f\n", w);
+            otherVehicle->vehicleCollisionCB->handleHardCollision(w);
+        }
+    }
+*/
 private:
     Vehicle*        vehicle;
     MySound*        hitSound;
     MySound*        hitSoundGround;
     unsigned int    lastTick;
+    unsigned int    lastTickVehicle;
 };
 
 // -------------------------------------------------------
@@ -861,12 +970,6 @@ void Vehicle::handleUpdatePos(bool phys)
         lastPos = newPos;
         node->setPosition(newPos);
         node->setRotation(matrix.getRotationDegrees());
-        if (nameText)
-        {
-            irr::core::vector3df textPos = newPos;
-            textPos.Y += 5.0f;
-            nameText->setPosition(textPos);
-        }
         
         linearVelocity.X = hkLV(0);
         linearVelocity.Y = hkLV(1);
@@ -953,6 +1056,18 @@ void Vehicle::handleUpdatePos(bool phys)
         {
             engineSound->setPosition(soundPos);
         }
+    }
+    updateNameTextPos();
+}
+
+void Vehicle::updateNameTextPos()
+{
+    if (nameText)
+    {
+        irr::core::vector3df pos = node->getPosition();
+        float dist = TheGame::getInstance()->getCamera()->getPosition().getDistanceFrom(pos) / 1000.f;
+        pos.Y += (4.0f + (140.f * dist * dist));
+        nameText->setPosition(pos);
     }
 }
 

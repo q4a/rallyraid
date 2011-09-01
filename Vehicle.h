@@ -127,7 +127,7 @@ public:
     void pause();
     void resume();
 
-    void setNameText(irr::scene::ITextSceneNode* nameText) {this->nameText = nameText;}
+    void setNameText(irr::scene::ITextSceneNode* nameText) {this->nameText = nameText; updateNameTextPos();}
     void setVehicleCollisionCB(VehicleCollisionCB* vehicleCollisionCB) {this->vehicleCollisionCB = vehicleCollisionCB;}
 
 private:
@@ -135,6 +135,7 @@ private:
     void updateToMatrix();
     void addSmoke(const float speed, const irr::core::vector3df& pos, float offset);
     void updateSmoke();
+    void updateNameTextPos();
 
 private:
     VehicleType*                vehicleType;
