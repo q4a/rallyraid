@@ -14,6 +14,7 @@
 #include "Competitor.h"
 #include "Vehicle.h"
 #include "VehicleType.h"
+#include "VehicleTypeManager.h"
 #include "OffsetObject.h"
 #include "OffsetManager.h"
 #include "WStringConverter.h"
@@ -113,7 +114,7 @@ Starter::Starter(Stage* stage,
 {
     const static float placeHardening[3] = {20.f, 8.f, 4.f};
     irr::core::stringw namePlusCar = L"";
-    namePlusCar += (competitor->getName() + " (" + competitor->getVehicleTypeName() + ")").c_str();
+    namePlusCar += (competitor->getName() + " (" + VehicleTypeManager::getInstance()->getVehicleType(competitor->getVehicleTypeName())->getLongName() + ")").c_str();
     nameText = TheGame::getInstance()->getSmgr()->addTextSceneNode(
         /*env->getBuiltInFont()*/ FontManager::getInstance()->getFont(FontManager::FONT_NORMALBOLD),
         namePlusCar.c_str(),
@@ -600,7 +601,7 @@ bool Starter::update(unsigned int currentTime, const irr::core::vector3df& apos,
 
 void Starter::switchToVisible()
 {
-    dprintf(MY_DEBUG_INFO, "%d became visible\n", competitor->getNum());
+    dprintf(MY_DEBUG_NOTE, "%d became visible\n", competitor->getNum());
     float rot = 0.f;
     bool addImpulse = false;
     if (nextPoint != stage->getAIPointList().begin() && nextPoint != stage->getAIPointList().end())
@@ -631,12 +632,12 @@ void Starter::switchToVisible()
     //nameTextOffsetObject->addToManager();
     visible = true;
     lastAngleToNextAbs = 180.f;
-    dprintf(MY_DEBUG_INFO, "%d became visible end\n", competitor->getNum());
+    dprintf(MY_DEBUG_NOTE, "%d became visible end\n", competitor->getNum());
 }
 
 void Starter::switchToNotVisible()
 {
-    dprintf(MY_DEBUG_INFO, "%d became not visible\n", competitor->getNum());
+    dprintf(MY_DEBUG_NOTE, "%d became not visible\n", competitor->getNum());
     visible = false;
     if (vehicle)
     {

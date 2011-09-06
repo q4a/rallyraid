@@ -86,10 +86,11 @@ public:
     void setSuspensionDamperModifier(float suspensionDamperModifier); // inline
 
     bool addPassedWayPointNum(unsigned int wpNum); // inline
-    bool isPassedWayPointNum(unsigned int wpNum); // inline
+    bool isPassedWayPointNum(unsigned int wpNum) const; // inline
+    size_t getPassedWayPointsCount() const; // inline
 
-    const irr::core::vector3df& getSavedPos(); // inline
-    const irr::core::vector3df& getSavedRot(); // inline
+    const irr::core::vector3df& getSavedPos() const; // inline
+    const irr::core::vector3df& getSavedRot() const; // inline
 
 private:
     virtual void handleHardCollision(float w);
@@ -346,11 +347,15 @@ inline bool Player::addPassedWayPointNum(unsigned int wpNum)
     return passedWayPoints.insert(wpNum).second;
 }
 
-inline bool Player::isPassedWayPointNum(unsigned int wpNum)
+inline bool Player::isPassedWayPointNum(unsigned int wpNum) const
 {
     return passedWayPoints.count(wpNum) > 0;
 }
 
+inline size_t Player::getPassedWayPointsCount() const
+{
+    return passedWayPoints.size();
+}
 inline unsigned int Player::getStageTime()
 {
     return stageTime;
@@ -395,12 +400,12 @@ inline void Player::setSuspensionDamperModifier(float suspensionDamperModifier)
     }
 }
 
-inline const irr::core::vector3df& Player::getSavedPos()
+inline const irr::core::vector3df& Player::getSavedPos() const
 {
     return savedPos;
 }
 
-inline const irr::core::vector3df& Player::getSavedRot()
+inline const irr::core::vector3df& Player::getSavedRot() const
 {
     return savedRot;
 }
