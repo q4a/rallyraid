@@ -2,6 +2,8 @@
 #include "MenuPageBase.h"
 #include "MenuManager.h"
 #include "TheGame.h"
+#include "FontManager.h"
+#include "Settings.h"
 
 #include "MenuPageEditor.h"
 #include "MenuPageEditorRace.h"
@@ -74,6 +76,17 @@ MenuManager::MenuManager()
     : currentMenuPage(0), menuInput(false), eer(new EmptyEventReceiver())
 {
     menuManager = this;
+
+    if (Settings::getInstance()->editorMode)
+    {
+        TheGame::getInstance()->getEnv()->getSkin()->setFont(FontManager::getInstance()->getFont(FontManager::FONT_BUILTIN));
+    }
+    else
+    {
+        TheGame::getInstance()->getEnv()->getSkin()->setFont(FontManager::getInstance()->getFont(FontManager::FONT_VERDANA_10PX));
+    }
+    //TheGame::getInstance()->getEnv()->getSkin()->setFont(FontManager::getInstance()->getFont(FontManager::FONT_VERDANA_10PX));
+
     memset(menuPages, 0, sizeof(menuPages));
     menuPages[MP_EDITOR] = new MenuPageEditor();
     menuPages[MP_EDITORRACE] = new MenuPageEditorRace();

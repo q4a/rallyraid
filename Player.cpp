@@ -52,6 +52,7 @@ Player::Player()
       savedStagePenaltyTime(0),
       suspensionSpringModifier(0.0f),
       suspensionDamperModifier(0.0f),
+      brakeBalance(0.2f),
       loaded(false),
       savedPos(),
       savedRot(),
@@ -77,7 +78,7 @@ void Player::initializeVehicle(const std::string& vehicleTypeName, const irr::co
     assert(vehicle == 0);
     competitor->setVehicleTypeName(vehicleTypeName);
     vehicle = new Vehicle(vehicleTypeName, apos, rotation, Settings::getInstance()->manualGearShifting,
-        Settings::getInstance()->sequentialGearShifting, suspensionSpringModifier, suspensionDamperModifier);
+        Settings::getInstance()->sequentialGearShifting, suspensionSpringModifier, suspensionDamperModifier, brakeBalance);
     recenterView = true;
     firstPressed = false;
     distance = savedDistance;
@@ -164,6 +165,7 @@ bool Player::save(const std::string& filename)
     ret = fprintf(f, "%u\n", stagePenaltyTime);
     ret = fprintf(f, "%f\n", suspensionSpringModifier);
     ret = fprintf(f, "%f\n", suspensionDamperModifier);
+    ret = fprintf(f, "%f\n", brakeBalance);
     ret = fprintf(f, "%f %f %f\n", savedPos.X, savedPos.Y, savedPos.Z);
     ret = fprintf(f, "%f %f %f\n", savedRot.X, savedRot.Y, savedRot.Z);
     ret = fprintf(f, "%f\n", savedSpeed);
@@ -271,10 +273,10 @@ bool Player::load(const std::string& filename, Stage* stage)
         return false;
     }
 
-    ret = fscanf_s(f, "%f\n%f\n", &suspensionSpringModifier, &suspensionDamperModifier);
-    if (ret < 2)
+    ret = fscanf_s(f, "%f\n%f\n%f\n", &suspensionSpringModifier, &suspensionDamperModifier, &brakeBalance);
+    if (ret < 3)
     {
-        printf("player file unable to read suspension modifiers: %s\n", filename.c_str());
+        printf("player file unable to read suspension modifiers and brake balance: %s\n", filename.c_str());
         fclose(f);
         return false;
     }

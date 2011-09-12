@@ -28,6 +28,7 @@ public:
 
         MI_CBFULLSCREEN,
         MI_CBVSYNC,
+        MI_CBSCANJOYSTICK,
         MI_CBSHOWNAMES,
         MI_CBNAVIGATIONASSISTANT,
         MI_CBMANUALSHIFTING,
@@ -35,6 +36,7 @@ public:
 
         MI_SCROLLSUSPENSIONSPRING,
         MI_SCROLLSUSPENSIONDAMPER,
+        MI_SCROLLBRAKEBALANCE,
 
         NUMBER_OF_MENUITEMS
     };
@@ -67,12 +69,14 @@ private:
     irr::gui::IGUIComboBox* comboBoxDisplayBits;
     irr::gui::IGUICheckBox* cbFullScreen;
     irr::gui::IGUICheckBox* cbVsync;
+    irr::gui::IGUICheckBox* cbScanJoystick;
     irr::gui::IGUICheckBox* cbShowNames;
     irr::gui::IGUICheckBox* cbNavigationAssistant;
     irr::gui::IGUICheckBox* cbManualShifting;
     irr::gui::IGUICheckBox* cbSequentialShifting;
     irr::gui::IGUIScrollBar* scrollSuspensionSpring;
     irr::gui::IGUIScrollBar* scrollSuspensionDamper;
+    irr::gui::IGUIScrollBar* scrollBrakeBalance;
 
     std::map<int, int>      resolutionMap;
     int                     lastKeyName;

@@ -18,6 +18,7 @@ public:
         MI_BUTTONSTART,
         MI_BUTTONLOAD,
         MI_BUTTONOPTIONS,
+        MI_BUTTONEXIT,
 
         MI_TABLERACES,
         MI_TABLEVEHICLES,
@@ -54,6 +55,7 @@ private:
     irr::gui::IGUICheckBox* checkBoxEditor;
     irr::gui::IGUIStaticText* staticTextRaceData;
     irr::gui::IGUIStaticText* staticTextVehicleData;
+    irr::gui::IGUIButton*   buttonLoad;
     
     Race*                   selectedRace;
     VehicleType*            selectedVehicleType;

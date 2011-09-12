@@ -37,6 +37,7 @@ MenuPageInGame::MenuPageInGame()
       tableStages(0),
       tableCompetitors(0),
       tableCompetitorsG(0),
+      buttonLoad(0),
       willOpenOtherWindow(false)
 {
     menuPageInGame = this;
@@ -49,37 +50,44 @@ MenuPageInGame::MenuPageInGame()
 
     int line = 60;
     TheGame::getInstance()->getEnv()->addButton(
-        irr::core::recti(10,line,90,line+20),
+        irr::core::recti(10,line,140,line+20),
         window,
         MI_BUTTONBACK,
         L"Back To Game");
 
     line += 30;
-    TheGame::getInstance()->getEnv()->addButton(
-        irr::core::recti(10,line,90,line+20),
+    buttonLoad = TheGame::getInstance()->getEnv()->addButton(
+        irr::core::recti(10,line,140,line+20),
         window,
         MI_BUTTONLOAD,
         L"Load Game");
 
     line += 30;
     TheGame::getInstance()->getEnv()->addButton(
-        irr::core::recti(10,line,90,line+20),
+        irr::core::recti(10,line,140,line+20),
         window,
         MI_BUTTONSAVE,
         L"Save Game");
 
     line += 30;
     TheGame::getInstance()->getEnv()->addButton(
-        irr::core::recti(10,line,90,line+20),
+        irr::core::recti(10,line,140,line+20),
         window,
         MI_BUTTONOPTIONS,
         L"Options");
 
+    line += 30;
+    TheGame::getInstance()->getEnv()->addButton(
+        irr::core::recti(10,line,140,line+20),
+        window,
+        MI_BUTTONEXIT,
+        L"Exit");
+
     staticTextRaceName = TheGame::getInstance()->getEnv()->addStaticText(L"",
-        irr::core::recti(window->getRelativePosition().getSize().Width/2 - 400,54,window->getRelativePosition().getSize().Width/2 + 400,88),
+        irr::core::recti(window->getRelativePosition().getSize().Width/2 - 400,54,window->getRelativePosition().getSize().Width/2 + 400,90),
         //irr::core::recti(120,54,1200,88),
         false, false, window, 0, false);
-    staticTextRaceName->setOverrideFont(FontManager::getInstance()->getFont(FontManager::FONT_SPECIAL18));
+    staticTextRaceName->setOverrideFont(FontManager::getInstance()->getFont(FontManager::FONT_VERDANA_22PX_BORDER/*SPECIAL18*/));
     staticTextRaceName->setOverrideColor(irr::video::SColor(255, 255, 255, 255));
     staticTextRaceName->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_UPPERLEFT);
 
@@ -87,7 +95,7 @@ MenuPageInGame::MenuPageInGame()
     // Stages
     // ----------------------------
     tableStages = TheGame::getInstance()->getEnv()->addTable(
-        irr::core::recti(irr::core::position2di(window->getRelativePosition().getSize().Width/6, (window->getRelativePosition().getSize().Height)/3), irr::core::dimension2di(window->getRelativePosition().getSize().Width/3-2,(window->getRelativePosition().getSize().Height*2)/3-2)),
+        irr::core::recti(irr::core::position2di(window->getRelativePosition().getSize().Width/6, (window->getRelativePosition().getSize().Height)/3), irr::core::dimension2di(window->getRelativePosition().getSize().Width/6-2,(window->getRelativePosition().getSize().Height*2)/3-2)),
         window,
         MI_TABLESTAGES,
         true);
@@ -99,7 +107,7 @@ MenuPageInGame::MenuPageInGame()
     // Competitors
     // ----------------------------
     irr::gui::IGUITabControl* tc = TheGame::getInstance()->getEnv()->addTabControl(
-        irr::core::recti(irr::core::position2di(window->getRelativePosition().getSize().Width/2+2, (window->getRelativePosition().getSize().Height)/3), irr::core::dimension2di(window->getRelativePosition().getSize().Width/3-2,(window->getRelativePosition().getSize().Height*2)/3-2)),
+        irr::core::recti(irr::core::position2di(window->getRelativePosition().getSize().Width/3+2, (window->getRelativePosition().getSize().Height)/3-34), irr::core::dimension2di(window->getRelativePosition().getSize().Width/2-2,(window->getRelativePosition().getSize().Height*2)/3-2+34)),
         window,
         true,
         true,
@@ -114,11 +122,11 @@ MenuPageInGame::MenuPageInGame()
         true);
 
     tableCompetitors->addColumn(L"Pos");
-    tableCompetitors->setColumnWidth(0, 30);
+    tableCompetitors->setColumnWidth(0, 40);
     tableCompetitors->addColumn(L"Time");
-    tableCompetitors->setColumnWidth(1, 50);
+    tableCompetitors->setColumnWidth(1, 80);
     tableCompetitors->addColumn(L"Num");
-    tableCompetitors->setColumnWidth(2, 30);
+    tableCompetitors->setColumnWidth(2, 40);
     tableCompetitors->addColumn(L"Name");
     tableCompetitors->setColumnWidth(3, tableCompetitors->getRelativePosition().getSize().Width-(16+tableCompetitors->getColumnWidth(0)+tableCompetitors->getColumnWidth(1)+tableCompetitors->getColumnWidth(2)));
 
@@ -131,11 +139,11 @@ MenuPageInGame::MenuPageInGame()
         true);
 
     tableCompetitorsG->addColumn(L"Pos");
-    tableCompetitorsG->setColumnWidth(0, 30);
+    tableCompetitorsG->setColumnWidth(0, 40);
     tableCompetitorsG->addColumn(L"Time");
-    tableCompetitorsG->setColumnWidth(1, 50);
+    tableCompetitorsG->setColumnWidth(1, 80);
     tableCompetitorsG->addColumn(L"Num");
-    tableCompetitorsG->setColumnWidth(2, 30);
+    tableCompetitorsG->setColumnWidth(2, 40);
     tableCompetitorsG->addColumn(L"Name");
     tableCompetitorsG->setColumnWidth(3, tableCompetitorsG->getRelativePosition().getSize().Width-(16+tableCompetitorsG->getColumnWidth(0)+tableCompetitorsG->getColumnWidth(1)+tableCompetitorsG->getColumnWidth(2)));
 
@@ -206,6 +214,11 @@ bool MenuPageInGame::OnEvent(const irr::SEvent &event)
                         MenuManager::getInstance()->open(MenuManager::MP_OPTIONS);
                         return true;
                         break;
+                    case MI_BUTTONEXIT:
+                        dprintf(MY_DEBUG_NOTE, "ingamemenu::exitbutton::clicked\n");
+                        TheGame::getInstance()->setTerminate();
+                        return true;
+                        break;
                 };
                 break;
             }
@@ -257,6 +270,8 @@ void MenuPageInGame::close()
 void MenuPageInGame::refresh()
 {
     assert(!GamePlay::getInstance()->raceState.empty());
+
+    buttonLoad->setEnabled(!GamePlay::getInstance()->loadableGames.empty());
 
     if (RaceManager::getInstance()->getCurrentRace())
     {

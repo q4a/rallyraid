@@ -162,63 +162,63 @@ TheGame::TheGame()
 
         loadingThread->startLoading();
 
-        loadingThread->refresh();
+        loadingThread->setLargeSteps(0, 6);
         dprintf(MY_DEBUG_NOTE, "Initialize event receiver\n");
         eventReceiver = new EventReceiver();
-        loadingThread->refresh();
+        loadingThread->setLargeSteps(7, 13);
         dprintf(MY_DEBUG_NOTE, "Initialize Havok\n");
         hk::initialize();
-        loadingThread->refresh();
+        loadingThread->setLargeSteps(14, 20);
         dprintf(MY_DEBUG_NOTE, "Initialize offset manager\n");
         OffsetManager::initialize();
         offsetManager = OffsetManager::getInstance();
-        loadingThread->refresh();
+        loadingThread->setLargeSteps(21, 27);
         dprintf(MY_DEBUG_NOTE, "Initialize object pool manager\n");
         ObjectPoolManager::initialize();
-        loadingThread->refresh();
+        loadingThread->setLargeSteps(28, 34);
         dprintf(MY_DEBUG_NOTE, "Initialize shadow renderer\n");
         ShadowRenderer::initialize();
-        loadingThread->refresh();
+        loadingThread->setLargeSteps(35, 41);
         dprintf(MY_DEBUG_NOTE, "Initialize road type manager\n");
         RoadTypeManager::initialize();
         roadTypeManager = RoadTypeManager::getInstance();
-        loadingThread->refresh();
+        loadingThread->setLargeSteps(42, 48);
         dprintf(MY_DEBUG_NOTE, "Initialize road manager\n");
         RoadManager::initialize();
         roadManager = RoadManager::getInstance();
-        loadingThread->refresh();
+        loadingThread->setLargeSteps(49, 55);
         dprintf(MY_DEBUG_NOTE, "Initialize earth\n");
         TheEarth::initialize();
         earth = TheEarth::getInstance();
-        loadingThread->refresh();
+        loadingThread->setLargeSteps(56, 62);
         dprintf(MY_DEBUG_NOTE, "Initialize VehicleTypeManager\n");
         VehicleTypeManager::initialize();
         vehicleTypeManager = VehicleTypeManager::getInstance();
-        loadingThread->refresh();
+        loadingThread->setLargeSteps(63, 69);
         dprintf(MY_DEBUG_NOTE, "Initialize VehicleManager\n");
         VehicleManager::initialize();
         vehicleManager = VehicleManager::getInstance();
-        loadingThread->refresh();
+        loadingThread->setLargeSteps(70, 76);
         dprintf(MY_DEBUG_NOTE, "Initialize SoundEngine\n");
         MySoundEngine::initialize();
         soundEngine = MySoundEngine::getInstance();
-        loadingThread->refresh();
+        loadingThread->setLargeSteps(77, 83);
         dprintf(MY_DEBUG_NOTE, "Initialize object wire\n");
         ObjectWire::initialize();
         objectWire = ObjectWire::getInstance();
-        loadingThread->refresh();
+        loadingThread->setLargeSteps(84, 90);
         dprintf(MY_DEBUG_NOTE, "Initialize player\n");
         Player::initialize();
         player = Player::getInstance();
-        loadingThread->refresh();
+        loadingThread->setLargeSteps(91, 92);
         dprintf(MY_DEBUG_NOTE, "Initialize itiner manager\n");
         ItinerManager::initialize();
         itinerManager = ItinerManager::getInstance();
-        loadingThread->refresh();
+        loadingThread->setLargeSteps(93, 94);
         dprintf(MY_DEBUG_NOTE, "Initialize waypoint manager\n");
         WayPointManager::initialize();
         wayPointManager = WayPointManager::getInstance();
-        loadingThread->refresh();
+        loadingThread->setLargeSteps(95, 100);
         dprintf(MY_DEBUG_NOTE, "Initialize race manager\n");
         RaceManager::initialize();
         raceManager = RaceManager::getInstance();
@@ -661,7 +661,9 @@ void TheGame::doFewSteps(unsigned int stepCnt)
         }
         if (stepCnt == 1)
         {
+            inGame = false; // turn off inGame -> not to update itiner stuff
             handleUpdatePos(true); // update the camera to the player position
+            inGame = true;
         }
     }
 }
@@ -790,10 +792,17 @@ void TheGame::handleUpdatePos(bool phys)
     
     cameraDirection = camera->getTarget()-camera->getPosition();
     cameraDirection.normalize();
-    // calculate cameraAngle
-    cameraAngle = (float)(irr::core::vector2df(cameraDirection.X, cameraDirection.Z)).getAngle();
     
     irr::core::vector3df velocity;
-    if (camera != fps_camera && player->getVehicle() != 0) velocity = player->getVehicle()->getLinearVelocity();
+    if (camera != fps_camera && player->getVehicle() != 0)
+    {
+        velocity = player->getVehicle()->getLinearVelocity();
+        cameraAngle = player->getVehicle()->getAngle();
+    }
+    else
+    {
+        // calculate cameraAngle
+        cameraAngle = (float)(irr::core::vector2df(cameraDirection.X, cameraDirection.Z)).getAngle();
+    }
     soundEngine->setListenerPosition(camera->getPosition(), cameraDirection, camera->getUpVector(), velocity);
 }

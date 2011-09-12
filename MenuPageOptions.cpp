@@ -10,11 +10,12 @@
 #include "Settings.h"
 #include "KeyConfig.h"
 #include "Player.h"
+#include "FontManager.h"
 #include <assert.h>
 
 
 #define PADDING         3
-#define FTW             200
+#define FTW             240
 #define LTW             0
 
 MenuPageOptions* MenuPageOptions::menuPageOptions = 0;
@@ -27,12 +28,14 @@ MenuPageOptions::MenuPageOptions()
       comboBoxDisplayBits(0),
       cbFullScreen(0),
       cbVsync(0),
+      cbScanJoystick(0),
       cbShowNames(0),
       cbNavigationAssistant(0),
       cbManualShifting(0),
       cbSequentialShifting(0),
       scrollSuspensionSpring(0),
       scrollSuspensionDamper(0),
+      scrollBrakeBalance(0),
       resolutionMap(),
       lastKeyName(0),
       primary(true)
@@ -52,10 +55,11 @@ MenuPageOptions::MenuPageOptions()
         false,
         false,
         window);
+    warningText->setOverrideFont(FontManager::getInstance()->getFont(FontManager::FONT_BUILTIN));
     warningText->setTextAlignment(irr::gui::EGUIA_UPPERLEFT, irr::gui::EGUIA_CENTER);
 
     TheGame::getInstance()->getEnv()->addButton(
-        irr::core::recti(irr::core::position2di(window->getRelativePosition().getSize().Width-82, window->getRelativePosition().getSize().Height-22), irr::core::dimension2du(80, 20)),
+        irr::core::recti(irr::core::position2di(window->getRelativePosition().getSize().Width-132, window->getRelativePosition().getSize().Height-22), irr::core::dimension2du(130, 20)),
         window,
         MI_BUTTONSAVE,
         L"Save Settings");
@@ -140,6 +144,18 @@ MenuPageOptions::MenuPageOptions()
         irr::core::recti(irr::core::position2di(FTW+(PADDING*2), line), irr::core::dimension2di(16, 16)),
         tabGeneral,
         MI_CBVSYNC);
+
+    line += 20;
+    TheGame::getInstance()->getEnv()->addStaticText(L"Scan joystick (*)",
+        irr::core::recti(irr::core::position2di(PADDING, line), irr::core::dimension2di(FTW, 16)),
+        false,
+        false,
+        tabGeneral);
+
+    cbScanJoystick = TheGame::getInstance()->getEnv()->addCheckBox(Settings::getInstance()->scanForJoystick,
+        irr::core::recti(irr::core::position2di(FTW+(PADDING*2), line), irr::core::dimension2di(16, 16)),
+        tabGeneral,
+        MI_CBSCANJOYSTICK);
 
     line += 20;
     TheGame::getInstance()->getEnv()->addStaticText(L"Show Names",
@@ -262,6 +278,36 @@ MenuPageOptions::MenuPageOptions()
     scrollSuspensionDamper->setLargeStep(5);
     scrollSuspensionDamper->setSmallStep(1);
 
+    line += 20;
+    TheGame::getInstance()->getEnv()->addStaticText(L"Brake balance",
+        irr::core::recti(irr::core::position2di(PADDING, line), irr::core::dimension2di(FTW, 16)),
+        false,
+        false,
+        tabVehicle);
+
+    const int frontRearSize = 40;
+    irr::gui::IGUIStaticText* s = TheGame::getInstance()->getEnv()->addStaticText(L"front",
+        irr::core::recti(irr::core::position2di((PADDING*2)+FTW, line), irr::core::dimension2di(frontRearSize, 16)),
+        false,
+        false,
+        tabVehicle);
+    s->setTextAlignment(irr::gui::EGUIA_LOWERRIGHT, irr::gui::EGUIA_UPPERLEFT);
+
+    TheGame::getInstance()->getEnv()->addStaticText(L"rear",
+        irr::core::recti(irr::core::position2di(tabGeneral->getRelativePosition().getSize().Width-PADDING-frontRearSize, line), irr::core::dimension2di(frontRearSize, 16)),
+        false,
+        false,
+        tabVehicle);
+
+    scrollBrakeBalance = TheGame::getInstance()->getEnv()->addScrollBar(true, 
+        irr::core::recti(irr::core::position2di(FTW+(PADDING*3)+frontRearSize, line), irr::core::dimension2di(tabGeneral->getRelativePosition().getSize().Width-(6*PADDING)-LTW-FTW-(frontRearSize*2), 16)),
+            tabVehicle,
+            MI_SCROLLBRAKEBALANCE);
+    scrollBrakeBalance->setMin(0);
+    scrollBrakeBalance->setMax(100);
+    scrollBrakeBalance->setLargeStep(10);
+    scrollBrakeBalance->setSmallStep(1);
+
     window->setVisible(false);
 }
 
@@ -381,6 +427,10 @@ bool MenuPageOptions::OnEvent(const irr::SEvent &event)
                         Settings::getInstance()->vsync = ((irr::gui::IGUICheckBox*)event.GUIEvent.Caller)->isChecked();
                         return true;
                         break;
+                    case MI_CBSCANJOYSTICK:
+                        Settings::getInstance()->scanForJoystick = ((irr::gui::IGUICheckBox*)event.GUIEvent.Caller)->isChecked();
+                        return true;
+                        break;
                     case MI_CBSHOWNAMES:
                         Settings::getInstance()->showNames = ((irr::gui::IGUICheckBox*)event.GUIEvent.Caller)->isChecked();
                         return true;
@@ -425,6 +475,14 @@ bool MenuPageOptions::OnEvent(const irr::SEvent &event)
                         int pos = scrollSuspensionDamper->getPos();
                         dprintf(MY_DEBUG_NOTE, "options::scrollbarsuspensiondamper::clicked: pos: %d\n", pos);
                         Player::getInstance()->setSuspensionDamperModifier((float)pos);
+                        return true;
+                        break;
+                    }
+                    case MI_SCROLLBRAKEBALANCE:
+                    {
+                        int pos = scrollBrakeBalance->getPos();
+                        dprintf(MY_DEBUG_NOTE, "options::scrollbrakebalance::clicked: pos: %d\n", pos);
+                        Player::getInstance()->setBrakeBalance(((float)pos)/100.f);
                         return true;
                         break;
                     }
@@ -491,6 +549,7 @@ void MenuPageOptions::refreshGeneral()
 
     cbFullScreen->setChecked(Settings::getInstance()->fullScreen);
     cbVsync->setChecked(Settings::getInstance()->vsync);
+    cbScanJoystick->setChecked(Settings::getInstance()->scanForJoystick);
     cbShowNames->setChecked(Settings::getInstance()->showNames);
     cbNavigationAssistant->setChecked(Settings::getInstance()->navigationAssistant);
     cbManualShifting->setChecked(Settings::getInstance()->manualGearShifting);
@@ -548,6 +607,7 @@ void MenuPageOptions::refreshVehicle()
 {
     scrollSuspensionSpring->setPos((int)Player::getInstance()->getSuspensionSpringModifier());
     scrollSuspensionDamper->setPos((int)Player::getInstance()->getSuspensionDamperModifier());
+    scrollBrakeBalance->setPos((int)(Player::getInstance()->getBrakeBalance()*100.f));
 }
 
 void MenuPageOptions::optionKBClosed()

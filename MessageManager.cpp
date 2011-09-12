@@ -33,7 +33,7 @@ MessageManager::MessageManager()
         true,  // wordwrap
         0, -1,
         true); // show bg
-    messageText->setOverrideFont(FontManager::getInstance()->getFont(FontManager::FONT_NORMALBOLD));
+    messageText->setOverrideFont(FontManager::getInstance()->getFont(FontManager::FONT_VERDANA_12PX));
     messageText->setVisible(false);
 }
 

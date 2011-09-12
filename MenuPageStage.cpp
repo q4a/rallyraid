@@ -91,27 +91,27 @@ MenuPageStage::MenuPageStage()
     window->setImage(TheGame::getInstance()->getDriver()->getTexture("data/bg/transp.png"));
 
     TheGame::getInstance()->getEnv()->addButton(
-        irr::core::recti(10,60,90,80),
+        irr::core::recti(10,60,140,80),
         window,
         MI_BUTTONSTART,
-        L"Start The Game");
+        L"Start This Stage");
 
     TheGame::getInstance()->getEnv()->addButton(
-        irr::core::recti(10,90,90,110),
+        irr::core::recti(10,90,140,110),
         window,
         MI_BUTTONBACK,
         L"Back To Main");
 
     staticTextStageName = TheGame::getInstance()->getEnv()->addStaticText(L"",
-        irr::core::recti(120,54,1200,88),
+        irr::core::recti(160,54,1200,90),
         false, false, window, 0, false);
-    staticTextStageName->setOverrideFont(FontManager::getInstance()->getFont(FontManager::FONT_SPECIAL18));
+    staticTextStageName->setOverrideFont(FontManager::getInstance()->getFont(FontManager::FONT_VERDANA_22PX_BORDER/*SPECIAL18*/));
     staticTextStageName->setOverrideColor(irr::video::SColor(255, 255, 255, 255));
 
     staticTextStageDescription = TheGame::getInstance()->getEnv()->addStaticText(L"",
-        irr::core::recti(120,88,1200,128),
+        irr::core::recti(160,88,1200,128),
         false, true, window, 0, false);
-    staticTextStageDescription->setOverrideFont(FontManager::getInstance()->getFont(FontManager::FONT_NORMAL));
+    staticTextStageDescription->setOverrideFont(FontManager::getInstance()->getFont(FontManager::FONT_VERDANA_12PX));
     //staticTextStageDescription->setOverrideColor(irr::video::SColor(255, 255, 255, 255));
 
     bgQuad = new ScreenQuad(TheGame::getInstance()->getDriver(),
@@ -150,7 +150,7 @@ MenuPageStage::MenuPageStage()
             ROADBOOKBG_POS_Y/*(window->getRelativePosition().getSize().Height*3/4) + 10*/ + ROADBOOKENTRY_NUM_POS_Y),
             irr::core::dimension2di(ROADBOOKENTRY_NUM_SIZE_X, ROADBOOKENTRY_NUM_SIZE_Y)),
             false, false, window, -1, false);
-        roadBookEntries[i].numText->setOverrideFont(FontManager::getInstance()->getFont(FontManager::FONT_SMALL));
+        roadBookEntries[i].numText->setOverrideFont(FontManager::getInstance()->getFont(FontManager::FONT_VERDANA_8PX));
         roadBookEntries[i].numText->setTextAlignment(irr::gui::EGUIA_LOWERRIGHT, irr::gui::EGUIA_UPPERLEFT);
         //if (i!=1) roadBookEntries[i].numText->setOverrideColor(irr::video::SColor(255, 127, 127, 127));
 
@@ -159,7 +159,7 @@ MenuPageStage::MenuPageStage()
             ROADBOOKBG_POS_Y/*(window->getRelativePosition().getSize().Height*3/4) + 10*/ + ROADBOOKENTRY_GD_POS_Y),
             irr::core::dimension2di(ROADBOOKENTRY_GD_SIZE_X, ROADBOOKENTRY_GD_SIZE_Y)),
             false, false, window, -1, false);
-        roadBookEntries[i].globalDistanceText->setOverrideFont(FontManager::getInstance()->getFont(FontManager::FONT_EXTRALARGEBOLD));
+        roadBookEntries[i].globalDistanceText->setOverrideFont(FontManager::getInstance()->getFont(FontManager::FONT_VERDANA_14PX));
         roadBookEntries[i].globalDistanceText->setTextAlignment(irr::gui::EGUIA_LOWERRIGHT, irr::gui::EGUIA_UPPERLEFT);
         //if (i!=1) roadBookEntries[i].globalDistanceText->setOverrideColor(irr::video::SColor(255, 127, 127, 127));
 
@@ -168,7 +168,7 @@ MenuPageStage::MenuPageStage()
             ROADBOOKBG_POS_Y/*(window->getRelativePosition().getSize().Height*3/4) + 10*/ + ROADBOOKENTRY_LD_POS_Y),
             irr::core::dimension2di(ROADBOOKENTRY_LD_SIZE_X, ROADBOOKENTRY_LD_SIZE_Y)),
             false, false, window, -1, false);
-        roadBookEntries[i].localDistanceText->setOverrideFont(FontManager::getInstance()->getFont(FontManager::FONT_LARGEBOLD));
+        roadBookEntries[i].localDistanceText->setOverrideFont(FontManager::getInstance()->getFont(FontManager::FONT_VERDANA_12PX));
         //roadBookEntries[i].localDistanceText->setTextAlignment(irr::gui::EGUIA_LOWERRIGHT, irr::gui::EGUIA_UPPERLEFT);
         //if (i!=1) roadBookEntries[i].localDistanceText->setOverrideColor(irr::video::SColor(255, 127, 127, 127));
 
@@ -177,7 +177,7 @@ MenuPageStage::MenuPageStage()
             ROADBOOKBG_POS_Y/*(window->getRelativePosition().getSize().Height*3/4) + 10*/ + ROADBOOKENTRY_NOTE_POS_Y),
             irr::core::dimension2di(ROADBOOKENTRY_NOTE_SIZE_X, ROADBOOKENTRY_NOTE_SIZE_Y)),
             false, true, window, -1, false);
-        roadBookEntries[i].noteText->setOverrideFont(FontManager::getInstance()->getFont(FontManager::FONT_SMALLBOLD));
+        roadBookEntries[i].noteText->setOverrideFont(FontManager::getInstance()->getFont(FontManager::FONT_VERDANA_8PX));
         roadBookEntries[i].noteText->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
         //if (i!=1) roadBookEntries[i].noteText->setOverrideColor(irr::video::SColor(255, 127, 127, 127));
 
