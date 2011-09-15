@@ -11,6 +11,7 @@
 #include "KeyConfig.h"
 #include "Player.h"
 #include "FontManager.h"
+#include "Competitor.h"
 #include <assert.h>
 
 
@@ -36,6 +37,9 @@ MenuPageOptions::MenuPageOptions()
       scrollSuspensionSpring(0),
       scrollSuspensionDamper(0),
       scrollBrakeBalance(0),
+      editBoxPlayerName(0),
+      editBoxPlayerCoName(0),
+      editBoxPlayerTeamName(0),
       resolutionMap(),
       lastKeyName(0),
       primary(true)
@@ -245,6 +249,7 @@ MenuPageOptions::MenuPageOptions()
     // Vehicle
     // ----------------------------
     irr::gui::IGUITab* tabVehicle = tc->addTab(L"Vehicle", 0);
+    const int frontRearSize = 40;
 
     line = PADDING;
     TheGame::getInstance()->getEnv()->addStaticText(L"Suspension spring",
@@ -253,10 +258,24 @@ MenuPageOptions::MenuPageOptions()
         false,
         tabVehicle);
 
+    irr::gui::IGUIStaticText* s = TheGame::getInstance()->getEnv()->addStaticText(L"soft",
+        irr::core::recti(irr::core::position2di((PADDING*2)+FTW, line), irr::core::dimension2di(frontRearSize, 16)),
+        false,
+        false,
+        tabVehicle);
+    s->setTextAlignment(irr::gui::EGUIA_LOWERRIGHT, irr::gui::EGUIA_UPPERLEFT);
+
+    TheGame::getInstance()->getEnv()->addStaticText(L"hard",
+        irr::core::recti(irr::core::position2di(tabVehicle->getRelativePosition().getSize().Width-PADDING-frontRearSize, line), irr::core::dimension2di(frontRearSize, 16)),
+        false,
+        false,
+        tabVehicle);
+
     scrollSuspensionSpring = TheGame::getInstance()->getEnv()->addScrollBar(true, 
-            irr::core::recti(irr::core::position2di(FTW+(PADDING*2), line), irr::core::dimension2di(tabGeneral->getRelativePosition().getSize().Width-(4*PADDING)-LTW-FTW, 16)),
-            tabVehicle,
-            MI_SCROLLSUSPENSIONSPRING);
+        irr::core::recti(irr::core::position2di(FTW+(PADDING*3)+frontRearSize, line), irr::core::dimension2di(tabVehicle->getRelativePosition().getSize().Width-(6*PADDING)-LTW-FTW-(frontRearSize*2), 16)),
+        //irr::core::recti(irr::core::position2di(FTW+(PADDING*2), line), irr::core::dimension2di(tabVehicle->getRelativePosition().getSize().Width-(4*PADDING)-LTW-FTW, 16)),
+        tabVehicle,
+        MI_SCROLLSUSPENSIONSPRING);
     scrollSuspensionSpring->setMin(-20);
     scrollSuspensionSpring->setMax(20);
     scrollSuspensionSpring->setLargeStep(5);
@@ -269,10 +288,24 @@ MenuPageOptions::MenuPageOptions()
         false,
         tabVehicle);
 
+    s = TheGame::getInstance()->getEnv()->addStaticText(L"slow",
+        irr::core::recti(irr::core::position2di((PADDING*2)+FTW, line), irr::core::dimension2di(frontRearSize, 16)),
+        false,
+        false,
+        tabVehicle);
+    s->setTextAlignment(irr::gui::EGUIA_LOWERRIGHT, irr::gui::EGUIA_UPPERLEFT);
+
+    TheGame::getInstance()->getEnv()->addStaticText(L"fast",
+        irr::core::recti(irr::core::position2di(tabVehicle->getRelativePosition().getSize().Width-PADDING-frontRearSize, line), irr::core::dimension2di(frontRearSize, 16)),
+        false,
+        false,
+        tabVehicle);
+
     scrollSuspensionDamper = TheGame::getInstance()->getEnv()->addScrollBar(true, 
-            irr::core::recti(irr::core::position2di(FTW+(PADDING*2), line), irr::core::dimension2di(tabGeneral->getRelativePosition().getSize().Width-(4*PADDING)-LTW-FTW, 16)),
-            tabVehicle,
-            MI_SCROLLSUSPENSIONDAMPER);
+        irr::core::recti(irr::core::position2di(FTW+(PADDING*3)+frontRearSize, line), irr::core::dimension2di(tabVehicle->getRelativePosition().getSize().Width-(6*PADDING)-LTW-FTW-(frontRearSize*2), 16)),
+        //irr::core::recti(irr::core::position2di(FTW+(PADDING*2), line), irr::core::dimension2di(tabVehicle->getRelativePosition().getSize().Width-(4*PADDING)-LTW-FTW, 16)),
+        tabVehicle,
+        MI_SCROLLSUSPENSIONDAMPER);
     scrollSuspensionDamper->setMin(-20);
     scrollSuspensionDamper->setMax(20);
     scrollSuspensionDamper->setLargeStep(5);
@@ -285,8 +318,7 @@ MenuPageOptions::MenuPageOptions()
         false,
         tabVehicle);
 
-    const int frontRearSize = 40;
-    irr::gui::IGUIStaticText* s = TheGame::getInstance()->getEnv()->addStaticText(L"front",
+    s = TheGame::getInstance()->getEnv()->addStaticText(L"front",
         irr::core::recti(irr::core::position2di((PADDING*2)+FTW, line), irr::core::dimension2di(frontRearSize, 16)),
         false,
         false,
@@ -294,19 +326,65 @@ MenuPageOptions::MenuPageOptions()
     s->setTextAlignment(irr::gui::EGUIA_LOWERRIGHT, irr::gui::EGUIA_UPPERLEFT);
 
     TheGame::getInstance()->getEnv()->addStaticText(L"rear",
-        irr::core::recti(irr::core::position2di(tabGeneral->getRelativePosition().getSize().Width-PADDING-frontRearSize, line), irr::core::dimension2di(frontRearSize, 16)),
+        irr::core::recti(irr::core::position2di(tabVehicle->getRelativePosition().getSize().Width-PADDING-frontRearSize, line), irr::core::dimension2di(frontRearSize, 16)),
         false,
         false,
         tabVehicle);
 
     scrollBrakeBalance = TheGame::getInstance()->getEnv()->addScrollBar(true, 
-        irr::core::recti(irr::core::position2di(FTW+(PADDING*3)+frontRearSize, line), irr::core::dimension2di(tabGeneral->getRelativePosition().getSize().Width-(6*PADDING)-LTW-FTW-(frontRearSize*2), 16)),
+        irr::core::recti(irr::core::position2di(FTW+(PADDING*3)+frontRearSize, line), irr::core::dimension2di(tabVehicle->getRelativePosition().getSize().Width-(6*PADDING)-LTW-FTW-(frontRearSize*2), 16)),
             tabVehicle,
             MI_SCROLLBRAKEBALANCE);
     scrollBrakeBalance->setMin(0);
     scrollBrakeBalance->setMax(100);
     scrollBrakeBalance->setLargeStep(10);
     scrollBrakeBalance->setSmallStep(1);
+
+
+    // ----------------------------
+    // Player
+    // ----------------------------
+    irr::gui::IGUITab* tabPlayer = tc->addTab(L"Player", 0);
+
+    line = PADDING;
+    TheGame::getInstance()->getEnv()->addStaticText(L"Name",
+        irr::core::recti(irr::core::position2di(PADDING, line), irr::core::dimension2di(FTW, 16)),
+        false,
+        false,
+        tabPlayer);
+
+    editBoxPlayerName = TheGame::getInstance()->getEnv()->addEditBox(L"",
+        irr::core::recti(irr::core::position2di(FTW+(PADDING*2), line), irr::core::dimension2di(tabPlayer->getRelativePosition().getSize().Width-(4*PADDING)-LTW-FTW, 16)),
+        true,
+        tabPlayer,
+        MI_EBPLAYERNAME);
+
+    line += 20;
+    TheGame::getInstance()->getEnv()->addStaticText(L"Co-pilot name",
+        irr::core::recti(irr::core::position2di(PADDING, line), irr::core::dimension2di(FTW, 16)),
+        false,
+        false,
+        tabPlayer);
+
+    editBoxPlayerCoName = TheGame::getInstance()->getEnv()->addEditBox(L"",
+        irr::core::recti(irr::core::position2di(FTW+(PADDING*2), line), irr::core::dimension2di(tabPlayer->getRelativePosition().getSize().Width-(4*PADDING)-LTW-FTW, 16)),
+        true,
+        tabPlayer,
+        MI_EBPLAYERCONAME);
+
+    line += 20;
+    TheGame::getInstance()->getEnv()->addStaticText(L"Team name",
+        irr::core::recti(irr::core::position2di(PADDING, line), irr::core::dimension2di(FTW, 16)),
+        false,
+        false,
+        tabPlayer);
+
+    editBoxPlayerTeamName = TheGame::getInstance()->getEnv()->addEditBox(L"",
+        irr::core::recti(irr::core::position2di(FTW+(PADDING*2), line), irr::core::dimension2di(tabPlayer->getRelativePosition().getSize().Width-(4*PADDING)-LTW-FTW, 16)),
+        true,
+        tabPlayer,
+        MI_EBPLAYERTEAMNAME);
+
 
     window->setVisible(false);
 }
@@ -489,6 +567,35 @@ bool MenuPageOptions::OnEvent(const irr::SEvent &event)
                 };
                 break;
             }
+            case irr::gui::EGET_EDITBOX_CHANGED:
+            case irr::gui::EGET_EDITBOX_ENTER:
+            {
+                switch (id)
+                {
+                    case MI_EBPLAYERNAME:
+                    {
+                        std::string newName;
+                        WStringConverter::toString(editBoxPlayerName->getText(), newName);
+                        Player::getInstance()->getCompetitor()->setName(newName);
+                        break;
+                    }
+                    case MI_EBPLAYERCONAME:
+                    {
+                        std::string newName;
+                        WStringConverter::toString(editBoxPlayerCoName->getText(), newName);
+                        Player::getInstance()->getCompetitor()->setCoName(newName);
+                        break;
+                    }
+                    case MI_EBPLAYERTEAMNAME:
+                    {
+                        std::string newName;
+                        WStringConverter::toString(editBoxPlayerTeamName->getText(), newName);
+                        Player::getInstance()->getCompetitor()->setTeamName(newName);
+                        break;
+                    }
+                }
+                break;
+            }
         };
     }
     return false;
@@ -513,6 +620,7 @@ void MenuPageOptions::refresh()
     refreshGeneral();
     refreshKB();
     refreshVehicle();
+    refreshPlayer();
 }
 
 void MenuPageOptions::refreshGeneral()
@@ -608,6 +716,22 @@ void MenuPageOptions::refreshVehicle()
     scrollSuspensionSpring->setPos((int)Player::getInstance()->getSuspensionSpringModifier());
     scrollSuspensionDamper->setPos((int)Player::getInstance()->getSuspensionDamperModifier());
     scrollBrakeBalance->setPos((int)(Player::getInstance()->getBrakeBalance()*100.f));
+}
+
+void MenuPageOptions::refreshPlayer()
+{
+    irr::core::stringw str;
+    
+    str += Player::getInstance()->getCompetitor()->getName().c_str();
+    editBoxPlayerName->setText(str.c_str());
+
+    str = L"";    
+    str += Player::getInstance()->getCompetitor()->getCoName().c_str();
+    editBoxPlayerCoName->setText(str.c_str());
+
+    str = L"";    
+    str += Player::getInstance()->getCompetitor()->getTeamName().c_str();
+    editBoxPlayerTeamName->setText(str.c_str());
 }
 
 void MenuPageOptions::optionKBClosed()

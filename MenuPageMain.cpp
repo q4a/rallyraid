@@ -97,7 +97,7 @@ MenuPageMain::MenuPageMain()
     havok_image->setUseAlphaChannel(true);
     havok_image->setImage(havok_logo);
 
-    irr::gui::IGUIStaticText* s = TheGame::getInstance()->getEnv()->addStaticText(L"Version: 1.0 - Build: 158",
+    irr::gui::IGUIStaticText* s = TheGame::getInstance()->getEnv()->addStaticText(L"Version: 1.0 - Build: 159",
         irr::core::recti(irr::core::position2di(window->getRelativePosition().getSize().Width - 110, window->getRelativePosition().getSize().Height - 20), havok_logo->getOriginalSize()),
         false, false, window, 0, false);
     s->setOverrideFont(FontManager::getInstance()->getFont(FontManager::FONT_BUILTIN));
@@ -331,6 +331,7 @@ void MenuPageMain::refresh()
     if (!raceMap.empty())
     {
         tableRaces->setSelected(0);
+        refreshRaceData((Race*)tableRaces->getCellData(tableRaces->getSelected(), 0));
     }
 
     // ----------------------------
@@ -365,6 +366,7 @@ void MenuPageMain::refresh()
     if (!VehicleTypeManager::getInstance()->getVehicleTypeMap().empty())
     {
         tableVehicles->setSelected(VehicleTypeManager::getInstance()->getVehicleTypeMap().size()-1);
+        refreshVehicleData((VehicleType*)tableVehicles->getCellData(tableVehicles->getSelected(), 0));
     }
 }
 
@@ -394,13 +396,13 @@ void MenuPageMain::refreshVehicleData(VehicleType* vehicleType)
 
     str += L" / 10\nBrake: ";
     if ((int)vehicleType->maxBrakeForce)
-        str += (int)((vehicleType->maxBrakeForce*10) / VehicleType::maxMaxBrakeForce);
+        str += (int)((vehicleType->maxBrakeForce*10/vehicleType->mass) / VehicleType::maxMaxBrakeForce);
     else
         str += L"0";
 
     str += L" / 10\nAccelerate: ";
-    if ((int)vehicleType->maxTorque)
-        str += (int)((vehicleType->maxTorque*10) / VehicleType::maxMaxTorque);
+    if ((int)vehicleType->maxTorqueRate)
+        str += (int)((vehicleType->maxTorqueRate*10/vehicleType->mass) / VehicleType::maxMaxTorqueRate);
     else
         str += L"0";
 

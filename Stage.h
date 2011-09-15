@@ -19,13 +19,26 @@ public:
     ~Stage();
     
 private:
-    bool read();
+    // called in the constructior
+    bool readHeader();
+    
+    // EXTERNAL, called in the stage menu, need some additional data
+    bool readPreData();
+    
+    // called in the activate
+    bool readData();
+
+    // called by readHeader()
     bool readCfg();
     void readShortDescription();
-    void readGlobalObjects();
+
+    // called by readPreData()
     void readItinerPointList();
     void readWayPointList();
     void readAIPointList();
+
+    // called by readData()
+    void readGlobalObjects();
     void readHeightModifierList();
 
     bool write();
@@ -40,6 +53,7 @@ private:
 public:
     const std::string& getName() const; // inline
     const std::string& getLongName() const; // inline
+    const std::string& getDssAss() const; // inline
     const std::string& getShortDescription() const; // inline
     const RoadManager::roadMap_t& getRoadMap() const; // inline
     const ItinerManager::itinerPointList_t& getItinerPointList() const; // inline
@@ -59,6 +73,7 @@ private:
     std::string                     dayName;
     std::string                     stageName;
     std::string                     stageLongName;
+    std::string                     dssAssName;
     std::string                     shortDescription;
     std::string                     imageName;
     RaceManager::globalObjectList_t globalObjectList;
@@ -70,6 +85,8 @@ private:
     unsigned int                    stageTime;
     irr::video::ITexture*           image;
     heightModifierList_t            heightModifierList;
+    bool                            loaded;
+    bool                            preLoaded;
     
     
     HeightModifier                  editorHeightModifier;
@@ -80,6 +97,7 @@ private:
     friend class MenuPageEditorRace;
     friend class MenuPageEditorDay;
     friend class MenuPageEditorStage;
+    friend class MenuPageStage;
 };
 
 inline const std::string& Stage::getName() const
@@ -90,6 +108,11 @@ inline const std::string& Stage::getName() const
 inline const std::string& Stage::getLongName() const
 {
     return stageLongName;
+}
+
+inline const std::string& Stage::getDssAss() const
+{
+    return dssAssName;
 }
 
 inline const std::string& Stage::getShortDescription() const

@@ -73,7 +73,7 @@ void Terrain::setVisible(bool p_visible)
             groundInfo.m_shape = hkShape;
             groundInfo.m_position.set(terrain->getPosition().X, terrain->getPosition().Y, terrain->getPosition().Z);
             groundInfo.m_motionType = hkpMotion::MOTION_FIXED;
-            groundInfo.m_friction = 0.8f;
+            groundInfo.m_friction = Settings::getInstance()->groundFriction; // 0.8f;
             groundInfo.m_collisionFilterInfo = hkpGroupFilter::calcFilterInfo(hk::materialType::terrainId);
             hkpRigidBody* hkBody = new hkpRigidBody(groundInfo);
             hkpPropertyValue val(1);
@@ -102,6 +102,7 @@ void Terrain::setVisible(bool p_visible)
             terrain->setMaterialTexture(0, texture);
             terrain->setMaterialTexture(1, TheGame::getInstance()->getDriver()->getTexture("data/earthdata/detailmap_03.png"));
             terrain->setMaterialTexture(2, ShadowRenderer::getInstance()->getShadowMap());
+            terrain->setMaterialTexture(3, TheGame::getInstance()->getDriver()->getTexture("data/earthdata/detailmap_04.png"));
             if (Shaders::getInstance()->getSupportedSMVersion() < 2)
             {
                 terrain->setMaterialFlag(irr::video::EMF_LIGHTING, Settings::getInstance()->nonshaderLight);

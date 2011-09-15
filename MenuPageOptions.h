@@ -37,6 +37,10 @@ public:
         MI_SCROLLSUSPENSIONSPRING,
         MI_SCROLLSUSPENSIONDAMPER,
         MI_SCROLLBRAKEBALANCE,
+        
+        MI_EBPLAYERNAME,
+        MI_EBPLAYERCONAME,
+        MI_EBPLAYERTEAMNAME,
 
         NUMBER_OF_MENUITEMS
     };
@@ -60,6 +64,7 @@ private:
     void refreshGeneral();
     void refreshKB();
     void refreshVehicle();
+    void refreshPlayer();
 
 private:
     irr::gui::IGUIWindow*   window;
@@ -77,6 +82,9 @@ private:
     irr::gui::IGUIScrollBar* scrollSuspensionSpring;
     irr::gui::IGUIScrollBar* scrollSuspensionDamper;
     irr::gui::IGUIScrollBar* scrollBrakeBalance;
+    irr::gui::IGUIEditBox*  editBoxPlayerName;
+    irr::gui::IGUIEditBox*  editBoxPlayerCoName;
+    irr::gui::IGUIEditBox*  editBoxPlayerTeamName;
 
     std::map<int, int>      resolutionMap;
     int                     lastKeyName;

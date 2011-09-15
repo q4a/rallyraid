@@ -151,6 +151,10 @@ bool Player::save(const std::string& filename)
     for (unsigned int i = 0; i < nameToSave.length(); i++) if (nameToSave[i] == ' ') nameToSave[i] = '¤';
     ret = fprintf(f, "%s\n", nameToSave.c_str());
 
+    nameToSave = competitor->getCoName();
+    for (unsigned int i = 0; i < nameToSave.length(); i++) if (nameToSave[i] == ' ') nameToSave[i] = '¤';
+    ret = fprintf(f, "%s\n", nameToSave.c_str());
+
     nameToSave = competitor->getTeamName();
     for (unsigned int i = 0; i < nameToSave.length(); i++) if (nameToSave[i] == ' ') nameToSave[i] = '¤';
     ret = fprintf(f, "%s\n", nameToSave.c_str());
@@ -189,6 +193,7 @@ bool Player::load(const std::string& filename, Stage* stage)
     FILE* f;
     int ret = 0;
     char name[256];
+    char coName[256];
     char teamName[256];
     char vehicleTypeName[256];
     unsigned int prevItinerNum = 0;
@@ -209,6 +214,14 @@ bool Player::load(const std::string& filename, Stage* stage)
     if (ret < 1)
     {
         printf("player file unable to read player name: %s\n", filename.c_str());
+        fclose(f);
+        return false;
+    }
+
+    ret = fscanf_s(f, "%s\n", coName, 255);
+    if (ret < 1)
+    {
+        printf("player file unable to read co-pilot name: %s\n", filename.c_str());
         fclose(f);
         return false;
     }
@@ -329,6 +342,8 @@ bool Player::load(const std::string& filename, Stage* stage)
     fclose(f);
     for (unsigned int i = 0; i < strlen(name); i++) if (name[i] == '¤') name[i] = ' ';
     competitor->setName(name);
+    for (unsigned int i = 0; i < strlen(coName); i++) if (coName[i] == '¤') coName[i] = ' ';
+    competitor->setCoName(coName);
     for (unsigned int i = 0; i < strlen(teamName); i++) if (teamName[i] == '¤') teamName[i] = ' ';
     competitor->setTeamName(teamName);
     competitor->setVehicleTypeName(vehicleTypeName);

@@ -38,6 +38,7 @@ public:
         FONT_VERDANA_26PX,
         FONT_VERDANA_28PX,
 
+        FONT_VERDANA_18PX_BORDER,
         FONT_VERDANA_22PX_BORDER,
 
         FONT_COUNT,

@@ -49,7 +49,8 @@ Settings::Settings()
       sequentialGearShifting(true),
       editorMode(false),
       steerRate(1.0f),
-      steerRatePressed(0.1f)
+      steerRatePressed(0.1f),
+      groundFriction(0.8f)
 {
     read();
 }
@@ -168,6 +169,9 @@ void Settings::read()
             } else if (keyName == "steer_rate_pressed")
             {
                 steerRatePressed = StringConverter::parseFloat(valName, 0.1f);
+            } else if (keyName == "ground_friction")
+            {
+                groundFriction = StringConverter::parseFloat(valName, 0.8f);
             }
         }
     }
@@ -212,6 +216,7 @@ void Settings::write()
     ret = fprintf(f, "editor_mode=%s\n", editorMode?"yes":"no");
     ret = fprintf(f, "steer_rate=%f\n", steerRate);
     ret = fprintf(f, "steer_rate_pressed=%f\n", steerRatePressed);
+    ret = fprintf(f, "ground_friction=%f\n", groundFriction);
 
     fclose(f);
 }

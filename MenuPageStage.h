@@ -47,6 +47,7 @@ private:
 
 private:
     irr::gui::IGUIImage*    window;
+    irr::gui::IGUIStaticText*   staticTextRaceName;
     irr::gui::IGUIStaticText*   staticTextStageName;
     irr::gui::IGUIStaticText*   staticTextStageDescription;
     ScreenQuad*             bgQuad;

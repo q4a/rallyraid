@@ -14,6 +14,7 @@ Stage::Stage(Day* parent, const std::string& raceName, const std::string& dayNam
       dayName(dayName),
       stageName(stageName),
       stageLongName(),
+      dssAssName(),
       shortDescription(),
       imageName(STAGE_DIR(raceName, dayName, stageName)+"/"+DEFAULTSTAGE_IMG),
       globalObjectList(),
@@ -25,9 +26,11 @@ Stage::Stage(Day* parent, const std::string& raceName, const std::string& dayNam
       stageTime(1000),
       image(0),
       heightModifierList(),
+      loaded(false),
+      preLoaded(false),
       editorHeightModifier()
 {
-    ret = read();
+    ret = readHeader();
 }
 
 Stage::~Stage()
@@ -41,20 +44,44 @@ Stage::~Stage()
     heightModifierList.clear();
 }
 
-bool Stage::read()
+bool Stage::readHeader()
 {
     bool ret = readCfg();
     if (ret)
     {
         readShortDescription();
-        readGlobalObjects();
-        readItinerPointList();
-        readWayPointList();
-        readAIPointList();
-        readHeightModifierList();
-        RoadManager::readRoads(STAGE_ROADS(raceName, dayName, stageName), roadMap, false, true);
     }
     return ret;
+}
+
+bool Stage::readPreData()
+{
+    if (preLoaded) return true;
+    
+    preLoaded = true;
+    
+    readItinerPointList();
+    readWayPointList();
+    readAIPointList();
+    
+    return true;
+}
+
+bool Stage::readData()
+{
+    if (loaded) return true;
+    
+    loaded = true;
+
+
+    readGlobalObjects();
+    //readItinerPointList();
+    //readWayPointList();
+    //readAIPointList();
+    readHeightModifierList();
+    RoadManager::readRoads(STAGE_ROADS(raceName, dayName, stageName), roadMap, false, true);
+
+    return true;
 }
 
 bool Stage::readCfg()
@@ -88,6 +115,9 @@ bool Stage::readCfg()
             } else if (keyName == "image")
             {
                 imageName = valName;
+            } else if (keyName == "dss_ass")
+            {
+                dssAssName = valName;
             }
         }
     }
@@ -127,6 +157,7 @@ void Stage::readHeightModifierList()
 
 bool Stage::write()
 {
+    if (!loaded) readData();
     bool ret = writeCfg();
     ret &= writeShortDescription();
     ret &= writeGlobalObjects();
@@ -152,6 +183,7 @@ bool Stage::writeCfg()
     ret = fprintf(f, "long_name=%s\n", stageLongName.c_str());
     ret = fprintf(f, "stage_time=%u\n", stageTime);
     ret = fprintf(f, "image=%s\n", imageName.c_str());
+    ret = fprintf(f, "dss_ass=%s\n", dssAssName.c_str());
 
     fclose(f);
     return true;
@@ -189,6 +221,8 @@ bool Stage::writeHeightModifierList()
 
 void Stage::activate()
 {
+    if (!loaded) readData();
+
     RoadManager::getInstance()->addStageRoad(roadMap);
     
     if (active) return;

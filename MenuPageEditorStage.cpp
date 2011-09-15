@@ -36,6 +36,7 @@ MenuPageEditorStage::MenuPageEditorStage()
       tableWP(0),
       tableHM(0),
       editBoxLongName(0),
+      editBoxDssAss(0),
       editBoxShortDescription(0),
       editBoxNewRoadFilename(0),
       editBoxNewRoadName(0),
@@ -77,26 +78,32 @@ MenuPageEditorStage::MenuPageEditorStage()
         window,
         MI_EBLONGNAME);
 
-    editBoxShortDescription = TheGame::getInstance()->getEnv()->addEditBox(L"short description",
+    editBoxDssAss = TheGame::getInstance()->getEnv()->addEditBox(L"dss - ass",
         irr::core::recti(irr::core::position2di(2, 66), irr::core::dimension2di(window->getRelativePosition().getSize().Width - 4, 20)),
+        true,
+        window,
+        MI_EBDSSASS);
+
+    editBoxShortDescription = TheGame::getInstance()->getEnv()->addEditBox(L"short description",
+        irr::core::recti(irr::core::position2di(2, 88), irr::core::dimension2di(window->getRelativePosition().getSize().Width - 4, 20)),
         true,
         window,
         MI_EBSHORTDESCRIPTION);
 
     editBoxStageTime = TheGame::getInstance()->getEnv()->addEditBox(L"1000",
-        irr::core::recti(irr::core::position2di(2, 88), irr::core::dimension2di(window->getRelativePosition().getSize().Width - 4, 20)),
+        irr::core::recti(irr::core::position2di(2, 110), irr::core::dimension2di(window->getRelativePosition().getSize().Width - 4, 20)),
         true,
         window,
         MI_EBSTAGETIME);
 
     editBoxImage = TheGame::getInstance()->getEnv()->addEditBox(L"",
-        irr::core::recti(irr::core::position2di(2, 110), irr::core::dimension2di(window->getRelativePosition().getSize().Width - 4, 20)),
+        irr::core::recti(irr::core::position2di(2, 132), irr::core::dimension2di(window->getRelativePosition().getSize().Width - 4, 20)),
         true,
         window,
         MI_EBIMAGE);
 
     irr::gui::IGUITabControl* tc = TheGame::getInstance()->getEnv()->addTabControl(
-        irr::core::recti(irr::core::position2di(2, 132), irr::core::dimension2di(window->getRelativePosition().getSize().Width - 4, window->getRelativePosition().getSize().Height - 134)),
+        irr::core::recti(irr::core::position2di(2, 154), irr::core::dimension2di(window->getRelativePosition().getSize().Width - 4, window->getRelativePosition().getSize().Height - 156)),
         window,
         true,
         true,
@@ -310,6 +317,7 @@ bool MenuPageEditorStage::OnEvent(const irr::SEvent &event)
                     case MI_BUTTONSAVE:
                         dprintf(MY_DEBUG_NOTE, "editor::stage::save\n");
                         WStringConverter::toString(editBoxLongName->getText(), RaceManager::getInstance()->editorStage->stageLongName);
+                        WStringConverter::toString(editBoxDssAss->getText(), RaceManager::getInstance()->editorStage->dssAssName);
                         WStringConverter::toString(editBoxShortDescription->getText(), RaceManager::getInstance()->editorStage->shortDescription);
                         WStringConverter::toUnsignedInt(editBoxStageTime->getText(), RaceManager::getInstance()->editorStage->stageTime);
                         WStringConverter::toString(editBoxImage->getText(), RaceManager::getInstance()->editorStage->imageName);
@@ -515,6 +523,10 @@ void MenuPageEditorStage::refreshEditBoxes()
 
     str += RaceManager::getInstance()->editorStage->getLongName().c_str();
     editBoxLongName->setText(str.c_str());
+
+    str = L"";
+    str += RaceManager::getInstance()->editorStage->getDssAss().c_str();
+    editBoxDssAss->setText(str.c_str());
 
     str = L"";
     str += RaceManager::getInstance()->editorStage->getShortDescription().c_str();

@@ -866,6 +866,7 @@ bool RaceEngine::update(unsigned int tick, const irr::core::vector3df& apos, Upd
                     (*it)->startTime = currentTime;
                     if (!(*it)->competitor->getAi())
                     {
+                        (*it)->startTime++; // one sec need to the TheGame::doFewSteps(), which run for one sec virtually
                         return false;
                     }
                     (*it)->goToNextPoint(currentTime, when == InTheMiddle);

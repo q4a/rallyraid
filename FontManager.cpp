@@ -59,6 +59,7 @@ FontManager::FontManager()
     fonts[FONT_VERDANA_26PX] = env->getFont("data/fonts/verdana_26px_b.xml");
     fonts[FONT_VERDANA_28PX] = env->getFont("data/fonts/verdana_28px_b.xml");
 
+    fonts[FONT_VERDANA_18PX_BORDER] = env->getFont("data/fonts/verdana_18px_b_border.xml");
     fonts[FONT_VERDANA_22PX_BORDER] = env->getFont("data/fonts/verdana_22px_b_border.xml");
 }
 
