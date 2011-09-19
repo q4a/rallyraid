@@ -60,9 +60,10 @@ public:
     const WayPointManager::wayPointList_t& getWayPointList() const; // inline
     const AIPoint::AIPointList_t& getAIPointList() const; // inline
     Day* getParent() const; // inline
-    unsigned int getStageTime(); // inline
+    unsigned int getStageTime() const; // inline
     irr::video::ITexture* getImage(); // inline
-    const heightModifierList_t& getHeightModifierList(); // inline
+    const heightModifierList_t& getHeightModifierList() const; // inline
+    float getGroundFriction() const; // inline
 
     void activate();
     void deactivate();
@@ -84,6 +85,7 @@ private:
     RoadManager::roadMap_t          roadMap;
     unsigned int                    stageTime;
     irr::video::ITexture*           image;
+    float                           groundFriction;
     heightModifierList_t            heightModifierList;
     bool                            loaded;
     bool                            preLoaded;
@@ -145,7 +147,7 @@ inline Day* Stage::getParent() const
     return parent;
 }
 
-inline unsigned int Stage::getStageTime()
+inline unsigned int Stage::getStageTime() const
 {
     return stageTime;
 }
@@ -155,9 +157,14 @@ inline irr::video::ITexture* Stage::getImage()
     return image;
 }
 
-inline const heightModifierList_t& Stage::getHeightModifierList()
+inline const heightModifierList_t& Stage::getHeightModifierList() const
 {
     return heightModifierList;
+}
+
+inline float Stage::getGroundFriction() const
+{
+    return groundFriction;
 }
 
 #endif // STAGE_H

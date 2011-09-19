@@ -23,6 +23,7 @@ public:
 
 private:
     bool readHeader();
+    bool readPreData();
     bool readData();
     
     bool readCfg();
@@ -60,6 +61,7 @@ private:
     bool                            active;
     RoadManager::roadMap_t          roadMap;
     bool                            loaded;
+    bool                            preLoaded;
 
     
     friend class RaceManager;
@@ -67,6 +69,7 @@ private:
     friend class MenuPageEditorRace;
     friend class MenuPageEditorDay;
     friend class MenuPageEditorStage;
+    friend class MenuPageStage;
 };
 
 

@@ -558,7 +558,7 @@ void Hud::preRender(float p_angle)
     bool showWPCompass = WayPointManager::getInstance()->getShowCompass();
     if (showWPCompass)
     {
-        compassWPQuad->rotate(WayPointManager::getInstance()->getAngle()-p_angle-90.f);
+        compassWPQuad->rotate(WayPointManager::getInstance()->getAngle()-p_angle/*-90.f*/);
     }
     compassWPQuad->setVisible(showWPCompass);
 

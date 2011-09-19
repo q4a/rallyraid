@@ -352,6 +352,7 @@ void MenuPageStage::open()
         selectedRace = selectedStage->getParent()->getParent();
     }
     assert(selectedStage);
+    selectedRace->readPreData();
     selectedStage->readPreData();
     itinerIt = selectedStage->getItinerPointList().begin();
     stageImageQuad->getMaterial().setTexture(0, selectedStage->getImage());

@@ -50,7 +50,8 @@ Settings::Settings()
       editorMode(false),
       steerRate(1.0f),
       steerRatePressed(0.1f),
-      groundFriction(0.8f)
+      groundFriction(0.8f),
+      fpsStep(0.1f)
 {
     read();
 }
@@ -172,6 +173,9 @@ void Settings::read()
             } else if (keyName == "ground_friction")
             {
                 groundFriction = StringConverter::parseFloat(valName, 0.8f);
+            } else if (keyName == "fps_step")
+            {
+                fpsStep = StringConverter::parseFloat(valName, 0.1f);
             }
         }
     }
@@ -217,6 +221,7 @@ void Settings::write()
     ret = fprintf(f, "steer_rate=%f\n", steerRate);
     ret = fprintf(f, "steer_rate_pressed=%f\n", steerRatePressed);
     ret = fprintf(f, "ground_friction=%f\n", groundFriction);
+    ret = fprintf(f, "fps_step=%f\n", fpsStep);
 
     fclose(f);
 }

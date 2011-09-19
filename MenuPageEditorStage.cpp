@@ -159,14 +159,14 @@ MenuPageEditorStage::MenuPageEditorStage()
 
     tableRoads->addColumn(L"#");
     tableRoads->addColumn(L"name");
-    tableRoads->setColumnWidth(1, 60);
+    tableRoads->setColumnWidth(1, 70);
     tableRoads->addColumn(L"type");
-    tableRoads->setColumnWidth(2, 60);
+    tableRoads->setColumnWidth(2, 70);
     tableRoads->addColumn(L"size");
     tableRoads->addColumn(L"loaded");
     tableRoads->setColumnWidth(4, 30);
-    tableRoads->addColumn(L"filename");
-    tableRoads->addColumn(L"data");
+    //tableRoads->addColumn(L"filename");
+    //tableRoads->addColumn(L"data");
 
     // ----------------------------
     // Itiner tab
@@ -206,9 +206,9 @@ MenuPageEditorStage::MenuPageEditorStage()
     tableAI->addColumn(L"X");
     tableAI->addColumn(L"Y");
     tableAI->addColumn(L"GD");
-    tableAI->setColumnWidth(3, 60);
+    tableAI->setColumnWidth(3, 70);
     tableAI->addColumn(L"LD");
-    tableAI->setColumnWidth(4, 60);
+    tableAI->setColumnWidth(4, 70);
 
     // ----------------------------
     // WP tab
@@ -219,7 +219,8 @@ MenuPageEditorStage::MenuPageEditorStage()
         irr::core::recti(irr::core::position2di(0, 0), irr::core::dimension2di(tabWP->getRelativePosition().getSize().Width, 20)),
         tabWP,
         MI_COMBOBOXWPTYPE);
-    comboBoxWPType->addItem(L"hidden");
+    comboBoxWPType->addItem(L"hidden - WPM");
+    comboBoxWPType->addItem(L"safety - WPS");
 
     tableWP = TheGame::getInstance()->getEnv()->addTable(
         irr::core::recti(irr::core::position2di(0, 1*22), irr::core::dimension2di(tabWP->getRelativePosition().getSize().Width, tabWP->getRelativePosition().getSize().Height-(1*22))),
@@ -437,6 +438,7 @@ bool MenuPageEditorStage::OnEvent(const irr::SEvent &event)
                 {
                     case MI_COMBOBOXWPTYPE:
                         WayPointManager::getInstance()->editorWayPointType = WayPoint::Hidden + comboBoxWPType->getSelected();
+                        MenuPageEditor::menuPageEditor->refreshSelected();
                         return true;
                         break;
                 };
@@ -586,7 +588,7 @@ void MenuPageEditorStage::refreshRoads()
             str = L"true";
         }
         tableRoads->setCellText(i, 4, str.c_str());
-
+        /*
         str = L"";
         str += rit->second->roadFilename.c_str();
         tableRoads->setCellText(i, 5, str.c_str());
@@ -594,6 +596,7 @@ void MenuPageEditorStage::refreshRoads()
         str = L"";
         str += rit->second->roadDataFilename.c_str();
         tableRoads->setCellText(i, 6, str.c_str());
+        */
     }
 
 }
@@ -739,6 +742,9 @@ void MenuPageEditorStage::refreshWP()
         {
         case WayPoint::Hidden:
             str = L"hidden";
+            break;
+        case WayPoint::Safety:
+            str = L"safety";
             break;
         default:
             str = L"unknown";

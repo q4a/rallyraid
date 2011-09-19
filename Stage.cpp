@@ -25,6 +25,7 @@ Stage::Stage(Day* parent, const std::string& raceName, const std::string& dayNam
       roadMap(),
       stageTime(1000),
       image(0),
+      groundFriction(0.8f),
       heightModifierList(),
       loaded(false),
       preLoaded(false),
@@ -118,6 +119,9 @@ bool Stage::readCfg()
             } else if (keyName == "dss_ass")
             {
                 dssAssName = valName;
+            } else if (keyName == "ground_friction")
+            {
+                groundFriction = StringConverter::parseFloat(valName, 0.8f);
             }
         }
     }
@@ -157,6 +161,7 @@ void Stage::readHeightModifierList()
 
 bool Stage::write()
 {
+    if (!preLoaded) readPreData();
     if (!loaded) readData();
     bool ret = writeCfg();
     ret &= writeShortDescription();
@@ -184,6 +189,7 @@ bool Stage::writeCfg()
     ret = fprintf(f, "stage_time=%u\n", stageTime);
     ret = fprintf(f, "image=%s\n", imageName.c_str());
     ret = fprintf(f, "dss_ass=%s\n", dssAssName.c_str());
+    ret = fprintf(f, "ground_friction=%f\n", groundFriction);
 
     fclose(f);
     return true;
@@ -221,6 +227,7 @@ bool Stage::writeHeightModifierList()
 
 void Stage::activate()
 {
+    if (!preLoaded) readPreData();
     if (!loaded) readData();
 
     RoadManager::getInstance()->addStageRoad(roadMap);

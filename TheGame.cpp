@@ -33,6 +33,7 @@
 #include "LoadingThread.h"
 #include "ShadowRenderer.h"
 #include <CSceneNodeAnimatorCameraFPS.h>
+#include "error.h"
 
 
 // static stuff
@@ -117,11 +118,14 @@ TheGame::TheGame()
     if (device==0)
     {
          dprintf(MY_DEBUG_ERROR, "unable to create device\n");
+         PrintMessage(11, "Unable to create device!");
          terminate = true;
     }
     else
     {
         terminate = false;
+        
+        switchPrintDestination();
 
         device->setWindowCaption(L"Rally Raid 1.0");
 
@@ -138,7 +142,7 @@ TheGame::TheGame()
             }
         }
         fix_camera = smgr->addCameraSceneNode();
-        fps_camera = smgr->addCameraSceneNodeFPS(0, 100.f, 0.1f);
+        fps_camera = smgr->addCameraSceneNodeFPS(0, 100.f, Settings::getInstance()->fpsStep);
         fix_camera->setFarValue(28000.f);
         fix_camera->setNearValue(0.5f);
         fps_camera->setFarValue(28000.f);
@@ -387,6 +391,9 @@ void TheGame::loop()
     const unsigned int slowStep_ms = 100;
     const float step_sec = 1.f / (float)Settings::getInstance()->targetFps;
     unsigned int physUpdate;
+    unsigned int eventReceiverTick = 0;
+    unsigned int lastEventReceiverTick = 0;
+    const unsigned int eventReceiverCheckRate = 1000 / 30;
 
     /*ScreenQuad testQuad(driver, irr::core::position2di(10, 10), irr::core::dimension2du(400, 300));
     // ScreenQuad testQuad(driver, irr::core::position2di(0, 0), driver->getScreenSize());
@@ -409,15 +416,16 @@ void TheGame::loop()
         if (device->isWindowActive())
         {
             tick = device->getTimer()->getTime();
-
+            eventReceiverTick = tick / eventReceiverCheckRate;
             if (inGame)
             {
                 // -------------------------------
                 //         update events
                 // -------------------------------
-                if (eventReceiver)
+                if (eventReceiver && eventReceiverTick != lastEventReceiverTick)
                 {
                     eventReceiver->checkEvents();
+                    lastEventReceiverTick = eventReceiverTick;
                 }
                 /*
                 if (eventReceiver)
@@ -701,13 +709,10 @@ void TheGame::setFPSSpeed(float speed)
 void TheGame::incFPSSpeed()
 {
     float fpsSpeed = getFPSSpeed();
-    if (fpsSpeed > 1.95f)
+    fpsSpeed += Settings::getInstance()->fpsStep;
+    if (fpsSpeed > 2.0f)
     {
         fpsSpeed = 2.0f;
-    }
-    else
-    {
-        fpsSpeed += 0.1f;
     }
     setFPSSpeed(fpsSpeed);
 }
@@ -715,13 +720,10 @@ void TheGame::incFPSSpeed()
 void TheGame::decFPSSpeed()
 {
     float fpsSpeed = getFPSSpeed();
-    if (fpsSpeed < 0.15f)
+    fpsSpeed -= Settings::getInstance()->fpsStep;
+    if (fpsSpeed < Settings::getInstance()->fpsStep)
     {
-        fpsSpeed = 0.1f;
-    }
-    else
-    {
-        fpsSpeed -= 0.1f;
+        fpsSpeed = Settings::getInstance()->fpsStep;
     }
     setFPSSpeed(fpsSpeed);
 }

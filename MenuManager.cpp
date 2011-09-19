@@ -73,7 +73,7 @@ void MenuManager::finalize()
 }
 
 MenuManager::MenuManager()
-    : currentMenuPage(0), menuInput(false), eer(new EmptyEventReceiver())
+    : currentMenuPage(0), menuInput(false), eer(new EmptyEventReceiver()), currentEventReceiver(0)
 {
     menuManager = this;
 
@@ -147,6 +147,7 @@ void MenuManager::closeAll()
 void MenuManager::refreshEventReceiver()
 {
     TheGame::getInstance()->getEnv()->setUserEventReceiver(currentMenuPage);
+    currentEventReceiver = currentMenuPage;
     menuInput = (currentMenuPage != 0);
     TheGame::getInstance()->getCamera()->setInputReceiverEnabled(!menuInput);
     //printf("set event receiver: %p, menuInput %d\n", currentMenuPage, menuInput);
@@ -155,6 +156,7 @@ void MenuManager::refreshEventReceiver()
 void MenuManager::clearEventReceiver()
 {
     TheGame::getInstance()->getEnv()->setUserEventReceiver(eer);
+    currentEventReceiver = eer;
     TheGame::getInstance()->resetMouseCursor();
     menuInput = false;
     TheGame::getInstance()->getCamera()->setInputReceiverEnabled(true);

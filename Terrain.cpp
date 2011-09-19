@@ -10,6 +10,8 @@
 #include "Settings.h"
 #include "stdafx.h"
 #include "ShadowRenderer.h"
+#include "RaceManager.h"
+#include "Stage.h"
 
 
 Terrain::Terrain(const std::string& prefix)
@@ -74,6 +76,11 @@ void Terrain::setVisible(bool p_visible)
             groundInfo.m_position.set(terrain->getPosition().X, terrain->getPosition().Y, terrain->getPosition().Z);
             groundInfo.m_motionType = hkpMotion::MOTION_FIXED;
             groundInfo.m_friction = Settings::getInstance()->groundFriction; // 0.8f;
+                /* if (RaceManager::getInstance()->getCurrentStage())
+                    groundInfo.m_friction = RaceManager::getInstance()->getCurrentStage()->getGroundFriction();
+                   else
+                    groundInfo.m_friction = 0.8f;
+                */
             groundInfo.m_collisionFilterInfo = hkpGroupFilter::calcFilterInfo(hk::materialType::terrainId);
             hkpRigidBody* hkBody = new hkpRigidBody(groundInfo);
             hkpPropertyValue val(1);
