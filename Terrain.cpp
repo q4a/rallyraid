@@ -22,7 +22,8 @@ Terrain::Terrain(const std::string& prefix)
       offsetX(0),
       offsetY(0),
       prefix(prefix),
-      image(0)
+      image(0),
+      texture(0)
       /*, loading(false)*/
 {
 }
@@ -40,6 +41,16 @@ Terrain::~Terrain()
         hk::unlock();
         hkShape = 0;
     }
+    hkpRigidBody* hkBody = offsetObject->getBody();
+    if (hkBody)
+    {
+        hk::lock();
+        hkBody->removeReference();
+        hk::hkWorld->removeEntity(hkBody);
+        hk::unlock();
+        hkBody = 0;
+        offsetObject->setBody(0);
+    }
     if (image)
     {
         image->drop();
@@ -47,6 +58,8 @@ Terrain::~Terrain()
     }
     delete terrain;
     delete offsetObject;
+    TheGame::getInstance()->getDriver()->removeTexture(texture);
+    texture = 0;
 }
 
 void Terrain::postConstruct()
@@ -97,9 +110,9 @@ void Terrain::setVisible(bool p_visible)
             char textureMapPartName[255];
             sprintf_s(textureMapPartName, "%s_textureMapPart_%d_%d", prefix.c_str(), offsetX, offsetY);
             TheGame::getInstance()->getDriver()->setTextureCreationFlag(irr::video::ETCF_CREATE_MIP_MAPS, false);
-            //irr::video::ITexture* texture = TheGame::getInstance()->getDriver()->addTexture(textureMapPartName, terrain->getGeneratedImage());
-            irr::video::ITexture* texture = TheGame::getInstance()->getDriver()->addTexture(textureMapPartName, image);
+            texture = TheGame::getInstance()->getDriver()->addTexture(textureMapPartName, image);
             TheGame::getInstance()->getDriver()->setTextureCreationFlag(irr::video::ETCF_CREATE_MIP_MAPS, true);
+            printf("texture cnt: %u\n", TheGame::getInstance()->getDriver()->getTextureCount());
             //printf("image found(%p): %s - %u x %u - %u, %u, %u\n",
             //    texture,
             //    prefix.c_str(), image->getDimension().Width, image->getDimension().Height,

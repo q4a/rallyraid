@@ -70,7 +70,14 @@ MenuPageMain::MenuPageMain()
         MI_BUTTONOPTIONS,
         L"Options");
 
+/*    TheGame::getInstance()->getEnv()->addButton(
+        irr::core::recti(10,150,140,170),
+        window,
+        MI_BUTTONSETUP,
+        L"Setup");
+*/
     TheGame::getInstance()->getEnv()->addButton(
+        //irr::core::recti(10,180,140,200),
         irr::core::recti(10,150,140,170),
         window,
         MI_BUTTONEXIT,
@@ -97,7 +104,7 @@ MenuPageMain::MenuPageMain()
     havok_image->setUseAlphaChannel(true);
     havok_image->setImage(havok_logo);
 
-    irr::gui::IGUIStaticText* s = TheGame::getInstance()->getEnv()->addStaticText(L"Version: 1.0 - Build: 160",
+    irr::gui::IGUIStaticText* s = TheGame::getInstance()->getEnv()->addStaticText(L"Version: 1.0 - Build: 161",
         irr::core::recti(irr::core::position2di(window->getRelativePosition().getSize().Width - 110, window->getRelativePosition().getSize().Height - 20), havok_logo->getOriginalSize()),
         false, false, window, 0, false);
     s->setOverrideFont(FontManager::getInstance()->getFont(FontManager::FONT_BUILTIN));
@@ -210,6 +217,12 @@ bool MenuPageMain::OnEvent(const irr::SEvent &event)
                         dprintf(MY_DEBUG_NOTE, "mainmenu::optionsbutton::clicked\n");
                         willOpenOtherWindow = false;
                         MenuManager::getInstance()->open(MenuManager::MP_OPTIONS);
+                        return true;
+                        break;
+                    case MI_BUTTONSETUP:
+                        dprintf(MY_DEBUG_NOTE, "mainmenu::setupbutton::clicked\n");
+                        willOpenOtherWindow = false;
+                        MenuManager::getInstance()->open(MenuManager::MP_SETUP);
                         return true;
                         break;
                     case MI_BUTTONEXIT:

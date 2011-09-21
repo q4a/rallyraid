@@ -34,12 +34,6 @@ MenuPageOptions::MenuPageOptions()
       cbNavigationAssistant(0),
       cbManualShifting(0),
       cbSequentialShifting(0),
-      scrollSuspensionSpring(0),
-      scrollSuspensionDamper(0),
-      scrollBrakeBalance(0),
-      editBoxPlayerName(0),
-      editBoxPlayerCoName(0),
-      editBoxPlayerTeamName(0),
       resolutionMap(),
       lastKeyName(0),
       primary(true)
@@ -76,20 +70,85 @@ MenuPageOptions::MenuPageOptions()
         0);
 
     // ----------------------------
-    // General
+    // Game
     // ----------------------------
-    irr::gui::IGUITab* tabGeneral = tc->addTab(L"General", 0);
+    irr::gui::IGUITab* tabGame = tc->addTab(L"Game", 0);
 
     unsigned int line = PADDING;
+    TheGame::getInstance()->getEnv()->addStaticText(L"Scan joystick (*)",
+        irr::core::recti(irr::core::position2di(PADDING, line), irr::core::dimension2di(FTW, 16)),
+        false,
+        false,
+        tabGame);
+
+    cbScanJoystick = TheGame::getInstance()->getEnv()->addCheckBox(Settings::getInstance()->scanForJoystick,
+        irr::core::recti(irr::core::position2di(FTW+(PADDING*2), line), irr::core::dimension2di(16, 16)),
+        tabGame,
+        MI_CBSCANJOYSTICK);
+
+    line += 20;
+    TheGame::getInstance()->getEnv()->addStaticText(L"Show Names",
+        irr::core::recti(irr::core::position2di(PADDING, line), irr::core::dimension2di(FTW, 16)),
+        false,
+        false,
+        tabGame);
+
+    cbShowNames = TheGame::getInstance()->getEnv()->addCheckBox(Settings::getInstance()->showNames,
+        irr::core::recti(irr::core::position2di(FTW+(PADDING*2), line), irr::core::dimension2di(16, 16)),
+        tabGame,
+        MI_CBSHOWNAMES);
+
+    line += 20;
+    TheGame::getInstance()->getEnv()->addStaticText(L"Navigation Assistant",
+        irr::core::recti(irr::core::position2di(PADDING, line), irr::core::dimension2di(FTW, 16)),
+        false,
+        false,
+        tabGame);
+
+    cbNavigationAssistant = TheGame::getInstance()->getEnv()->addCheckBox(Settings::getInstance()->navigationAssistant,
+        irr::core::recti(irr::core::position2di(FTW+(PADDING*2), line), irr::core::dimension2di(16, 16)),
+        tabGame,
+        MI_CBNAVIGATIONASSISTANT);
+
+    line += 20;
+    TheGame::getInstance()->getEnv()->addStaticText(L"Manual shifting",
+        irr::core::recti(irr::core::position2di(PADDING, line), irr::core::dimension2di(FTW, 16)),
+        false,
+        false,
+        tabGame);
+
+    cbManualShifting = TheGame::getInstance()->getEnv()->addCheckBox(Settings::getInstance()->manualGearShifting,
+        irr::core::recti(irr::core::position2di(FTW+(PADDING*2), line), irr::core::dimension2di(16, 16)),
+        tabGame,
+        MI_CBMANUALSHIFTING);
+
+    line += 20;
+    TheGame::getInstance()->getEnv()->addStaticText(L"Sequential shifting (if manual)",
+        irr::core::recti(irr::core::position2di(PADDING, line), irr::core::dimension2di(FTW, 16)),
+        false,
+        false,
+        tabGame);
+
+    cbSequentialShifting = TheGame::getInstance()->getEnv()->addCheckBox(Settings::getInstance()->sequentialGearShifting,
+        irr::core::recti(irr::core::position2di(FTW+(PADDING*2), line), irr::core::dimension2di(16, 16)),
+        tabGame,
+        MI_CBSEQUENTIALSHIFTING);
+
+    // ----------------------------
+    // Graphics
+    // ----------------------------
+    irr::gui::IGUITab* tabGraphics = tc->addTab(L"Graphics", 0);
+
+    line = PADDING;
     TheGame::getInstance()->getEnv()->addStaticText(L"Driver Type (*)",
         irr::core::recti(irr::core::position2di(PADDING, line), irr::core::dimension2di(FTW, 16)),
         false,
         false,
-        tabGeneral);
+        tabGraphics);
 
     comboBoxDriverType = TheGame::getInstance()->getEnv()->addComboBox(
-        irr::core::recti(irr::core::position2di(FTW+(PADDING*2), line), irr::core::dimension2di(tabGeneral->getRelativePosition().getSize().Width-(4*PADDING)-LTW-FTW, 16)),
-        tabGeneral,
+        irr::core::recti(irr::core::position2di(FTW+(PADDING*2), line), irr::core::dimension2di(tabGraphics->getRelativePosition().getSize().Width-(4*PADDING)-LTW-FTW, 16)),
+        tabGraphics,
         MI_COMBOBOXDRIVERTYPE);
     comboBoxDriverType->addItem(L"Direct 3D 9");
     comboBoxDriverType->addItem(L"OpenGL");
@@ -99,11 +158,11 @@ MenuPageOptions::MenuPageOptions()
         irr::core::recti(irr::core::position2di(PADDING, line), irr::core::dimension2di(FTW, 16)),
         false,
         false,
-        tabGeneral);
+        tabGraphics);
 
     comboBoxResolution = TheGame::getInstance()->getEnv()->addComboBox(
-        irr::core::recti(irr::core::position2di(FTW+(PADDING*2), line), irr::core::dimension2di(tabGeneral->getRelativePosition().getSize().Width-(4*PADDING)-LTW-FTW, 16)),
-        tabGeneral,
+        irr::core::recti(irr::core::position2di(FTW+(PADDING*2), line), irr::core::dimension2di(tabGraphics->getRelativePosition().getSize().Width-(4*PADDING)-LTW-FTW, 16)),
+        tabGraphics,
         MI_COMBOBOXRESOLUTION);
     int j = 0;
     for(int i=0;i<device->getVideoModeList()->getVideoModeCount();i++)
@@ -130,11 +189,11 @@ MenuPageOptions::MenuPageOptions()
         irr::core::recti(irr::core::position2di(PADDING, line), irr::core::dimension2di(FTW, 16)),
         false,
         false,
-        tabGeneral);
+        tabGraphics);
 
     cbFullScreen = TheGame::getInstance()->getEnv()->addCheckBox(Settings::getInstance()->fullScreen,
         irr::core::recti(irr::core::position2di(FTW+(PADDING*2), line), irr::core::dimension2di(16, 16)),
-        tabGeneral,
+        tabGraphics,
         MI_CBFULLSCREEN);
 
     line += 20;
@@ -142,72 +201,13 @@ MenuPageOptions::MenuPageOptions()
         irr::core::recti(irr::core::position2di(PADDING, line), irr::core::dimension2di(FTW, 16)),
         false,
         false,
-        tabGeneral);
+        tabGraphics);
 
     cbVsync = TheGame::getInstance()->getEnv()->addCheckBox(Settings::getInstance()->vsync,
         irr::core::recti(irr::core::position2di(FTW+(PADDING*2), line), irr::core::dimension2di(16, 16)),
-        tabGeneral,
+        tabGraphics,
         MI_CBVSYNC);
 
-    line += 20;
-    TheGame::getInstance()->getEnv()->addStaticText(L"Scan joystick (*)",
-        irr::core::recti(irr::core::position2di(PADDING, line), irr::core::dimension2di(FTW, 16)),
-        false,
-        false,
-        tabGeneral);
-
-    cbScanJoystick = TheGame::getInstance()->getEnv()->addCheckBox(Settings::getInstance()->scanForJoystick,
-        irr::core::recti(irr::core::position2di(FTW+(PADDING*2), line), irr::core::dimension2di(16, 16)),
-        tabGeneral,
-        MI_CBSCANJOYSTICK);
-
-    line += 20;
-    TheGame::getInstance()->getEnv()->addStaticText(L"Show Names",
-        irr::core::recti(irr::core::position2di(PADDING, line), irr::core::dimension2di(FTW, 16)),
-        false,
-        false,
-        tabGeneral);
-
-    cbShowNames = TheGame::getInstance()->getEnv()->addCheckBox(Settings::getInstance()->showNames,
-        irr::core::recti(irr::core::position2di(FTW+(PADDING*2), line), irr::core::dimension2di(16, 16)),
-        tabGeneral,
-        MI_CBSHOWNAMES);
-
-    line += 20;
-    TheGame::getInstance()->getEnv()->addStaticText(L"Navigation Assistant",
-        irr::core::recti(irr::core::position2di(PADDING, line), irr::core::dimension2di(FTW, 16)),
-        false,
-        false,
-        tabGeneral);
-
-    cbNavigationAssistant = TheGame::getInstance()->getEnv()->addCheckBox(Settings::getInstance()->navigationAssistant,
-        irr::core::recti(irr::core::position2di(FTW+(PADDING*2), line), irr::core::dimension2di(16, 16)),
-        tabGeneral,
-        MI_CBNAVIGATIONASSISTANT);
-
-    line += 20;
-    TheGame::getInstance()->getEnv()->addStaticText(L"Manual shifting",
-        irr::core::recti(irr::core::position2di(PADDING, line), irr::core::dimension2di(FTW, 16)),
-        false,
-        false,
-        tabGeneral);
-
-    cbManualShifting = TheGame::getInstance()->getEnv()->addCheckBox(Settings::getInstance()->manualGearShifting,
-        irr::core::recti(irr::core::position2di(FTW+(PADDING*2), line), irr::core::dimension2di(16, 16)),
-        tabGeneral,
-        MI_CBMANUALSHIFTING);
-
-    line += 20;
-    TheGame::getInstance()->getEnv()->addStaticText(L"Sequential shifting (if manual)",
-        irr::core::recti(irr::core::position2di(PADDING, line), irr::core::dimension2di(FTW, 16)),
-        false,
-        false,
-        tabGeneral);
-
-    cbSequentialShifting = TheGame::getInstance()->getEnv()->addCheckBox(Settings::getInstance()->sequentialGearShifting,
-        irr::core::recti(irr::core::position2di(FTW+(PADDING*2), line), irr::core::dimension2di(16, 16)),
-        tabGeneral,
-        MI_CBSEQUENTIALSHIFTING);
 
     // ----------------------------
     // Input
@@ -244,146 +244,6 @@ MenuPageOptions::MenuPageOptions()
     tableKB->setColumnWidth(1, (tableKB->getRelativePosition().getSize().Width-16)/3);
     tableKB->addColumn(L"Secondary");
     tableKB->setColumnWidth(2, (tableKB->getRelativePosition().getSize().Width-16)/3);
-
-    // ----------------------------
-    // Vehicle
-    // ----------------------------
-    irr::gui::IGUITab* tabVehicle = tc->addTab(L"Vehicle", 0);
-    const int frontRearSize = 40;
-
-    line = PADDING;
-    TheGame::getInstance()->getEnv()->addStaticText(L"Suspension spring",
-        irr::core::recti(irr::core::position2di(PADDING, line), irr::core::dimension2di(FTW, 16)),
-        false,
-        false,
-        tabVehicle);
-
-    irr::gui::IGUIStaticText* s = TheGame::getInstance()->getEnv()->addStaticText(L"soft",
-        irr::core::recti(irr::core::position2di((PADDING*2)+FTW, line), irr::core::dimension2di(frontRearSize, 16)),
-        false,
-        false,
-        tabVehicle);
-    s->setTextAlignment(irr::gui::EGUIA_LOWERRIGHT, irr::gui::EGUIA_UPPERLEFT);
-
-    TheGame::getInstance()->getEnv()->addStaticText(L"hard",
-        irr::core::recti(irr::core::position2di(tabVehicle->getRelativePosition().getSize().Width-PADDING-frontRearSize, line), irr::core::dimension2di(frontRearSize, 16)),
-        false,
-        false,
-        tabVehicle);
-
-    scrollSuspensionSpring = TheGame::getInstance()->getEnv()->addScrollBar(true, 
-        irr::core::recti(irr::core::position2di(FTW+(PADDING*3)+frontRearSize, line), irr::core::dimension2di(tabVehicle->getRelativePosition().getSize().Width-(6*PADDING)-LTW-FTW-(frontRearSize*2), 16)),
-        //irr::core::recti(irr::core::position2di(FTW+(PADDING*2), line), irr::core::dimension2di(tabVehicle->getRelativePosition().getSize().Width-(4*PADDING)-LTW-FTW, 16)),
-        tabVehicle,
-        MI_SCROLLSUSPENSIONSPRING);
-    scrollSuspensionSpring->setMin(-20);
-    scrollSuspensionSpring->setMax(20);
-    scrollSuspensionSpring->setLargeStep(5);
-    scrollSuspensionSpring->setSmallStep(1);
-
-    line += 20;
-    TheGame::getInstance()->getEnv()->addStaticText(L"Suspension damping",
-        irr::core::recti(irr::core::position2di(PADDING, line), irr::core::dimension2di(FTW, 16)),
-        false,
-        false,
-        tabVehicle);
-
-    s = TheGame::getInstance()->getEnv()->addStaticText(L"slow",
-        irr::core::recti(irr::core::position2di((PADDING*2)+FTW, line), irr::core::dimension2di(frontRearSize, 16)),
-        false,
-        false,
-        tabVehicle);
-    s->setTextAlignment(irr::gui::EGUIA_LOWERRIGHT, irr::gui::EGUIA_UPPERLEFT);
-
-    TheGame::getInstance()->getEnv()->addStaticText(L"fast",
-        irr::core::recti(irr::core::position2di(tabVehicle->getRelativePosition().getSize().Width-PADDING-frontRearSize, line), irr::core::dimension2di(frontRearSize, 16)),
-        false,
-        false,
-        tabVehicle);
-
-    scrollSuspensionDamper = TheGame::getInstance()->getEnv()->addScrollBar(true, 
-        irr::core::recti(irr::core::position2di(FTW+(PADDING*3)+frontRearSize, line), irr::core::dimension2di(tabVehicle->getRelativePosition().getSize().Width-(6*PADDING)-LTW-FTW-(frontRearSize*2), 16)),
-        //irr::core::recti(irr::core::position2di(FTW+(PADDING*2), line), irr::core::dimension2di(tabVehicle->getRelativePosition().getSize().Width-(4*PADDING)-LTW-FTW, 16)),
-        tabVehicle,
-        MI_SCROLLSUSPENSIONDAMPER);
-    scrollSuspensionDamper->setMin(-20);
-    scrollSuspensionDamper->setMax(20);
-    scrollSuspensionDamper->setLargeStep(5);
-    scrollSuspensionDamper->setSmallStep(1);
-
-    line += 20;
-    TheGame::getInstance()->getEnv()->addStaticText(L"Brake balance",
-        irr::core::recti(irr::core::position2di(PADDING, line), irr::core::dimension2di(FTW, 16)),
-        false,
-        false,
-        tabVehicle);
-
-    s = TheGame::getInstance()->getEnv()->addStaticText(L"front",
-        irr::core::recti(irr::core::position2di((PADDING*2)+FTW, line), irr::core::dimension2di(frontRearSize, 16)),
-        false,
-        false,
-        tabVehicle);
-    s->setTextAlignment(irr::gui::EGUIA_LOWERRIGHT, irr::gui::EGUIA_UPPERLEFT);
-
-    TheGame::getInstance()->getEnv()->addStaticText(L"rear",
-        irr::core::recti(irr::core::position2di(tabVehicle->getRelativePosition().getSize().Width-PADDING-frontRearSize, line), irr::core::dimension2di(frontRearSize, 16)),
-        false,
-        false,
-        tabVehicle);
-
-    scrollBrakeBalance = TheGame::getInstance()->getEnv()->addScrollBar(true, 
-        irr::core::recti(irr::core::position2di(FTW+(PADDING*3)+frontRearSize, line), irr::core::dimension2di(tabVehicle->getRelativePosition().getSize().Width-(6*PADDING)-LTW-FTW-(frontRearSize*2), 16)),
-            tabVehicle,
-            MI_SCROLLBRAKEBALANCE);
-    scrollBrakeBalance->setMin(0);
-    scrollBrakeBalance->setMax(100);
-    scrollBrakeBalance->setLargeStep(10);
-    scrollBrakeBalance->setSmallStep(1);
-
-
-    // ----------------------------
-    // Player
-    // ----------------------------
-    irr::gui::IGUITab* tabPlayer = tc->addTab(L"Player", 0);
-
-    line = PADDING;
-    TheGame::getInstance()->getEnv()->addStaticText(L"Name",
-        irr::core::recti(irr::core::position2di(PADDING, line), irr::core::dimension2di(FTW, 16)),
-        false,
-        false,
-        tabPlayer);
-
-    editBoxPlayerName = TheGame::getInstance()->getEnv()->addEditBox(L"",
-        irr::core::recti(irr::core::position2di(FTW+(PADDING*2), line), irr::core::dimension2di(tabPlayer->getRelativePosition().getSize().Width-(4*PADDING)-LTW-FTW, 16)),
-        true,
-        tabPlayer,
-        MI_EBPLAYERNAME);
-
-    line += 20;
-    TheGame::getInstance()->getEnv()->addStaticText(L"Co-pilot name",
-        irr::core::recti(irr::core::position2di(PADDING, line), irr::core::dimension2di(FTW, 16)),
-        false,
-        false,
-        tabPlayer);
-
-    editBoxPlayerCoName = TheGame::getInstance()->getEnv()->addEditBox(L"",
-        irr::core::recti(irr::core::position2di(FTW+(PADDING*2), line), irr::core::dimension2di(tabPlayer->getRelativePosition().getSize().Width-(4*PADDING)-LTW-FTW, 16)),
-        true,
-        tabPlayer,
-        MI_EBPLAYERCONAME);
-
-    line += 20;
-    TheGame::getInstance()->getEnv()->addStaticText(L"Team name",
-        irr::core::recti(irr::core::position2di(PADDING, line), irr::core::dimension2di(FTW, 16)),
-        false,
-        false,
-        tabPlayer);
-
-    editBoxPlayerTeamName = TheGame::getInstance()->getEnv()->addEditBox(L"",
-        irr::core::recti(irr::core::position2di(FTW+(PADDING*2), line), irr::core::dimension2di(tabPlayer->getRelativePosition().getSize().Width-(4*PADDING)-LTW-FTW, 16)),
-        true,
-        tabPlayer,
-        MI_EBPLAYERTEAMNAME);
 
 
     window->setVisible(false);
@@ -536,66 +396,6 @@ bool MenuPageOptions::OnEvent(const irr::SEvent &event)
                 };
                 break;
             }
-            case irr::gui::EGET_SCROLL_BAR_CHANGED:
-            {
-                switch (id)
-                {
-                    case MI_SCROLLSUSPENSIONSPRING:
-                    {
-                        int pos = scrollSuspensionSpring->getPos();
-                        dprintf(MY_DEBUG_NOTE, "options::scrollbarsuspensionspring::clicked: pos: %d\n", pos);
-                        Player::getInstance()->setSuspensionSpringModifier((float)pos);
-                        return true;
-                        break;
-                    }
-                    case MI_SCROLLSUSPENSIONDAMPER:
-                    {
-                        int pos = scrollSuspensionDamper->getPos();
-                        dprintf(MY_DEBUG_NOTE, "options::scrollbarsuspensiondamper::clicked: pos: %d\n", pos);
-                        Player::getInstance()->setSuspensionDamperModifier((float)pos);
-                        return true;
-                        break;
-                    }
-                    case MI_SCROLLBRAKEBALANCE:
-                    {
-                        int pos = scrollBrakeBalance->getPos();
-                        dprintf(MY_DEBUG_NOTE, "options::scrollbrakebalance::clicked: pos: %d\n", pos);
-                        Player::getInstance()->setBrakeBalance(((float)pos)/100.f);
-                        return true;
-                        break;
-                    }
-                };
-                break;
-            }
-            case irr::gui::EGET_EDITBOX_CHANGED:
-            case irr::gui::EGET_EDITBOX_ENTER:
-            {
-                switch (id)
-                {
-                    case MI_EBPLAYERNAME:
-                    {
-                        std::string newName;
-                        WStringConverter::toString(editBoxPlayerName->getText(), newName);
-                        Player::getInstance()->getCompetitor()->setName(newName);
-                        break;
-                    }
-                    case MI_EBPLAYERCONAME:
-                    {
-                        std::string newName;
-                        WStringConverter::toString(editBoxPlayerCoName->getText(), newName);
-                        Player::getInstance()->getCompetitor()->setCoName(newName);
-                        break;
-                    }
-                    case MI_EBPLAYERTEAMNAME:
-                    {
-                        std::string newName;
-                        WStringConverter::toString(editBoxPlayerTeamName->getText(), newName);
-                        Player::getInstance()->getCompetitor()->setTeamName(newName);
-                        break;
-                    }
-                }
-                break;
-            }
         };
     }
     return false;
@@ -617,13 +417,21 @@ void MenuPageOptions::close()
 
 void MenuPageOptions::refresh()
 {
-    refreshGeneral();
+    refreshGame();
+    refreshGraphics();
     refreshKB();
-    refreshVehicle();
-    refreshPlayer();
 }
 
-void MenuPageOptions::refreshGeneral()
+void MenuPageOptions::refreshGame()
+{
+    cbScanJoystick->setChecked(Settings::getInstance()->scanForJoystick);
+    cbShowNames->setChecked(Settings::getInstance()->showNames);
+    cbNavigationAssistant->setChecked(Settings::getInstance()->navigationAssistant);
+    cbManualShifting->setChecked(Settings::getInstance()->manualGearShifting);
+    cbSequentialShifting->setChecked(Settings::getInstance()->sequentialGearShifting);
+}
+
+void MenuPageOptions::refreshGraphics()
 {
     irr::IrrlichtDevice* device = TheGame::getInstance()->getDevice();
 
@@ -657,11 +465,6 @@ void MenuPageOptions::refreshGeneral()
 
     cbFullScreen->setChecked(Settings::getInstance()->fullScreen);
     cbVsync->setChecked(Settings::getInstance()->vsync);
-    cbScanJoystick->setChecked(Settings::getInstance()->scanForJoystick);
-    cbShowNames->setChecked(Settings::getInstance()->showNames);
-    cbNavigationAssistant->setChecked(Settings::getInstance()->navigationAssistant);
-    cbManualShifting->setChecked(Settings::getInstance()->manualGearShifting);
-    cbSequentialShifting->setChecked(Settings::getInstance()->sequentialGearShifting);
 }
 
 void MenuPageOptions::refreshKB()
@@ -709,29 +512,6 @@ void MenuPageOptions::refreshKB()
         }
         tableKB->setCellText(i, 2, str.c_str());
     }
-}
-
-void MenuPageOptions::refreshVehicle()
-{
-    scrollSuspensionSpring->setPos((int)Player::getInstance()->getSuspensionSpringModifier());
-    scrollSuspensionDamper->setPos((int)Player::getInstance()->getSuspensionDamperModifier());
-    scrollBrakeBalance->setPos((int)(Player::getInstance()->getBrakeBalance()*100.f));
-}
-
-void MenuPageOptions::refreshPlayer()
-{
-    irr::core::stringw str;
-    
-    str += Player::getInstance()->getCompetitor()->getName().c_str();
-    editBoxPlayerName->setText(str.c_str());
-
-    str = L"";    
-    str += Player::getInstance()->getCompetitor()->getCoName().c_str();
-    editBoxPlayerCoName->setText(str.c_str());
-
-    str = L"";    
-    str += Player::getInstance()->getCompetitor()->getTeamName().c_str();
-    editBoxPlayerTeamName->setText(str.c_str());
 }
 
 void MenuPageOptions::optionKBClosed()

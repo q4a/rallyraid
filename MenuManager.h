@@ -33,6 +33,7 @@ public:
         MP_OPTIONS,
         MP_OPTIONSKB,
         MP_LOADSAVE,
+        MP_SETUP,
         NUMBER_OF_MENUPAGES
     };
 

@@ -19,6 +19,7 @@ public:
     {
         MI_WINDOW = MAX_MENU_ITEMS * MenuManager::MP_STAGE,
         MI_BUTTONSTART,
+        MI_BUTTONSETUP,
         MI_BUTTONBACK,
 
         MI_SCROLLROADBOOK,

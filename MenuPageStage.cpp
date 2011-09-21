@@ -106,6 +106,12 @@ MenuPageStage::MenuPageStage()
     TheGame::getInstance()->getEnv()->addButton(
         irr::core::recti(10,90,140,110),
         window,
+        MI_BUTTONSETUP,
+        L"Setup");
+
+    TheGame::getInstance()->getEnv()->addButton(
+        irr::core::recti(10,120,140,140),
+        window,
         MI_BUTTONBACK,
         L"Back To Main");
 
@@ -299,6 +305,11 @@ bool MenuPageStage::OnEvent(const irr::SEvent &event)
                         willOpenOtherWindow = true;
                         MenuManager::getInstance()->close();
                         MenuManager::getInstance()->open(MenuManager::MP_MAIN);
+                        return true;
+                        break;
+                    case MI_BUTTONSETUP:
+                        dprintf(MY_DEBUG_NOTE, "stagemenu::setupbutton::clicked\n");
+                        MenuManager::getInstance()->open(MenuManager::MP_SETUP);
                         return true;
                         break;
                 };

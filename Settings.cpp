@@ -125,7 +125,7 @@ void Settings::read()
             } else if (keyName == "display_bits")
             {
                 displayBits = StringConverter::parseUnsignedInt(valName, 16);
-                if (displayBits != 16 || displayBits != 32)
+                if (displayBits != 16 && displayBits != 32)
                 {
                     displayBits = 16;
                 }

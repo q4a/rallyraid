@@ -18,6 +18,7 @@ public:
         MI_BUTTONSTART,
         MI_BUTTONLOAD,
         MI_BUTTONOPTIONS,
+        MI_BUTTONSETUP,
         MI_BUTTONEXIT,
 
         MI_TABLERACES,

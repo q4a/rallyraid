@@ -16,6 +16,7 @@
 #include "MenuPageOptions.h"
 #include "MenuPageOptionsKB.h"
 #include "MenuPageLoadSave.h"
+#include "MenuPageSetup.h"
 
 #include <string.h>
 
@@ -99,6 +100,7 @@ MenuManager::MenuManager()
     menuPages[MP_OPTIONS] = new MenuPageOptions();
     menuPages[MP_OPTIONSKB] = new MenuPageOptionsKB();
     menuPages[MP_LOADSAVE] = new MenuPageLoadSave();
+    menuPages[MP_SETUP] = new MenuPageSetup();
 }
 
 MenuManager::~MenuManager()
