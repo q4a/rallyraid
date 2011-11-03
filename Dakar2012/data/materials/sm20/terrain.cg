@@ -72,7 +72,7 @@ void main_f(float4 position         : POSITION,
     float4 col0 = tex2D(tex0, Uv0);  // sample color map
     //float2 Uv1_ = Uv0*128.0; // frac(Uv0*128.0);
     float4 col1 = tex2D(tex1, Uv1);  // detailmap
-    float4 col2 = tex2D(tex3, Uv1);  // detailmap
+    float4 col2 = tex2D(tex3, Uv1*2.0);  // detailmap
     float4 shadowCoeff = calculate_shadow_ter(texCoordProj, tex2, shadowParam, shadowRes, objPos.y);
     float multip = calc_multip(color, 0.6);
 
