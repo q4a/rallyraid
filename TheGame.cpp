@@ -243,7 +243,10 @@ TheGame::TheGame()
         Hud::initialize();
         hud = Hud::getInstance();
 
-        //renderVehicleImages();
+        if (Settings::getInstance()->generatePreImages)
+        {
+            renderVehicleImages();
+        }
 
         skydome = smgr->addSkyDomeSceneNode(driver->getTexture("data/skys/fairday.jpg"),16,8,0.95f,2.0f);
         /*if (useShaders && useCgShaders)
@@ -575,7 +578,7 @@ void TheGame::loop()
                             str += L"0";
                         }
                         str += L"     FPS speed: ";
-                        str += (int)(getFPSSpeed()*10.f);
+                        str += (int)(getFPSSpeed()*(1.0f / Settings::getInstance()->fpsStep));
                         
                         hud->getEditorText()->setText(str.c_str());
                     }
@@ -877,7 +880,8 @@ void renderVehicleImages()
         
         printf("Render start\n");
         TheGame::getInstance()->getDriver()->beginScene(true, true, irr::video::SColor(0,255,0,0));
-        TheGame::getInstance()->getDriver()->setRenderTarget(car_selector_rtt, true, true, irr::video::SColor(0, 255, 0, 255));
+        //TheGame::getInstance()->getDriver()->setRenderTarget(car_selector_rtt, true, true, irr::video::SColor(0, 255, 0, 255));
+        TheGame::getInstance()->getDriver()->setRenderTarget(car_selector_rtt, true, true, irr::video::SColor(0, 0, 0, 0));
         TheGame::getInstance()->getSmgr()->drawAll();
         TheGame::getInstance()->getDriver()->endScene();
         printf("Render end\n");
