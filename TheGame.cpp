@@ -478,7 +478,7 @@ void TheGame::loop()
                 //camera->setTarget(camera->getPosition()+initialDir);
                 //printf("off: %f, %f (%f, %f)\n", offsetManager->getOffset().X, offsetManager->getOffset().Z,
                 //    camera->getPosition().X, camera->getPosition().Z);
-                /*bool ou = */offsetManager->update(offsetManager->getOffset()+camera->getPosition());
+                bool ou = offsetManager->update(offsetManager->getOffset()+camera->getPosition());
                 objectWire->update(offsetManager->getOffset()+camera->getPosition());
                 //printf("off: %f, %f (%f, %f)\n", offsetManager->getOffset().X, offsetManager->getOffset().Z,
                 //    camera->getPosition().X, camera->getPosition().Z);
@@ -508,7 +508,7 @@ void TheGame::loop()
                 /*
                 update dynamic object position
                 */
-                if (physUpdateDone/* || ou*/)
+                if (physUpdateDone || ou)
                 {
                     OffsetObject::updateDynamicToPhys();
                     handleUpdatePos(true); // update the camera to the player position
