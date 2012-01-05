@@ -630,7 +630,12 @@ void MenuPageInGame::refreshCompetitors(StageState* stageState)
                 {
                     if (RaceManager::getInstance()->getCurrentStage()->getAIPointList().size())
                     {
-                        perc = ((*it)->prevPointNum * 100) / RaceManager::getInstance()->getCurrentStage()->getAIPointList().size();
+                        //perc = ((*it)->prevPointNum * 100) / RaceManager::getInstance()->getCurrentStage()->getAIPointList().size();
+                        perc = (unsigned int)(((*it)->passedDistance * 100.f) / RaceManager::getInstance()->getCurrentStage()->getAIPointList().back()->getGlobalDistance());
+                        if (perc > 100)
+                        {
+                            perc = 100;
+                        }
                     }
                 }
                 str += perc;
