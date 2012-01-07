@@ -708,16 +708,15 @@ Vehicle::Vehicle(const std::string& vehicleTypeName, const irr::core::vector3df&
     // ------------------------------------------------
     hkpVehicleDefaultEngine* engine = static_cast< hkpVehicleDefaultEngine*>(hkVehicle->m_engine);
     engine->m_maxTorque = vehicleType->maxTorqueRate /*500.0f*/;
-    engine->m_minRPM = vehicleType->maxTorque / 8.0f /*1000.0f*/;
-    engine->m_optRPM = (vehicleType->maxTorque * 3.0f) / 4.0f /*5500.0f*/;
+    engine->m_minRPM = vehicleType->maxTorque * 0.2f /*1000.0f*/;
+    engine->m_optRPM = vehicleType->maxTorque * 0.75f /*5500.0f*/;
     // This value is also used to calculate the m_primaryTransmissionRatio.
     engine->m_maxRPM = vehicleType->maxTorque /*7500.0f*/;
-    engine->m_torqueFactorAtMinRPM = 0.8f;
-    engine->m_torqueFactorAtMaxRPM = 0.8f;
-    engine->m_resistanceFactorAtMinRPM = 0.1f;
+    engine->m_torqueFactorAtMinRPM = 0.4f;
+    engine->m_torqueFactorAtMaxRPM = 0.75f;
+    engine->m_resistanceFactorAtMinRPM = 0.15f;
     engine->m_resistanceFactorAtOptRPM = 0.3f;
     engine->m_resistanceFactorAtMaxRPM = 0.8f;
-
 
     // ------------------------------------------------
     // setupComponent( *hkVehicle->m_data, *static_cast< hkpVehicleDefaultTransmission*>(hkVehicle->m_transmission) );
@@ -726,14 +725,27 @@ Vehicle::Vehicle(const std::string& vehicleTypeName, const irr::core::vector3df&
     transmission->m_gearsRatio.setSize(vehicleType->gearMap.size());
     transmission->m_wheelsTorqueRatio.setSize(hkVehicle->m_data->m_numWheels);
 
-    transmission->m_downshiftRPM = vehicleType->maxTorque / 2.5f /*3500.0f*/;
-    transmission->m_upshiftRPM = (vehicleType->maxTorque * 4.0f) / 5.0f /*6500.0f*/;
+    transmission->m_downshiftRPM = vehicleType->maxTorque * 0.6f /*3500.0f*/;
+    transmission->m_upshiftRPM = vehicleType->maxTorque * 0.9f /*6500.0f*/;
+    
+    float baseGearRatio = vehicleType->gearMap[1] * 1.3f;
 
     for (unsigned int i = 0; i < vehicleType->gearMap.size(); i++)
     {
-        transmission->m_gearsRatio[i] = vehicleType->gearMap[i+1];
+        //transmission->m_gearsRatio[i] = vehicleType->gearMap[i+1];
+        baseGearRatio /= 1.3f;
+        transmission->m_gearsRatio[i] = baseGearRatio;
         dprintf(MY_DEBUG_NOTE, "\t%d. gear ration: %f\n", i, transmission->m_gearsRatio[i]);
     }
+
+    /*float baseGearRatio = 1.0f / 1.5f;
+    for (int i = vehicleType->gearMap.size()-1; i >= 0; i--)
+    {
+        //transmission->m_gearsRatio[i] = vehicleType->gearMap[i+1];
+        baseGearRatio *= 1.5f;
+        transmission->m_gearsRatio[i] = baseGearRatio;
+        dprintf(MY_DEBUG_NOTE, "\t%d. gear ration: %f\n", i, transmission->m_gearsRatio[i]);
+    }*/
 
     transmission->m_clutchDelayTime = vehicleType->changeGearTime / 50.0f;
     transmission->m_reverseGearRatio = 1.5f;
@@ -1315,6 +1327,7 @@ void Vehicle::setSteer(float value)
     //hkVehicle->getChassis()->activate();
     hkpVehicleDriverInputAnalogStatus* deviceStatus = (hkpVehicleDriverInputAnalogStatus*)hkVehicle->m_deviceStatus;
     //deviceStatus->m_positionX = hkMath::clamp(-value, -1.0f, 1.0f);
+    value *= conditionSteer;
     deviceStatus->m_positionX = hkMath::clamp(-value, -conditionSteer, conditionSteer);
 }
 
@@ -1323,6 +1336,7 @@ void Vehicle::setTorque(float value)
     hkpVehicleDriverInputAnalogStatus* deviceStatus = (hkpVehicleDriverInputAnalogStatus*)hkVehicle->m_deviceStatus;
     if (((VehicleTransmission*)hkVehicle->m_transmission)->manual && ((VehicleTransmission*)hkVehicle->m_transmission)->gear < 0) value *= -1.0f;
     //deviceStatus->m_positionY = hkMath::clamp(value, -1.0f, 1.0f);
+    value *= condition;
     deviceStatus->m_positionY = hkMath::clamp(value, -condition, condition);
 }
 
