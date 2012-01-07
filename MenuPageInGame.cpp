@@ -288,6 +288,7 @@ bool MenuPageInGame::OnEvent(const irr::SEvent &event)
                         break;
                     case MI_BUTTONEXIT:
                         dprintf(MY_DEBUG_NOTE, "ingamemenu::exitbutton::clicked\n");
+                        willOpenOtherWindow = true;
                         TheGame::getInstance()->setTerminate();
                         return true;
                         break;

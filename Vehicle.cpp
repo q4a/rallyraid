@@ -541,6 +541,8 @@ Vehicle::Vehicle(const std::string& vehicleTypeName, const irr::core::vector3df&
       tyres(),
       hkVehicle(0),
       engineSound(0),
+      groundSound(0),
+      puffSound(0),
       linearVelocity(),
       distance(0.0f),
       lastPos(),
@@ -553,7 +555,10 @@ Vehicle::Vehicle(const std::string& vehicleTypeName, const irr::core::vector3df&
       suspensionSpringModifier(suspensionSpringModifier),
       suspensionDamperModifier(suspensionDamperModifier),
       brakeBalance(brakeBalance),
-      nameText(0)
+      nameText(0),
+      lastOnGround(true),
+      lastOnGroundTick(0),
+      lastNotOnGroundTick(0)
 {
     dprintf(MY_DEBUG_NOTE, "Vehicle::Vehicle(): %p, [%s]\n", this, vehicleTypeName.c_str());
     vehicleType = VehicleTypeManager::getInstance()->getVehicleType(vehicleTypeName);
@@ -895,6 +900,21 @@ Vehicle::Vehicle(const std::string& vehicleTypeName, const irr::core::vector3df&
         engineSound->setMinDistance(4.0f);
         // engineSound->setIsPaused(true);
     }
+
+    groundSound = MySoundEngine::getInstance()->play3D("data/sounds/surfaces/sand.wav", irr::core::vector3df(), true, true, true);
+    if (groundSound)
+    {
+        groundSound->setMinDistance(3.0);
+        groundSound->setVolume(0.1f);
+    }
+
+    puffSound = MySoundEngine::getInstance()->play3D("data/sounds/puff.wav", irr::core::vector3df(), false, true, true);
+    if (puffSound)
+    {
+        puffSound->setMinDistance(3.0f);
+        puffSound->setVolume(0.1f);
+    }
+
     VehicleManager::getInstance()->addVehicle(this);
     memset(smokes, 0, MAX_SMOKES*sizeof(Smoke*));
     
@@ -929,6 +949,18 @@ Vehicle::~Vehicle()
     {
         delete engineSound;
         engineSound = 0;
+    }
+
+    if (groundSound)
+    {
+        delete groundSound;
+        groundSound = 0;
+    }
+
+    if (puffSound)
+    {
+        delete puffSound;
+        puffSound = 0;
     }
 
     VehicleManager::getInstance()->removeVehicle(this);
@@ -1046,6 +1078,41 @@ void Vehicle::handleUpdatePos(bool phys)
             }
         }
 
+        if (onGround)
+        {
+            if (!lastOnGround && TheGame::getInstance()->getTick() - lastOnGroundTick > 300 /* ms */)
+            {
+                if (puffSound)
+                {
+                    puffSound->setPosition(soundPos);
+                    puffSound->play();
+                }
+            }
+            if(groundSound)
+            {
+                if (angularVelocity > 2.0f)
+                {
+                    groundSound->setPosition(soundPos);
+                    groundSound->setPlaybackSpeed(ssSpeed);
+                    groundSound->setIsPaused(false);
+                }
+                else
+                {
+                    groundSound->setIsPaused(true);
+                }
+            }
+            lastOnGroundTick = TheGame::getInstance()->getTick();
+        }
+        else
+        {
+            if(groundSound)
+            {
+                groundSound->setIsPaused(true);
+            }
+            lastNotOnGroundTick = TheGame::getInstance()->getTick();
+        }
+        lastOnGround = onGround;
+
         /*
             Debug
         */
@@ -1079,6 +1146,10 @@ void Vehicle::handleUpdatePos(bool phys)
         if (engineSound)
         {
             engineSound->setPosition(soundPos);
+        }
+        if (groundSound)
+        {
+            groundSound->setPosition(soundPos);
         }
     }
     updateNameTextPos();
@@ -1325,6 +1396,12 @@ void Vehicle::pause()
         engineSound->setPlaybackSpeed(1.f);
         engineSound->setVelocity(irr::core::vector3df());
         engineSound->setIsPaused(true);
+    }
+    if (groundSound)
+    {
+        groundSound->setPlaybackSpeed(1.f);
+        groundSound->setVelocity(irr::core::vector3df());
+        groundSound->setIsPaused(true);
     }
 }
 

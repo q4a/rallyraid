@@ -157,6 +157,8 @@ private:
     tyreVector_t                tyres;
     hkpVehicleInstance*         hkVehicle;
     MySound*                    engineSound;
+    MySound*                    groundSound;
+    MySound*                    puffSound;
     irr::core::vector3df        linearVelocity;
     float                       distance;
     irr::core::vector3df        lastPos;
@@ -171,6 +173,9 @@ private:
     float                       brakeBalance;
     irr::scene::ITextSceneNode* nameText;
     VehicleCollisionCB*         vehicleCollisionCB;
+    bool                        lastOnGround;
+    unsigned int                lastOnGroundTick;
+    unsigned int                lastNotOnGroundTick;
 
 
     friend class FrictionMapVehicleRaycastWheelCollide;
