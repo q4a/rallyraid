@@ -89,10 +89,11 @@ public:
     */
     Vehicle(const std::string& vehicleTypeName, const irr::core::vector3df& apos, const irr::core::vector3df& rotation,
         bool manual = false, bool sequential = true, float suspensionSpringModifier = 0.0f, float suspensionDamperModifier = 0.0f,
-        float brakeBalance = 0.2f);
+        float brakeBalance = 0.2f, float initialCondition = 1.0f, float initialConditionSteer = 1.0f);
     ~Vehicle();
 
     void reset(const irr::core::vector3df& pos);
+    void repair();
     void addStartImpulse(float initialSpeed, const irr::core::vector3df& dir);
     float getAngle() const;
     int getGear() const;
@@ -107,6 +108,12 @@ public:
     float getDistance() const {return distance;}
     bool getGearShifting() const;
     bool getGearShiftingSequential() const;
+    unsigned int getDamagePercentage() const
+    {
+        return (unsigned int)((2.f - (condition+conditionSteer)) * 50.f);
+    }
+    float getCondition() const {return condition;}
+    float getConditionSteer() const {return conditionSteer;}
 
     void setSteer(float value);
     void setTorque(float value);
@@ -176,6 +183,8 @@ private:
     bool                        lastOnGround;
     unsigned int                lastOnGroundTick;
     unsigned int                lastNotOnGroundTick;
+    float                       condition;
+    float                       conditionSteer;
 
 
     friend class FrictionMapVehicleRaycastWheelCollide;

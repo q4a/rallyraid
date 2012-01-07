@@ -139,7 +139,7 @@ private:
         {
             speed = vehicle->getLinearVelocity().getLength() * 3.6f;
         }
-        
+
         if (sound)
         {
             // play sound
@@ -170,6 +170,25 @@ private:
             , localNormal.X, localNormal.Y, localNormal.Z,
             speed
             );
+
+        // damage
+        if (Settings::getInstance()->useDamage)
+        {
+            irr::core::vector2df localPoint2D(localPoint.X, localPoint.Z);
+            float angle = (float)localPoint2D.getAngle();
+            normalizeAngle180(angle);
+            angle = fabsf(angle);
+            float damage = speed / 1000.f;
+
+            if (angle < 45.f)
+            {
+                vehicle->conditionSteer -= damage /* 0.6f*/;
+                if (vehicle->conditionSteer < 0.0f) vehicle->conditionSteer = 0.0f;
+            }
+
+            vehicle->condition -= damage /* 0.6f*/;
+            if (vehicle->condition < 0.0f) vehicle->condition = 0.0f;
+        }
 
         // check for penalties
         if (vehicle && otherVehicle &&
@@ -531,7 +550,8 @@ VehicleTyre::~VehicleTyre()
 // -------------------------------------------------------
 
 Vehicle::Vehicle(const std::string& vehicleTypeName, const irr::core::vector3df& apos, const irr::core::vector3df& rotation,
-    bool manual, bool sequential, float suspensionSpringModifier, float suspensionDamperModifier, float brakeBalance)
+    bool manual, bool sequential, float suspensionSpringModifier, float suspensionDamperModifier, float brakeBalance,
+    float initialCondition, float initialConditionSteer)
     : vehicleType(0),
       collisionListener(0),
       matrix(),
@@ -558,7 +578,9 @@ Vehicle::Vehicle(const std::string& vehicleTypeName, const irr::core::vector3df&
       nameText(0),
       lastOnGround(true),
       lastOnGroundTick(0),
-      lastNotOnGroundTick(0)
+      lastNotOnGroundTick(0),
+      condition(initialCondition),
+      conditionSteer(initialConditionSteer)
 {
     dprintf(MY_DEBUG_NOTE, "Vehicle::Vehicle(): %p, [%s]\n", this, vehicleTypeName.c_str());
     vehicleType = VehicleTypeManager::getInstance()->getVehicleType(vehicleTypeName);
@@ -1203,6 +1225,13 @@ void Vehicle::reset(const irr::core::vector3df& pos)
     updateToMatrix();
 }
 
+void Vehicle::repair()
+{
+    dprintf(MY_DEBUG_NOTE, "repair car\n");
+    condition = 1.0f;
+    conditionSteer = 1.0f;
+}
+
 void Vehicle::addStartImpulse(float initialSpeed, const irr::core::vector3df& dir)
 {
     float v = initialSpeed / 3.6f; // km/h -> m/s
@@ -1285,14 +1314,16 @@ void Vehicle::setSteer(float value)
 {
     //hkVehicle->getChassis()->activate();
     hkpVehicleDriverInputAnalogStatus* deviceStatus = (hkpVehicleDriverInputAnalogStatus*)hkVehicle->m_deviceStatus;
-    deviceStatus->m_positionX = hkMath::clamp(-value, -1.0f, 1.0f);
+    //deviceStatus->m_positionX = hkMath::clamp(-value, -1.0f, 1.0f);
+    deviceStatus->m_positionX = hkMath::clamp(-value, -conditionSteer, conditionSteer);
 }
 
 void Vehicle::setTorque(float value)
 {
     hkpVehicleDriverInputAnalogStatus* deviceStatus = (hkpVehicleDriverInputAnalogStatus*)hkVehicle->m_deviceStatus;
     if (((VehicleTransmission*)hkVehicle->m_transmission)->manual && ((VehicleTransmission*)hkVehicle->m_transmission)->gear < 0) value *= -1.0f;
-    deviceStatus->m_positionY = hkMath::clamp(value, -1.0f, 1.0f);
+    //deviceStatus->m_positionY = hkMath::clamp(value, -1.0f, 1.0f);
+    deviceStatus->m_positionY = hkMath::clamp(value, -condition, condition);
 }
 
 void Vehicle::setHandbrake(float value)

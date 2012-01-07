@@ -377,23 +377,15 @@ bool Starter::update(unsigned int currentTime, const irr::core::vector3df& apos,
                 currentPos2d = irr::core::vector2df(currentPos.X, currentPos.Z);
             }
         }
-        /*
-        if (vehicle->getDemagePer() > 20.f)
+        
+        if (vehicle->getDamagePercentage() > 30.f)
         {
-            float demage = vehicle->getDemagePer();
-            int penalty = (int)(3.f*demage);
-            for (int i = 0; i < 4; i++) 
-            {
-                if (!vehicle->isTyreConnected(i))
-                {
-                    penalty += 15;
-                }
-            }
-            dprintf(MY_DEBUG_INFO, "------------\nrepair AI car %d, penalty: %d\n------------\n", competitor->num, penalty);
-            competitor->lastPenaltyTime += penalty;
+            unsigned int damage = vehicle->getDamagePercentage();
+            unsigned int penalty = (REPAIR_PENALTY/3)*damage;
+            dprintf(MY_DEBUG_INFO, "------------\nrepair AI car %d, penalty: %d\n------------\n", competitor->getNum(), penalty);
             vehicle->repair();
         }
-        */
+        
         float nextPointAngle = (float)(nextPointPos2d - currentPos2d).getAngle();
         normalizeAngle(nextPointAngle);
         float nextNextPointAngle = nextPointAngle;
