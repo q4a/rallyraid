@@ -339,7 +339,10 @@ bool Starter::update(unsigned int currentTime, const irr::core::vector3df& apos,
         const float speed = vehicle->getSpeed();
         //const float speedLimitLow = (((m_bigTerrain->getSpeed()-25.f-(float)(difficulty*5)) * ((float)competitor->strength+currentRand+stageRand)) / 100.f);
         const float speedLimitDist = 40.f;
-        const float speedLimitLow = (((vehicle->getVehicleType()->getMaxSpeed()-speedLimitDist-(float)(Settings::getInstance()->difficulty*5)) * ((float)competitor->getStrength()+currentRand+stageRand)) / 100.f);
+        const float speedLimitLow = (((vehicle->getVehicleType()->getMaxSpeed()-
+            speedLimitDist-
+            ((float)Settings::getInstance()->difficulty*vehicle->getVehicleType()->getMaxSpeed()/DIFFICULTY_SPEED_STEP_DIVIDER)) *
+            ((float)competitor->getStrength()+currentRand+stageRand)) / 100.f);
         const float speedLimitHigh = speedLimitLow + speedLimitDist;
         const float angleLimit = ANGLE_LIMIT;           // for the steer calculation
         const float angleLimitMax = ANGLE_LIMIT_MAX;    // for the desired speed calculation
