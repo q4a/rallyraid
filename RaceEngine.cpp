@@ -44,6 +44,11 @@
 #define SPEED_ANGLE_LIMIT_MIN_SPEED     150.f
 #define AI_STEP                 (1.15f) // orig: (1.05f)
 
+// Visible rate means how often call the visible player update compare to the not visibles
+#define VISIBLE_RATE            10
+#define VISIBLE_RATE_F          10.f
+#define UPDATE_PERIOD           1000
+#define UPDATE_PERIOD_F         1000.f
 
 // normalize angle between 0 and 360
 static float normalizeAngle(float &angle)
@@ -335,26 +340,29 @@ bool Starter::update(unsigned int currentTime, const irr::core::vector3df& apos,
         float brake = 0.0f;
         float brake2 = 0.0f;
         float steer = 0.0f;
+
         float vehicleAngle = vehicle->getAngle(); normalizeAngle(vehicleAngle);
-        const float speed = vehicle->getSpeed();
-        //const float speedLimitLow = (((m_bigTerrain->getSpeed()-25.f-(float)(difficulty*5)) * ((float)competitor->strength+currentRand+stageRand)) / 100.f);
-        const float speedLimitDist = 40.f;
-        const float speedLimitLow = (((vehicle->getVehicleType()->getMaxSpeed()-
-            speedLimitDist-
-            ((float)Settings::getInstance()->difficulty*vehicle->getVehicleType()->getMaxSpeed()/DIFFICULTY_SPEED_STEP_DIVIDER)) *
-            ((float)competitor->getStrength()+currentRand+stageRand)) / 100.f);
-        const float speedLimitHigh = speedLimitLow + speedLimitDist;
         const float angleLimit = ANGLE_LIMIT;           // for the steer calculation
         const float angleLimitMax = ANGLE_LIMIT_MAX;    // for the desired speed calculation
         const float angleLimitMin = ANGLE_LIMIT_MIN;    // for the desired speed calculation
         const float speedAngleLimitMax = SPEED_ANGLE_LIMIT_MAX;
         const float speedAngleLimitMaxSpeed = SPEED_ANGLE_LIMIT_MAX_SPEED;
         const float speedAngleLimitMin = SPEED_ANGLE_LIMIT_MIN;
-        //const float speedAngleLimitMinSpeed = SPEED_ANGLE_LIMIT_MIN_SPEED;
-        //const float angleLimitMax = 180.f;
-        //const float brakeSpeedLimitMin = BRAKE_SPEED_LIMIT_MIN;         // for the desired speed calculation
-        //const float brakeSpeedLimitMax = BRAKE_SPEED_LIMIT_MAX;         // for the desired speed calculation
-        
+
+        const float speed = vehicle->getSpeed();
+        //const float speedLimitLow = (((m_bigTerrain->getSpeed()-25.f-(float)(difficulty*5)) * ((float)competitor->strength+currentRand+stageRand)) / 100.f);
+        const float speedLimitDist = 40.f;
+        const float speedLimitDistH = speedLimitDist*0.5f;
+        float speedLimitLow = (((vehicle->getVehicleType()->getMaxSpeed()-
+            speedLimitDist-
+            ((float)Settings::getInstance()->difficulty*vehicle->getVehicleType()->getMaxSpeed()/DIFFICULTY_SPEED_STEP_DIVIDER)) *
+            ((float)competitor->getStrength()+currentRand+stageRand)) / 100.f);
+        if ((*prevPoint)->getSpeed() > (speedLimitDistH + 0.001f) && speedLimitLow + speedLimitDistH > (*prevPoint)->getSpeed())
+        {
+            speedLimitLow = (*prevPoint)->getSpeed() - speedLimitDistH;
+        }
+        float speedLimitHigh = speedLimitLow + speedLimitDist;
+
         if (fabsf(speed) < 2.5f)
         {
             forResetCnt++;
@@ -582,7 +590,7 @@ bool Starter::update(unsigned int currentTime, const irr::core::vector3df& apos,
             vehicle->setHandbrake(0.0f);
             //if (competitor->getNum() == 499) printf("s: %d, ds: %d, t: %f, b: -\n", (int)speed, (int)desiredSpeed, torque);
         }
-        passedDistance += distanceStep/10.f;
+        passedDistance += distanceStep/VISIBLE_RATE_F;
     }
     else // not visible or there is no free pool vehicle
     {
@@ -717,6 +725,10 @@ void Starter::goToNextPoint(unsigned int currentTime, bool camActive)
     {
         if (visible)
         {
+            if (!competitor->getAi())
+            {
+                (*nextPoint)->setTime(currentTime - startTime);
+            }
             passedDistance = (*nextPoint)->getGlobalDistance();
             prevPoint = nextPoint;
             prevPointNum = nextPointNum;
@@ -781,8 +793,19 @@ void Starter::calculateTo(const irr::core::vector3df& nextPointPos)
     distanceStep = 0;
     if (!stage->getAIPointList().empty() && stage->getStageTime() > 0)
     {
-        distanceStep = (stage->getAIPointList().back()->getGlobalDistance() / (float)stage->getStageTime()) *
-            (((float)competitor->getStrength()+currentRand+stageRand) / 100.f);
+        if (stage->getAIPointList().back()->getTime() == 0 ||
+            nextPoint == stage->getAIPointList().begin() ||
+            nextPoint == stage->getAIPointList().end() ||
+            (*nextPoint)->getTime() == (*prevPoint)->getTime())
+        {
+            distanceStep = (stage->getAIPointList().back()->getGlobalDistance() / (float)stage->getStageTime());
+        }
+        else
+        {
+            distanceStep = (*nextPoint)->getLocalDistance() / (float)((*nextPoint)->getTime() - (*prevPoint)->getTime());
+        }
+
+        distanceStep *= (((float)competitor->getStrength()+currentRand+stageRand) / 100.f) * (1000.f/UPDATE_PERIOD_F);
     }
 }
 
@@ -881,8 +904,8 @@ RaceEngine::~RaceEngine()
 
 bool RaceEngine::update(unsigned int tick, const irr::core::vector3df& apos, UpdateWhen when)
 {
-    const unsigned int mtick = tick/1000;
-    const unsigned int ctick = tick/100;
+    const unsigned int mtick = tick/UPDATE_PERIOD;
+    const unsigned int ctick = tick/(UPDATE_PERIOD/VISIBLE_RATE);
     int updates = 0;
     
     //printf("raceupdate: raceFinished: %u\n", raceFinished);
