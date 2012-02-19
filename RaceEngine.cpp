@@ -21,6 +21,7 @@
 #include "MessageManager.h"
 #include "Player.h"
 #include "AIPoint.h"
+#include "error.h"
 #include <assert.h>
 
 
@@ -218,7 +219,7 @@ bool Starter::update(unsigned int currentTime, const irr::core::vector3df& apos,
     if (!competitor->getAi())
     {
         Player::getInstance()->setStageTime((currentTime - startTime), penaltyTime);
-        if (!stage->getAIPointList().empty())
+        if (!stage->getAIPointList().empty() && !Settings::getInstance()->AIPlayer)
         {
             irr::core::vector3df cp(OffsetManager::getInstance()->getOffset()+Player::getInstance()->getVehicleMatrix().getTranslation());
             float distToFinish = cp.getDistanceFrom(stage->getAIPointList().back()->getPos());
@@ -268,9 +269,6 @@ bool Starter::update(unsigned int currentTime, const irr::core::vector3df& apos,
                 str += position;
                 MessageManager::getInstance()->addText(str.c_str(), 12);
             }
-        }
-        if (!Settings::getInstance()->AIPlayer)
-        {
             return true;
         }
         Player::getInstance()->setFirstPressed();
@@ -352,14 +350,14 @@ bool Starter::update(unsigned int currentTime, const irr::core::vector3df& apos,
         const float speed = vehicle->getSpeed();
         //const float speedLimitLow = (((m_bigTerrain->getSpeed()-25.f-(float)(difficulty*5)) * ((float)competitor->strength+currentRand+stageRand)) / 100.f);
         const float speedLimitDist = 40.f;
-        const float speedLimitDistH = speedLimitDist*0.5f;
+        //const float speedLimitDistH = speedLimitDist*0.5f;
         float speedLimitLow = (((vehicle->getVehicleType()->getMaxSpeed()-
             speedLimitDist-
             ((float)Settings::getInstance()->difficulty*vehicle->getVehicleType()->getMaxSpeed()/DIFFICULTY_SPEED_STEP_DIVIDER)) *
             ((float)competitor->getStrength()+currentRand+stageRand)) / 100.f);
-        if ((*prevPoint)->getSpeed() > (speedLimitDistH + 0.001f) && speedLimitLow + speedLimitDistH > (*prevPoint)->getSpeed())
+        if ((*prevPoint)->getSpeed() > (speedLimitDist + 0.001f) && speedLimitLow + speedLimitDist > (*prevPoint)->getSpeed())
         {
-            speedLimitLow = (*prevPoint)->getSpeed() - speedLimitDistH;
+            speedLimitLow = (*prevPoint)->getSpeed() - speedLimitDist;
         }
         float speedLimitHigh = speedLimitLow + speedLimitDist;
 
@@ -727,7 +725,8 @@ void Starter::goToNextPoint(unsigned int currentTime, bool camActive)
         {
             if (!competitor->getAi())
             {
-                (*nextPoint)->setTime(currentTime - startTime);
+                unsigned int ptime = currentTime >= startTime ? currentTime - startTime : 0;
+                (*nextPoint)->setTime(ptime);
             }
             passedDistance = (*nextPoint)->getGlobalDistance();
             prevPoint = nextPoint;
@@ -750,27 +749,35 @@ void Starter::goToNextPoint(unsigned int currentTime, bool camActive)
     }
     if (nextPoint == stage->getAIPointList().end())
     {
-        //if (competitor->getAi())
+        if (!competitor->getAi())
         {
-            // no more point finish the stage
-            finishTime = currentTime - startTime;
-            globalTime += finishTime;
-            globalPenaltyTime += penaltyTime;
-            
-            unsigned int position = raceEngine->insertIntoFinishedState(this);
-            if (camActive)
+            if (!stage->updateStageTimeAndWriteAIPoints())
             {
-                irr::core::stringw str = L"";
-                
-                str += competitor->getNum();
-                str += L" ";
-                str += competitor->getName().c_str();
-                str += L" finished the stage, time: ";
-                WStringConverter::addTimeToStr(str, finishTime+penaltyTime);
-                str += L",  position: ";
-                str += position;
-                MessageManager::getInstance()->addText(str.c_str(), 6);
+                PrintMessage(15, "Unable to update and write stage time and AI points!");
             }
+            else
+            {
+                PrintMessage(16, "Update and write stage time and AI points successfully!");
+            }
+        }
+        // no more point finish the stage
+        finishTime = currentTime - startTime;
+        globalTime += finishTime;
+        globalPenaltyTime += penaltyTime;
+            
+        unsigned int position = raceEngine->insertIntoFinishedState(this);
+        if (camActive)
+        {
+            irr::core::stringw str = L"";
+                
+            str += competitor->getNum();
+            str += L" ";
+            str += competitor->getName().c_str();
+            str += L" finished the stage, time: ";
+            WStringConverter::addTimeToStr(str, finishTime+penaltyTime);
+            str += L",  position: ";
+            str += position;
+            MessageManager::getInstance()->addText(str.c_str(), 6);
         }
     }
     else
