@@ -126,7 +126,7 @@ MySound* MySoundEngine::play3D(const std::string& soundFileName, const irr::core
     else
     {
         buffer = it->second;
-        dprintf(MY_DEBUG_NOTE, "AL: buffer found %d\n");
+        dprintf(MY_DEBUG_NOTE, "AL: buffer found %d\n", buffer);
     }
     
     MySound* sound = new MySound(buffer, playLooped, pos);

@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -20,12 +20,14 @@
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -60,7 +62,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>..\ogre\Dependencies\lib\$(Configuration);..\hk2010_1_0_r1\Lib\win32_net_9-0\release_multithreaded_dll;..\openal11sdk\libs\Win32;..\freealut-1.1.0-bin\lib;..\irrlicht-svn-dakar2012-p1\lib\Win32-visualstudio;..\Cg30\lib;..\vld\lib\Win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Irrlicht_d.lib;cg.lib;cgD3D9.lib;cgGL.lib;opengl32.lib;OIS_d.lib;alut.lib;OpenAl32.lib;hkBase.lib;hkSerialize.lib;hkSceneData.lib;hkInternal.lib;hkGeometryUtilities.lib;hkVisualize.lib;hkCompat.lib;hkpCollide.lib;hkpConstraintSolver.lib;hkpDynamics.lib;hkpInternal.lib;hkpUtilities.lib;hkpVehicle.lib;hkaAnimation.lib;hkaInternal.lib;hkaRagdoll.lib;hkgBridge.lib;hkgCommon.lib;hkgDx9.lib;hkgDx9s.lib;hkgDx10.lib;hkgOgl.lib;hkgOgls.lib;hksCommon.lib;hksXAudio2.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Irrlicht_d.lib;cg.lib;cgD3D9.lib;cgGL.lib;opengl32.lib;OIS_d.lib;alut.lib;OpenAl32.lib;hkBase.lib;hkSerialize.lib;hkSceneData.lib;hkInternal.lib;hkGeometryUtilities.lib;hkVisualize.lib;hkCompat.lib;hkpCollide.lib;hkpConstraintSolver.lib;hkpDynamics.lib;hkpInternal.lib;hkpUtilities.lib;hkpVehicle.lib;hkaAnimation.lib;hkaInternal.lib;hkaRagdoll.lib;hkgBridge.lib;hkgCommon.lib;hkgDx9.lib;hkgDx9s.lib;hkgDx10.lib;hkgOgl.lib;hkgOgls.lib;hksCommon.lib;hksXAudio2.lib;legacy_stdio_definitions.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -80,7 +82,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>..\ogre\Dependencies\lib\$(Configuration);..\hk2010_1_0_r1\Lib\win32_net_9-0\release_multithreaded_dll;..\openal11sdk\libs\Win32;..\freealut-1.1.0-bin\lib;..\irrlicht-svn-dakar2012-p1\lib\Win32-visualstudio;..\Cg30\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Irrlicht.lib;cg.lib;cgD3D9.lib;cgGL.lib;opengl32.lib;alut.lib;OpenAl32.lib;OIS.lib;hkBase.lib;hkSerialize.lib;hkSceneData.lib;hkInternal.lib;hkGeometryUtilities.lib;hkVisualize.lib;hkCompat.lib;hkpCollide.lib;hkpConstraintSolver.lib;hkpDynamics.lib;hkpInternal.lib;hkpUtilities.lib;hkpVehicle.lib;hkaAnimation.lib;hkaInternal.lib;hkaRagdoll.lib;hkgBridge.lib;hkgCommon.lib;hkgDx9.lib;hkgDx9s.lib;hkgDx10.lib;hkgOgl.lib;hkgOgls.lib;hksCommon.lib;hksXAudio2.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Irrlicht.lib;cg.lib;cgD3D9.lib;cgGL.lib;opengl32.lib;alut.lib;OpenAl32.lib;OIS.lib;hkBase.lib;hkSerialize.lib;hkSceneData.lib;hkInternal.lib;hkGeometryUtilities.lib;hkVisualize.lib;hkCompat.lib;hkpCollide.lib;hkpConstraintSolver.lib;hkpDynamics.lib;hkpInternal.lib;hkpUtilities.lib;hkpVehicle.lib;hkaAnimation.lib;hkaInternal.lib;hkaRagdoll.lib;hkgBridge.lib;hkgCommon.lib;hkgDx9.lib;hkgDx9s.lib;hkgDx10.lib;hkgOgl.lib;hkgOgls.lib;hksCommon.lib;hksXAudio2.lib;legacy_stdio_definitions.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
